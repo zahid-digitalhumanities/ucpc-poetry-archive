@@ -1,0 +1,9 @@
+﻿Flask>=2.0
+psycopg2-binary>=2.9
+markupsafe>=2.0
+Werkzeug>=2.0
+deep-translator>=1.9
+pdfplumber>=0.7
+PyPDF2>=3.0
+chardet>=5.0
+gunicorn>=20.0
