@@ -1,0 +1,91 @@
+﻿{% extends "base.html" %}
+{% block title %}{{ poet.name_urdu }} - UCPC Poetry Archive{% endblock %}
+{% block extra_css %}
+<style>
+    .poet-detail-container { max-width: 1200px; margin: 0 auto; }
+    .poet-info-bar { background: linear-gradient(135deg, #fefcf8, #faf7f0); border-radius: 60px; padding: 18px 30px; margin-bottom: 40px; border: 1px solid rgba(212,175,55,0.3); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px; }
+    .poet-name-wrapper { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+    .poet-name-en { font-size: 1.6rem; font-weight: 800; color: #1e3c72; }
+    .poet-name-urdu { font-family: 'Jameel Noori Nastaleeq', serif; font-size: 1.3rem; font-weight: 700; color: #d4af37; direction: rtl; }
+    .poet-years { background: rgba(212,175,55,0.12); padding: 4px 16px; border-radius: 40px; font-size: 0.9rem; }
+    .poet-stat-compact { background: white; padding: 6px 20px; border-radius: 40px; font-size: 0.9rem; font-weight: 600; border: 1px solid rgba(212,175,55,0.2); }
+    .research-metadata { background: #f8f9fc; border-radius: 24px; padding: 20px 30px; margin-bottom: 40px; border: 1px solid rgba(212,175,55,0.25); }
+    .radif-tag, .qaafiya-tag { display: inline-flex; align-items: center; gap: 8px; background: white; border: 1px solid #e2e8f0; border-radius: 40px; padding: 8px 18px; font-family: 'Jameel Noori Nastaleeq', serif; font-size: 1rem; transition: all 0.3s; cursor: pointer; text-decoration: none; color: inherit; }
+    .radif-tag:hover, .qaafiya-tag:hover { border-color: #d4af37; background: #fefcf8; transform: translateY(-2px); }
+    .frequency-badge { background: #d4af37; color: white; border-radius: 30px; padding: 2px 8px; font-size: 0.7rem; }
+    .ghazals-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); gap: 25px; }
+    .ghazal-card { background: white; border-radius: 20px; overflow: hidden; transition: all 0.4s; border: 1px solid rgba(212,175,55,0.2); text-decoration: none; display: block; }
+    .ghazal-card:hover { transform: translateY(-5px); box-shadow: 0 20px 35px rgba(212,175,55,0.15); border-color: #d4af37; }
+    .ghazal-english { background: #1e3c72; padding: 18px 20px; text-align: center; border-bottom: 2px solid #d4af37; }
+    .ghazal-english-text { font-family: 'Georgia', serif; font-size: 1rem; font-weight: 600; color: white; }
+    .ghazal-urdu { padding: 16px 18px; text-align: center; background: #fefcf8; }
+    .ghazal-urdu-text { font-family: 'Jameel Noori Nastaleeq', serif; font-size: 1.2rem; font-weight: 600; color: #1e3c72; direction: rtl; }
+    .ghazal-meta { display: flex; gap: 12px; justify-content: center; padding: 12px 18px; background: #faf7f0; border-top: 1px solid rgba(212,175,55,0.15); }
+    @media (max-width: 768px) { .ghazals-grid { grid-template-columns: 1fr; } }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="poet-detail-container">
+    <div class="poet-info-bar">
+        <div class="poet-name-wrapper">
+            <span class="poet-name-en">{{ poet.name }}</span>
+            <span class="poet-name-urdu">({{ poet.name_urdu }})</span>
+            {% if poet.birth_year or poet.death_year %}
+            <span class="poet-years"><i class="fas fa-calendar-alt"></i> {{ poet.birth_year or '?' }} – {{ poet.death_year or 'Present' }}</span>
+            {% endif %}
+        </div>
+        <div class="poet-stats-wrapper">
+            <div class="poet-stat-compact"><i class="fas fa-book"></i> {{ ghazals|length }} Ghazals</div>
+            {% if ghazals|length > 0 %}<div class="poet-stat-compact"><i class="fas fa-pen-fancy"></i> {{ ghazals|sum(attribute='verse_count') }} Verses</div>{% endif %}
+        </div>
+    </div>
+
+    {% if radif_summary or qaafiya_summary %}
+    <div class="research-metadata">
+        <div class="research-title"><i class="fas fa-microscope"></i> Research Metadata | Gold Standard Corpus</div>
+        <div class="grid md:grid-cols-2 gap-6">
+            {% if radif_summary %}
+            <div>
+                <div class="font-semibold mb-2"><i class="fas fa-repeat"></i> Most Used Radif (ردیف)</div>
+                <div class="flex flex-wrap gap-2">
+                    {% for item in radif_summary %}
+                    <a href="/search?radif={{ item.radif }}" class="radif-tag">{{ item.radif }}<span class="frequency-badge">{{ item.frequency }}</span></a>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+            {% if qaafiya_summary %}
+            <div>
+                <div class="font-semibold mb-2"><i class="fas fa-ruler"></i> Most Used Qaafiya (قافیہ)</div>
+                <div class="flex flex-wrap gap-2">
+                    {% for item in qaafiya_summary %}
+                    <a href="/search?qaafiya={{ item.qaafiya|join(', ') if item.qaafiya is iterable else item.qaafiya }}" class="qaafiya-tag">
+                        {% if item.qaafiya is iterable and item.qaafiya is not string %}{{ item.qaafiya|join(' • ') }}{% else %}{{ item.qaafiya }}{% endif %}
+                        <span class="frequency-badge">{{ item.frequency }}</span>
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="ghazals-section mt-8">
+        <h2 class="text-2xl font-bold text-center mb-8">All Ghazals <span class="bg-gold text-white px-3 py-1 rounded-full text-sm">{{ ghazals|length }}</span></h2>
+        <div class="ghazals-grid">
+            {% for ghazal in ghazals %}
+            <a href="/view/{{ ghazal.id }}" class="ghazal-card">
+                <div class="ghazal-english"><div class="ghazal-english-text">{{ ghazal.title_english or 'Untitled Ghazal' }}</div></div>
+                <div class="ghazal-urdu"><div class="ghazal-urdu-text">{{ ghazal.title_urdu or 'غزل' }}</div></div>
+                <div class="ghazal-meta">
+                    <span><i class="fas fa-pen-fancy"></i> {{ ghazal.verse_count }} verses</span>
+                    {% if ghazal.radif %}<span><i class="fas fa-repeat"></i> {{ ghazal.radif }}</span>{% endif %}
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

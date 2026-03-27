@@ -1,0 +1,301 @@
+﻿{% extends "base.html" %}
+{% block title %}{{ ghazal.title_urdu or ghazal.title_english }} - UCPC Poetry{% endblock %}
+{% block extra_css %}
+<style>
+    .view-container {
+        max-width: 950px;
+        margin: 0 auto;
+    }
+
+    /* HERO */
+    .ghazal-hero {
+        background: linear-gradient(135deg, #0F2B3D, #1E3C72);
+        border-radius: 28px;
+        padding: 60px 30px;
+        margin-bottom: 50px;
+        text-align: center;
+    }
+
+    .hero-poet {
+        font-size: 1rem;
+        letter-spacing: 3px;
+        color: #D4AF37;
+        text-transform: uppercase;
+    }
+
+    .hero-title-english {
+        font-size: 2.4rem;
+        font-weight: 800;
+        color: white;
+        margin: 20px 0;
+    }
+
+    .hero-title-urdu {
+        font-family: 'Jameel Noori Nastaleeq';
+        font-size: 2.3rem;
+        color: #F5E7B2;
+        direction: rtl;
+    }
+
+    .hero-metadata {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        flex-wrap: wrap;
+        margin-top: 25px;
+    }
+
+    .hero-metadata span {
+        background: rgba(255,255,255,0.15);
+        padding: 8px 20px;
+        border-radius: 40px;
+        font-size: 0.9rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-family: 'Jameel Noori Nastaleeq', serif;
+    }
+
+    /* Insight box – scholarly tone */
+    .insight-box {
+        background: #fff9e6;
+        padding: 18px 28px;
+        border-left: 5px solid var(--gold);
+        margin-bottom: 40px;
+        border-radius: 20px;
+        color: #2c3e50;
+        font-size: 1rem;
+        font-style: italic;
+    }
+
+    /* MODE BUTTONS */
+    .mode-switcher {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        margin-bottom: 45px;
+        flex-wrap: wrap;
+    }
+    .mode-btn {
+        padding: 10px 26px;
+        border-radius: 50px;
+        border: 1px solid #ddd;
+        font-weight: 600;
+        background: white;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .mode-btn.active {
+        background: #1E3C72;
+        color: white;
+        border-color: var(--gold);
+    }
+
+    /* VERSE CARD */
+    .verse-card {
+        margin-bottom: 12px;   /* FIXED spacing */
+        padding: 20px 25px;
+        border-radius: 20px;
+        background: #ffffff;
+        border: 1px solid #f0f0f0;
+        transition: 0.25s;
+    }
+    .verse-card:hover {
+        border-color: #D4AF37;
+    }
+
+    /* BILINGUAL GRID */
+    .bilingual-block {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 30px;
+    }
+    /* URDU */
+    .urdu-side {
+        font-family: 'Jameel Noori Nastaleeq';
+        font-size: 1.9rem;
+        line-height: 2.6rem;
+        text-align: right;
+        direction: rtl;
+        color: #0F2B3D;
+    }
+    /* ENGLISH */
+    .english-side {
+        font-family: 'Georgia';
+        font-size: 1.15rem;
+        line-height: 2rem;
+        color: #444;
+    }
+    /* SINGLE MODES */
+    .urdu-only-block .urdu-text-center {
+        font-family: 'Jameel Noori Nastaleeq';
+        font-size: 2.2rem;
+        line-height: 3rem;
+        text-align: center;
+    }
+    .english-only-block .english-text-center {
+        font-family: 'Georgia';
+        font-size: 1.3rem;
+        text-align: center;
+    }
+    /* VERSE NUMBER */
+    .verse-number {
+        font-size: 0.7rem;
+        color: #aaa;
+        margin-bottom: 6px;
+    }
+
+    /* Navigation Buttons */
+    .nav-buttons {
+        display: flex;
+        gap: 20px;
+        margin-top: 50px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    .nav-btn {
+        padding: 12px 32px;
+        border-radius: 60px;
+        transition: all 0.2s;
+        font-weight: 700;
+        font-size: 1rem;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .nav-btn-prev, .nav-btn-next {
+        background: #1e3c72;
+        color: white;
+    }
+    .nav-btn-all {
+        background: var(--gold);
+        color: white;
+    }
+    .nav-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 14px rgba(0,0,0,0.15);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .ghazal-hero {
+            padding: 30px 20px;
+        }
+        .hero-title-english {
+            font-size: 1.6rem;
+        }
+        .hero-title-urdu {
+            font-size: 1.5rem;
+        }
+        .bilingual-block {
+            grid-template-columns: 1fr;
+            gap: 30px;
+        }
+        .urdu-side {
+            border-right: none;
+            border-bottom: 2px solid var(--gold);
+            padding-right: 0;
+            padding-bottom: 20px;
+            font-size: 1.6rem;
+            line-height: 2.4rem;
+        }
+        .english-side {
+            border-left: none;
+            border-top: 2px solid var(--gold);
+            padding-left: 0;
+            padding-top: 20px;
+            font-size: 1rem;
+            line-height: 1.6rem;
+        }
+        .verse-card {
+            padding: 15px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="view-container">
+    <div class="ghazal-hero">
+        <div class="hero-poet">{{ ghazal.poet_name | upper }}</div>
+        <div class="hero-title-english">{{ ghazal.title_english or 'Untitled' }}</div>
+        <div class="hero-title-urdu">{{ ghazal.title_urdu }}</div>
+        <div class="hero-metadata">
+            {% if ghazal.radif %}<span><i class="fas fa-repeat"></i> Radif: {{ ghazal.radif }}</span>{% endif %}
+            {% if ghazal.qaafiya %}<span><i class="fas fa-ruler"></i> Qaafiya: {% if ghazal.qaafiya is iterable and not ghazal.qaafiya is string %}{{ ghazal.qaafiya | join(' • ') }}{% else %}{{ ghazal.qaafiya }}{% endif %}</span>{% endif %}
+            <span><i class="fas fa-book"></i> {{ verses|length }} verses</span>
+        </div>
+    </div>
+
+    <div class="insight-box">
+        <strong>📖 Research Insight:</strong> This ghazal follows
+        {% if ghazal.radif %} Radif "<b>{{ ghazal.radif }}</b>"{% endif %}
+        {% if ghazal.qaafiya %}{% if ghazal.radif %} and {% endif %} Qaafiya pattern <b>{% if ghazal.qaafiya is iterable and not ghazal.qaafiya is string %}{{ ghazal.qaafiya | join(' • ') }}{% else %}{{ ghazal.qaafiya }}{% endif %}</b>{% endif %}
+        {% if not ghazal.radif and not ghazal.qaafiya %}(no radif/qaafiya data available){% endif %}
+        <br><span class="text-sm">This ghazal explores themes of longing, metaphysical absence, and poetic self-reflection—hallmarks of classical Urdu poetics.</span>
+    </div>
+
+    <div class="mode-switcher">
+        <button class="mode-btn" data-mode="bilingual">📖 Bilingual</button>
+        <button class="mode-btn" data-mode="urdu">🇵🇰 اردو</button>
+        <button class="mode-btn" data-mode="english">🇬🇧 English</button>
+        <button id="reading-mode-toggle" class="mode-btn">📖 Reading Mode</button>
+    </div>
+
+    {% for verse in verses %}
+    <div class="verse-card">
+        <div class="bilingual-block">
+            <div class="urdu-side">
+                <div class="verse-number">{{ verse.couplet_index }}</div>
+                <div>{{ verse.misra1_urdu }}</div>
+                <div>{{ verse.misra2_urdu }}</div>
+            </div>
+            <div class="english-side">
+                <div class="verse-number">{{ verse.couplet_index }}</div>
+                <div>{{ verse.misra1_english or 'Translation coming soon...' }}</div>
+                <div>{{ verse.misra2_english or 'Translation coming soon...' }}</div>
+            </div>
+        </div>
+        <div class="urdu-only-block" style="display:none;">
+            <div class="urdu-text-center">{{ verse.misra1_urdu }}<br>{{ verse.misra2_urdu }}</div>
+        </div>
+        <div class="english-only-block" style="display:none;">
+            <div class="english-text-center">{{ verse.misra1_english or 'Translation coming soon...' }}<br>{{ verse.misra2_english or 'Translation coming soon...' }}</div>
+        </div>
+    </div>
+    {% endfor %}
+
+    <div class="nav-buttons">
+        {% if prev_id %}<a href="/view/{{ prev_id }}" class="nav-btn nav-btn-prev"><i class="fas fa-chevron-left"></i> Previous</a>{% endif %}
+        <a href="/poet/{{ ghazal.poet_id }}" class="nav-btn nav-btn-all"><i class="fas fa-list"></i> All Poems</a>
+        {% if next_id %}<a href="/view/{{ next_id }}" class="nav-btn nav-btn-next">Next <i class="fas fa-chevron-right"></i></a>{% endif %}
+    </div>
+</div>
+
+<script>
+let currentMode = "{{ mode }}";
+function applyMode(mode) {
+    document.querySelectorAll('.bilingual-block, .urdu-only-block, .english-only-block').forEach(el => el.style.display = 'none');
+    if (mode === 'bilingual') document.querySelectorAll('.bilingual-block').forEach(el => el.style.display = 'grid');
+    else if (mode === 'urdu') document.querySelectorAll('.urdu-only-block').forEach(el => el.style.display = 'block');
+    else if (mode === 'english') document.querySelectorAll('.english-only-block').forEach(el => el.style.display = 'block');
+    document.querySelectorAll('.mode-btn[data-mode]').forEach(btn => btn.classList.remove('active'));
+    const activeBtn = document.querySelector(`.mode-btn[data-mode="${mode}"]`);
+    if (activeBtn) activeBtn.classList.add('active');
+}
+document.addEventListener('DOMContentLoaded', () => applyMode(currentMode));
+document.querySelectorAll('.mode-btn[data-mode]').forEach(btn => btn.addEventListener('click', () => {
+    const mode = btn.dataset.mode;
+    fetch("{{ url_for('ghazals.set_mode', mode='') }}" + mode).catch(console.warn);
+    applyMode(mode);
+}));
+
+// Reading Mode Toggle
+const readingBtn = document.getElementById('reading-mode-toggle');
+readingBtn.addEventListener('click', () => {
+    document.body.classList.toggle('reading-mode');
+    readingBtn.textContent = document.body.classList.contains('reading-mode') ? '📖 Exit Reading Mode' : '📖 Reading Mode';
+});
+</script>
+{% endblock %}
