@@ -7,7 +7,7 @@ import re
 import uuid
 import hashlib
 from models.ghazal_model import get_stats, get_all_poets, get_db
-from bulk_model import (
+from models.bulk_model import (
     is_duplicate, get_or_create_contributor,
     insert_ghazal_bulk, get_books_by_poet
 )

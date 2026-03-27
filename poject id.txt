@@ -1,0 +1,6 @@
+vxfdajpggxebqskwgnyl
+
+connecting string
+
+
+postgresql://postgres:Mano%40pln3877@db.vxfdajpggxebqskwgnyl.supabase.co:5432/postgres
