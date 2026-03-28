@@ -74,12 +74,74 @@
         ::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
         ::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+
+        /* Marquee styles – exactly matching attached index.html */
+        .nav-marquee {
+            background: #1e293b;  /* dark background, like header/footer */
+            border-bottom: 1px solid rgba(212,175,55,0.5);
+            border-top: 1px solid rgba(212,175,55,0.5);
+            overflow: hidden;
+            white-space: nowrap;
+            padding: 10px 0;
+            position: relative;
+            z-index: 10;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        .marquee-content {
+            display: inline-block;
+            animation: marquee 45s linear infinite;
+            font-size: 0.9rem;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+        }
+        .marquee-content a {
+            color: #F5E7B2;  /* light gold */
+            text-decoration: none;
+            transition: all 0.2s;
+            margin: 0 4px;
+        }
+        .marquee-content a:hover {
+            color: #D4AF37;
+            text-decoration: underline;
+        }
+        .marquee-content span {
+            color: #e2e8f0;  /* light gray for separators and non-link text */
+            padding-right: 2rem;
+        }
+        @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+        @media (max-width: 768px) {
+            .marquee-content { animation-duration: 60s; font-size: 0.8rem; }
+        }
     </style>
     {% block extra_css %}{% endblock %}
 </head>
 <body>
     <div class="app-wrapper">
         {% include 'header.html' %}
+
+        <!-- MARQUEE – matching style of attached index.html, with hyperlinks -->
+        <div class="nav-marquee">
+            <div class="marquee-content">
+                <span>
+                    <a href="/poets">📜 Poets: Click to view a complete list of poets. Select your favorite poet to read their Ghazals. Explore Poets →</a> &nbsp;|&nbsp;
+                    <a href="/ghazals/add">📖 Add: Click to submit your own Ghazal and share it with the community. Contribute →</a> &nbsp;|&nbsp;
+                    <a href="/search">🔍 Search: Search by voice or type any keyword to find specific poems. Search Now →</a> &nbsp;|&nbsp;
+                    <a href="/bulk">📤 Bulk: Use this option to upload or write multiple Ghazals at once. Bulk Upload →</a> &nbsp;|&nbsp;
+                    ✨ Special Thanks to Mr. Muhammad Riaz (OSI SPU), Punjab Police, Lahore, for his invaluable inspiration and guidance. ✨
+                </span>
+                <span>
+                    <a href="/poets">📜 Poets: Click to view a complete list of poets. Select your favorite poet to read their Ghazals. Explore Poets →</a> &nbsp;|&nbsp;
+                    <a href="/ghazals/add">📖 Add: Click to submit your own Ghazal and share it with the community. Contribute →</a> &nbsp;|&nbsp;
+                    <a href="/search">🔍 Search: Search by voice or type any keyword to find specific poems. Search Now →</a> &nbsp;|&nbsp;
+                    <a href="/bulk">📤 Bulk: Use this option to upload or write multiple Ghazals at once. Bulk Upload →</a> &nbsp;|&nbsp;
+                    ✨ Special Thanks to Mr. Muhammad Riaz (OSI SPU), Punjab Police, Lahore, for his invaluable inspiration and guidance. ✨
+                </span>
+            </div>
+        </div>
+
         {% include 'navbar.html' %}
 
         <!-- Flash Messages -->
