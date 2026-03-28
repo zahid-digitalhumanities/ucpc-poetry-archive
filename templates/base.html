@@ -4,6 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>{% block title %}UCPC - Urdu Computational Philology Corpus{% endblock %}</title>
+
+    <!-- Open Graph / Social Media Meta Tags -->
+    <meta property="og:title" content="{% block og_title %}UCPC Poetry Archive{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}A research-grade digital archive of Urdu poetry with bilingual content, advanced search, voice input, and bulk upload.{% endblock %}">
+    <meta property="og:image" content="{% block og_image %}{{ url_for('static', filename='images/og-image.png', _external=True) }}{% endblock %}">
+    <meta property="og:url" content="{{ request.url }}">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ self.og_title() }}">
+    <meta name="twitter:description" content="{{ self.og_description() }}">
+    <meta name="twitter:image" content="{{ self.og_image() }}">
+
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts -->
