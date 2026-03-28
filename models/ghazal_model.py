@@ -1,4 +1,5 @@
 ﻿# models/ghazal_model.py
+import uuid                     # ✅ Added missing import
 from models.base import get_db_connection
 
 def get_db():
@@ -118,7 +119,7 @@ def insert_ghazal(poet_id, book_id, contributor_id, title_urdu, title_english,
                   text_urdu, text_english, content_hash, verse_count):
     with get_db_connection() as conn:
         with conn.cursor() as cur:
-            public_id = str(uuid.uuid4())[:8]
+            public_id = str(uuid.uuid4())[:8]   # ✅ uuid imported
             cur.execute("""
                 INSERT INTO texts (public_id, poet_id, book_id, contributor_id,
                                    title_urdu, title_english, text_urdu, text_english,
