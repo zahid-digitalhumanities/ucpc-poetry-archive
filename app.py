@@ -6,6 +6,7 @@ from routes.ghazals_routes import ghazals_bp
 from routes.search_routes import search_bp
 from routes.bulk_routes import bulk_bp
 from models.stats_model import get_stats
+from routes.listen_routes import listen_bp
 
 app = Flask(__name__)
 app.secret_key = 'your-secret-key-here'
@@ -15,6 +16,7 @@ app.register_blueprint(poets_bp)
 app.register_blueprint(ghazals_bp)
 app.register_blueprint(search_bp)
 app.register_blueprint(bulk_bp)
+app.register_blueprint(listen_bp)
 
 @app.route('/admin/add_ghazal')
 def redirect_add_ghazal():
