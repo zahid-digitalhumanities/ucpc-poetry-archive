@@ -1,42 +1,64 @@
-﻿from flask import Flask, redirect, url_for, render_template
-from flask import Flask, redirect, url_for
+from flask import Flask, redirect, url_for, render_template
+import os
+
+# Blueprints
 from routes.main_routes import main_bp
 from routes.poets_routes import poets_bp
 from routes.ghazals_routes import ghazals_bp
 from routes.search_routes import search_bp
 from routes.bulk_routes import bulk_bp
-from models.stats_model import get_stats
 from routes.listen_routes import listen_bp
 
-app = Flask(__name__)
-app.secret_key = 'your-secret-key-here'
+# Models
+from models.stats_model import get_stats
 
-app.register_blueprint(main_bp)
-app.register_blueprint(poets_bp)
-app.register_blueprint(ghazals_bp)
-app.register_blueprint(search_bp)
-app.register_blueprint(bulk_bp)
-app.register_blueprint(listen_bp)
 
-@app.route('/admin/add_ghazal')
-def redirect_add_ghazal():
-    return redirect(url_for('ghazals.add_ghazal'))
+def create_app():
+    app = Flask(__name__)
 
-@app.route('/view/<int:text_id>')
-def redirect_view(text_id):
-    return redirect(url_for('ghazals.view_ghazal', text_id=text_id))
+    # 🔐 Secret Key (env safe)
+    app.secret_key = os.getenv('SECRET_KEY', 'dev-secret-key')
 
-@app.context_processor
-def inject_stats():
-    return dict(stats=get_stats())
+    # ✅ Register Blueprints
+    app.register_blueprint(main_bp)
+    app.register_blueprint(poets_bp)
+    app.register_blueprint(ghazals_bp)
+    app.register_blueprint(search_bp)
+    app.register_blueprint(bulk_bp)
+    app.register_blueprint(listen_bp)
 
-@app.errorhandler(404)
-def page_not_found(e):
-    return render_template('404.html'), 404
+    # 🔁 Redirect routes (clean URLs)
+    @app.route('/admin/add_ghazal')
+    def redirect_add_ghazal():
+        return redirect(url_for('ghazals.add_ghazal'))
 
-@app.errorhandler(500)
-def internal_server_error(e):
-    return render_template('500.html'), 500
+    @app.route('/view/<int:text_id>')
+    def redirect_view(text_id):
+        return redirect(url_for('ghazals.view_ghazal', text_id=text_id))
 
+    # 📊 Global stats (available in all templates)
+    @app.context_processor
+    def inject_stats():
+        try:
+            return dict(stats=get_stats())
+        except Exception as e:
+            print("⚠️ Stats error:", str(e))
+            return dict(stats=None)
+
+    # ❌ 404 Error Page
+    @app.errorhandler(404)
+    def page_not_found(e):
+        return render_template('404.html'), 404
+
+    # ❌ 500 Error Page
+    @app.errorhandler(500)
+    def internal_server_error(e):
+        return render_template('500.html'), 500
+
+    return app
+
+
+# 🚀 Run App
 if __name__ == '__main__':
+    app = create_app()
     app.run(debug=True)
