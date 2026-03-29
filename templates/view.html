@@ -1,25 +1,245 @@
-﻿﻿{% extends "base.html" %}
+{% extends "base.html" %}
 {% block title %}{{ ghazal.title_urdu or ghazal.title_english }} - UCPC Poetry{% endblock %}
+
 {% block extra_css %}
 <style>
-    /* ... (your existing CSS remains unchanged) ... */
-    /* Add a small style for the listen button if needed */
+    :root {
+        --primary: #1E3C72;
+        --gold: #D4AF37;
+        --light-bg: #f9fafb;
+        --card-shadow: 0 10px 25px -5px rgba(0,0,0,0.05), 0 8px 10px -6px rgba(0,0,0,0.02);
+    }
+
+    .view-container {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 0 1rem;
+    }
+
+    /* Hero Section */
+    .ghazal-hero {
+        background: linear-gradient(135deg, #0F2B3D, #1E3C72);
+        border-radius: 2rem;
+        padding: 3rem 1.5rem;
+        margin-bottom: 2rem;
+        text-align: center;
+        color: white;
+        box-shadow: var(--card-shadow);
+    }
+    .hero-poet {
+        font-size: 0.85rem;
+        letter-spacing: 3px;
+        color: var(--gold);
+        text-transform: uppercase;
+    }
+    .hero-title-english {
+        font-size: 1.8rem;
+        font-weight: 700;
+        margin: 1rem 0 0.5rem;
+    }
+    .hero-title-urdu {
+        font-family: 'Jameel Noori Nastaleeq', 'Noto Nastaliq Urdu', serif;
+        font-size: 2rem;
+        color: #F5E7B2;
+        direction: rtl;
+        margin-bottom: 1rem;
+    }
+    .hero-metadata {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        margin-top: 1.5rem;
+    }
+    .hero-metadata span {
+        background: rgba(255,255,255,0.15);
+        padding: 0.4rem 1rem;
+        border-radius: 2rem;
+        font-size: 0.8rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
     .listen-btn {
         background: var(--gold);
         color: #1E3C72;
         border: none;
         font-weight: bold;
-        padding: 8px 20px;
-        border-radius: 40px;
+        padding: 0.4rem 1.2rem;
+        border-radius: 2rem;
         transition: all 0.2s;
+        cursor: pointer;
     }
     .listen-btn:hover {
         transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
     }
+
+    /* Insight Box */
+    .insight-box {
+        background: #fff9e6;
+        border-left: 5px solid var(--gold);
+        padding: 1rem 1.5rem;
+        border-radius: 1rem;
+        margin-bottom: 2rem;
+        font-size: 0.9rem;
+        color: #2c3e50;
+    }
+
+    /* Mode Switcher */
+    .mode-switcher {
+        display: flex;
+        justify-content: center;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+        margin-bottom: 2rem;
+    }
+    .mode-btn {
+        padding: 0.5rem 1.2rem;
+        border-radius: 2rem;
+        border: 1px solid #ddd;
+        background: white;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .mode-btn.active {
+        background: var(--primary);
+        color: white;
+        border-color: var(--gold);
+    }
+
+    /* Audio Player Container */
     .audio-player-container {
-        margin-top: 20px;
+        background: #f1f5f9;
+        border-radius: 3rem;
+        padding: 1rem;
+        margin-bottom: 2rem;
         text-align: center;
+        display: none;
+    }
+    audio {
+        width: 100%;
+        max-width: 500px;
+        border-radius: 2rem;
+    }
+
+    /* Verse Cards */
+    .verse-card {
+        background: white;
+        border-radius: 1.25rem;
+        padding: 1.25rem;
+        margin-bottom: 1rem;
+        box-shadow: var(--card-shadow);
+        border: 1px solid #eef2f6;
+        transition: 0.2s;
+    }
+    .verse-card:hover {
+        border-color: var(--gold);
+    }
+
+    /* Bilingual Grid */
+    .bilingual-block {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+    }
+    .urdu-side {
+        font-family: 'Jameel Noori Nastaleeq', 'Noto Nastaliq Urdu', serif;
+        font-size: 1.6rem;
+        line-height: 2.4rem;
+        text-align: right;
+        direction: rtl;
+        color: #0F2B3D;
+        word-break: break-word;
+    }
+    .english-side {
+        font-family: 'Georgia', serif;
+        font-size: 1rem;
+        line-height: 1.6rem;
+        color: #334155;
+        word-break: break-word;
+    }
+    .verse-number {
+        font-size: 0.7rem;
+        color: #94a3b8;
+        margin-bottom: 0.5rem;
+        letter-spacing: 1px;
+    }
+
+    /* Single language modes */
+    .urdu-only-block, .english-only-block {
+        display: none;
+    }
+    .urdu-only-block .urdu-text-center {
+        font-family: 'Jameel Noori Nastaleeq', serif;
+        font-size: 1.8rem;
+        line-height: 2.8rem;
+        text-align: center;
+        direction: rtl;
+    }
+    .english-only-block .english-text-center {
+        font-family: 'Georgia', serif;
+        font-size: 1.2rem;
+        text-align: center;
+        line-height: 1.8rem;
+    }
+
+    /* Navigation Buttons */
+    .nav-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        margin: 2.5rem 0 2rem;
+        flex-wrap: wrap;
+    }
+    .nav-btn {
+        padding: 0.6rem 1.5rem;
+        border-radius: 2rem;
+        text-decoration: none;
+        font-weight: 600;
+        transition: 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .nav-btn-prev, .nav-btn-next {
+        background: var(--primary);
+        color: white;
+    }
+    .nav-btn-all {
+        background: var(--gold);
+        color: #1E3C72;
+    }
+    .nav-btn:hover {
+        transform: translateY(-2px);
+        filter: brightness(0.95);
+    }
+
+    /* Responsive */
+    @media (max-width: 720px) {
+        .bilingual-block {
+            grid-template-columns: 1fr;
+            gap: 0.8rem;
+        }
+        .urdu-side {
+            border-bottom: 1px dashed #ddd;
+            padding-bottom: 0.8rem;
+            font-size: 1.4rem;
+            line-height: 2.2rem;
+        }
+        .english-side {
+            padding-top: 0.2rem;
+        }
+        .hero-title-english {
+            font-size: 1.4rem;
+        }
+        .hero-title-urdu {
+            font-size: 1.6rem;
+        }
+        .verse-card {
+            padding: 1rem;
+        }
     }
 </style>
 {% endblock %}
@@ -34,21 +254,20 @@
             {% if ghazal.radif %}<span><i class="fas fa-repeat"></i> Radif: {{ ghazal.radif }}</span>{% endif %}
             {% if ghazal.qaafiya %}<span><i class="fas fa-ruler"></i> Qaafiya: {% if ghazal.qaafiya is iterable and not ghazal.qaafiya is string %}{{ ghazal.qaafiya | join(' • ') }}{% else %}{{ ghazal.qaafiya }}{% endif %}</span>{% endif %}
             <span><i class="fas fa-book"></i> {{ verses|length }} verses</span>
-            <!-- Listen Button -->
-            <span>
-                <button id="listenBtn" class="listen-btn" onclick="playAudio({{ ghazal.id }})">
-                    <i class="fas fa-headphones"></i> Listen Ghazal
-                </button>
-            </span>
+            <span><button class="listen-btn" onclick="playAudio({{ ghazal.id }})"><i class="fas fa-headphones"></i> Listen Ghazal</button></span>
         </div>
     </div>
 
     <div class="insight-box">
-        <strong>📖 Research Insight:</strong> This ghazal follows
-        {% if ghazal.radif %} Radif "<b>{{ ghazal.radif }}</b>"{% endif %}
-        {% if ghazal.qaafiya %}{% if ghazal.radif %} and {% endif %} Qaafiya pattern <b>{% if ghazal.qaafiya is iterable and not ghazal.qaafiya is string %}{{ ghazal.qaafiya | join(' • ') }}{% else %}{{ ghazal.qaafiya }}{% endif %}</b>{% endif %}
-        {% if not ghazal.radif and not ghazal.qaafiya %}(no radif/qaafiya data available){% endif %}
-        <br><span class="text-sm">This ghazal explores themes of longing, metaphysical absence, and poetic self-reflection—hallmarks of classical Urdu poetics.</span>
+        <strong>📖 Research Insight:</strong> 
+        {% if ghazal.radif or ghazal.qaafiya %}
+            This ghazal follows 
+            {% if ghazal.radif %} Radif "<b>{{ ghazal.radif }}</b>"{% endif %}
+            {% if ghazal.qaafiya %}{% if ghazal.radif %} and {% endif %} Qaafiya pattern <b>{% if ghazal.qaafiya is iterable and not ghazal.qaafiya is string %}{{ ghazal.qaafiya | join(' • ') }}{% else %}{{ ghazal.qaafiya }}{% endif %}</b>{% endif %}.
+        {% else %}
+            (No radif/qaafiya data available)
+        {% endif %}
+        <br><span class="text-sm">This ghazal explores themes of longing, metaphysical absence, and poetic self-reflection — hallmarks of classical Urdu poetics.</span>
     </div>
 
     <div class="mode-switcher">
@@ -58,10 +277,9 @@
         <button id="reading-mode-toggle" class="mode-btn">📖 Reading Mode</button>
     </div>
 
-    <!-- Audio Player (initially hidden) -->
-    <div class="audio-player-container" id="audioContainer" style="display:none;">
-        <span id="loading" style="display:none;">Loading audio...</span>
-        <audio id="audioPlayer" controls class="mt-3 w-100"></audio>
+    <div class="audio-player-container" id="audioContainer">
+        <span id="loading" style="display: none;">⏳ Loading audio...</span>
+        <audio id="audioPlayer" controls preload="none"></audio>
     </div>
 
     {% for verse in verses %}
@@ -95,43 +313,48 @@
 </div>
 
 <script>
-let currentMode = "{{ mode }}";
+let currentMode = "{{ mode|default('bilingual') }}";
+
 function applyMode(mode) {
     document.querySelectorAll('.bilingual-block, .urdu-only-block, .english-only-block').forEach(el => el.style.display = 'none');
-    if (mode === 'bilingual') document.querySelectorAll('.bilingual-block').forEach(el => el.style.display = 'grid');
-    else if (mode === 'urdu') document.querySelectorAll('.urdu-only-block').forEach(el => el.style.display = 'block');
-    else if (mode === 'english') document.querySelectorAll('.english-only-block').forEach(el => el.style.display = 'block');
+    if (mode === 'bilingual') {
+        document.querySelectorAll('.bilingual-block').forEach(el => el.style.display = 'grid');
+    } else if (mode === 'urdu') {
+        document.querySelectorAll('.urdu-only-block').forEach(el => el.style.display = 'block');
+    } else if (mode === 'english') {
+        document.querySelectorAll('.english-only-block').forEach(el => el.style.display = 'block');
+    }
     document.querySelectorAll('.mode-btn[data-mode]').forEach(btn => btn.classList.remove('active'));
-    const activeBtn = document.querySelector(`.mode-btn[data-mode="${mode}"]`);
+    let activeBtn = document.querySelector(`.mode-btn[data-mode="${mode}"]`);
     if (activeBtn) activeBtn.classList.add('active');
 }
-document.addEventListener('DOMContentLoaded', () => applyMode(currentMode));
-document.querySelectorAll('.mode-btn[data-mode]').forEach(btn => btn.addEventListener('click', () => {
-    const mode = btn.dataset.mode;
-    fetch("{{ url_for('ghazals.set_mode', mode='') }}" + mode).catch(console.warn);
-    applyMode(mode);
-}));
 
-// Reading Mode Toggle
+document.addEventListener('DOMContentLoaded', () => {
+    applyMode(currentMode);
+    document.querySelectorAll('.mode-btn[data-mode]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            let mode = btn.dataset.mode;
+            fetch("{{ url_for('ghazals.set_mode', mode='') }}" + mode).catch(console.warn);
+            applyMode(mode);
+        });
+    });
+});
+
+// Reading mode
 const readingBtn = document.getElementById('reading-mode-toggle');
 readingBtn.addEventListener('click', () => {
     document.body.classList.toggle('reading-mode');
     readingBtn.textContent = document.body.classList.contains('reading-mode') ? '📖 Exit Reading Mode' : '📖 Reading Mode';
 });
 
-// ========== Audio Playback Function ==========
+// Audio playback
 function playAudio(id) {
     const container = document.getElementById('audioContainer');
     const player = document.getElementById('audioPlayer');
     const loading = document.getElementById('loading');
     if (!player) return;
-
-    // Show the audio player
     container.style.display = 'block';
-
-    // Show loading indicator
     if (loading) loading.style.display = 'inline';
-
     player.src = `/listen/${id}`;
     player.oncanplay = () => {
         if (loading) loading.style.display = 'none';
