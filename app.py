@@ -61,8 +61,6 @@ def create_app():
         return render_template('500.html'), 500
 
     return app
-
-
 # 🚀 Run
 app = create_app()
 
