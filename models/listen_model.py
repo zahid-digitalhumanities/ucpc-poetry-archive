@@ -2,7 +2,7 @@ import os
 from elevenlabs.client import ElevenLabs
 
 # API Key (env variable)
-client = ElevenLabs(api_key=sk_7cfc32b51a15329727cacd1c99ebbe1d249015d6962371bd"))
+client = ElevenLabs(api_key="sk_7cfc32b51a15329727cacd1c99ebbe1d249015d6962371bd")
 
 # Audio folder
 AUDIO_FOLDER = "static/audio"
