@@ -16,7 +16,7 @@ from models.stats_model import get_stats
 def create_app():
     app = Flask(__name__)
 
-    # 🔐 Secret Key (env safe)
+    # 🔐 Secret Key
     app.secret_key = os.getenv('SECRET_KEY', 'dev-secret-key')
 
     # ✅ Register Blueprints
@@ -27,7 +27,7 @@ def create_app():
     app.register_blueprint(bulk_bp)
     app.register_blueprint(listen_bp)
 
-    # 🔁 Redirect routes (clean URLs)
+    # 🔁 Redirect routes
     @app.route('/admin/add_ghazal')
     def redirect_add_ghazal():
         return redirect(url_for('ghazals.add_ghazal'))
@@ -36,7 +36,12 @@ def create_app():
     def redirect_view(text_id):
         return redirect(url_for('ghazals.view_ghazal', text_id=text_id))
 
-    # 📊 Global stats (available in all templates)
+    # 🧪 Debug route
+    @app.route('/check')
+    def check():
+        return "OK WORKING"
+
+    # 📊 Global stats
     @app.context_processor
     def inject_stats():
         try:
@@ -45,12 +50,12 @@ def create_app():
             print("⚠️ Stats error:", str(e))
             return dict(stats=None)
 
-    # ❌ 404 Error Page
+    # ❌ 404
     @app.errorhandler(404)
     def page_not_found(e):
         return render_template('404.html'), 404
 
-    # ❌ 500 Error Page
+    # ❌ 500
     @app.errorhandler(500)
     def internal_server_error(e):
         return render_template('500.html'), 500
@@ -58,9 +63,8 @@ def create_app():
     return app
 
 
-# 🚀 Run App
-# For production (gunicorn) and development
+# 🚀 Run
 app = create_app()
 
 if __name__ == '__main__':
-    app.run(debug=True))
+    app.run(debug=True)
