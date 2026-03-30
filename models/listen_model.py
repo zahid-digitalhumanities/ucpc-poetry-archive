@@ -1,7 +1,8 @@
 import os
 from elevenlabs import ElevenLabs
 
-client = ElevenLabs(api_key="sk_7cfc32b51a15329727cacd1c99ebbe1d249015d6962371bd")
+# Read the API key from the environment variable (set on Render)
+client = ElevenLabs(api_key=os.getenv("ELEVENLABS_API_KEY"))
 
 AUDIO_FOLDER = "static/audio"
 os.makedirs(AUDIO_FOLDER, exist_ok=True)
