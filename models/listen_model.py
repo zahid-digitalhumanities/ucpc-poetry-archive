@@ -1,17 +1,8 @@
 import os
 from elevenlabs import generate, save, set_api_key
 
-# 🔐 Load API key
-API_KEY = os.getenv("ELEVENLABS_API_KEY")
+set_api_key(os.getenv("ELEVENLABS_API_KEY"))
 
-if not API_KEY:
-    print("❌ ELEVENLABS_API_KEY is NOT set")
-else:
-    print("✅ ElevenLabs API Key Loaded")
-
-set_api_key(API_KEY)
-
-# 📁 Audio folder
 AUDIO_FOLDER = "static/audio"
 os.makedirs(AUDIO_FOLDER, exist_ok=True)
 
@@ -19,50 +10,35 @@ os.makedirs(AUDIO_FOLDER, exist_ok=True)
 def generate_audio(text_id, urdu_text, english_text):
     filename = os.path.join(AUDIO_FOLDER, f"{text_id}.mp3")
 
-    print("\n" + "="*50)
-    print("🎧 GENERATE AUDIO START")
-    print(f"TEXT ID: {text_id}")
-
-    # ✅ Use cached file
+    # ✅ 1. Return cached audio instantly
     if os.path.exists(filename):
-        print("⚡ Using cached audio")
-        print(f"FILE SIZE: {os.path.getsize(filename)} bytes")
+        print("⚡ Using cached audio:", filename)
         return filename
 
-    # 📝 Select text
+    # 📝 Prepare text
     text = urdu_text if urdu_text else english_text
 
     if not text:
-        print("❌ ERROR: No text available")
+        print("❌ No text found")
         return None
 
-    print(f"TEXT PREVIEW: {text[:100]}")
+    # 🔥 LIMIT TEXT (VERY IMPORTANT)
+    text = text[:2000]
 
     try:
-        # ✅ FIXED VOICE (multilingual supported)
+        print("⏳ Generating audio...")
+
         audio = generate(
             text=text,
-            voice="EXAVITQu4vr4xnSDxMaL",  # 🔥 BEST multilingual voice
+            voice="EXAVITQu4vr4xnSDxMaL",
             model="eleven_multilingual_v2"
         )
 
         save(audio, filename)
 
-        # ✅ Verify file
-        if os.path.exists(filename):
-            size = os.path.getsize(filename)
-            print(f"✅ AUDIO SAVED: {filename}")
-            print(f"📦 FILE SIZE: {size} bytes")
-
-            if size == 0:
-                print("❌ ERROR: Empty audio file")
-                return None
-
-            return filename
-        else:
-            print("❌ ERROR: File not created")
-            return None
+        print("✅ Saved:", filename)
+        return filename
 
     except Exception as e:
-        print("❌ ELEVENLABS ERROR:", str(e))
+        print("❌ ElevenLabs Error:", e)
         return None
