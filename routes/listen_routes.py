@@ -27,7 +27,18 @@ def listen(text_id):
 
     filepath = generate_audio(text_id, urdu_text, english_text)
 
+    # Debug prints
+    print("="*50)
+    print(f"TEXT ID: {text_id}")
+    print(f"FILE PATH: {filepath}")
+    if filepath and os.path.exists(filepath):
+        size = os.path.getsize(filepath)
+        print(f"FILE SIZE: {size} bytes")
+    else:
+        print("FILE DOES NOT EXIST")
+    print("="*50)
+
     if not filepath or not os.path.exists(filepath):
-        return "AUDIO GENERATION FAILED"
+        return "AUDIO GENERATION FAILED – file missing"
 
     return send_file(filepath, mimetype="audio/mpeg")
