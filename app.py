@@ -27,6 +27,8 @@ def create_app():
     app.register_blueprint(bulk_bp)
     app.register_blueprint(listen_bp)
 
+    print("🔥 Blueprints registered successfully")
+
     # 🔁 Redirect routes
     @app.route('/admin/add_ghazal')
     def redirect_add_ghazal():
@@ -40,6 +42,11 @@ def create_app():
     @app.route('/check')
     def check():
         return "OK WORKING"
+
+    # 🔥 ROUTE DEBUG (VERY IMPORTANT)
+    @app.route('/routes')
+    def show_routes():
+        return "<br>".join([str(rule) for rule in app.url_map.iter_rules()])
 
     # 📊 Global stats
     @app.context_processor
@@ -61,7 +68,9 @@ def create_app():
         return render_template('500.html'), 500
 
     return app
-# 🚀 Run
+
+
+# 🚀 Run App
 app = create_app()
 
 if __name__ == '__main__':
