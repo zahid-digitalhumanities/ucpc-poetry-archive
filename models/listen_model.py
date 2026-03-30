@@ -1,8 +1,8 @@
 import os
-from elevenlabs import ElevenLabs
+from elevenlabs import generate, save, set_api_key
 
-# Read the API key from the environment variable (set on Render)
-client = ElevenLabs(api_key=os.getenv("ELEVENLABS_API_KEY"))
+# Set API key from environment
+set_api_key(os.getenv("ELEVENLABS_API_KEY"))
 
 AUDIO_FOLDER = "static/audio"
 os.makedirs(AUDIO_FOLDER, exist_ok=True)
@@ -12,13 +12,14 @@ def generate_audio(text_id, urdu_text, english_text):
     if os.path.exists(filename):
         return filename
 
-    full_text = f"{urdu_text}\n\n{english_text}"
-    audio = client.generate(
-        text=full_text,
+    # Use Urdu text if available, otherwise English
+    text = urdu_text if urdu_text else english_text
+    if not text:
+        raise ValueError("No text to speak")
+
+    # Generate audio (returns iterator of bytes)
+    audio = generate(
+        text=text,
         voice="Rachel",
         model="eleven_multilingual_v2"
     )
-    with open(filename, "wb") as f:
-        for chunk in audio:
-            f.write(chunk)
-    return filename
