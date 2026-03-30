@@ -1,7 +1,6 @@
 import os
 from elevenlabs import generate, save, set_api_key
 
-# Set API key from environment
 set_api_key(os.getenv("ELEVENLABS_API_KEY"))
 
 AUDIO_FOLDER = "static/audio"
@@ -12,14 +11,14 @@ def generate_audio(text_id, urdu_text, english_text):
     if os.path.exists(filename):
         return filename
 
-    # Use Urdu text if available, otherwise English
     text = urdu_text if urdu_text else english_text
     if not text:
         raise ValueError("No text to speak")
 
-    # Generate audio (returns iterator of bytes)
     audio = generate(
         text=text,
         voice="Rachel",
         model="eleven_multilingual_v2"
     )
+    save(audio, filename)
+    return filename
