@@ -352,17 +352,38 @@ function playAudio(id) {
     const container = document.getElementById('audioContainer');
     const player = document.getElementById('audioPlayer');
     const loading = document.getElementById('loading');
+
     if (!player) return;
+
+    // ✅ Show player UI
     container.style.display = 'block';
-    if (loading) loading.style.display = 'inline';
-    player.src = `/listen/${id}`;
+    loading.style.display = 'inline';
+    loading.innerText = "⏳ Generating audio...";
+
+    // 🔥 VERY IMPORTANT: prevent caching issue
+    const url = `/listen/${id}?t=${Date.now()}`;
+
+    console.log("🎧 Requesting:", url);
+
+    // ✅ Reset player before loading new audio
+    player.pause();
+    player.currentTime = 0;
+    player.src = url;
+    player.load();
+
+    // ✅ When ready
     player.oncanplay = () => {
-        if (loading) loading.style.display = 'none';
-        player.play();
+        console.log("✅ Audio ready");
+        loading.style.display = 'none';
+        player.play().catch(err => {
+            console.warn("Autoplay blocked:", err);
+        });
     };
+
+    // ❌ Error handling
     player.onerror = () => {
-        if (loading) loading.style.display = 'none';
-        console.error('Audio failed to load');
+        console.error("❌ Audio failed");
+        loading.innerText = "❌ Failed to load audio";
     };
 }
 </script>
