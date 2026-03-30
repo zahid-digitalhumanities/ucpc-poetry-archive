@@ -3,10 +3,12 @@ import os
 
 listen_bp = Blueprint('listen', __name__, url_prefix='/listen')
 
-# 🧪 Test root
+
+# 🧪 Test route
 @listen_bp.route('/')
 def listen_home():
     return "LISTEN ROOT OK"
+
 
 # 🎧 Main route
 @listen_bp.route('/<int:text_id>')
@@ -20,25 +22,22 @@ def listen(text_id):
     ghazal, verses = get_ghazal_with_verses(text_id)
 
     if not ghazal:
-        abort(404)
+        return "❌ Ghazal not found", 404
 
     urdu_text = ghazal.get("text_urdu", "")
     english_text = ghazal.get("text_english", "")
 
     filepath = generate_audio(text_id, urdu_text, english_text)
 
-    # Debug prints
     print("="*50)
-    print(f"TEXT ID: {text_id}")
-    print(f"FILE PATH: {filepath}")
-    if filepath and os.path.exists(filepath):
-        size = os.path.getsize(filepath)
-        print(f"FILE SIZE: {size} bytes")
-    else:
-        print("FILE DOES NOT EXIST")
-    print("="*50)
+    print(f"FINAL FILEPATH: {filepath}")
 
     if not filepath or not os.path.exists(filepath):
-        return "AUDIO GENERATION FAILED – file missing"
+        print("❌ AUDIO GENERATION FAILED")
+        return "❌ AUDIO GENERATION FAILED", 500
+
+    size = os.path.getsize(filepath)
+    print(f"📦 FINAL FILE SIZE: {size} bytes")
+    print("="*50)
 
     return send_file(filepath, mimetype="audio/mpeg")
