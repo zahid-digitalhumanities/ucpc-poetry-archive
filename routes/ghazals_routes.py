@@ -1,6 +1,6 @@
-﻿# routes/ghazals_routes.py
-import hashlib
-from flask import Blueprint, render_template, request, redirect, url_for, flash, session, jsonify
+﻿import hashlib
+from io import BytesIO
+from flask import Blueprint, render_template, request, redirect, url_for, flash, session, jsonify, send_file
 from markupsafe import Markup
 from models.ghazal_model import (
     get_stats, get_all_poets, get_books_by_poet, check_duplicate_ghazal,
@@ -9,6 +9,7 @@ from models.ghazal_model import (
 )
 from modules.analysis import split_verses
 from modules.ai_tools import translate_urdu_to_english
+from modules.image_generator import generate_ghazal_card
 
 ghazals_bp = Blueprint('ghazals', __name__, url_prefix='/ghazals')
 
@@ -102,7 +103,7 @@ def add_ghazal():
         try:
             text_id = insert_ghazal(
                 poet_id=poet_id,
-                book_id=book_id,                     # ✅ book_id passed
+                book_id=book_id,
                 contributor_id=contributor_id,
                 title_urdu=title_urdu,
                 title_english=title_english,
@@ -162,3 +163,19 @@ def set_mode(mode):
     if mode in ['bilingual', 'urdu', 'english']:
         session['view_mode'] = mode
     return redirect(request.referrer or url_for('main.index'))
+
+@ghazals_bp.route('/share_image/<int:text_id>')
+def share_image(text_id):
+    """Generate and return a PNG image of the ghazal card with dedication names."""
+    dedicator = request.args.get('dedicator', '').strip()
+    dedicatee = request.args.get('dedicatee', '').strip()
+
+    ghazal, verses = get_ghazal_with_verses(text_id)
+    if not ghazal:
+        return "Ghazal not found", 404
+
+    img = generate_ghazal_card(ghazal, verses, dedicator, dedicatee)
+    img_io = BytesIO()
+    img.save(img_io, 'PNG')
+    img_io.seek(0)
+    return send_file(img_io, mimetype='image/png')
