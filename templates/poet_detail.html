@@ -179,13 +179,31 @@
 
     <div class="poems-grid">
         {% for item in texts %}
-        <a href="/view/{{ item.id }}" class="poem-card">
+        <div class="poem-card">
             <div class="poem-english-text">{{ item.title_english or 'Untitled' }}</div>
             <div class="poem-urdu-text">{{ item.title_urdu or 'عنوان' }}</div>
+
+            <!-- MATLA (first two lines) from text_urdu -->
+            {% set lines = item.text_urdu.split('\n') if item.text_urdu else [] %}
+            {% if lines %}
+            <div class="urdu-text text-sm mt-2 text-gray-500" style="font-size:0.9rem; direction:rtl;">
+                {{ lines[0] }}
+                {% if lines|length > 1 %}<br>{{ lines[1] }}{% endif %}
+            </div>
+            {% endif %}
+
             <div class="poem-meta">
                 <span><i class="fas fa-pen-fancy"></i> {{ item.verse_count }} verses</span>
             </div>
-        </a>
+
+            <!-- Actions: View Full and WhatsApp Share -->
+            <div class="flex gap-4 mt-4">
+                <a href="/view/{{ item.id }}" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm">View Full</a>
+                <a target="_blank"
+                   href="https://wa.me/?text={{ (poet.name ~ '\n\n' ~ (item.title_urdu or item.title_english) ~ '\n\n' ~ item.text_urdu ~ '\n\nRead more: ' ~ request.url_root ~ 'view/' ~ item.id) | urlencode }}"
+                   class="px-4 py-2 bg-green-500 text-white rounded-lg text-sm">Share</a>
+            </div>
+        </div>
         {% endfor %}
     </div>
 </div>

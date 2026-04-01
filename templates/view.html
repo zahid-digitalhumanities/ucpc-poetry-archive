@@ -76,18 +76,72 @@
         text-align: center;
     }
 
-    /* Urdu premium display – CENTERED */
-    .urdu-only-verses {
+    /* ===== Urdu‑only view – BLACK BACKGROUND, custom layout ===== */
+    #urduOnlyView {
+        background: #000000;
+        border-radius: 2rem;
+        padding: 2rem 1.5rem;
+    }
+    .urdu-only-first-couplet {
         font-family: 'Jameel Noori Nastaleeq', 'Noto Nastaliq Urdu', serif;
-        font-size: 2.2rem;
-        line-height: 3.2rem;
-        color: #ffffff;
+        font-size: 2rem;
+        line-height: 3rem;
         text-align: center;
         direction: rtl;
+        color: #ffffff;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid rgba(212,175,55,0.3);
     }
-    #urduOnlyView {
-        background: linear-gradient(135deg, #1a1a1a, #3b2f2f);
+    .urdu-only-poet {
+        font-family: 'Georgia', serif;
+        font-size: 1.2rem;
         text-align: center;
+        color: #d4af37;
+        margin-bottom: 2rem;
+        letter-spacing: 1px;
+    }
+    .urdu-only-verses {
+        font-family: 'Jameel Noori Nastaleeq', 'Noto Nastaliq Urdu', serif;
+        font-size: 1.8rem;
+        line-height: 2.8rem;
+        text-align: center;
+        direction: rtl;
+        color: #ffffff;
+    }
+    .urdu-only-verses .verse-item {
+        margin-bottom: 2rem;
+    }
+    .dedication-block {
+        margin-top: 2rem;
+        padding-top: 1rem;
+        border-top: 1px solid rgba(212,175,55,0.5);
+        text-align: center;
+        font-family: 'Georgia', serif;
+        font-size: 1rem;
+        color: #d4af37;
+    }
+    .dedication-block .dedicator-line {
+        font-weight: bold;
+        background: rgba(212,175,55,0.2);
+        display: inline-block;
+        padding: 0.2rem 1rem;
+        border-radius: 2rem;
+        margin-bottom: 0.5rem;
+    }
+    .dedication-block .dedicatee-line {
+        color: #f5e7b2;
+    }
+
+    /* Bilingual and English views share the same dedication block */
+    .existing-dedication {
+        background: #fff9e6;
+        border-radius: 1rem;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        text-align: center;
+        font-style: italic;
+        color: #b8860b;
     }
 
     /* Rest of the CSS (keep your existing styles) */
@@ -116,8 +170,8 @@
         .bilingual-verse { grid-template-columns: 1fr; gap: 1rem; }
         .urdu-couplet { font-size: 1.2rem; line-height: 1.8rem; }
         .english-couplet { font-size: 0.9rem; }
-        .urdu-only-verses { font-size: 1.6rem; line-height: 2.4rem; }
-        .english-only-verses { font-size: 1rem; line-height: 1.6rem; }
+        .urdu-only-verses { font-size: 1.4rem; line-height: 2.2rem; }
+        .urdu-only-first-couplet { font-size: 1.6rem; line-height: 2.4rem; }
         .hero-title-english { font-size: 1.4rem; }
         .hero-title-urdu { font-size: 1.6rem; }
         .dedication-btn { font-size: 1rem; padding: 0.6rem 1.2rem; }
@@ -182,6 +236,14 @@
 
         <!-- The ghazal card (display) -->
         <div class="ghazal-card" id="ghazalCard">
+            <!-- Display dedication if present in URL (for bilingual/english views) -->
+            {% if dedication %}
+            <div class="existing-dedication">
+                <i class="fas fa-heart"></i> {{ dedication.dedicator }} dedicates this ghazal to {{ dedication.dedicatee }}
+                {% if dedication.message %} — {{ dedication.message }}{% endif %}
+            </div>
+            {% endif %}
+
             <!-- Bilingual view -->
             <div id="bilingualView">
                 {% for verse in verses %}
@@ -198,16 +260,36 @@
                 {% endfor %}
             </div>
 
-            <!-- Urdu‑only view -->
+            <!-- Urdu‑only view (black background, matla above poet) -->
             <div id="urduOnlyView" style="display: none;">
+                <!-- First couplet (matla) -->
+                <div class="urdu-only-first-couplet">
+                    {% if verses|length > 0 %}
+                        {{ verses[0].misra1_urdu }}<br>{{ verses[0].misra2_urdu }}
+                    {% endif %}
+                </div>
+
+                <!-- Poet name -->
+                <div class="urdu-only-poet">{{ ghazal.poet_name_urdu }}</div>
+
+                <!-- Remaining verses (from index 1 onwards) -->
                 <div class="urdu-only-verses">
-                    {% for verse in verses %}
+                    {% for verse in verses[1:] %}
                     <div class="verse-item">
                         <div>{{ verse.misra1_urdu }}</div>
                         <div>{{ verse.misra2_urdu }}</div>
                     </div>
                     {% endfor %}
                 </div>
+
+                <!-- Dedication block (from URL or form) -->
+                {% if dedication %}
+                <div class="dedication-block">
+                    <div class="dedicator-line">{{ dedication.dedicator }}</div>
+                    <div class="dedicatee-line">→ {{ dedication.dedicatee }}</div>
+                    {% if dedication.message %}<div class="message-line">{{ dedication.message }}</div>{% endif %}
+                </div>
+                {% endif %}
             </div>
 
             <!-- English‑only view -->
@@ -222,7 +304,7 @@
                 </div>
             </div>
 
-            <!-- Footer -->
+            <!-- Footer (common to all views) -->
             <div class="card-footer">
                 <div class="tribute">
                     <i class="fas fa-heart"></i> Shared with love for my teacher, father, and mother.
@@ -310,7 +392,7 @@ function drawCenteredText(ctx, text, y, font, color) {
     ctx.fillText(text, ctx.canvas.width / 2, y);
 }
 
-// --- Canvas image generation (fully centered, RTL) ---
+// --- Canvas image generation (matches Urdu‑only view layout) ---
 async function generateImage() {
     await document.fonts.ready;
 
@@ -321,75 +403,83 @@ async function generateImage() {
     canvas.width = width;
     canvas.height = height;
 
-    // Background gradient
+    // Background gradient (dark, almost black)
     const grad = ctx.createLinearGradient(0, 0, 0, height);
-    grad.addColorStop(0, '#1a1a2e');
-    grad.addColorStop(1, '#2d2f3a');
+    grad.addColorStop(0, '#000000');
+    grad.addColorStop(1, '#1a1a1a');
     ctx.fillStyle = grad;
     ctx.fillRect(0, 0, width, height);
 
     // Fonts
-    const poetFont = "bold 44px 'Georgia', serif";
-    const urduTitleFont = "48px 'Jameel Noori Nastaleeq'";
-    const urduVerseFont = "48px 'Jameel Noori Nastaleeq'";
+    const matlaFont = "52px 'Jameel Noori Nastaleeq'";
+    const poetFont = "bold 36px 'Georgia', serif";
+    const verseFont = "44px 'Jameel Noori Nastaleeq'";
     const dedicationFont = "32px 'Georgia', serif";
     const watermarkFont = "24px 'Arial'";
 
-    let y = 140;
+    let y = 180;
+
+    // Matla (first couplet)
+    const firstVerse = document.querySelectorAll('#urduOnlyView .urdu-only-first-couplet')[0];
+    if (firstVerse) {
+        const lines = firstVerse.innerText.trim().split('\n');
+        if (lines[0]) {
+            drawCenteredText(ctx, lines[0], y, matlaFont, "#ffffff");
+            y += 80;
+        }
+        if (lines[1]) {
+            drawCenteredText(ctx, lines[1], y, matlaFont, "#ffffff");
+            y += 100;
+        }
+    }
 
     // Poet name
-    const poetElement = document.querySelector('.hero-poet');
+    const poetElement = document.querySelector('.urdu-only-poet');
     const poetName = poetElement ? poetElement.innerText.trim() : '';
     drawCenteredText(ctx, poetName, y, poetFont, "#d4af37");
     y += 100;
 
-    // Urdu title
-    const urduTitleElement = document.querySelector('.hero-title-urdu');
-    const urduTitle = urduTitleElement ? urduTitleElement.innerText.trim() : '';
-    if (urduTitle) {
-        drawCenteredText(ctx, urduTitle, y, urduTitleFont, "#ffffff");
-        y += 100;
-    }
-
-    // Verses (from Urdu‑only view)
-    const verseItems = document.querySelectorAll('#urduOnlyView .verse-item');
-    let verseY = y;
+    // Remaining verses
+    const verseItems = document.querySelectorAll('#urduOnlyView .urdu-only-verses .verse-item');
     const lineSpacing = 80;
     const coupletSpacing = 100;
-
+    let verseY = y;
     verseItems.forEach(item => {
         const children = item.children;
         if (children.length >= 2) {
             let line1 = children[0].innerText.trim();
             let line2 = children[1].innerText.trim();
             if (line1) {
-                drawCenteredText(ctx, line1, verseY, urduVerseFont, "#ffffff");
+                drawCenteredText(ctx, line1, verseY, verseFont, "#ffffff");
                 verseY += lineSpacing;
             }
             if (line2) {
-                drawCenteredText(ctx, line2, verseY, urduVerseFont, "#ffffff");
+                drawCenteredText(ctx, line2, verseY, verseFont, "#ffffff");
                 verseY += coupletSpacing;
             }
         } else {
-            // Fallback: if structure different, use whole text
+            // fallback
             let text = item.innerText.trim();
             let lines = text.split('\n');
             lines.forEach(line => {
-                drawCenteredText(ctx, line, verseY, urduVerseFont, "#ffffff");
+                drawCenteredText(ctx, line, verseY, verseFont, "#ffffff");
                 verseY += lineSpacing;
             });
             verseY += coupletSpacing;
         }
     });
 
-    // Dedication block
+    // Dedication block (from URL or form)
     const dedicator = document.getElementById('dedicator').value.trim();
     const dedicatee = document.getElementById('dedicatee').value.trim();
     if (dedicator && dedicatee) {
         ctx.direction = "ltr";
         ctx.font = dedicationFont;
         ctx.fillStyle = "#d4af37";
-        ctx.fillText(`${dedicator} → ${dedicatee}`, width/2, verseY + 50);
+        ctx.fillText(dedicator, width/2, verseY + 50);
+        verseY += 70;
+        ctx.fillStyle = "#f5e7b2";
+        ctx.fillText(`→ ${dedicatee}`, width/2, verseY);
         verseY += 120;
         ctx.direction = "rtl";
     }
