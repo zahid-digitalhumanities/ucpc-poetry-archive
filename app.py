@@ -148,6 +148,12 @@ app = create_app()
 # 🚀 RUN (RENDER COMPATIBLE)
 # =========================================================
 if __name__ == "__main__":
+    # Get port from environment (Render sets PORT, default 10000)
     port = int(os.environ.get("PORT", 10000))
-    print(f"🔥 Running on port {port}")
-    app.run(host="0.0.0.0", port=port)
+    
+    # Determine if we are in production (e.g., Render) or local
+    # Production should never use debug=True
+    debug_mode = os.environ.get("FLASK_ENV") != "production" and not os.environ.get("RENDER")
+    
+    print(f"🔥 Running on port {port} (debug={debug_mode})")
+    app.run(host="0.0.0.0", port=port, debug=debug_mode)
