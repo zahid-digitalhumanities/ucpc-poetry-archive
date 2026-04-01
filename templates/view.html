@@ -300,7 +300,17 @@ function playAudio(id) {
     };
 }
 
-// --- Canvas image generation (fixed: centered text, proper RTL, watermark) ---
+// --- Helper to draw centered Urdu text ---
+function drawCenteredText(ctx, text, y, font, color) {
+    if (!text) return;
+    ctx.font = font;
+    ctx.fillStyle = color;
+    ctx.textAlign = "center";
+    ctx.direction = "rtl";
+    ctx.fillText(text, ctx.canvas.width / 2, y);
+}
+
+// --- Canvas image generation (fully centered, RTL) ---
 async function generateImage() {
     await document.fonts.ready;
 
@@ -327,67 +337,74 @@ async function generateImage() {
 
     let y = 140;
 
-    // Poet name (from hero section)
+    // Poet name
     const poetElement = document.querySelector('.hero-poet');
     const poetName = poetElement ? poetElement.innerText.trim() : '';
-    ctx.textAlign = "center";
-    ctx.fillStyle = "#d4af37";
-    ctx.font = poetFont;
-    ctx.fillText(poetName, width/2, y);
+    drawCenteredText(ctx, poetName, y, poetFont, "#d4af37");
     y += 100;
 
-    // Urdu title (only, no English title)
+    // Urdu title
     const urduTitleElement = document.querySelector('.hero-title-urdu');
     const urduTitle = urduTitleElement ? urduTitleElement.innerText.trim() : '';
     if (urduTitle) {
-        ctx.font = urduTitleFont;
-        ctx.fillStyle = "#ffffff";
-        ctx.direction = "rtl";
-        ctx.fillText(urduTitle, width/2, y);
+        drawCenteredText(ctx, urduTitle, y, urduTitleFont, "#ffffff");
         y += 100;
-        ctx.direction = "ltr";
     }
 
-    // Verses (Urdu only)
-    ctx.font = urduVerseFont;
-    ctx.fillStyle = "#ffffff";
-    ctx.direction = "rtl";
-    const verseItems = document.querySelectorAll('.urdu-only-verses .verse-item');
+    // Verses (from Urdu‑only view)
+    const verseItems = document.querySelectorAll('#urduOnlyView .verse-item');
     let verseY = y;
-    const lineSpacing = 90;
+    const lineSpacing = 80;
+    const coupletSpacing = 100;
 
     verseItems.forEach(item => {
-        const lines = item.innerText.trim().split('\n');
-        lines.forEach(line => {
-            if (line) {
-                ctx.fillText(line, width/2, verseY);
+        const children = item.children;
+        if (children.length >= 2) {
+            let line1 = children[0].innerText.trim();
+            let line2 = children[1].innerText.trim();
+            if (line1) {
+                drawCenteredText(ctx, line1, verseY, urduVerseFont, "#ffffff");
                 verseY += lineSpacing;
             }
-        });
-        verseY += 40; // extra space between couplets
+            if (line2) {
+                drawCenteredText(ctx, line2, verseY, urduVerseFont, "#ffffff");
+                verseY += coupletSpacing;
+            }
+        } else {
+            // Fallback: if structure different, use whole text
+            let text = item.innerText.trim();
+            let lines = text.split('\n');
+            lines.forEach(line => {
+                drawCenteredText(ctx, line, verseY, urduVerseFont, "#ffffff");
+                verseY += lineSpacing;
+            });
+            verseY += coupletSpacing;
+        }
     });
-    ctx.direction = "ltr";
 
     // Dedication block
     const dedicator = document.getElementById('dedicator').value.trim();
     const dedicatee = document.getElementById('dedicatee').value.trim();
     if (dedicator && dedicatee) {
-        ctx.fillStyle = "#d4af37";
+        ctx.direction = "ltr";
         ctx.font = dedicationFont;
+        ctx.fillStyle = "#d4af37";
         ctx.fillText(`${dedicator} → ${dedicatee}`, width/2, verseY + 50);
         verseY += 120;
+        ctx.direction = "rtl";
     }
 
-    // Watermark (ensure it's visible)
-    ctx.fillStyle = "rgba(255,255,255,0.3)";
+    // Watermark
+    ctx.direction = "ltr";
     ctx.font = watermarkFont;
+    ctx.fillStyle = "rgba(255,255,255,0.3)";
     ctx.fillText("UCPC Poetry Archive • Preserving Urdu Poetry", width/2, height - 60);
 
     return canvas.toDataURL('image/png');
 }
 
-// --- Upload image and get shareable page URL ---
-async function uploadAndGetSharePage() {
+// --- Upload image and get shareable URL ---
+async function uploadImageAndGetUrl() {
     const imgData = await generateImage();
     const res = await fetch('/upload_image', {
         method: 'POST',
@@ -395,29 +412,30 @@ async function uploadAndGetSharePage() {
         body: JSON.stringify({ image: imgData })
     });
     const data = await res.json();
-    const imageUrl = data.url;
-    const filename = imageUrl.split('/').pop();
-    return `${window.location.origin}/share/${filename}`;
+    return data.url;
 }
 
-// --- Share functions (using share page) ---
-async function share(platform) {
+// --- Share function using image URL ---
+async function shareToSocial(platform) {
     const dedicator = document.getElementById('dedicator').value.trim();
     const dedicatee = document.getElementById('dedicatee').value.trim();
     if (!dedicator || !dedicatee) {
         alert('Please enter both names.');
         return;
     }
-    const sharePageUrl = await uploadAndGetSharePage();
-    let finalUrl = '';
+
+    const imageUrl = await uploadImageAndGetUrl();
+
+    let shareUrl = '';
     if (platform === 'facebook') {
-        finalUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(sharePageUrl)}`;
+        shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(imageUrl)}`;
     } else if (platform === 'twitter') {
-        finalUrl = `https://twitter.com/intent/tweet?text=Check out this ghazal!&url=${encodeURIComponent(sharePageUrl)}`;
+        shareUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(imageUrl)}`;
     } else if (platform === 'whatsapp') {
-        finalUrl = `https://wa.me/?text=${encodeURIComponent(sharePageUrl)}`;
+        shareUrl = `https://wa.me/?text=${encodeURIComponent(imageUrl)}`;
     }
-    if (finalUrl) window.open(finalUrl, '_blank');
+
+    if (shareUrl) window.open(shareUrl, '_blank');
 }
 
 async function downloadImage() {
@@ -427,9 +445,9 @@ async function downloadImage() {
         alert('Please enter both names.');
         return;
     }
-    const imgData = await generateImage();
+    const url = await uploadImageAndGetUrl();
     const a = document.createElement('a');
-    a.href = imgData;
+    a.href = url;
     a.download = 'ghazal_card.png';
     a.click();
 }
@@ -443,15 +461,15 @@ showBtn.addEventListener('click', () => {
 
 document.getElementById('fbShare').addEventListener('click', (e) => {
     e.preventDefault();
-    share('facebook');
+    shareToSocial('facebook');
 });
 document.getElementById('twShare').addEventListener('click', (e) => {
     e.preventDefault();
-    share('twitter');
+    shareToSocial('twitter');
 });
 document.getElementById('waShare').addEventListener('click', (e) => {
     e.preventDefault();
-    share('whatsapp');
+    shareToSocial('whatsapp');
 });
 document.getElementById('downloadBtn').addEventListener('click', (e) => {
     e.preventDefault();
