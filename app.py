@@ -18,6 +18,8 @@ from models.stats_model import get_stats
 def create_app():
     app = Flask(__name__)
 
+    print("🔥 APP FILE LOADED")
+
     # 🔐 Secret Key
     app.secret_key = os.getenv('SECRET_KEY', 'dev-secret-key')
 
@@ -45,45 +47,76 @@ def create_app():
     def check():
         return "OK WORKING"
 
-    # 🔥 ROUTE DEBUG (VERY IMPORTANT)
+    # 🔍 Route Debug
     @app.route('/routes')
     def show_routes():
         return "<br>".join([str(rule) for rule in app.url_map.iter_rules()])
 
-    # 📤 Image upload route (for social sharing)
+    # =========================================================
+    # 📤 IMAGE UPLOAD (SOCIAL SHARING)
+    # =========================================================
     @app.route('/upload_image', methods=['POST'])
     def upload_image():
         data = request.json.get('image')
         if not data:
             return jsonify({'error': 'No image data'}), 400
 
-        # Extract base64 data
-        header, encoded = data.split(',', 1)
-        binary = base64.b64decode(encoded)
+        try:
+            header, encoded = data.split(',', 1)
+            binary = base64.b64decode(encoded)
 
-        # Ensure generated folder exists
-        generated_dir = os.path.join(os.path.dirname(__file__), 'static', 'generated')
-        os.makedirs(generated_dir, exist_ok=True)
+            generated_dir = os.path.join(os.path.dirname(__file__), 'static', 'generated')
+            os.makedirs(generated_dir, exist_ok=True)
 
-        # Generate unique filename
-        filename = f"{int(time.time())}.png"
-        filepath = os.path.join(generated_dir, filename)
+            filename = f"{int(time.time())}.png"
+            filepath = os.path.join(generated_dir, filename)
 
-        with open(filepath, 'wb') as f:
-            f.write(binary)
+            with open(filepath, 'wb') as f:
+                f.write(binary)
 
-        # Return the full public URL
-        full_url = request.host_url + f"static/generated/{filename}"
-        return jsonify({'url': full_url})
+            base_url = request.host_url.rstrip('/')
 
-    # 📤 Share page route (for rich social previews)
+            image_url = f"{base_url}/static/generated/{filename}"
+            share_url = f"{base_url}/share/{filename}"
+
+            return jsonify({
+                "image_url": image_url,
+                "share_url": share_url
+            })
+
+        except Exception as e:
+            print("❌ Upload Error:", str(e))
+            return jsonify({"error": "Upload failed"}), 500
+
+    # =========================================================
+    # 🌐 SHARE PAGE (ALL SOCIAL PLATFORMS)
+    # =========================================================
     @app.route('/share/<filename>')
     def share_image_page(filename):
-        """Serve a share page with OG meta tags pointing to the image."""
-        image_url = request.host_url + f"static/generated/{filename}"
-        return render_template('share.html', image_url=image_url)
+        """
+        Universal share page:
+        Works on WhatsApp, Facebook, LinkedIn, X
+        """
 
-    # 📊 Global stats
+        base_url = request.host_url.rstrip('/')
+        image_url = f"{base_url}/static/generated/{filename}"
+        page_url = f"{base_url}/share/{filename}"
+
+        # 🔥 Dynamic content (future: DB se load kar sakte ho)
+        title = request.args.get('title', 'UCPC Poetry Archive')
+        description = request.args.get('desc', 'Beautiful Urdu & English Ghazal')
+
+        return render_template(
+            'share.html',
+            image_url=image_url,
+            title=title,
+            description=description,
+            page_url=page_url
+        )
+
+    # =========================================================
+    # 📊 GLOBAL STATS
+    # =========================================================
     @app.context_processor
     def inject_stats():
         try:
@@ -92,12 +125,13 @@ def create_app():
             print("⚠️ Stats error:", str(e))
             return dict(stats=None)
 
-    # ❌ 404
+    # =========================================================
+    # ❌ ERROR HANDLERS
+    # =========================================================
     @app.errorhandler(404)
     def page_not_found(e):
         return render_template('404.html'), 404
 
-    # ❌ 500
     @app.errorhandler(500)
     def internal_server_error(e):
         return render_template('500.html'), 500
@@ -105,12 +139,14 @@ def create_app():
     return app
 
 
-# 🚀 Create App
+# =========================================================
+# 🚀 CREATE APP
+# =========================================================
 app = create_app()
 
-# ✅ IMPORTANT FOR RENDER
-import os
-
+# =========================================================
+# 🚀 RUN (RENDER COMPATIBLE)
+# =========================================================
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))
     print(f"🔥 Running on port {port}")
