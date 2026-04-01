@@ -13,7 +13,7 @@ chardet>=5.2
 
 gunicorn>=21.2
 
-elevenlabs==0.2.27.
+elevenlabs==0.2.27
 arabic_reshaper
 python-bidi
 python-dotenv>=1.0
