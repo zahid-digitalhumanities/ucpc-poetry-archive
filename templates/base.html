@@ -184,6 +184,46 @@
 
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     {% block extra_js %}{% endblock %}
+ /* Disable text selection on the whole page */
+    <style>
+    /* Disable text selection on the whole page */
+    body {
+        user-select: none;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+    }
+</style>
+
+<script>
+    // Disable right-click
+    document.addEventListener('contextmenu', function(e) {
+        e.preventDefault();
+        return false;
+    });
+
+    // Disable copy, cut, paste events
+    document.addEventListener('copy', function(e) {
+        e.preventDefault();
+        return false;
+    });
+    document.addEventListener('cut', function(e) {
+        e.preventDefault();
+        return false;
+    });
+    document.addEventListener('paste', function(e) {
+        e.preventDefault();
+        return false;
+    });
+
+    // Disable keyboard shortcuts (Ctrl+C, Ctrl+X, etc.)
+    document.addEventListener('keydown', function(e) {
+        if ((e.ctrlKey || e.metaKey) && (e.key === 'c' || e.key === 'x' || e.key === 'v')) {
+            e.preventDefault();
+            return false;
+        }
+    });
+</script>
 </body>
 </html>
 
