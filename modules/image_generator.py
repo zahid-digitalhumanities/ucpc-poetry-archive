@@ -18,22 +18,27 @@ def generate_ghazal_card(ghazal, verses, dedicator='', dedicatee=''):
     text_color = (255, 255, 255)
     gold = (212, 175, 55)
 
-    poet_font = get_font('LiberationSerif-Bold.ttf', 52)
-    urdu_font = get_font('JameelNooriNastaleeq.ttf', 42)
+    # Fonts
+    poet_font = get_font('LiberationSerif-Bold.ttf', 56)
+    urdu_font = get_font('JameelNooriNastaleeq.ttf', 44)
     english_font = get_font('LiberationSerif-Regular.ttf', 32)
-    dedication_font = get_font('LiberationSerif-Bold.ttf', 36)
+    dedication_font = get_font('LiberationSerif-Bold.ttf', 38)
     watermark_font = get_font('LiberationSerif-Regular.ttf', 28)
 
     img = Image.new('RGB', (width, height), bg_color)
     draw = ImageDraw.Draw(img)
 
-    poet = ghazal.get('poet_name_urdu', ghazal.get('poet_name', ''))
-    draw.text((width//2, 120), poet, font=poet_font, fill=gold, anchor='mt')
+    # Poet name (Urdu + English)
+    poet_ur = ghazal.get('poet_name_urdu', '')
+    poet_en = ghazal.get('poet_name', '')
+    poet_text = f"{poet_ur}\n{poet_en}" if poet_ur else poet_en
+    draw.text((width//2, 120), poet_text, font=poet_font, fill=gold, anchor='mt')
 
+    # Bilingual verses: Urdu right, English left
     margin = 80
     urdu_x = width - margin
     english_x = margin
-    y = 260
+    y = 280
     line_spacing = 90
     couplet_spacing = 40
 
@@ -52,6 +57,7 @@ def generate_ghazal_card(ghazal, verses, dedicator='', dedicatee=''):
             y += line_spacing
         y += couplet_spacing
 
+    # Dedication block
     if dedicator and dedicatee:
         y += 80
         draw.text((width//2, y), f"From: {dedicator}", font=dedication_font, fill=gold, anchor='mt')
@@ -59,6 +65,8 @@ def generate_ghazal_card(ghazal, verses, dedicator='', dedicatee=''):
         draw.text((width//2, y), f"Dedicated to: {dedicatee}", font=dedication_font, fill=text_color, anchor='mt')
         y += 80
 
+    # Watermark
     watermark = "UCPC Poetry Archive • Preserving Urdu Poetry"
     draw.text((width//2, height - 80), watermark, font=watermark_font, fill=(100,100,100), anchor='mt')
+
     return img
