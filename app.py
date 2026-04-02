@@ -35,7 +35,7 @@ def create_app():
     def redirect_view(text_id):
         return redirect(url_for('ghazals.view_ghazal', text_id=text_id))
 
-    # Share page (for social previews)
+    # Share page for social previews (OG tags)
     @app.route('/share/<filename>')
     def share_page(filename):
         image_url = request.host_url + f"static/generated/{filename}"
