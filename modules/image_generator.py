@@ -12,18 +12,18 @@ def get_font(font_name, size):
         return ImageFont.load_default()
 
 def generate_ghazal_card(ghazal, verses, dedicator='', dedicatee=''):
-    width = 1200
-    height = 1800
-    bg_color = (20, 20, 30)
+    width = 1080
+    height = 1920   # Instagram story size
+    bg_color = (10, 10, 20)
     text_color = (255, 255, 255)
     gold = (212, 175, 55)
 
     # Fonts (fallback if missing)
-    poet_font = get_font('LiberationSerif-Bold.ttf', 48)
-    urdu_font = get_font('JameelNooriNastaleeq.ttf', 38)
-    english_font = get_font('LiberationSerif-Regular.ttf', 28)
-    dedication_font = get_font('LiberationSerif-Bold.ttf', 32)
-    watermark_font = get_font('LiberationSerif-Regular.ttf', 24)
+    poet_font = get_font('LiberationSerif-Bold.ttf', 52)
+    urdu_font = get_font('JameelNooriNastaleeq.ttf', 42)
+    english_font = get_font('LiberationSerif-Regular.ttf', 32)
+    dedication_font = get_font('LiberationSerif-Bold.ttf', 36)
+    watermark_font = get_font('LiberationSerif-Regular.ttf', 28)
 
     img = Image.new('RGB', (width, height), bg_color)
     draw = ImageDraw.Draw(img)
@@ -32,21 +32,13 @@ def generate_ghazal_card(ghazal, verses, dedicator='', dedicatee=''):
     poet = ghazal.get('poet_name_urdu', ghazal.get('poet_name', ''))
     draw.text((width//2, 120), poet, font=poet_font, fill=gold, anchor='mt')
 
-    # Dedication block (if names provided)
-    y = 240
-    if dedicator and dedicatee:
-        draw.text((width//2, y), f"From: {dedicator}", font=dedication_font, fill=gold, anchor='mt')
-        y += 60
-        draw.text((width//2, y), f"Dedicated to: {dedicatee}", font=dedication_font, fill=text_color, anchor='mt')
-        y += 100
-    else:
-        y = 220
-
     # Bilingual verses (Urdu right, English left)
     margin = 80
     urdu_x = width - margin
     english_x = margin
+    y = 260
     line_spacing = 90
+    couplet_spacing = 40
 
     for verse in verses:
         m1_ur = verse.get('misra1_urdu', '')
@@ -62,10 +54,17 @@ def generate_ghazal_card(ghazal, verses, dedicator='', dedicatee=''):
             draw.text((urdu_x, y), m2_ur, font=urdu_font, fill=text_color, anchor='rt')
             draw.text((english_x, y), m2_en, font=english_font, fill=text_color, anchor='lt')
             y += line_spacing
-        y += 30  # extra space between couplets
+        y += couplet_spacing
 
-    # Watermark (bottom)
+    # Dedication block (To: / From:)
+    if dedicator and dedicatee:
+        y += 80
+        draw.text((width//2, y), f"To: {dedicatee}", font=dedication_font, fill=gold, anchor='mt')
+        y += 60
+        draw.text((width//2, y), f"From: {dedicator}", font=dedication_font, fill=text_color, anchor='mt')
+
+    # Watermark
     watermark = "UCPC Poetry Archive • Preserving Urdu Poetry"
-    draw.text((width//2, height - 60), watermark, font=watermark_font, fill=(150,150,150), anchor='mt')
+    draw.text((width//2, height - 80), watermark, font=watermark_font, fill=(100,100,100), anchor='mt')
 
     return img
