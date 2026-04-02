@@ -144,6 +144,32 @@
         color: #b8860b;
     }
 
+    /* Top & bottom share buttons */
+    .share-top, .share-bottom {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        margin: 1rem 0;
+    }
+    .share-top button, .share-bottom button {
+        background: #25D366;
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 2rem;
+        cursor: pointer;
+        font-weight: bold;
+        transition: 0.2s;
+    }
+    .share-top button:last-child, .share-bottom button:last-child {
+        background: #D4AF37;
+        color: #1E3C72;
+    }
+    .share-top button:hover, .share-bottom button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    }
+
     /* Rest of the CSS (keep your existing styles) */
     .ghazal-hero { background: linear-gradient(135deg, #0F2B3D, #1E3C72); padding: 2rem; text-align: center; color: white; }
     .hero-poet { font-size: 0.85rem; letter-spacing: 3px; color: var(--gold); text-transform: uppercase; }
@@ -176,6 +202,7 @@
         .hero-title-urdu { font-size: 1.6rem; }
         .dedication-btn { font-size: 1rem; padding: 0.6rem 1.2rem; }
         .social-share-icons a { font-size: 1.8rem; }
+        .share-top button, .share-bottom button { padding: 0.4rem 0.8rem; font-size: 0.8rem; }
     }
 </style>
 {% endblock %}
@@ -212,12 +239,22 @@
             <button class="mode-btn" data-mode="english">🇬🇧 English</button>
         </div>
 
+        <!-- ✅ TOP SHARE BUTTONS (FIXED) -->
+        <div class="share-top">
+            <button onclick="shareGhazal({{ ghazal.id }})">
+                🟢 WhatsApp
+            </button>
+            <button onclick="openShareMenu({{ ghazal.id }})">
+                🔗 Share
+            </button>
+        </div>
+
         <div class="audio-player-container" id="audioContainer">
             <span id="loading" style="display: none;">⏳ Loading audio...</span>
             <audio id="audioPlayer" controls preload="none"></audio>
         </div>
 
-        <!-- Dedication Section -->
+        <!-- Dedication Section (existing) -->
         <div class="dedication-section">
             <button id="showDedicationFormBtn" class="dedication-btn">
                 💖 Dedicate and share your loved ones (اپنے پیاروں کا نام شیئر کریں)
@@ -320,6 +357,16 @@
             </div>
         </div>
 
+        <!-- ✅ BOTTOM SHARE BUTTONS (FIXED) -->
+        <div class="share-bottom">
+            <button onclick="shareGhazal({{ ghazal.id }})">
+                🟢 Share on WhatsApp
+            </button>
+            <button onclick="openShareMenu({{ ghazal.id }})">
+                🚀 Share Everywhere
+            </button>
+        </div>
+
         <div class="nav-buttons">
             {% if prev_id %}<a href="/view/{{ prev_id }}" class="nav-btn nav-btn-prev"><i class="fas fa-chevron-left"></i> Previous</a>{% endif %}
             <a href="/poet/{{ ghazal.poet_id }}" class="nav-btn nav-btn-all"><i class="fas fa-list"></i> All Poems</a>
@@ -382,7 +429,7 @@ function playAudio(id) {
     };
 }
 
-// --- Helper to draw centered Urdu text ---
+// --- Helper to draw centered Urdu text (for canvas) ---
 function drawCenteredText(ctx, text, y, font, color) {
     if (!text) return;
     ctx.font = font;
@@ -458,7 +505,6 @@ async function generateImage() {
                 verseY += coupletSpacing;
             }
         } else {
-            // fallback
             let text = item.innerText.trim();
             let lines = text.split('\n');
             lines.forEach(line => {
@@ -469,7 +515,7 @@ async function generateImage() {
         }
     });
 
-    // Dedication block (from URL or form)
+    // Dedication block (from form)
     const dedicator = document.getElementById('dedicator').value.trim();
     const dedicatee = document.getElementById('dedicatee').value.trim();
     if (dedicator && dedicatee) {
@@ -505,7 +551,7 @@ async function uploadImageAndGetUrl() {
     return data.url;
 }
 
-// --- Share function using image URL ---
+// --- Share function using image URL (for dedication icons) ---
 async function shareToSocial(platform) {
     const dedicator = document.getElementById('dedicator').value.trim();
     const dedicatee = document.getElementById('dedicatee').value.trim();
@@ -542,7 +588,7 @@ async function downloadImage() {
     a.click();
 }
 
-// --- Bind events ---
+// --- Bind events for dedication form icons ---
 const showBtn = document.getElementById('showDedicationFormBtn');
 const formDiv = document.getElementById('dedicationForm');
 showBtn.addEventListener('click', () => {
