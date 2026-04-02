@@ -8,12 +8,7 @@
         display: none !important;
     }
 
-    /* Hide canvas from view */
-    canvas {
-        display: none;
-    }
-
-    /* Dedication button – premium */
+    /* Dedication button */
     .dedication-btn {
         background: linear-gradient(135deg, #d4af37, #f5e7b2);
         color: #000;
@@ -207,24 +202,19 @@
                 <input type="text" id="dedicator" placeholder="Your Name">
                 <input type="text" id="dedicatee" placeholder="Dedicate To">
                 <div class="social-share-icons">
-                    <a href="#" id="fbShare" title="Share on Facebook"><i class="fab fa-facebook-f"></i></a>
-                    <a href="#" id="waShare" title="Share on WhatsApp"><i class="fab fa-whatsapp"></i></a>
-                    <a href="#" id="twShare" title="Share on Twitter"><i class="fab fa-twitter"></i></a>
-                    <a href="#" id="liShare" title="Share on LinkedIn"><i class="fab fa-linkedin-in"></i></a>
-                    <a href="#" id="copyLink" title="Copy Link"><i class="fas fa-link"></i></a>
+                    <a href="#" id="fbShare"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" id="waShare"><i class="fab fa-whatsapp"></i></a>
+                    <a href="#" id="twShare"><i class="fab fa-twitter"></i></a>
+                    <a href="#" id="liShare"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="#" id="copyLink"><i class="fas fa-link"></i></a>
                 </div>
             </div>
         </div>
 
         <!-- Ghazal card -->
         <div class="ghazal-card" id="ghazalCard">
-            <!-- Poet name (displayed always) -->
             <div class="poet-name">{{ ghazal.poet_name_urdu }} ({{ ghazal.poet_name }})</div>
-
-            <!-- Dedication display (will be filled by JS) -->
             <div id="dedicationDisplay" class="dedication-display" style="display: none;"></div>
-
-            <!-- Bilingual verses -->
             <div id="bilingualView">
                 {% for verse in verses %}
                 <div class="bilingual-verse">
@@ -240,20 +230,15 @@
                 {% endfor %}
             </div>
 
-            <!-- Footer -->
             <div class="card-footer">
-                <div class="tribute">
-                    <i class="fas fa-heart"></i> Shared with love for my teacher, father, and mother.
-                </div>
+                <div class="tribute"><i class="fas fa-heart"></i> Shared with love for my teacher, father, and mother.</div>
                 <div class="social-icons">
                     <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.url }}" target="_blank"><i class="fab fa-facebook-f"></i></a>
                     <a href="https://twitter.com/intent/tweet?text=UCPC%20Poetry%20Archive&url={{ request.url }}" target="_blank"><i class="fab fa-twitter"></i></a>
                     <a href="https://wa.me/?text=Explore%20UCPC%20Poetry%20Archive%3A%20{{ request.url }}" target="_blank"><i class="fab fa-whatsapp"></i></a>
                 </div>
             </div>
-            <div class="ucpc-watermark">
-                UCPC Poetry Archive • Preserving Urdu Poetry
-            </div>
+            <div class="ucpc-watermark">UCPC Poetry Archive • Preserving Urdu Poetry</div>
         </div>
 
         <div class="nav-buttons">
@@ -264,30 +249,7 @@
     </div>
 </div>
 
-<canvas id="ghazalCanvas" width="1080" height="1920" style="display:none;"></canvas>
-
 <script>
-let currentMode = "bilingual";
-
-function applyMode(mode) {
-    // Only bilingual mode is used now, but keep for compatibility
-    if (mode === 'bilingual') {
-        document.getElementById('bilingualView').style.display = 'block';
-    }
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-    applyMode('bilingual');
-    // Remove mode switcher buttons except bilingual? We keep them but ignore.
-    document.querySelectorAll('.mode-btn[data-mode]').forEach(btn => {
-        btn.addEventListener('click', () => {
-            if (btn.dataset.mode === 'bilingual') {
-                applyMode('bilingual');
-            }
-        });
-    });
-});
-
 function playAudio(id) {
     const container = document.getElementById('audioContainer');
     const player = document.getElementById('audioPlayer');
@@ -319,11 +281,8 @@ const dedicationDisplay = document.getElementById('dedicationDisplay');
 
 showBtn.addEventListener('click', () => {
     formDiv.style.display = formDiv.style.display === 'none' ? 'block' : 'none';
-    // Clear previous display
-    dedicationDisplay.style.display = 'none';
 });
 
-// Update dedication display when names are filled (real-time)
 function updateDedicationDisplay() {
     const dedicator = dedicatorInput.value.trim();
     const dedicatee = dedicateeInput.value.trim();
@@ -337,7 +296,7 @@ function updateDedicationDisplay() {
 dedicatorInput.addEventListener('input', updateDedicationDisplay);
 dedicateeInput.addEventListener('input', updateDedicationDisplay);
 
-// ---------- Share functions (using server-side image generation) ----------
+// Share functions (using backend endpoint)
 async function getShareUrl(textId) {
     const dedicator = dedicatorInput.value.trim();
     const dedicatee = dedicateeInput.value.trim();
@@ -345,60 +304,45 @@ async function getShareUrl(textId) {
         alert('Please enter both names in the dedication form first.');
         return null;
     }
-
     try {
         const url = `/ghazals/share_image/${textId}?dedicator=${encodeURIComponent(dedicator)}&dedicatee=${encodeURIComponent(dedicatee)}`;
         const res = await fetch(url);
         const data = await res.json();
-        if (!data.share_url) {
-            throw new Error("No share_url");
-        }
+        if (!data.share_url) throw new Error('No share_url');
         return data.share_url;
     } catch (err) {
-        console.error("Share URL Error:", err);
-        alert("❌ Failed to generate share link");
+        console.error(err);
+        alert('Failed to generate share link');
         return null;
     }
 }
 
 async function shareOnFacebook(textId) {
     const shareUrl = await getShareUrl(textId);
-    if (shareUrl) {
-        window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`, '_blank');
-    }
+    if (shareUrl) window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`, '_blank');
 }
-
 async function shareOnWhatsApp(textId) {
     const shareUrl = await getShareUrl(textId);
-    if (shareUrl) {
-        window.open(`https://wa.me/?text=${encodeURIComponent(shareUrl)}`, '_blank');
-    }
+    if (shareUrl) window.open(`https://wa.me/?text=${encodeURIComponent(shareUrl)}`, '_blank');
 }
-
 async function shareOnTwitter(textId) {
     const shareUrl = await getShareUrl(textId);
-    if (shareUrl) {
-        window.open(`https://twitter.com/intent/tweet?url=${encodeURIComponent(shareUrl)}`, '_blank');
-    }
+    if (shareUrl) window.open(`https://twitter.com/intent/tweet?url=${encodeURIComponent(shareUrl)}`, '_blank');
 }
-
 async function shareOnLinkedIn(textId) {
     const shareUrl = await getShareUrl(textId);
-    if (shareUrl) {
-        window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`, '_blank');
-    }
+    if (shareUrl) window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`, '_blank');
 }
-
 async function copyShareLink(textId) {
     const shareUrl = await getShareUrl(textId);
     if (shareUrl) {
         navigator.clipboard.writeText(shareUrl)
-            .then(() => alert("✅ Link copied!"))
-            .catch(() => alert("❌ Copy failed"));
+            .then(() => alert('✅ Link copied!'))
+            .catch(() => alert('❌ Copy failed'));
     }
 }
 
-// Bind buttons
+// Bind icons
 document.getElementById('fbShare').addEventListener('click', (e) => {
     e.preventDefault();
     shareOnFacebook({{ ghazal.id }});
