@@ -3,7 +3,7 @@
 
 {% block extra_css %}
 <style>
-    /* Force these styles – override any external issues */
+    /* Critical styles for border and vertical line – ensures they apply */
     .verse-number { display: none !important; }
     .ghazal-card {
         background: linear-gradient(135deg, #fff6e8, #fff2e0);
@@ -27,7 +27,6 @@
         margin-bottom: 0;
         padding-bottom: 0;
     }
-    /* Vertical dashed line */
     .bilingual-verse::after {
         content: '';
         position: absolute;
@@ -79,8 +78,6 @@
 {% endblock %}
 
 {% block content %}
-<!-- The rest of your content remains exactly the same as before -->
-<!-- (Keep the HTML structure you already have, unchanged) -->
 <div class="view-container">
     <div class="ghazal-hero">
         <div class="hero-poet">{{ ghazal.poet_name | upper }}</div>
@@ -114,7 +111,7 @@
             <audio id="audioPlayer" controls preload="none"></audio>
         </div>
 
-        <!-- Dedication Section -->
+        <!-- Dedication Section – only share buttons here -->
         <div class="dedication-section">
             <button id="showDedicationFormBtn" class="dedication-btn">
                 💖 Dedicate and share your loved ones (اپنے پیاروں کا نام شیئر کریں)
@@ -165,7 +162,94 @@
 </div>
 
 <script>
-// All your existing JavaScript (unchanged) – keep it exactly as before
-// (playAudio, dedication form handling, share functions, etc.)
+function playAudio(id) {
+    const container = document.getElementById('audioContainer');
+    const player = document.getElementById('audioPlayer');
+    const loading = document.getElementById('loading');
+    if (!player) return;
+    container.style.display = 'block';
+    loading.style.display = 'inline';
+    loading.innerText = "⏳ Generating audio...";
+    const url = `/listen/${id}?t=${Date.now()}`;
+    player.pause();
+    player.currentTime = 0;
+    player.src = url;
+    player.load();
+    player.oncanplay = () => {
+        loading.style.display = 'none';
+        player.play().catch(err => console.warn("Autoplay blocked:", err));
+    };
+    player.onerror = () => {
+        loading.innerText = "❌ Failed to load audio";
+    };
+}
+
+const showBtn = document.getElementById('showDedicationFormBtn');
+const formDiv = document.getElementById('dedicationForm');
+const dedicatorInput = document.getElementById('dedicator');
+const dedicateeInput = document.getElementById('dedicatee');
+const dedicationDisplay = document.getElementById('dedicationDisplay');
+
+showBtn.addEventListener('click', () => {
+    formDiv.style.display = formDiv.style.display === 'none' ? 'block' : 'none';
+});
+
+function updateDedicationDisplay() {
+    const dedicator = dedicatorInput.value.trim();
+    const dedicatee = dedicateeInput.value.trim();
+    if (dedicator && dedicatee) {
+        dedicationDisplay.innerHTML = `<strong>From:</strong> ${dedicator} &nbsp;|&nbsp; <strong>Dedicated to:</strong> ${dedicatee}`;
+        dedicationDisplay.style.display = 'block';
+    } else {
+        dedicationDisplay.style.display = 'none';
+    }
+}
+dedicatorInput.addEventListener('input', updateDedicationDisplay);
+dedicateeInput.addEventListener('input', updateDedicationDisplay);
+
+async function getShareUrl(textId) {
+    const dedicator = dedicatorInput.value.trim();
+    const dedicatee = dedicateeInput.value.trim();
+    if (!dedicator || !dedicatee) {
+        alert('Please enter both names in the dedication form first.');
+        return null;
+    }
+    try {
+        const url = `/ghazals/share_image/${textId}?dedicator=${encodeURIComponent(dedicator)}&dedicatee=${encodeURIComponent(dedicatee)}`;
+        const res = await fetch(url);
+        const data = await res.json();
+        if (!data.share_url) throw new Error('No share_url');
+        return data.share_url;
+    } catch (err) {
+        console.error(err);
+        alert('Failed to generate share link');
+        return null;
+    }
+}
+
+// Make getShareUrl available globally for main.js functions
+window.getShareUrlFromPage = getShareUrl;
+
+// Bind share icons (use main.js functions or local ones)
+document.getElementById('fbShare').addEventListener('click', (e) => {
+    e.preventDefault();
+    window.shareOnFacebook({{ ghazal.id }});
+});
+document.getElementById('waShare').addEventListener('click', (e) => {
+    e.preventDefault();
+    window.shareOnWhatsApp({{ ghazal.id }});
+});
+document.getElementById('twShare').addEventListener('click', (e) => {
+    e.preventDefault();
+    window.shareOnTwitter({{ ghazal.id }});
+});
+document.getElementById('liShare').addEventListener('click', (e) => {
+    e.preventDefault();
+    window.shareOnLinkedIn({{ ghazal.id }});
+});
+document.getElementById('copyLink').addEventListener('click', (e) => {
+    e.preventDefault();
+    window.copyShareLink({{ ghazal.id }});
+});
 </script>
 {% endblock %}
