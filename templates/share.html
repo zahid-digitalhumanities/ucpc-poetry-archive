@@ -3,66 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <!-- 🔥 BASIC SEO -->
-    <title>UCPC Poetry Archive</title>
-    <meta name="description" content="A beautiful ghazal shared with love">
-
-    <!-- 🔥 OPEN GRAPH (WhatsApp, Facebook, LinkedIn) -->
     <meta property="og:title" content="UCPC Poetry Archive">
     <meta property="og:description" content="A beautiful ghazal shared with love">
     <meta property="og:image" content="{{ image_url }}">
     <meta property="og:url" content="{{ request.url }}">
     <meta property="og:type" content="website">
-    <meta property="og:site_name" content="UCPC Poetry Archive">
-
-    <!-- 🔥 IMPORTANT IMAGE TAGS -->
-    <meta property="og:image:width" content="800">
-    <meta property="og:image:height" content="800">
-    <meta property="og:image:type" content="image/png">
-
-    <!-- 🔥 TWITTER / X -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="UCPC Poetry Archive">
-    <meta name="twitter:description" content="A beautiful ghazal shared with love">
-    <meta name="twitter:image" content="{{ image_url }}">
-
-    <!-- 🔥 EXTRA (Better compatibility) -->
-    <meta name="theme-color" content="#0a0a0a">
-    <link rel="canonical" href="{{ request.url }}">
-
+    <title>UCPC Ghazal</title>
     <style>
-        body {
-            margin: 0;
-            background: #0a0a0a;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            font-family: system-ui, -apple-system, sans-serif;
-        }
-        .container {
-            text-align: center;
-            padding: 10px;
-        }
-        img {
-            max-width: 100%;
-            height: auto;
-            border-radius: 14px;
-            box-shadow: 0 6px 20px rgba(0,0,0,0.4);
-        }
-        .footer {
-            margin-top: 10px;
-            color: #aaa;
-            font-size: 14px;
-        }
+        body { margin: 0; background: #0a0a0a; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        img { max-width: 100%; height: auto; border-radius: 14px; box-shadow: 0 6px 20px rgba(0,0,0,0.4); }
     </style>
 </head>
-
 <body>
-    <div class="container">
-        <img src="{{ image_url }}" alt="Ghazal Image">
-        <div class="footer">UCPC Poetry Archive</div>
-    </div>
+    <img src="{{ image_url }}" alt="Ghazal Image">
 </body>
 </html>
