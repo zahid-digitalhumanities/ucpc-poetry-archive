@@ -195,35 +195,7 @@
     }
 </style>
 
-<script>
-    // Disable right-click
-    document.addEventListener('contextmenu', function(e) {
-        e.preventDefault();
-        return false;
-    });
 
-    // Disable copy, cut, paste events
-    document.addEventListener('copy', function(e) {
-        e.preventDefault();
-        return false;
-    });
-    document.addEventListener('cut', function(e) {
-        e.preventDefault();
-        return false;
-    });
-    document.addEventListener('paste', function(e) {
-        e.preventDefault();
-        return false;
-    });
-
-    // Disable keyboard shortcuts (Ctrl+C, Ctrl+X, etc.)
-    document.addEventListener('keydown', function(e) {
-        if ((e.ctrlKey || e.metaKey) && (e.key === 'c' || e.key === 'x' || e.key === 'v')) {
-            e.preventDefault();
-            return false;
-        }
-    });
-</script>
 </body>
 </html>
 
