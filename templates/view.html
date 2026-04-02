@@ -4,6 +4,7 @@
 {% block extra_css %}
 <style>
     .verse-number { display: none !important; }
+
     .dedication-btn {
         background: linear-gradient(135deg, #d4af37, #f5e7b2);
         color: #000;
@@ -51,12 +52,15 @@
         cursor: pointer;
     }
     .share-row a:hover { color: var(--gold); transform: translateY(-2px); }
+
+    /* Ghazal card – with thin gold border */
     .ghazal-card {
         background: linear-gradient(135deg, #fff6e8, #fff2e0);
-        border: 1px solid #f0e0cc;
+        border: 2px solid var(--gold);
         border-radius: 2rem;
         padding: 2rem 1.5rem;
         margin-bottom: 2rem;
+        box-shadow: 0 12px 28px -12px rgba(0,0,0,0.12);
     }
     .poet-name {
         text-align: center;
@@ -85,8 +89,28 @@
         margin-bottom: 2rem;
         padding-bottom: 1rem;
         border-bottom: 1px solid #f0e4cf;
+        position: relative;
     }
     .bilingual-verse:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+
+    /* Vertical dashed line between Urdu and English */
+    .bilingual-verse::after {
+        content: '';
+        position: absolute;
+        left: 50%;
+        top: 0;
+        bottom: 0;
+        width: 1px;
+        background: repeating-linear-gradient(
+            to bottom,
+            #d4af37,
+            #d4af37 10px,
+            transparent 10px,
+            transparent 20px
+        );
+        transform: translateX(-50%);
+    }
+
     .urdu-couplet {
         font-family: 'Jameel Noori Nastaleeq', 'Noto Nastaliq Urdu', serif;
         font-size: 1.5rem;
@@ -102,7 +126,14 @@
         color: #4a5568;
         text-align: left;
     }
-    .ghazal-hero { background: linear-gradient(135deg, #0F2B3D, #1E3C72); padding: 2rem; text-align: center; color: white; }
+
+    /* Hero section */
+    .ghazal-hero {
+        background: linear-gradient(135deg, #0F2B3D, #1E3C72);
+        padding: 2rem;
+        text-align: center;
+        color: white;
+    }
     .hero-poet { font-size: 0.85rem; letter-spacing: 3px; color: var(--gold); text-transform: uppercase; }
     .hero-title-english { font-size: 1.8rem; font-weight: 700; margin: 1rem 0 0.5rem; }
     .hero-title-urdu { font-family: 'Jameel Noori Nastaleeq', serif; font-size: 2rem; color: #F5E7B2; direction: rtl; }
@@ -122,6 +153,7 @@
     .nav-btn-all { background: var(--gold); color: #1E3C72; }
     @media (max-width: 768px) {
         .bilingual-verse { grid-template-columns: 1fr; gap: 1rem; }
+        .bilingual-verse::after { display: none; }
         .urdu-couplet { font-size: 1.2rem; line-height: 1.8rem; }
         .english-couplet { font-size: 0.9rem; }
         .hero-title-english { font-size: 1.4rem; }
@@ -166,7 +198,7 @@
             <audio id="audioPlayer" controls preload="none"></audio>
         </div>
 
-        <!-- Dedication Section – ONLY share buttons here -->
+        <!-- Dedication Section – only share buttons here -->
         <div class="dedication-section">
             <button id="showDedicationFormBtn" class="dedication-btn">
                 💖 Dedicate and share your loved ones (اپنے پیاروں کا نام شیئر کریں)
