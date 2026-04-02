@@ -191,7 +191,6 @@ def share_image(text_id):
     file_size = os.path.getsize(filepath)
     print(f"✅ Image saved: {filepath} (size: {file_size} bytes)")
 
-    # If file size is zero, something went wrong
     if file_size == 0:
         return jsonify({"error": "Image generation failed (zero size)"}), 500
 
