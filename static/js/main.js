@@ -18,70 +18,49 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 // =======================================================
-// 🔥 SOCIAL SHARE FUNCTION (ALL PLATFORMS)
+// 🔥 CORE SHARE FUNCTION (FIXED)
 // =======================================================
 
-async function shareGhazal(textId) {
+async function getShareUrl(textId) {
     try {
         const res = await fetch(`/ghazals/share_image/${textId}`);
         const data = await res.json();
 
         if (!data.share_url) {
-            alert("❌ Error generating share link");
-            return;
+            throw new Error("No share_url");
         }
 
-        const url = data.share_url;
-
-        // 🔥 Default: WhatsApp
-        window.open(`https://wa.me/?text=${encodeURIComponent(url)}`);
+        return data.share_url;
 
     } catch (err) {
-        console.error("Share error:", err);
-        alert("❌ Something went wrong");
+        console.error("Share URL Error:", err);
+        alert("❌ Failed to generate share link");
+        return null;
     }
 }
 
 
 // =======================================================
-// 🔥 PLATFORM SPECIFIC SHARES
+// 🔥 QUICK WHATSAPP SHARE
 // =======================================================
 
-function shareWhatsApp(url) {
+async function shareGhazal(textId) {
+    const url = await getShareUrl(textId);
+    if (!url) return;
+
     window.open(`https://wa.me/?text=${encodeURIComponent(url)}`);
 }
 
-function shareFacebook(url) {
-    window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`);
-}
-
-function shareTwitter(url) {
-    window.open(`https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}`);
-}
-
-function shareLinkedIn(url) {
-    window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`);
-}
-
 
 // =======================================================
-// 🔥 ADVANCED SHARE (WITH UI OPTIONS)
+// 🔥 MULTI PLATFORM SHARE MENU
 // =======================================================
 
 async function openShareMenu(textId) {
-    try {
-        const res = await fetch(`/ghazals/share_image/${textId}`);
-        const data = await res.json();
+    const url = await getShareUrl(textId);
+    if (!url) return;
 
-        if (!data.share_url) {
-            alert("❌ Error generating share link");
-            return;
-        }
-
-        const url = data.share_url;
-
-        // 🔥 Simple prompt menu (can upgrade to modal later)
-        const choice = prompt(
+    const choice = prompt(
 `Share Ghazal:
 
 1 = WhatsApp
@@ -92,29 +71,24 @@ async function openShareMenu(textId) {
 
 Enter choice:`);
 
-        switch(choice) {
-            case "1":
-                shareWhatsApp(url);
-                break;
-            case "2":
-                shareFacebook(url);
-                break;
-            case "3":
-                shareTwitter(url);
-                break;
-            case "4":
-                shareLinkedIn(url);
-                break;
-            case "5":
-                copyToClipboard(url);
-                break;
-            default:
-                alert("❌ Invalid choice");
-        }
-
-    } catch (err) {
-        console.error(err);
-        alert("❌ Share failed");
+    switch(choice) {
+        case "1":
+            window.open(`https://wa.me/?text=${encodeURIComponent(url)}`);
+            break;
+        case "2":
+            window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`);
+            break;
+        case "3":
+            window.open(`https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}`);
+            break;
+        case "4":
+            window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`);
+            break;
+        case "5":
+            copyToClipboard(url);
+            break;
+        default:
+            alert("❌ Invalid choice");
     }
 }
 
