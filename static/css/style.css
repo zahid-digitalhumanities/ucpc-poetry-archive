@@ -130,7 +130,7 @@ input:focus {
 }
 
 /* ======================================================= */
-/* NEW STYLES FOR GHAZAL CARD – BORDER & VERTICAL LINE     */
+/* GHAZAL CARD – BORDER & VERTICAL LINE                   */
 /* ======================================================= */
 .verse-number {
     display: none !important;
@@ -188,11 +188,11 @@ input:focus {
     cursor: pointer;
 }
 .share-row a:hover {
-    color: var(--gold);
+    color: #D4AF37;
     transform: translateY(-2px);
 }
 
-/* Ghazal card – with thin gold border */
+/* Ghazal card – thin gold border */
 .ghazal-card {
     background: linear-gradient(135deg, #fff6e8, #fff2e0);
     border: 2px solid #D4AF37;
