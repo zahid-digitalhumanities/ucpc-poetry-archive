@@ -38,19 +38,19 @@
         border-radius: 1rem;
         font-size: 1rem;
     }
-    .social-share-icons {
+    .share-row {
         margin-top: 1rem;
         display: flex;
-        gap: 1.5rem;
+        gap: 1rem;
         justify-content: center;
     }
-    .social-share-icons a {
-        font-size: 2.2rem;
+    .share-row a {
+        font-size: 2rem;
         color: #9a7b4b;
         transition: 0.2s;
         cursor: pointer;
     }
-    .social-share-icons a:hover { color: var(--gold); transform: translateY(-2px); }
+    .share-row a:hover { color: var(--gold); transform: translateY(-2px); }
     .ghazal-card {
         background: linear-gradient(135deg, #fff6e8, #fff2e0);
         border: 1px solid #f0e0cc;
@@ -115,8 +115,6 @@
     .insight-box { background: #fff9e6; border-left: 5px solid var(--gold); padding: 1rem 1.5rem; border-radius: 1rem; margin-bottom: 2rem; font-size: 0.9rem; color: #2c3e50; }
     .card-footer { margin-top: 2rem; padding-top: 1.2rem; border-top: 1px solid #e2d5c0; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; }
     .tribute { font-style: italic; color: #6c757d; }
-    .social-icons { display: flex; gap: 0.8rem; }
-    .social-icons a { color: #9a7b4b; font-size: 1.2rem; }
     .ucpc-watermark { font-size: 0.7rem; color: #cdb38c; text-align: center; margin-top: 1rem; }
     .nav-buttons { display: flex; justify-content: center; gap: 1rem; margin: 2rem 0; flex-wrap: wrap; }
     .nav-btn { padding: 0.6rem 1.5rem; border-radius: 2rem; text-decoration: none; font-weight: 600; }
@@ -129,7 +127,7 @@
         .hero-title-english { font-size: 1.4rem; }
         .hero-title-urdu { font-size: 1.6rem; }
         .dedication-btn { font-size: 1rem; padding: 0.6rem 1.2rem; }
-        .social-share-icons a { font-size: 1.8rem; }
+        .share-row a { font-size: 1.5rem; }
     }
 </style>
 {% endblock %}
@@ -168,7 +166,7 @@
             <audio id="audioPlayer" controls preload="none"></audio>
         </div>
 
-        <!-- Dedication Section – only one set of share buttons here -->
+        <!-- Dedication Section – ONLY share buttons here -->
         <div class="dedication-section">
             <button id="showDedicationFormBtn" class="dedication-btn">
                 💖 Dedicate and share your loved ones (اپنے پیاروں کا نام شیئر کریں)
@@ -176,7 +174,7 @@
             <div id="dedicationForm" class="dedication-form">
                 <input type="text" id="dedicator" placeholder="Your Name">
                 <input type="text" id="dedicatee" placeholder="Dedicate To">
-                <div class="social-share-icons">
+                <div class="share-row">
                     <a href="#" id="fbShare"><i class="fab fa-facebook-f"></i></a>
                     <a href="#" id="waShare"><i class="fab fa-whatsapp"></i></a>
                     <a href="#" id="twShare"><i class="fab fa-twitter"></i></a>
@@ -206,11 +204,6 @@
             </div>
             <div class="card-footer">
                 <div class="tribute"><i class="fas fa-heart"></i> Shared with love for my teacher, father, and mother.</div>
-                <div class="social-icons">
-                    <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.url }}" target="_blank"><i class="fab fa-facebook-f"></i></a>
-                    <a href="https://twitter.com/intent/tweet?text=UCPC%20Poetry%20Archive&url={{ request.url }}" target="_blank"><i class="fab fa-twitter"></i></a>
-                    <a href="https://wa.me/?text=Explore%20UCPC%20Poetry%20Archive%3A%20{{ request.url }}" target="_blank"><i class="fab fa-whatsapp"></i></a>
-                </div>
             </div>
             <div class="ucpc-watermark">UCPC Poetry Archive • Preserving Urdu Poetry</div>
         </div>
