@@ -11,6 +11,17 @@ def get_font(font_name, size):
         logging.warning(f"Could not load {font_name}: {e}")
         return ImageFont.load_default()
 
+def draw_centered_text(draw, text, y, font, color, width):
+    """Draw centered text (supports multiline)."""
+    lines = text.split('\n')
+    for line in lines:
+        bbox = draw.textbbox((0, 0), line, font=font)
+        line_width = bbox[2] - bbox[0]
+        x = (width - line_width) // 2
+        draw.text((x, y), line, font=font, fill=color)
+        y += bbox[3] - bbox[1] + 10  # line height + spacing
+    return y
+
 def generate_ghazal_card(ghazal, verses, dedicator='', dedicatee=''):
     width = 1080
     height = 1920
@@ -27,17 +38,17 @@ def generate_ghazal_card(ghazal, verses, dedicator='', dedicatee=''):
     img = Image.new('RGB', (width, height), bg_color)
     draw = ImageDraw.Draw(img)
 
-    # Poet name
+    # Poet name (Urdu + English) – multiline
     poet_ur = ghazal.get('poet_name_urdu', '')
     poet_en = ghazal.get('poet_name', '')
     poet_text = f"{poet_ur}\n{poet_en}" if poet_ur else poet_en
-    draw.text((width//2, 120), poet_text, font=poet_font, fill=gold, anchor='mt')
+    y = draw_centered_text(draw, poet_text, 120, poet_font, gold, width)
 
     # Verses
     margin = 80
     urdu_x = width - margin
     english_x = margin
-    y = 280
+    y = max(y + 40, 280)
     line_spacing = 90
     couplet_spacing = 40
 
