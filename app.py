@@ -53,7 +53,7 @@ def create_app():
         return "<br>".join([str(rule) for rule in app.url_map.iter_rules()])
 
     # =========================================================
-    # 📤 IMAGE UPLOAD (SOCIAL SHARING)
+    # 📤 IMAGE UPLOAD (SOCIAL SHARING) – optional, kept for compatibility
     # =========================================================
     @app.route('/upload_image', methods=['POST'])
     def upload_image():
@@ -75,7 +75,6 @@ def create_app():
                 f.write(binary)
 
             base_url = request.host_url.rstrip('/')
-
             image_url = f"{base_url}/static/generated/{filename}"
             share_url = f"{base_url}/share/{filename}"
 
@@ -97,12 +96,11 @@ def create_app():
         Universal share page:
         Works on WhatsApp, Facebook, LinkedIn, X
         """
-
         base_url = request.host_url.rstrip('/')
         image_url = f"{base_url}/static/generated/{filename}"
         page_url = f"{base_url}/share/{filename}"
 
-        # 🔥 Dynamic content (future: DB se load kar sakte ho)
+        # Dynamic content (can be extended later)
         title = request.args.get('title', 'UCPC Poetry Archive')
         description = request.args.get('desc', 'Beautiful Urdu & English Ghazal')
 
@@ -148,12 +146,7 @@ app = create_app()
 # 🚀 RUN (RENDER COMPATIBLE)
 # =========================================================
 if __name__ == "__main__":
-    # Get port from environment (Render sets PORT, default 10000)
     port = int(os.environ.get("PORT", 10000))
-    
-    # Determine if we are in production (e.g., Render) or local
-    # Production should never use debug=True
     debug_mode = os.environ.get("FLASK_ENV") != "production" and not os.environ.get("RENDER")
-    
     print(f"🔥 Running on port {port} (debug={debug_mode})")
     app.run(host="0.0.0.0", port=port, debug=debug_mode)
