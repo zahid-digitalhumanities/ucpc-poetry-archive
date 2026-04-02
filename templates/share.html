@@ -5,12 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <!-- 🔥 BASIC SEO -->
-    <title>{{ title or "UCPC Poetry Archive" }}</title>
-    <meta name="description" content="{{ description or 'Beautiful Urdu & English Ghazal' }}">
+    <title>UCPC Poetry Archive</title>
+    <meta name="description" content="A beautiful ghazal shared with love">
 
     <!-- 🔥 OPEN GRAPH (WhatsApp, Facebook, LinkedIn) -->
-    <meta property="og:title" content="{{ title or 'UCPC Poetry Archive' }}">
-    <meta property="og:description" content="{{ description or 'Beautiful Urdu & English Ghazal' }}">
+    <meta property="og:title" content="UCPC Poetry Archive">
+    <meta property="og:description" content="A beautiful ghazal shared with love">
     <meta property="og:image" content="{{ image_url }}">
     <meta property="og:url" content="{{ request.url }}">
     <meta property="og:type" content="website">
@@ -23,8 +23,8 @@
 
     <!-- 🔥 TWITTER / X -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="{{ title or 'UCPC Poetry Archive' }}">
-    <meta name="twitter:description" content="{{ description or 'Beautiful Urdu & English Ghazal' }}">
+    <meta name="twitter:title" content="UCPC Poetry Archive">
+    <meta name="twitter:description" content="A beautiful ghazal shared with love">
     <meta name="twitter:image" content="{{ image_url }}">
 
     <!-- 🔥 EXTRA (Better compatibility) -->
@@ -41,19 +41,16 @@
             min-height: 100vh;
             font-family: system-ui, -apple-system, sans-serif;
         }
-
         .container {
             text-align: center;
             padding: 10px;
         }
-
         img {
             max-width: 100%;
             height: auto;
             border-radius: 14px;
             box-shadow: 0 6px 20px rgba(0,0,0,0.4);
         }
-
         .footer {
             margin-top: 10px;
             color: #aaa;
