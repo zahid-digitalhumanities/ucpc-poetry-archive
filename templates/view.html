@@ -3,21 +3,38 @@
 
 {% block extra_css %}
 <style>
-    /* Critical styles for border and vertical line – ensures they apply */
+    /* Additional inline styles to ensure critical layout (can be moved to style.css later) */
     .verse-number { display: none !important; }
     .ghazal-card {
-        background: linear-gradient(135deg, #fff6e8, #fff2e0);
-        border: 2px solid #D4AF37 !important;
+        background: linear-gradient(135deg, #fffef7, #fff9ed);
+        border: 1px solid rgba(212,175,55,0.3);
         border-radius: 2rem;
         padding: 2rem 1.5rem;
         margin-bottom: 2rem;
         box-shadow: 0 12px 28px -12px rgba(0,0,0,0.12);
+        transition: transform 0.2s;
     }
+    .poet-name {
+        font-family: 'Jameel Noori Nastaleeq', 'Noto Nastaliq Urdu', serif;
+        font-size: 2.5rem;
+        text-align: center;
+        color: #1E3C72;
+        margin-bottom: 0.75rem;
+        letter-spacing: 1px;
+    }
+    .poet-line {
+        width: 80px;
+        height: 3px;
+        background: #D4AF37;
+        margin: 0 auto 1.5rem auto;
+        border-radius: 2px;
+    }
+    /* Bilingual couplets */
     .bilingual-verse {
         display: grid;
         grid-template-columns: 1fr 1fr;
         gap: 2rem;
-        margin-bottom: 2rem;
+        margin-bottom: 1.8rem;
         padding-bottom: 1rem;
         border-bottom: 1px solid #f0e4cf;
         position: relative;
@@ -36,17 +53,17 @@
         width: 1px;
         background: repeating-linear-gradient(
             to bottom,
-            #d4af37,
-            #d4af37 10px,
-            transparent 10px,
-            transparent 20px
+            #D4AF37,
+            #D4AF37 8px,
+            transparent 8px,
+            transparent 16px
         );
         transform: translateX(-50%);
     }
     .urdu-couplet {
         font-family: 'Jameel Noori Nastaleeq', 'Noto Nastaliq Urdu', serif;
-        font-size: 1.5rem;
-        line-height: 2.2rem;
+        font-size: 1.6rem;
+        line-height: 2.4rem;
         direction: rtl;
         color: #0F2B3D;
         text-align: center;
@@ -54,9 +71,217 @@
     .english-couplet {
         font-family: 'Georgia', serif;
         font-size: 1rem;
-        line-height: 1.5rem;
+        line-height: 1.6rem;
         color: #4a5568;
         text-align: left;
+    }
+    /* Urdu‑only mode */
+    .urdu-only-verses {
+        text-align: center;
+        direction: rtl;
+    }
+    .urdu-only-verses .urdu-couplet {
+        font-size: 1.8rem;
+        line-height: 2.8rem;
+        margin-bottom: 1.5rem;
+    }
+    /* English‑only mode */
+    .english-only-verses {
+        text-align: center;
+    }
+    .english-only-verses .english-couplet {
+        font-size: 1.2rem;
+        line-height: 1.8rem;
+        margin-bottom: 1.5rem;
+        text-align: center;
+    }
+    /* Dedication display */
+    .dedication-display {
+        background: #fef3c7;
+        border-radius: 1.5rem;
+        padding: 1rem 1.5rem;
+        margin: 1.5rem 0 1rem;
+        text-align: center;
+        font-family: 'Georgia', serif;
+        font-size: 1.1rem;
+        color: #b45309;
+        border-left: 4px solid #D4AF37;
+        border-right: 4px solid #D4AF37;
+    }
+    .dedication-display p {
+        margin: 0.25rem 0;
+    }
+    /* Hero, buttons, audio, etc. – elegant styles */
+    .ghazal-hero {
+        background: linear-gradient(135deg, #0F2B3D, #1E3C72);
+        padding: 2rem;
+        text-align: center;
+        color: white;
+        border-radius: 2rem;
+        margin-bottom: 2rem;
+    }
+    .hero-poet {
+        font-size: 0.9rem;
+        letter-spacing: 4px;
+        color: #D4AF37;
+        text-transform: uppercase;
+    }
+    .hero-title-english {
+        font-size: 1.8rem;
+        font-weight: 700;
+        margin: 0.5rem 0;
+    }
+    .hero-title-urdu {
+        font-family: 'Jameel Noori Nastaleeq', serif;
+        font-size: 2rem;
+        color: #F5E7B2;
+        direction: rtl;
+    }
+    .mode-switcher {
+        display: flex;
+        justify-content: center;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+        margin-bottom: 1.5rem;
+    }
+    .mode-btn, .listen-btn {
+        padding: 0.5rem 1.2rem;
+        border-radius: 2rem;
+        border: 1px solid #ddd;
+        background: white;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .mode-btn.active {
+        background: #1E3C72;
+        color: white;
+        border-color: #D4AF37;
+    }
+    .listen-btn {
+        background: #D4AF37;
+        color: #1E3C72;
+        border: none;
+    }
+    .listen-btn:hover {
+        background: #b8860b;
+        color: white;
+    }
+    .audio-player-container {
+        background: #f1f5f9;
+        border-radius: 3rem;
+        padding: 0.8rem;
+        margin-bottom: 2rem;
+        text-align: center;
+        display: none;
+    }
+    audio {
+        width: 100%;
+        max-width: 500px;
+        border-radius: 2rem;
+    }
+    .insight-box {
+        background: #fff9e6;
+        border-left: 5px solid #D4AF37;
+        padding: 1rem 1.5rem;
+        border-radius: 1rem;
+        margin-bottom: 2rem;
+        font-size: 0.9rem;
+        color: #2c3e50;
+    }
+    .dedication-btn {
+        background: linear-gradient(135deg, #d4af37, #f5e7b2);
+        color: #000;
+        font-weight: bold;
+        font-size: 1.1rem;
+        padding: 0.7rem 1.5rem;
+        border-radius: 50px;
+        border: none;
+        transition: 0.3s;
+        cursor: pointer;
+        width: 100%;
+        max-width: 350px;
+        margin: 0 auto 1rem;
+        display: block;
+    }
+    .dedication-form {
+        background: #fff9e6;
+        border-radius: 1.5rem;
+        padding: 1.5rem;
+        margin-top: 1rem;
+        display: none;
+        max-width: 500px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    .dedication-form input {
+        width: 100%;
+        margin-bottom: 0.8rem;
+        padding: 0.6rem;
+        border: 1px solid #ccc;
+        border-radius: 1rem;
+        font-size: 1rem;
+    }
+    .share-row {
+        margin-top: 1rem;
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+    }
+    .share-row a {
+        font-size: 1.8rem;
+        color: #9a7b4b;
+        transition: 0.2s;
+        cursor: pointer;
+    }
+    .share-row a:hover {
+        color: #D4AF37;
+        transform: translateY(-2px);
+    }
+    .card-footer {
+        margin-top: 2rem;
+        padding-top: 1rem;
+        border-top: 1px solid #e2d5c0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    .tribute {
+        font-style: italic;
+        color: #6c757d;
+        font-size: 0.9rem;
+    }
+    .ucpc-watermark {
+        font-size: 0.7rem;
+        color: #cdb38c;
+        text-align: center;
+        margin-top: 1rem;
+    }
+    .nav-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        margin: 2rem 0;
+        flex-wrap: wrap;
+    }
+    .nav-btn {
+        padding: 0.6rem 1.5rem;
+        border-radius: 2rem;
+        text-decoration: none;
+        font-weight: 600;
+        background: #1E3C72;
+        color: white;
+        transition: 0.2s;
+    }
+    .nav-btn-all {
+        background: #D4AF37;
+        color: #1E3C72;
+    }
+    .nav-btn:hover {
+        transform: translateY(-2px);
+        filter: brightness(0.95);
     }
     @media (max-width: 768px) {
         .bilingual-verse {
@@ -67,11 +292,26 @@
             display: none;
         }
         .urdu-couplet {
-            font-size: 1.2rem;
-            line-height: 1.8rem;
+            font-size: 1.3rem;
+            line-height: 2rem;
         }
         .english-couplet {
             font-size: 0.9rem;
+        }
+        .poet-name {
+            font-size: 2rem;
+        }
+        .hero-title-english {
+            font-size: 1.4rem;
+        }
+        .hero-title-urdu {
+            font-size: 1.6rem;
+        }
+        .share-row a {
+            font-size: 1.5rem;
+        }
+        .dedication-btn {
+            font-size: 1rem;
         }
     }
 </style>
@@ -103,6 +343,8 @@
 
         <div class="mode-switcher">
             <button class="mode-btn" data-mode="bilingual">📖 Bilingual</button>
+            <button class="mode-btn" data-mode="urdu">🇵🇰 اردو</button>
+            <button class="mode-btn" data-mode="english">🇬🇧 English</button>
             <button class="mode-btn listen-btn" onclick="playAudio({{ ghazal.id }})"><i class="fas fa-headphones"></i> Listen Ghazal</button>
         </div>
 
@@ -111,7 +353,7 @@
             <audio id="audioPlayer" controls preload="none"></audio>
         </div>
 
-        <!-- Dedication Section – only share buttons here -->
+        <!-- Dedication Section -->
         <div class="dedication-section">
             <button id="showDedicationFormBtn" class="dedication-btn">
                 💖 Dedicate and share your loved ones (اپنے پیاروں کا نام شیئر کریں)
@@ -120,19 +362,21 @@
                 <input type="text" id="dedicator" placeholder="Your Name">
                 <input type="text" id="dedicatee" placeholder="Dedicate To">
                 <div class="share-row">
-                    <a href="#" id="fbShare"><i class="fab fa-facebook-f"></i></a>
-                    <a href="#" id="waShare"><i class="fab fa-whatsapp"></i></a>
-                    <a href="#" id="twShare"><i class="fab fa-twitter"></i></a>
-                    <a href="#" id="liShare"><i class="fab fa-linkedin-in"></i></a>
-                    <a href="#" id="copyLink"><i class="fas fa-link"></i></a>
+                    <a href="#" id="fbShare" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" id="waShare" title="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+                    <a href="#" id="twShare" title="Twitter"><i class="fab fa-twitter"></i></a>
+                    <a href="#" id="liShare" title="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="#" id="copyLink" title="Copy Link"><i class="fas fa-link"></i></a>
                 </div>
             </div>
         </div>
 
-        <!-- Ghazal card -->
+        <!-- Ghazal Card -->
         <div class="ghazal-card" id="ghazalCard">
-            <div class="poet-name">{{ ghazal.poet_name_urdu }} ({{ ghazal.poet_name }})</div>
-            <div id="dedicationDisplay" class="dedication-display" style="display: none;"></div>
+            <div class="poet-name">{{ ghazal.poet_name_urdu }}</div>
+            <div class="poet-line"></div>
+
+            <!-- Bilingual View -->
             <div id="bilingualView">
                 {% for verse in verses %}
                 <div class="bilingual-verse">
@@ -147,6 +391,34 @@
                 </div>
                 {% endfor %}
             </div>
+
+            <!-- Urdu‑only View -->
+            <div id="urduOnlyView" style="display: none;">
+                <div class="urdu-only-verses">
+                    {% for verse in verses %}
+                    <div class="urdu-couplet">
+                        <div>{{ verse.misra1_urdu }}</div>
+                        <div>{{ verse.misra2_urdu }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- English‑only View -->
+            <div id="englishOnlyView" style="display: none;">
+                <div class="english-only-verses">
+                    {% for verse in verses %}
+                    <div class="english-couplet">
+                        <div>{{ verse.misra1_english or 'Translation coming soon...' }}</div>
+                        <div>{{ verse.misra2_english or 'Translation coming soon...' }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Dedication Display (live) -->
+            <div id="dedicationDisplay" class="dedication-display" style="display: none;"></div>
+
             <div class="card-footer">
                 <div class="tribute"><i class="fas fa-heart"></i> Shared with love for my teacher, father, and mother.</div>
             </div>
@@ -162,6 +434,35 @@
 </div>
 
 <script>
+let currentMode = "{{ mode|default('bilingual') }}";
+
+function applyMode(mode) {
+    document.getElementById('bilingualView').style.display = 'none';
+    document.getElementById('urduOnlyView').style.display = 'none';
+    document.getElementById('englishOnlyView').style.display = 'none';
+    if (mode === 'bilingual') {
+        document.getElementById('bilingualView').style.display = 'block';
+    } else if (mode === 'urdu') {
+        document.getElementById('urduOnlyView').style.display = 'block';
+    } else if (mode === 'english') {
+        document.getElementById('englishOnlyView').style.display = 'block';
+    }
+    document.querySelectorAll('.mode-btn[data-mode]').forEach(btn => btn.classList.remove('active'));
+    let activeBtn = document.querySelector(`.mode-btn[data-mode="${mode}"]`);
+    if (activeBtn) activeBtn.classList.add('active');
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    applyMode(currentMode);
+    document.querySelectorAll('.mode-btn[data-mode]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            let mode = btn.dataset.mode;
+            fetch("{{ url_for('ghazals.set_mode', mode='') }}" + mode).catch(console.warn);
+            applyMode(mode);
+        });
+    });
+});
+
 function playAudio(id) {
     const container = document.getElementById('audioContainer');
     const player = document.getElementById('audioPlayer');
@@ -198,7 +499,7 @@ function updateDedicationDisplay() {
     const dedicator = dedicatorInput.value.trim();
     const dedicatee = dedicateeInput.value.trim();
     if (dedicator && dedicatee) {
-        dedicationDisplay.innerHTML = `<strong>From:</strong> ${dedicator} &nbsp;|&nbsp; <strong>Dedicated to:</strong> ${dedicatee}`;
+        dedicationDisplay.innerHTML = `<p><strong>sender name :</strong> ${dedicator}</p><p><strong>Dedicated to :</strong> ${dedicatee}</p>`;
         dedicationDisplay.style.display = 'block';
     } else {
         dedicationDisplay.style.display = 'none';
@@ -207,6 +508,7 @@ function updateDedicationDisplay() {
 dedicatorInput.addEventListener('input', updateDedicationDisplay);
 dedicateeInput.addEventListener('input', updateDedicationDisplay);
 
+// Share functions (use backend image generation)
 async function getShareUrl(textId) {
     const dedicator = dedicatorInput.value.trim();
     const dedicatee = dedicateeInput.value.trim();
@@ -227,29 +529,50 @@ async function getShareUrl(textId) {
     }
 }
 
-// Make getShareUrl available globally for main.js functions
-window.getShareUrlFromPage = getShareUrl;
+async function shareOnFacebook(textId) {
+    const shareUrl = await getShareUrl(textId);
+    if (shareUrl) window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`, '_blank');
+}
+async function shareOnWhatsApp(textId) {
+    const shareUrl = await getShareUrl(textId);
+    if (shareUrl) window.open(`https://wa.me/?text=${encodeURIComponent(shareUrl)}`, '_blank');
+}
+async function shareOnTwitter(textId) {
+    const shareUrl = await getShareUrl(textId);
+    if (shareUrl) window.open(`https://twitter.com/intent/tweet?url=${encodeURIComponent(shareUrl)}`, '_blank');
+}
+async function shareOnLinkedIn(textId) {
+    const shareUrl = await getShareUrl(textId);
+    if (shareUrl) window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`, '_blank');
+}
+async function copyShareLink(textId) {
+    const shareUrl = await getShareUrl(textId);
+    if (shareUrl) {
+        navigator.clipboard.writeText(shareUrl)
+            .then(() => alert('✅ Link copied!'))
+            .catch(() => alert('❌ Copy failed'));
+    }
+}
 
-// Bind share icons (use main.js functions or local ones)
 document.getElementById('fbShare').addEventListener('click', (e) => {
     e.preventDefault();
-    window.shareOnFacebook({{ ghazal.id }});
+    shareOnFacebook({{ ghazal.id }});
 });
 document.getElementById('waShare').addEventListener('click', (e) => {
     e.preventDefault();
-    window.shareOnWhatsApp({{ ghazal.id }});
+    shareOnWhatsApp({{ ghazal.id }});
 });
 document.getElementById('twShare').addEventListener('click', (e) => {
     e.preventDefault();
-    window.shareOnTwitter({{ ghazal.id }});
+    shareOnTwitter({{ ghazal.id }});
 });
 document.getElementById('liShare').addEventListener('click', (e) => {
     e.preventDefault();
-    window.shareOnLinkedIn({{ ghazal.id }});
+    shareOnLinkedIn({{ ghazal.id }});
 });
 document.getElementById('copyLink').addEventListener('click', (e) => {
     e.preventDefault();
-    window.copyShareLink({{ ghazal.id }});
+    copyShareLink({{ ghazal.id }});
 });
 </script>
 {% endblock %}
