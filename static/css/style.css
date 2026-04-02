@@ -1,19 +1,14 @@
 /* ===== GLOBAL STYLES ===== */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
+* { margin: 0; padding: 0; box-sizing: border-box; }
 body {
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
     background: #fdfbf7;
     color: #1E293B;
     scroll-behavior: smooth;
+    user-select: none;
+    -webkit-user-select: none;
 }
-a {
-    text-decoration: none;
-    color: inherit;
-}
+a { text-decoration: none; color: inherit; }
 .btn {
     padding: 10px 18px;
     border-radius: 10px;
@@ -23,151 +18,45 @@ a {
     cursor: pointer;
     transition: 0.3s ease;
 }
-.btn:hover {
-    background: #0F2B3D;
-}
-input, textarea, select {
-    font-family: inherit;
-}
-/* Scrollbar */
-::-webkit-scrollbar {
-    width: 8px;
-}
-::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 10px;
-}
-::-webkit-scrollbar-thumb {
-    background: #D4AF37;
-    border-radius: 10px;
-}
-::-webkit-scrollbar-thumb:hover {
-    background: #b8860b;
-}
-/* Responsive container */
-.container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 1rem;
-}
-/* Urdu text base */
+.btn:hover { background: #0F2B3D; }
+input, textarea, select { font-family: inherit; }
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
+::-webkit-scrollbar-thumb { background: #D4AF37; border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: #b8860b; }
+.container { max-width: 1200px; margin: 0 auto; padding: 0 1rem; }
 .urdu-text, .urdu-font {
     font-family: 'Jameel Noori Nastaleeq', 'Noto Nastaliq Urdu', serif;
     direction: rtl;
     text-align: right;
     line-height: 2.2;
 }
-/* Hero section (used in header) */
-.hero-stats {
-    display: flex;
-    gap: 1.5rem;
-    justify-content: center;
-    background: rgba(255,255,255,0.1);
-    backdrop-filter: blur(8px);
-    border-radius: 3rem;
-    padding: 0.5rem 1.5rem;
-}
-.stat-item {
-    text-align: center;
-}
-.stat-number {
-    font-size: 1.5rem;
-    font-weight: bold;
-    color: #D4AF37;
-}
-.stat-label {
-    font-size: 0.7rem;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
+/* Hero stats (used in header) */
+.hero-stats { display: flex; gap: 1.5rem; justify-content: center; background: rgba(255,255,255,0.1); backdrop-filter: blur(8px); border-radius: 3rem; padding: 0.5rem 1.5rem; }
+.stat-item { text-align: center; }
+.stat-number { font-size: 1.5rem; font-weight: bold; color: #D4AF37; }
+.stat-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; }
 /* Flash messages */
-.flash-message {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 0.75rem 1rem;
-    border-radius: 1rem;
-    margin-bottom: 1rem;
-}
+.flash-message { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; border-radius: 1rem; margin-bottom: 1rem; }
 .flash-success { background: #dcfce7; border-left: 4px solid #22c55e; color: #166534; }
 .flash-error { background: #fee2e2; border-left: 4px solid #ef4444; color: #991b1b; }
 .flash-warning { background: #fef9c3; border-left: 4px solid #eab308; color: #854d0e; }
 .flash-info { background: #dbeafe; border-left: 4px solid #3b82f6; color: #1e3a8a; }
 /* Footer */
-.footer {
-    text-align: center;
-    padding: 1.5rem;
-    color: #6c757d;
-    border-top: 1px solid #e2e8f0;
-    margin-top: 2rem;
-}
-/* Navbar (basic, your navbar.html will override) */
-.navbar {
-    background: white;
-    border-bottom: 1px solid rgba(212,175,55,0.3);
-    position: sticky;
-    top: 0;
-    z-index: 50;
-}
-.nav-link {
-    padding: 0.5rem 1.2rem;
-    border-radius: 2rem;
-    font-weight: 600;
-    transition: 0.2s;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    color: #1E3C72;
-}
-.nav-link:hover, .nav-link.active {
-    background: #1E3C72;
-    color: white;
-}
-.nav-link i {
-    color: #D4AF37;
-}
-/* ===== GHAZAL PAGE SPECIFIC (elegant additions) ===== */
-.ghazal-card {
-    transition: transform 0.2s, box-shadow 0.2s;
-}
-.ghazal-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 20px 35px -12px rgba(0,0,0,0.15);
-}
-.poet-line {
-    transition: width 0.3s;
-}
-.ghazal-card:hover .poet-line {
-    width: 120px;
-}
-/* Ensure the vertical line in bilingual mode is smooth */
-.bilingual-verse::after {
-    transition: opacity 0.2s;
-}
-/* Buttons */
-.mode-btn, .listen-btn, .dedication-btn, .nav-btn {
-    transition: all 0.2s ease;
-}
-/* Responsive tables for poet list etc. */
-.poets-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 1.5rem;
-}
-.poet-card {
-    background: white;
-    border-radius: 1.5rem;
-    padding: 1.5rem;
-    text-align: center;
-    transition: 0.2s;
-    border: 1px solid #f0e4cf;
-}
-.poet-card:hover {
-    transform: translateY(-4px);
-    border-color: #D4AF37;
-    box-shadow: 0 12px 20px -12px rgba(212,175,55,0.3);
-}
-/* Ensure canvas is hidden */
-canvas {
-    display: none;
-}
+.footer { text-align: center; padding: 1.5rem; color: #6c757d; border-top: 1px solid #e2e8f0; margin-top: 2rem; }
+/* Navbar (your navbar.html will override) */
+.navbar { background: white; border-bottom: 1px solid rgba(212,175,55,0.3); position: sticky; top: 0; z-index: 50; }
+.nav-link { padding: 0.5rem 1.2rem; border-radius: 2rem; font-weight: 600; transition: 0.2s; display: inline-flex; align-items: center; gap: 0.5rem; color: #1E3C72; }
+.nav-link:hover, .nav-link.active { background: #1E3C72; color: white; }
+.nav-link i { color: #D4AF37; }
+/* Ghazal card specific */
+.ghazal-card { transition: transform 0.2s, box-shadow 0.2s; }
+.ghazal-card:hover { transform: translateY(-2px); box-shadow: 0 20px 35px -12px rgba(0,0,0,0.15); }
+.poet-line { transition: width 0.3s; }
+.ghazal-card:hover .poet-line { width: 120px; }
+.bilingual-verse::after { transition: opacity 0.2s; }
+.mode-btn, .listen-btn, .dedication-btn, .nav-btn { transition: all 0.2s ease; }
+.poets-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; }
+.poet-card { background: white; border-radius: 1.5rem; padding: 1.5rem; text-align: center; transition: 0.2s; border: 1px solid #f0e4cf; }
+.poet-card:hover { transform: translateY(-4px); border-color: #D4AF37; box-shadow: 0 12px 20px -12px rgba(212,175,55,0.3); }
+canvas { display: none; }
