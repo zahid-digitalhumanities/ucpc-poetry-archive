@@ -25,6 +25,11 @@
         transition: 0.3s;
         cursor: pointer;
         margin-bottom: 1rem;
+        width: 100%;
+        max-width: 400px;
+        margin-left: auto;
+        margin-right: auto;
+        display: block;
     }
     .dedication-btn:hover {
         transform: scale(1.02);
@@ -39,6 +44,9 @@
         margin-top: 1rem;
         text-align: left;
         display: none;
+        max-width: 500px;
+        margin-left: auto;
+        margin-right: auto;
     }
     .dedication-form input {
         width: 100%;
@@ -65,109 +73,61 @@
         transform: translateY(-2px);
     }
 
-    /* Improved English view */
-    .english-only-verses {
-        font-size: 1.3rem;
-        line-height: 2.2rem;
-        color: #2c3e50;
-        background: #f7f7f7;
-        padding: 2rem;
-        border-radius: 1.5rem;
-        text-align: center;
-    }
-
-    /* ===== Urdu‑only view – BLACK BACKGROUND, custom layout ===== */
-    #urduOnlyView {
-        background: #000000;
+    /* Ghazal card */
+    .ghazal-card {
+        background: linear-gradient(135deg, #fff6e8, #fff2e0);
+        border: 1px solid #f0e0cc;
         border-radius: 2rem;
         padding: 2rem 1.5rem;
-    }
-    .urdu-only-first-couplet {
-        font-family: 'Jameel Noori Nastaleeq', 'Noto Nastaliq Urdu', serif;
-        font-size: 2rem;
-        line-height: 3rem;
-        text-align: center;
-        direction: rtl;
-        color: #ffffff;
-        margin-bottom: 1.5rem;
-        padding-bottom: 1rem;
-        border-bottom: 1px solid rgba(212,175,55,0.3);
-    }
-    .urdu-only-poet {
-        font-family: 'Georgia', serif;
-        font-size: 1.2rem;
-        text-align: center;
-        color: #d4af37;
         margin-bottom: 2rem;
-        letter-spacing: 1px;
     }
-    .urdu-only-verses {
-        font-family: 'Jameel Noori Nastaleeq', 'Noto Nastaliq Urdu', serif;
+    .poet-name {
+        text-align: center;
         font-size: 1.8rem;
-        line-height: 2.8rem;
-        text-align: center;
-        direction: rtl;
-        color: #ffffff;
+        font-weight: bold;
+        color: #b8860b;
+        margin-bottom: 1rem;
+        font-family: 'Georgia', serif;
     }
-    .urdu-only-verses .verse-item {
-        margin-bottom: 2rem;
-    }
-    .dedication-block {
-        margin-top: 2rem;
-        padding-top: 1rem;
-        border-top: 1px solid rgba(212,175,55,0.5);
+    .dedication-display {
         text-align: center;
+        background: #fef3c7;
+        border-radius: 1rem;
+        padding: 0.8rem;
+        margin-bottom: 1.5rem;
         font-family: 'Georgia', serif;
         font-size: 1rem;
-        color: #d4af37;
+        color: #b45309;
+        border-left: 4px solid #d4af37;
+        border-right: 4px solid #d4af37;
     }
-    .dedication-block .dedicator-line {
-        font-weight: bold;
-        background: rgba(212,175,55,0.2);
-        display: inline-block;
-        padding: 0.2rem 1rem;
-        border-radius: 2rem;
-        margin-bottom: 0.5rem;
+    .bilingual-verse {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #f0e4cf;
     }
-    .dedication-block .dedicatee-line {
-        color: #f5e7b2;
+    .bilingual-verse:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+        padding-bottom: 0;
     }
-
-    /* Bilingual and English views share the same dedication block */
-    .existing-dedication {
-        background: #fff9e6;
-        border-radius: 1rem;
-        padding: 1rem;
-        margin-bottom: 1rem;
+    .urdu-couplet {
+        font-family: 'Jameel Noori Nastaleeq', 'Noto Nastaliq Urdu', serif;
+        font-size: 1.5rem;
+        line-height: 2.2rem;
+        direction: rtl;
+        color: #0F2B3D;
         text-align: center;
-        font-style: italic;
-        color: #b8860b;
     }
-
-    /* Top & bottom share buttons */
-    .share-top, .share-bottom {
-        display: flex;
-        gap: 1rem;
-        justify-content: center;
-        margin: 1rem 0;
-    }
-    .share-top button, .share-bottom button {
-        background: #25D366;
-        color: white;
-        border: none;
-        padding: 0.5rem 1rem;
-        border-radius: 2rem;
-        cursor: pointer;
-        font-weight: bold;
-        transition: 0.2s;
-    }
-    .share-top button:last-child, .share-bottom button:last-child {
-        background: #D4AF37;
-        color: #1E3C72;
-    }
-    .share-top button:hover, .share-bottom button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    .english-couplet {
+        font-family: 'Georgia', serif;
+        font-size: 1rem;
+        line-height: 1.5rem;
+        color: #4a5568;
+        text-align: left;
     }
 
     /* Rest of the CSS (keep your existing styles) */
@@ -179,10 +139,9 @@
     .mode-btn, .listen-btn { padding: 0.5rem 1.2rem; border-radius: 2rem; border: 1px solid #ddd; background: white; font-weight: 600; cursor: pointer; }
     .mode-btn.active { background: var(--primary); color: white; border-color: var(--gold); }
     .listen-btn { background: var(--gold); color: #1E3C72; border: none; }
-    .ghazal-card { background: linear-gradient(135deg, #fff6e8, #fff2e0); border: 1px solid #f0e0cc; border-radius: 2rem; padding: 2rem 1.5rem; margin-bottom: 2rem; }
-    .bilingual-verse { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem; border-bottom: 1px solid #f0e4cf; }
-    .urdu-couplet { font-family: 'Jameel Noori Nastaleeq', serif; font-size: 1.5rem; line-height: 2.2rem; direction: rtl; color: #0F2B3D; text-align: center; }
-    .english-couplet { font-family: 'Georgia', serif; font-size: 1rem; line-height: 1.5rem; color: #4a5568; text-align: left; }
+    .audio-player-container { background: #f1f5f9; border-radius: 3rem; padding: 1rem; margin-bottom: 2rem; text-align: center; display: none; }
+    audio { width: 100%; max-width: 500px; border-radius: 2rem; }
+    .insight-box { background: #fff9e6; border-left: 5px solid var(--gold); padding: 1rem 1.5rem; border-radius: 1rem; margin-bottom: 2rem; font-size: 0.9rem; color: #2c3e50; }
     .card-footer { margin-top: 2rem; padding-top: 1.2rem; border-top: 1px solid #e2d5c0; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; }
     .tribute { font-style: italic; color: #6c757d; }
     .social-icons { display: flex; gap: 0.8rem; }
@@ -196,13 +155,10 @@
         .bilingual-verse { grid-template-columns: 1fr; gap: 1rem; }
         .urdu-couplet { font-size: 1.2rem; line-height: 1.8rem; }
         .english-couplet { font-size: 0.9rem; }
-        .urdu-only-verses { font-size: 1.4rem; line-height: 2.2rem; }
-        .urdu-only-first-couplet { font-size: 1.6rem; line-height: 2.4rem; }
         .hero-title-english { font-size: 1.4rem; }
         .hero-title-urdu { font-size: 1.6rem; }
         .dedication-btn { font-size: 1rem; padding: 0.6rem 1.2rem; }
         .social-share-icons a { font-size: 1.8rem; }
-        .share-top button, .share-bottom button { padding: 0.4rem 0.8rem; font-size: 0.8rem; }
     }
 </style>
 {% endblock %}
@@ -234,19 +190,7 @@
 
         <div class="mode-switcher">
             <button class="mode-btn" data-mode="bilingual">📖 Bilingual</button>
-            <button class="mode-btn" data-mode="urdu">🇵🇰 اردو (Classic)</button>
             <button class="mode-btn listen-btn" onclick="playAudio({{ ghazal.id }})"><i class="fas fa-headphones"></i> Listen Ghazal</button>
-            <button class="mode-btn" data-mode="english">🇬🇧 English</button>
-        </div>
-
-        <!-- ✅ TOP SHARE BUTTONS (FIXED) -->
-        <div class="share-top">
-            <button onclick="shareGhazal({{ ghazal.id }})">
-                🟢 WhatsApp
-            </button>
-            <button onclick="openShareMenu({{ ghazal.id }})">
-                🔗 Share
-            </button>
         </div>
 
         <div class="audio-player-container" id="audioContainer">
@@ -254,7 +198,7 @@
             <audio id="audioPlayer" controls preload="none"></audio>
         </div>
 
-        <!-- Dedication Section (existing) -->
+        <!-- Dedication Section -->
         <div class="dedication-section">
             <button id="showDedicationFormBtn" class="dedication-btn">
                 💖 Dedicate and share your loved ones (اپنے پیاروں کا نام شیئر کریں)
@@ -266,22 +210,21 @@
                     <a href="#" id="fbShare" title="Share on Facebook"><i class="fab fa-facebook-f"></i></a>
                     <a href="#" id="waShare" title="Share on WhatsApp"><i class="fab fa-whatsapp"></i></a>
                     <a href="#" id="twShare" title="Share on Twitter"><i class="fab fa-twitter"></i></a>
-                    <a href="#" id="downloadBtn" title="Download Image"><i class="fas fa-download"></i></a>
+                    <a href="#" id="liShare" title="Share on LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="#" id="copyLink" title="Copy Link"><i class="fas fa-link"></i></a>
                 </div>
             </div>
         </div>
 
-        <!-- The ghazal card (display) -->
+        <!-- Ghazal card -->
         <div class="ghazal-card" id="ghazalCard">
-            <!-- Display dedication if present in URL (for bilingual/english views) -->
-            {% if dedication %}
-            <div class="existing-dedication">
-                <i class="fas fa-heart"></i> {{ dedication.dedicator }} dedicates this ghazal to {{ dedication.dedicatee }}
-                {% if dedication.message %} — {{ dedication.message }}{% endif %}
-            </div>
-            {% endif %}
+            <!-- Poet name (displayed always) -->
+            <div class="poet-name">{{ ghazal.poet_name_urdu }} ({{ ghazal.poet_name }})</div>
 
-            <!-- Bilingual view -->
+            <!-- Dedication display (will be filled by JS) -->
+            <div id="dedicationDisplay" class="dedication-display" style="display: none;"></div>
+
+            <!-- Bilingual verses -->
             <div id="bilingualView">
                 {% for verse in verses %}
                 <div class="bilingual-verse">
@@ -297,51 +240,7 @@
                 {% endfor %}
             </div>
 
-            <!-- Urdu‑only view (black background, matla above poet) -->
-            <div id="urduOnlyView" style="display: none;">
-                <!-- First couplet (matla) -->
-                <div class="urdu-only-first-couplet">
-                    {% if verses|length > 0 %}
-                        {{ verses[0].misra1_urdu }}<br>{{ verses[0].misra2_urdu }}
-                    {% endif %}
-                </div>
-
-                <!-- Poet name -->
-                <div class="urdu-only-poet">{{ ghazal.poet_name_urdu }}</div>
-
-                <!-- Remaining verses (from index 1 onwards) -->
-                <div class="urdu-only-verses">
-                    {% for verse in verses[1:] %}
-                    <div class="verse-item">
-                        <div>{{ verse.misra1_urdu }}</div>
-                        <div>{{ verse.misra2_urdu }}</div>
-                    </div>
-                    {% endfor %}
-                </div>
-
-                <!-- Dedication block (from URL or form) -->
-                {% if dedication %}
-                <div class="dedication-block">
-                    <div class="dedicator-line">{{ dedication.dedicator }}</div>
-                    <div class="dedicatee-line">→ {{ dedication.dedicatee }}</div>
-                    {% if dedication.message %}<div class="message-line">{{ dedication.message }}</div>{% endif %}
-                </div>
-                {% endif %}
-            </div>
-
-            <!-- English‑only view -->
-            <div id="englishOnlyView" style="display: none;">
-                <div class="english-only-verses">
-                    {% for verse in verses %}
-                    <div class="verse-item">
-                        <div>{{ verse.misra1_english or 'Translation coming soon...' }}</div>
-                        <div>{{ verse.misra2_english or 'Translation coming soon...' }}</div>
-                    </div>
-                    {% endfor %}
-                </div>
-            </div>
-
-            <!-- Footer (common to all views) -->
+            <!-- Footer -->
             <div class="card-footer">
                 <div class="tribute">
                     <i class="fas fa-heart"></i> Shared with love for my teacher, father, and mother.
@@ -357,16 +256,6 @@
             </div>
         </div>
 
-        <!-- ✅ BOTTOM SHARE BUTTONS (FIXED) -->
-        <div class="share-bottom">
-            <button onclick="shareGhazal({{ ghazal.id }})">
-                🟢 Share on WhatsApp
-            </button>
-            <button onclick="openShareMenu({{ ghazal.id }})">
-                🚀 Share Everywhere
-            </button>
-        </div>
-
         <div class="nav-buttons">
             {% if prev_id %}<a href="/view/{{ prev_id }}" class="nav-btn nav-btn-prev"><i class="fas fa-chevron-left"></i> Previous</a>{% endif %}
             <a href="/poet/{{ ghazal.poet_id }}" class="nav-btn nav-btn-all"><i class="fas fa-list"></i> All Poems</a>
@@ -378,31 +267,23 @@
 <canvas id="ghazalCanvas" width="1080" height="1920" style="display:none;"></canvas>
 
 <script>
-let currentMode = "{{ mode|default('bilingual') }}";
+let currentMode = "bilingual";
 
 function applyMode(mode) {
-    document.getElementById('bilingualView').style.display = 'none';
-    document.getElementById('urduOnlyView').style.display = 'none';
-    document.getElementById('englishOnlyView').style.display = 'none';
+    // Only bilingual mode is used now, but keep for compatibility
     if (mode === 'bilingual') {
         document.getElementById('bilingualView').style.display = 'block';
-    } else if (mode === 'urdu') {
-        document.getElementById('urduOnlyView').style.display = 'block';
-    } else if (mode === 'english') {
-        document.getElementById('englishOnlyView').style.display = 'block';
     }
-    document.querySelectorAll('.mode-btn[data-mode]').forEach(btn => btn.classList.remove('active'));
-    let activeBtn = document.querySelector(`.mode-btn[data-mode="${mode}"]`);
-    if (activeBtn) activeBtn.classList.add('active');
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    applyMode(currentMode);
+    applyMode('bilingual');
+    // Remove mode switcher buttons except bilingual? We keep them but ignore.
     document.querySelectorAll('.mode-btn[data-mode]').forEach(btn => {
         btn.addEventListener('click', () => {
-            let mode = btn.dataset.mode;
-            fetch("{{ url_for('ghazals.set_mode', mode='') }}" + mode).catch(console.warn);
-            applyMode(mode);
+            if (btn.dataset.mode === 'bilingual') {
+                applyMode('bilingual');
+            }
         });
     });
 });
@@ -429,187 +310,114 @@ function playAudio(id) {
     };
 }
 
-// --- Helper to draw centered Urdu text (for canvas) ---
-function drawCenteredText(ctx, text, y, font, color) {
-    if (!text) return;
-    ctx.font = font;
-    ctx.fillStyle = color;
-    ctx.textAlign = "center";
-    ctx.direction = "rtl";
-    ctx.fillText(text, ctx.canvas.width / 2, y);
-}
-
-// --- Canvas image generation (matches Urdu‑only view layout) ---
-async function generateImage() {
-    await document.fonts.ready;
-
-    const canvas = document.getElementById('ghazalCanvas');
-    const ctx = canvas.getContext('2d');
-    const width = 1080;
-    const height = 1920;
-    canvas.width = width;
-    canvas.height = height;
-
-    // Background gradient (dark, almost black)
-    const grad = ctx.createLinearGradient(0, 0, 0, height);
-    grad.addColorStop(0, '#000000');
-    grad.addColorStop(1, '#1a1a1a');
-    ctx.fillStyle = grad;
-    ctx.fillRect(0, 0, width, height);
-
-    // Fonts
-    const matlaFont = "52px 'Jameel Noori Nastaleeq'";
-    const poetFont = "bold 36px 'Georgia', serif";
-    const verseFont = "44px 'Jameel Noori Nastaleeq'";
-    const dedicationFont = "32px 'Georgia', serif";
-    const watermarkFont = "24px 'Arial'";
-
-    let y = 180;
-
-    // Matla (first couplet)
-    const firstVerse = document.querySelectorAll('#urduOnlyView .urdu-only-first-couplet')[0];
-    if (firstVerse) {
-        const lines = firstVerse.innerText.trim().split('\n');
-        if (lines[0]) {
-            drawCenteredText(ctx, lines[0], y, matlaFont, "#ffffff");
-            y += 80;
-        }
-        if (lines[1]) {
-            drawCenteredText(ctx, lines[1], y, matlaFont, "#ffffff");
-            y += 100;
-        }
-    }
-
-    // Poet name
-    const poetElement = document.querySelector('.urdu-only-poet');
-    const poetName = poetElement ? poetElement.innerText.trim() : '';
-    drawCenteredText(ctx, poetName, y, poetFont, "#d4af37");
-    y += 100;
-
-    // Remaining verses
-    const verseItems = document.querySelectorAll('#urduOnlyView .urdu-only-verses .verse-item');
-    const lineSpacing = 80;
-    const coupletSpacing = 100;
-    let verseY = y;
-    verseItems.forEach(item => {
-        const children = item.children;
-        if (children.length >= 2) {
-            let line1 = children[0].innerText.trim();
-            let line2 = children[1].innerText.trim();
-            if (line1) {
-                drawCenteredText(ctx, line1, verseY, verseFont, "#ffffff");
-                verseY += lineSpacing;
-            }
-            if (line2) {
-                drawCenteredText(ctx, line2, verseY, verseFont, "#ffffff");
-                verseY += coupletSpacing;
-            }
-        } else {
-            let text = item.innerText.trim();
-            let lines = text.split('\n');
-            lines.forEach(line => {
-                drawCenteredText(ctx, line, verseY, verseFont, "#ffffff");
-                verseY += lineSpacing;
-            });
-            verseY += coupletSpacing;
-        }
-    });
-
-    // Dedication block (from form)
-    const dedicator = document.getElementById('dedicator').value.trim();
-    const dedicatee = document.getElementById('dedicatee').value.trim();
-    if (dedicator && dedicatee) {
-        ctx.direction = "ltr";
-        ctx.font = dedicationFont;
-        ctx.fillStyle = "#d4af37";
-        ctx.fillText(dedicator, width/2, verseY + 50);
-        verseY += 70;
-        ctx.fillStyle = "#f5e7b2";
-        ctx.fillText(`→ ${dedicatee}`, width/2, verseY);
-        verseY += 120;
-        ctx.direction = "rtl";
-    }
-
-    // Watermark
-    ctx.direction = "ltr";
-    ctx.font = watermarkFont;
-    ctx.fillStyle = "rgba(255,255,255,0.3)";
-    ctx.fillText("UCPC Poetry Archive • Preserving Urdu Poetry", width/2, height - 60);
-
-    return canvas.toDataURL('image/png');
-}
-
-// --- Upload image and get shareable URL ---
-async function uploadImageAndGetUrl() {
-    const imgData = await generateImage();
-    const res = await fetch('/upload_image', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ image: imgData })
-    });
-    const data = await res.json();
-    return data.url;
-}
-
-// --- Share function using image URL (for dedication icons) ---
-async function shareToSocial(platform) {
-    const dedicator = document.getElementById('dedicator').value.trim();
-    const dedicatee = document.getElementById('dedicatee').value.trim();
-    if (!dedicator || !dedicatee) {
-        alert('Please enter both names.');
-        return;
-    }
-
-    const imageUrl = await uploadImageAndGetUrl();
-
-    let shareUrl = '';
-    if (platform === 'facebook') {
-        shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(imageUrl)}`;
-    } else if (platform === 'twitter') {
-        shareUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(imageUrl)}`;
-    } else if (platform === 'whatsapp') {
-        shareUrl = `https://wa.me/?text=${encodeURIComponent(imageUrl)}`;
-    }
-
-    if (shareUrl) window.open(shareUrl, '_blank');
-}
-
-async function downloadImage() {
-    const dedicator = document.getElementById('dedicator').value.trim();
-    const dedicatee = document.getElementById('dedicatee').value.trim();
-    if (!dedicator || !dedicatee) {
-        alert('Please enter both names.');
-        return;
-    }
-    const url = await uploadImageAndGetUrl();
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'ghazal_card.png';
-    a.click();
-}
-
-// --- Bind events for dedication form icons ---
+// Dedication form handling
 const showBtn = document.getElementById('showDedicationFormBtn');
 const formDiv = document.getElementById('dedicationForm');
+const dedicatorInput = document.getElementById('dedicator');
+const dedicateeInput = document.getElementById('dedicatee');
+const dedicationDisplay = document.getElementById('dedicationDisplay');
+
 showBtn.addEventListener('click', () => {
     formDiv.style.display = formDiv.style.display === 'none' ? 'block' : 'none';
+    // Clear previous display
+    dedicationDisplay.style.display = 'none';
 });
 
+// Update dedication display when names are filled (real-time)
+function updateDedicationDisplay() {
+    const dedicator = dedicatorInput.value.trim();
+    const dedicatee = dedicateeInput.value.trim();
+    if (dedicator && dedicatee) {
+        dedicationDisplay.innerHTML = `<strong>From:</strong> ${dedicator} &nbsp;|&nbsp; <strong>Dedicated to:</strong> ${dedicatee}`;
+        dedicationDisplay.style.display = 'block';
+    } else {
+        dedicationDisplay.style.display = 'none';
+    }
+}
+dedicatorInput.addEventListener('input', updateDedicationDisplay);
+dedicateeInput.addEventListener('input', updateDedicationDisplay);
+
+// ---------- Share functions (using server-side image generation) ----------
+async function getShareUrl(textId) {
+    const dedicator = dedicatorInput.value.trim();
+    const dedicatee = dedicateeInput.value.trim();
+    if (!dedicator || !dedicatee) {
+        alert('Please enter both names in the dedication form first.');
+        return null;
+    }
+
+    try {
+        const url = `/ghazals/share_image/${textId}?dedicator=${encodeURIComponent(dedicator)}&dedicatee=${encodeURIComponent(dedicatee)}`;
+        const res = await fetch(url);
+        const data = await res.json();
+        if (!data.share_url) {
+            throw new Error("No share_url");
+        }
+        return data.share_url;
+    } catch (err) {
+        console.error("Share URL Error:", err);
+        alert("❌ Failed to generate share link");
+        return null;
+    }
+}
+
+async function shareOnFacebook(textId) {
+    const shareUrl = await getShareUrl(textId);
+    if (shareUrl) {
+        window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`, '_blank');
+    }
+}
+
+async function shareOnWhatsApp(textId) {
+    const shareUrl = await getShareUrl(textId);
+    if (shareUrl) {
+        window.open(`https://wa.me/?text=${encodeURIComponent(shareUrl)}`, '_blank');
+    }
+}
+
+async function shareOnTwitter(textId) {
+    const shareUrl = await getShareUrl(textId);
+    if (shareUrl) {
+        window.open(`https://twitter.com/intent/tweet?url=${encodeURIComponent(shareUrl)}`, '_blank');
+    }
+}
+
+async function shareOnLinkedIn(textId) {
+    const shareUrl = await getShareUrl(textId);
+    if (shareUrl) {
+        window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`, '_blank');
+    }
+}
+
+async function copyShareLink(textId) {
+    const shareUrl = await getShareUrl(textId);
+    if (shareUrl) {
+        navigator.clipboard.writeText(shareUrl)
+            .then(() => alert("✅ Link copied!"))
+            .catch(() => alert("❌ Copy failed"));
+    }
+}
+
+// Bind buttons
 document.getElementById('fbShare').addEventListener('click', (e) => {
     e.preventDefault();
-    shareToSocial('facebook');
-});
-document.getElementById('twShare').addEventListener('click', (e) => {
-    e.preventDefault();
-    shareToSocial('twitter');
+    shareOnFacebook({{ ghazal.id }});
 });
 document.getElementById('waShare').addEventListener('click', (e) => {
     e.preventDefault();
-    shareToSocial('whatsapp');
+    shareOnWhatsApp({{ ghazal.id }});
 });
-document.getElementById('downloadBtn').addEventListener('click', (e) => {
+document.getElementById('twShare').addEventListener('click', (e) => {
     e.preventDefault();
-    downloadImage();
+    shareOnTwitter({{ ghazal.id }});
+});
+document.getElementById('liShare').addEventListener('click', (e) => {
+    e.preventDefault();
+    shareOnLinkedIn({{ ghazal.id }});
+});
+document.getElementById('copyLink').addEventListener('click', (e) => {
+    e.preventDefault();
+    copyShareLink({{ ghazal.id }});
 });
 </script>
 {% endblock %}
