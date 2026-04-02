@@ -3,12 +3,7 @@
 
 {% block extra_css %}
 <style>
-    /* Remove verse numbers */
-    .verse-number {
-        display: none !important;
-    }
-
-    /* Dedication button */
+    .verse-number { display: none !important; }
     .dedication-btn {
         background: linear-gradient(135deg, #d4af37, #f5e7b2);
         color: #000;
@@ -19,25 +14,17 @@
         border: none;
         transition: 0.3s;
         cursor: pointer;
-        margin-bottom: 1rem;
         width: 100%;
         max-width: 400px;
-        margin-left: auto;
-        margin-right: auto;
+        margin: 0 auto 1rem;
         display: block;
     }
-    .dedication-btn:hover {
-        transform: scale(1.02);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    }
-
-    /* Dedication form */
+    .dedication-btn:hover { transform: scale(1.02); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
     .dedication-form {
         background: #fff9e6;
         border-radius: 1.5rem;
         padding: 1.5rem;
         margin-top: 1rem;
-        text-align: left;
         display: none;
         max-width: 500px;
         margin-left: auto;
@@ -63,12 +50,7 @@
         transition: 0.2s;
         cursor: pointer;
     }
-    .social-share-icons a:hover {
-        color: var(--gold);
-        transform: translateY(-2px);
-    }
-
-    /* Ghazal card */
+    .social-share-icons a:hover { color: var(--gold); transform: translateY(-2px); }
     .ghazal-card {
         background: linear-gradient(135deg, #fff6e8, #fff2e0);
         border: 1px solid #f0e0cc;
@@ -104,11 +86,7 @@
         padding-bottom: 1rem;
         border-bottom: 1px solid #f0e4cf;
     }
-    .bilingual-verse:last-child {
-        border-bottom: none;
-        margin-bottom: 0;
-        padding-bottom: 0;
-    }
+    .bilingual-verse:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
     .urdu-couplet {
         font-family: 'Jameel Noori Nastaleeq', 'Noto Nastaliq Urdu', serif;
         font-size: 1.5rem;
@@ -124,8 +102,6 @@
         color: #4a5568;
         text-align: left;
     }
-
-    /* Rest of the CSS (keep your existing styles) */
     .ghazal-hero { background: linear-gradient(135deg, #0F2B3D, #1E3C72); padding: 2rem; text-align: center; color: white; }
     .hero-poet { font-size: 0.85rem; letter-spacing: 3px; color: var(--gold); text-transform: uppercase; }
     .hero-title-english { font-size: 1.8rem; font-weight: 700; margin: 1rem 0 0.5rem; }
@@ -160,7 +136,6 @@
 
 {% block content %}
 <div class="view-container">
-    <!-- Hero -->
     <div class="ghazal-hero">
         <div class="hero-poet">{{ ghazal.poet_name | upper }}</div>
         <div class="hero-title-english">{{ ghazal.title_english or 'Untitled' }}</div>
@@ -193,7 +168,7 @@
             <audio id="audioPlayer" controls preload="none"></audio>
         </div>
 
-        <!-- Dedication Section -->
+        <!-- Dedication Section – only one set of share buttons here -->
         <div class="dedication-section">
             <button id="showDedicationFormBtn" class="dedication-btn">
                 💖 Dedicate and share your loved ones (اپنے پیاروں کا نام شیئر کریں)
@@ -229,7 +204,6 @@
                 </div>
                 {% endfor %}
             </div>
-
             <div class="card-footer">
                 <div class="tribute"><i class="fas fa-heart"></i> Shared with love for my teacher, father, and mother.</div>
                 <div class="social-icons">
@@ -272,7 +246,6 @@ function playAudio(id) {
     };
 }
 
-// Dedication form handling
 const showBtn = document.getElementById('showDedicationFormBtn');
 const formDiv = document.getElementById('dedicationForm');
 const dedicatorInput = document.getElementById('dedicator');
@@ -296,7 +269,6 @@ function updateDedicationDisplay() {
 dedicatorInput.addEventListener('input', updateDedicationDisplay);
 dedicateeInput.addEventListener('input', updateDedicationDisplay);
 
-// Share functions (using backend endpoint)
 async function getShareUrl(textId) {
     const dedicator = dedicatorInput.value.trim();
     const dedicatee = dedicateeInput.value.trim();
@@ -342,7 +314,6 @@ async function copyShareLink(textId) {
     }
 }
 
-// Bind icons
 document.getElementById('fbShare').addEventListener('click', (e) => {
     e.preventDefault();
     shareOnFacebook({{ ghazal.id }});
