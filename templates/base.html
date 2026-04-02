@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -23,6 +23,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@400;700&display=swap" rel="stylesheet">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <style>
         @font-face {
             font-family: 'Jameel Noori Nastaleeq';
@@ -40,6 +41,11 @@
             font-family: 'Inter', system-ui, -apple-system, sans-serif;
             background: var(--paper);
             min-height: 100vh;
+            /* Disable text selection globally (optional) */
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
         }
         .urdu-text, .urdu-font {
             font-family: 'Jameel Noori Nastaleeq', 'Noto Nastaliq Urdu', serif;
@@ -89,7 +95,7 @@
 
         /* Marquee styles – exactly matching attached index.html */
         .nav-marquee {
-            background: #1e293b;  /* dark background, like header/footer */
+            background: #1e293b;
             border-bottom: 1px solid rgba(212,175,55,0.5);
             border-top: 1px solid rgba(212,175,55,0.5);
             overflow: hidden;
@@ -107,7 +113,7 @@
             letter-spacing: 0.3px;
         }
         .marquee-content a {
-            color: #F5E7B2;  /* light gold */
+            color: #F5E7B2;
             text-decoration: none;
             transition: all 0.2s;
             margin: 0 4px;
@@ -117,7 +123,7 @@
             text-decoration: underline;
         }
         .marquee-content span {
-            color: #e2e8f0;  /* light gray for separators and non-link text */
+            color: #e2e8f0;
             padding-right: 2rem;
         }
         @keyframes marquee {
@@ -134,7 +140,7 @@
     <div class="app-wrapper">
         {% include 'header.html' %}
 
-        <!-- MARQUEE – matching style of attached index.html, with hyperlinks -->
+        <!-- MARQUEE -->
         <div class="nav-marquee">
             <div class="marquee-content">
                 <span>
@@ -184,18 +190,5 @@
 
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     {% block extra_js %}{% endblock %}
- /* Disable text selection on the whole page */
-    <style>
-    /* Disable text selection on the whole page */
-    body {
-        user-select: none;
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
-    }
-</style>
-
-
 </body>
 </html>
-
