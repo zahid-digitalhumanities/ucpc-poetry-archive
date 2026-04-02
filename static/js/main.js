@@ -1,4 +1,24 @@
-console.log('UCPC Poetry Archive Loaded');
+console.log('✅ UCPC Poetry Archive main.js loaded successfully');
+
+// Add a global test function to verify share URL generation
+window.testShare = async function(textId) {
+    console.log(`🔍 Testing share URL for ghazal ID ${textId}...`);
+    try {
+        const res = await fetch(`/ghazals/share_image/${textId}`);
+        const data = await res.json();
+        console.log('📦 Server response:', data);
+        if (data.share_url) {
+            console.log('✅ Share URL:', data.share_url);
+            alert(`Share URL: ${data.share_url}`);
+        } else {
+            console.error('❌ No share_url in response');
+            alert('No share_url returned');
+        }
+    } catch (err) {
+        console.error('❌ Test failed:', err);
+        alert('Test failed: ' + err.message);
+    }
+};
 
 document.addEventListener('DOMContentLoaded', function() {
     const currentPath = window.location.pathname;
@@ -16,12 +36,12 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-
 // =======================================================
-// 🔥 CORE SHARE FUNCTION (FIXED)
+// 🔥 CORE SHARE FUNCTION (FIXED – uses share_url, not image_url)
 // =======================================================
 
 async function getShareUrl(textId) {
+    console.log(`📡 Fetching share URL for ghazal ${textId}...`);
     try {
         const res = await fetch(`/ghazals/share_image/${textId}`);
         const data = await res.json();
@@ -30,15 +50,15 @@ async function getShareUrl(textId) {
             throw new Error("No share_url");
         }
 
+        console.log(`✅ Got share URL: ${data.share_url}`);
         return data.share_url;
 
     } catch (err) {
-        console.error("Share URL Error:", err);
+        console.error("❌ Share URL Error:", err);
         alert("❌ Failed to generate share link");
         return null;
     }
 }
-
 
 // =======================================================
 // 🔥 QUICK WHATSAPP SHARE
@@ -48,9 +68,9 @@ async function shareGhazal(textId) {
     const url = await getShareUrl(textId);
     if (!url) return;
 
+    console.log(`🚀 Sharing on WhatsApp: ${url}`);
     window.open(`https://wa.me/?text=${encodeURIComponent(url)}`);
 }
-
 
 // =======================================================
 // 🔥 MULTI PLATFORM SHARE MENU
@@ -91,7 +111,6 @@ Enter choice:`);
             alert("❌ Invalid choice");
     }
 }
-
 
 // =======================================================
 // 📋 COPY LINK
