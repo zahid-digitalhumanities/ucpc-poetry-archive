@@ -3,67 +3,47 @@
 
 {% block extra_css %}
 <style>
+    /* Remove verse numbers */
     .verse-number { display: none !important; }
+
+    /* Thick border around the card */
     .ghazal-card {
         background: linear-gradient(135deg, #fffef7, #fff9ed);
-        border: 1px solid rgba(212,175,55,0.3);
+        border: 4px solid #D4AF37;   /* thick gold border */
         border-radius: 2rem;
         padding: 2rem 1.5rem;
         margin-bottom: 2rem;
         box-shadow: 0 12px 28px -12px rgba(0,0,0,0.12);
     }
+
+    /* Poet name: extra large Jameel Noori, centered, with thick black line */
     .poet-name {
         font-family: 'Jameel Noori Nastaleeq', 'Noto Nastaliq Urdu', serif;
-        font-size: 2.5rem;
+        font-size: 3rem;
         text-align: center;
         color: #1E3C72;
-        margin-bottom: 0.75rem;
+        margin-bottom: 0.5rem;
     }
     .poet-line {
-        width: 80px;
-        height: 3px;
-        background: #D4AF37;
+        width: 100px;
+        height: 4px;
+        background: #000000;
         margin: 0 auto 1.5rem auto;
         border-radius: 2px;
     }
-    .bilingual-verse {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 2rem;
-        margin-bottom: 1.8rem;
-        padding-bottom: 1rem;
-        border-bottom: 1px solid #f0e4cf;
-        position: relative;
-    }
-    .bilingual-verse:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
-    .bilingual-verse::after {
-        content: '';
-        position: absolute;
-        left: 50%;
-        top: 0;
-        bottom: 0;
-        width: 1px;
-        background: repeating-linear-gradient(to bottom, #D4AF37, #D4AF37 8px, transparent 8px, transparent 16px);
-        transform: translateX(-50%);
-    }
+
+    /* Urdu couplets – centered, large font */
     .urdu-couplet {
         font-family: 'Jameel Noori Nastaleeq', 'Noto Nastaliq Urdu', serif;
-        font-size: 1.6rem;
-        line-height: 2.4rem;
+        font-size: 1.8rem;
+        line-height: 2.6rem;
         direction: rtl;
         color: #0F2B3D;
         text-align: center;
-    }
-    .english-couplet {
-        font-family: 'Georgia', serif;
-        font-size: 1rem;
-        line-height: 1.6rem;
-        color: #4a5568;
-        text-align: left;
-    }
-    .urdu-only-verses .urdu-couplet, .english-only-verses .english-couplet {
         margin-bottom: 1.5rem;
     }
+
+    /* Dedication display */
     .dedication-display {
         background: #fef3c7;
         border-radius: 1.5rem;
@@ -71,11 +51,16 @@
         margin: 1.5rem 0 1rem;
         text-align: center;
         font-family: 'Georgia', serif;
-        font-size: 1.1rem;
+        font-size: 1.2rem;
         color: #b45309;
         border-left: 4px solid #D4AF37;
         border-right: 4px solid #D4AF37;
     }
+    .dedication-display p {
+        margin: 0.25rem 0;
+    }
+
+    /* Other styles (hero, buttons, audio, etc.) remain unchanged */
     .ghazal-hero {
         background: linear-gradient(135deg, #0F2B3D, #1E3C72);
         padding: 2rem;
@@ -130,11 +115,9 @@
     .nav-btn-all { background: #D4AF37; color: #1E3C72; }
     .nav-btn:hover { transform: translateY(-2px); filter: brightness(0.95); }
     @media (max-width: 768px) {
-        .bilingual-verse { grid-template-columns: 1fr; gap: 1rem; }
-        .bilingual-verse::after { display: none; }
-        .urdu-couplet { font-size: 1.3rem; line-height: 2rem; }
-        .english-couplet { font-size: 0.9rem; }
         .poet-name { font-size: 2rem; }
+        .urdu-couplet { font-size: 1.3rem; line-height: 2rem; }
+        .dedication-display { font-size: 1rem; }
         .hero-title-english { font-size: 1.4rem; }
         .hero-title-urdu { font-size: 1.6rem; }
         .share-row a { font-size: 1.5rem; }
@@ -196,54 +179,20 @@
             </div>
         </div>
 
-        <!-- Ghazal Card -->
+        <!-- Ghazal Card – Urdu only, thick border, poet line -->
         <div class="ghazal-card" id="ghazalCard">
             <div class="poet-name">{{ ghazal.poet_name_urdu }}</div>
             <div class="poet-line"></div>
-
-            <!-- Bilingual View -->
-            <div id="bilingualView">
+            <div id="urduVerses">
                 {% for verse in verses %}
-                <div class="bilingual-verse">
-                    <div class="urdu-couplet">
-                        <div>{{ verse.misra1_urdu }}</div>
-                        <div>{{ verse.misra2_urdu }}</div>
-                    </div>
-                    <div class="english-couplet">
-                        <div>{{ verse.misra1_english or 'Translation coming soon...' }}</div>
-                        <div>{{ verse.misra2_english or 'Translation coming soon...' }}</div>
-                    </div>
+                <div class="urdu-couplet">
+                    <div>{{ verse.misra1_urdu }}</div>
+                    <div>{{ verse.misra2_urdu }}</div>
                 </div>
                 {% endfor %}
             </div>
-
-            <!-- Urdu‑only View -->
-            <div id="urduOnlyView" style="display: none;">
-                <div class="urdu-only-verses">
-                    {% for verse in verses %}
-                    <div class="urdu-couplet">
-                        <div>{{ verse.misra1_urdu }}</div>
-                        <div>{{ verse.misra2_urdu }}</div>
-                    </div>
-                    {% endfor %}
-                </div>
-            </div>
-
-            <!-- English‑only View -->
-            <div id="englishOnlyView" style="display: none;">
-                <div class="english-only-verses">
-                    {% for verse in verses %}
-                    <div class="english-couplet">
-                        <div>{{ verse.misra1_english or 'Translation coming soon...' }}</div>
-                        <div>{{ verse.misra2_english or 'Translation coming soon...' }}</div>
-                    </div>
-                    {% endfor %}
-                </div>
-            </div>
-
-            <!-- Dedication Display (live) -->
+            <!-- Dedication display (live) -->
             <div id="dedicationDisplay" class="dedication-display" style="display: none;"></div>
-
             <div class="card-footer">
                 <div class="tribute"><i class="fas fa-heart"></i> Shared with love for my teacher, father, and mother.</div>
             </div>
@@ -259,22 +208,23 @@
 </div>
 
 <script>
-let currentMode = "{{ mode|default('bilingual') }}";
+let currentMode = "urdu";   // default to Urdu-only view (as per requirement)
 
 function applyMode(mode) {
-    document.getElementById('bilingualView').style.display = 'none';
-    document.getElementById('urduOnlyView').style.display = 'none';
-    document.getElementById('englishOnlyView').style.display = 'none';
-    if (mode === 'bilingual') document.getElementById('bilingualView').style.display = 'block';
-    else if (mode === 'urdu') document.getElementById('urduOnlyView').style.display = 'block';
-    else if (mode === 'english') document.getElementById('englishOnlyView').style.display = 'block';
+    // We only have Urdu view in this card (bilingual/English modes are not used for display)
+    // but keep the buttons for compatibility
+    if (mode === 'urdu') {
+        document.getElementById('urduVerses').style.display = 'block';
+    } else {
+        document.getElementById('urduVerses').style.display = 'block'; // always show Urdu
+    }
     document.querySelectorAll('.mode-btn[data-mode]').forEach(btn => btn.classList.remove('active'));
     let activeBtn = document.querySelector(`.mode-btn[data-mode="${mode}"]`);
     if (activeBtn) activeBtn.classList.add('active');
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    applyMode(currentMode);
+    applyMode('urdu');
     document.querySelectorAll('.mode-btn[data-mode]').forEach(btn => {
         btn.addEventListener('click', () => {
             let mode = btn.dataset.mode;
@@ -312,7 +262,7 @@ function updateDedicationDisplay() {
     const dedicator = dedicatorInput.value.trim();
     const dedicatee = dedicateeInput.value.trim();
     if (dedicator && dedicatee) {
-        dedicationDisplay.innerHTML = `<p><strong>sender name :</strong> ${dedicator}</p><p><strong>Dedicated to :</strong> ${dedicatee}</p>`;
+        dedicationDisplay.innerHTML = `<p><strong>From:</strong> ${dedicator}</p><p><strong>Dedicated to:</strong> ${dedicatee}</p>`;
         dedicationDisplay.style.display = 'block';
     } else {
         dedicationDisplay.style.display = 'none';
