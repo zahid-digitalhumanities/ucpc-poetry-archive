@@ -114,6 +114,7 @@ def generate_ghazal_card(ghazal, verses, dedicator='', dedicatee=''):
         first = verses[0]
         m1 = first.get('misra1_urdu', '')
         m2 = first.get('misra2_urdu', '')
+        print(f"DEBUG: First couplet misra1='{m1}', misra2='{m2}'")
         if m1 and m2:
             y = draw_couplet_on_one_line(draw, m1, m2, y, urdu_font, black, width, gap=100)
         elif m1:
@@ -128,11 +129,11 @@ def generate_ghazal_card(ghazal, verses, dedicator='', dedicatee=''):
         # From
         y = draw_left_aligned(draw, f"From: {dedicator}", y, dedication_font, gold, left_margin)
 
-        # Dedicated to (full line underlined)
+        # Dedicated to (full line underlined) – increased gap to 20px
         ded_line = f"Dedicated to: {dedicatee}"
         bbox_full = draw.textbbox((0, 0), ded_line, font=dedication_font)
         draw.text((left_margin, y), ded_line, font=dedication_font, fill=black)
-        underline_y_name = y + (bbox_full[3] - bbox_full[1]) + 8
+        underline_y_name = y + (bbox_full[3] - bbox_full[1]) + 20   # 20px gap (was 8)
         draw.line([(left_margin, underline_y_name), (left_margin + (bbox_full[2] - bbox_full[0]), underline_y_name)], fill=black, width=6)
         y += (bbox_full[3] - bbox_full[1]) + 30
 
