@@ -37,14 +37,13 @@ def draw_left_aligned(draw, text, y, font, color, left_margin=80):
     return y + (bbox[3] - bbox[1]) + 10
 
 def draw_couplet_on_one_line(draw, misra1, misra2, y, font, color, width, gap=100):
-    """Draw misra1 (right) and misra2 (left) on the same line, right‑aligned overall."""
+    """Draw misra1 (right) and misra2 (left) on the same line, centered as a pair."""
     bbox1 = draw.textbbox((0, 0), misra1, font=font)
     bbox2 = draw.textbbox((0, 0), misra2, font=font)
     width1 = bbox1[2] - bbox1[0]
     width2 = bbox2[2] - bbox2[0]
     total_width = width1 + gap + width2
-    right_margin = 80
-    start_x = width - right_margin - total_width
+    start_x = (width - total_width) // 2
     # misra1 (right side)
     draw.text((start_x + width2 + gap, y), misra1, font=font, fill=color, anchor='rt')
     # misra2 (left side)
@@ -88,7 +87,7 @@ def generate_ghazal_card(ghazal, verses, dedicator='', dedicatee=''):
     draw.line([(margin_line, underline_y), (width - margin_line, underline_y)], fill=gold, width=8)
     y += 80
 
-    # 2. First couplet (on one line, right‑aligned)
+    # 2. First couplet (special: one line, misra1 right, misra2 left, centered)
     if verses:
         first = verses[0]
         m1 = first.get('misra1_urdu', '')
@@ -111,20 +110,19 @@ def generate_ghazal_card(ghazal, verses, dedicator='', dedicatee=''):
         ded_line = f"Dedicated to: {dedicatee}"
         bbox_full = draw.textbbox((0, 0), ded_line, font=dedication_font)
         draw.text((left_margin, y), ded_line, font=dedication_font, fill=black)
-        # Underline the whole line
         underline_y_name = y + (bbox_full[3] - bbox_full[1]) + 8
         draw.line([(left_margin, underline_y_name), (left_margin + (bbox_full[2] - bbox_full[0]), underline_y_name)], fill=black, width=6)
         y += (bbox_full[3] - bbox_full[1]) + 30
 
-    # 4. Remaining verses (from second couplet onward) – each misra centered, both shown
-    for verse in verses[1:]:
+    # 4. Full ghazal (all verses, including the first, each misra centered)
+    for verse in verses:   # iterate over ALL verses (including the first)
         m1 = verse.get('misra1_urdu', '')
         m2 = verse.get('misra2_urdu', '')
         if m1:
             y = draw_centered(draw, m1, y, urdu_font, black, width, 10)
         if m2:
             y = draw_centered(draw, m2, y, urdu_font, black, width, 10)
-        y += 20  # space between couplets
+        y += 20
         if y > height - 250:
             break
 
