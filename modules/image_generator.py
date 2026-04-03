@@ -11,37 +11,39 @@ def get_font(font_name, size):
         logging.warning(f"Could not load {font_name}: {e}")
         return ImageFont.load_default()
 
-def draw_right_aligned_text(draw, text, y, font, color, width, right_margin=50):
-    """Draw text right‑aligned (for Urdu)."""
+def draw_centered_text(draw, text, y, font, color, width):
     bbox = draw.textbbox((0, 0), text, font=font)
     text_width = bbox[2] - bbox[0]
-    x = width - right_margin - text_width
+    x = (width - text_width) // 2
     draw.text((x, y), text, font=font, fill=color)
     return y + (bbox[3] - bbox[1]) + 10
 
-def draw_left_aligned_text(draw, text, y, font, color, left_margin=50):
-    """Draw text left‑aligned (for English dedication)."""
+def draw_left_aligned_text(draw, text, y, font, color, left_margin):
     bbox = draw.textbbox((0, 0), text, font=font)
     x = left_margin
     draw.text((x, y), text, font=font, fill=color)
     return y + (bbox[3] - bbox[1]) + 10
 
-def draw_centered_text(draw, text, y, font, color, width, line_spacing=10):
-    lines = text.split('\n')
-    for line in lines:
-        bbox = draw.textbbox((0, 0), line, font=font)
-        line_width = bbox[2] - bbox[0]
-        x = (width - line_width) // 2
-        draw.text((x, y), line, font=font, fill=color)
-        y += bbox[3] - bbox[1] + line_spacing
-    return y
+def draw_couplet_horizontal(draw, misra1, misra2, y, font, color, width, gap=80):
+    """Draw a couplet with both misras on the same line, centered."""
+    bbox1 = draw.textbbox((0, 0), misra1, font=font)
+    bbox2 = draw.textbbox((0, 0), misra2, font=font)
+    width1 = bbox1[2] - bbox1[0]
+    width2 = bbox2[2] - bbox2[0]
+    total_width = width1 + gap + width2
+    start_x = (width - total_width) // 2
+    # misra1 (right side)
+    draw.text((start_x + width2 + gap, y), misra1, font=font, fill=color, anchor='rt')
+    # misra2 (left side)
+    draw.text((start_x + width2, y), misra2, font=font, fill=color, anchor='lt')
+    return y + max(bbox1[3] - bbox1[1], bbox2[3] - bbox2[1]) + 20
 
 def generate_ghazal_card(ghazal, verses, dedicator='', dedicatee=''):
     width = 1080
     height = 1920
-    bg_color = (255, 255, 255)      # white background
-    text_color = (0, 0, 0)          # black text
-    gold = (212, 175, 55)           # gold for accents
+    bg_color = (255, 255, 255)
+    text_color = (0, 0, 0)
+    gold = (212, 175, 55)
     dark_gray = (50, 50, 50)
 
     # Fonts
@@ -54,51 +56,40 @@ def generate_ghazal_card(ghazal, verses, dedicator='', dedicatee=''):
     img = Image.new('RGB', (width, height), bg_color)
     draw = ImageDraw.Draw(img)
 
-    # 1. Gold frame
+    # Gold frame
     frame_width = 15
     draw.rectangle([frame_width, frame_width, width - frame_width, height - frame_width],
                    outline=gold, width=frame_width)
 
-    y = 120
+    y = 140
 
-    # 2. Poet name (Urdu and English) – right‑aligned, with underline below (not touching)
-    right_margin = 80
-    poet_ur = ghazal.get('poet_name_urdu', '').upper()
-    poet_en = ghazal.get('poet_name', '').upper()
+    # 1. Poet name – centered
+    poet_ur = ghazal.get('name_urdu', '').upper()   # using name_urdu column
+    poet_en = ghazal.get('name', '').upper()
     if poet_ur:
-        y = draw_right_aligned_text(draw, poet_ur, y, poet_name_font, gold, width, right_margin)
+        y = draw_centered_text(draw, poet_ur, y, poet_name_font, gold, width)
     if poet_en:
-        y = draw_right_aligned_text(draw, poet_en, y, poet_eng_font, dark_gray, width, right_margin)
-    # Underline below poet name – moved down
-    underline_y = y - 30  # 30 pixels below the last line of poet name
-    draw.line([(right_margin, underline_y), (width - right_margin, underline_y)], fill=gold, width=10)
-    y += 60
+        y = draw_centered_text(draw, poet_en, y, poet_eng_font, dark_gray, width)
+    # Underline – 30px below last line
+    underline_y = y - 20
+    draw.line([(200, underline_y), (width - 200, underline_y)], fill=gold, width=10)
+    y += 50
 
-    # 3. First couplet – both misras on the same line (centered horizontally)
-    if verses:
-        first_verse = verses[0]
-        misra1 = first_verse.get('misra1_urdu', '')
-        misra2 = first_verse.get('misra2_urdu', '')
+    # 2. All couplets (horizontal, same line for each couplet)
+    for verse in verses:
+        misra1 = verse.get('misra1_urdu', '')
+        misra2 = verse.get('misra2_urdu', '')
         if misra1 and misra2:
-            gap = 80
-            bbox1 = draw.textbbox((0, 0), misra1, font=urdu_font)
-            bbox2 = draw.textbbox((0, 0), misra2, font=urdu_font)
-            width1 = bbox1[2] - bbox1[0]
-            width2 = bbox2[2] - bbox2[0]
-            total_width = width1 + gap + width2
-            start_x = (width - total_width) // 2
-            draw.text((start_x + width2 + gap, y), misra1, font=urdu_font, fill=text_color, anchor='rt')
-            draw.text((start_x + width2, y), misra2, font=urdu_font, fill=text_color, anchor='lt')
-            y += 100
+            y = draw_couplet_horizontal(draw, misra1, misra2, y, urdu_font, text_color, width, gap=100)
         elif misra1:
-            draw_centered_text(draw, misra1, y, urdu_font, text_color, width)
-            y += 80
-    else:
-        y += 80
+            bbox = draw.textbbox((0, 0), misra1, font=urdu_font)
+            draw.text((width//2, y), misra1, font=urdu_font, fill=text_color, anchor='mt')
+            y += bbox[3] - bbox[1] + 30
+        y += 40  # extra space between couplets
 
-    y += 40  # space before dedication
+    y += 60  # space before dedication
 
-    # 4. Dedication section – left‑aligned
+    # 3. Dedication section – left‑aligned
     left_margin = 80
     if dedicator and dedicatee:
         y = draw_left_aligned_text(draw, f"From: {dedicator}", y, dedication_font, gold, left_margin)
@@ -108,31 +99,20 @@ def generate_ghazal_card(ghazal, verses, dedicator='', dedicatee=''):
         bbox_full = draw.textbbox((0, 0), ded_text, font=dedication_font)
         x_start = left_margin
         draw.text((x_start, y), ded_text, font=dedication_font, fill=text_color)
-        # Underline only the recipient's name – moved down
+        # Underline only the recipient's name – below the text
         prefix = "Dedicated to: "
         prefix_bbox = draw.textbbox((0, 0), prefix, font=dedication_font)
         name_bbox = draw.textbbox((0, 0), dedicatee, font=dedication_font)
         name_width = name_bbox[2] - name_bbox[0]
         name_start_x = x_start + (prefix_bbox[2] - prefix_bbox[0])
         name_end_x = name_start_x + name_width
-        underline_y_name = y + 15  # 15 pixels below the text
+        underline_y_name = y + 15   # 15 pixels below the text
         draw.line([(name_start_x, underline_y_name), (name_end_x, underline_y_name)], fill=text_color, width=8)
         y += 70
 
-    # 5. Remaining verses (from second couplet onward) – wider spacing (as before)
-    for verse in verses[1:]:
-        misra1 = verse.get('misra1_urdu', '')
-        misra2 = verse.get('misra2_urdu', '')
-        if misra1:
-            draw_centered_text(draw, misra1, y, urdu_font, text_color, width, line_spacing=10)
-            y += 80
-        if misra2:
-            draw_centered_text(draw, misra2, y, urdu_font, text_color, width, line_spacing=10)
-            y += 80
-        y += 40  # gap between couplets
-
-    # 6. Watermark at bottom
+    # 4. Watermark
     watermark = "UCPC Poetry Archive • Preserving Urdu Poetry"
-    draw_centered_text(draw, watermark, height - 100, watermark_font, (200,200,200), width)
+    bbox_wm = draw.textbbox((0, 0), watermark, font=watermark_font)
+    draw.text((width//2, height - 80), watermark, font=watermark_font, fill=(200,200,200), anchor='mt')
 
     return img
