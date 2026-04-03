@@ -2,23 +2,6 @@ import os
 import logging
 from PIL import Image, ImageDraw, ImageFont
 
-# Try to import shaping libraries (optional but improves Urdu rendering)
-try:
-    import arabic_reshaper
-    from bidi.algorithm import get_display
-    SHAPE_URDU = True
-except ImportError:
-    SHAPE_URDU = False
-
-def shape_urdu(text):
-    if SHAPE_URDU and text:
-        try:
-            reshaped = arabic_reshaper.reshape(text)
-            return get_display(reshaped)
-        except:
-            return text
-    return text
-
 FONT_CACHE = {}
 
 def get_font(font_name, size):
@@ -55,21 +38,16 @@ def draw_left_aligned(draw, text, y, font, color, left_margin=80):
 
 def draw_couplet_on_one_line(draw, misra1, misra2, y, font, color, width, gap=100):
     """Draw misra1 (right) and misra2 (left) on the same line, centered as a pair."""
-    m1 = shape_urdu(misra1)
-    m2 = shape_urdu(misra2)
-
-    bbox1 = draw.textbbox((0, 0), m1, font=font)
-    bbox2 = draw.textbbox((0, 0), m2, font=font)
+    bbox1 = draw.textbbox((0, 0), misra1, font=font)
+    bbox2 = draw.textbbox((0, 0), misra2, font=font)
     width1 = bbox1[2] - bbox1[0]
     width2 = bbox2[2] - bbox2[0]
     total_width = width1 + gap + width2
     start_x = (width - total_width) // 2
-
     # misra1 (right side)
-    draw.text((start_x + width2 + gap, y), m1, font=font, fill=color, anchor='rt')
+    draw.text((start_x + width2 + gap, y), misra1, font=font, fill=color, anchor='rt')
     # misra2 (left side)
-    draw.text((start_x + width2, y), m2, font=font, fill=color, anchor='lt')
-
+    draw.text((start_x + width2, y), misra2, font=font, fill=color, anchor='lt')
     line_height = max(bbox1[3] - bbox1[1], bbox2[3] - bbox2[1])
     return y + line_height + 30
 
@@ -109,12 +87,11 @@ def generate_ghazal_card(ghazal, verses, dedicator='', dedicatee=''):
     draw.line([(margin_line, underline_y), (width - margin_line, underline_y)], fill=gold, width=8)
     y += 80
 
-    # 2. First couplet (on one line, centered, misra1 right, misra2 left)
+    # 2. First couplet (special: one line, misra1 right, misra2 left, centered)
     if verses:
         first = verses[0]
         m1 = first.get('misra1_urdu', '')
         m2 = first.get('misra2_urdu', '')
-        print(f"DEBUG: First couplet misra1='{m1}', misra2='{m2}'")
         if m1 and m2:
             y = draw_couplet_on_one_line(draw, m1, m2, y, urdu_font, black, width, gap=100)
         elif m1:
@@ -129,16 +106,16 @@ def generate_ghazal_card(ghazal, verses, dedicator='', dedicatee=''):
         # From
         y = draw_left_aligned(draw, f"From: {dedicator}", y, dedication_font, gold, left_margin)
 
-        # Dedicated to (full line underlined) – increased gap to 20px
+        # Dedicated to (full line underlined)
         ded_line = f"Dedicated to: {dedicatee}"
         bbox_full = draw.textbbox((0, 0), ded_line, font=dedication_font)
         draw.text((left_margin, y), ded_line, font=dedication_font, fill=black)
-        underline_y_name = y + (bbox_full[3] - bbox_full[1]) + 20   # 20px gap (was 8)
+        underline_y_name = y + (bbox_full[3] - bbox_full[1]) + 8
         draw.line([(left_margin, underline_y_name), (left_margin + (bbox_full[2] - bbox_full[0]), underline_y_name)], fill=black, width=6)
         y += (bbox_full[3] - bbox_full[1]) + 30
 
-    # 4. Full ghazal (all verses, centered)
-    for verse in verses:
+    # 4. Full ghazal (all verses, including the first, each misra centered)
+    for verse in verses:   # iterate over ALL verses (including the first)
         m1 = verse.get('misra1_urdu', '')
         m2 = verse.get('misra2_urdu', '')
         if m1:
