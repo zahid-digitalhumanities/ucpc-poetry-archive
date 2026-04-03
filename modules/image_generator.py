@@ -2,7 +2,7 @@ import os
 import logging
 from PIL import Image, ImageDraw, ImageFont
 
-# Try to import shaping libraries (optional but improves Urdu rendering)
+# Optional Urdu shaping
 try:
     import arabic_reshaper
     from bidi.algorithm import get_display
@@ -51,9 +51,10 @@ def draw_centered(draw, text, y, font, color, width, spacing=8):
 def draw_left_aligned(draw, text, y, font, color, left_margin=40):
     bbox = draw.textbbox((0, 0), text, font=font)
     draw.text((left_margin, y), text, font=font, fill=color)
-    return y + (bbox[3] - bbox[1]) + 10
+    return y + (bbox[3] - bbox[1]) + 8
 
-def draw_couplet_on_one_line(draw, misra1, misra2, y, font, color, width, gap=80):
+def draw_couplet_on_one_line(draw, misra1, misra2, y, font, color, width, gap=70):
+    """Draw misra1 (right) and misra2 (left) on the same line, centered."""
     m1 = shape_urdu(misra1)
     m2 = shape_urdu(misra2)
 
@@ -71,7 +72,8 @@ def draw_couplet_on_one_line(draw, misra1, misra2, y, font, color, width, gap=80
     return y + line_height + 20
 
 def generate_ghazal_card(ghazal, verses, dedicator='', dedicatee=''):
-    width, height = 1200, 630   # Facebook recommended size
+    # Facebook‑friendly size (1200×630) – you can change to 1080×1080 for square
+    width, height = 1200, 630
     bg = (255, 255, 255)
     black = (0, 0, 0)
     gold = (212, 175, 55)
@@ -81,43 +83,49 @@ def generate_ghazal_card(ghazal, verses, dedicator='', dedicatee=''):
     draw = ImageDraw.Draw(img)
 
     # Gold frame
-    frame = 8
+    frame = 6
     draw.rectangle([frame, frame, width - frame, height - frame], outline=gold, width=frame)
 
-    # Fonts (smaller for this aspect ratio)
-    poet_ur_font = get_font('JameelNooriNastaleeq.ttf', 36)
-    poet_en_font = get_font('LiberationSerif-Bold.ttf', 28)
-    urdu_font = get_font('JameelNooriNastaleeq.ttf', 28)
-    dedication_font = get_font('LiberationSerif-Bold.ttf', 24)
-    watermark_font = get_font('LiberationSerif-Regular.ttf', 16)
+    # Fonts (adjusted for this size)
+    poet_ur_font = get_font('JameelNooriNastaleeq.ttf', 32)
+    poet_en_font = get_font('LiberationSerif-Bold.ttf', 24)
+    urdu_font = get_font('JameelNooriNastaleeq.ttf', 26)
+    dedication_font = get_font('LiberationSerif-Bold.ttf', 20)
+    watermark_font = get_font('LiberationSerif-Regular.ttf', 14)
 
-    y = 30
+    y = 20
 
-    # 1. Poet name
+    # 1. Poet name (centered, with underline)
     poet_ur = ghazal.get('poet_name_urdu', '')
     poet_en = ghazal.get('poet_name', '')
     if poet_ur:
-        y = draw_centered(draw, poet_ur, y, poet_ur_font, gold, width, 6)
+        y = draw_centered(draw, poet_ur, y, poet_ur_font, gold, width, 4)
     if poet_en:
-        y = draw_centered(draw, poet_en, y, poet_en_font, black, width, 6)
+        y = draw_centered(draw, poet_en, y, poet_en_font, black, width, 4)
 
-    underline_y = y + 5
+    underline_y = y + 4
     margin_line = 150
-    draw.line([(margin_line, underline_y), (width - margin_line, underline_y)], fill=gold, width=6)
-    y += 25
+    draw.line([(margin_line, underline_y), (width - margin_line, underline_y)], fill=gold, width=5)
+    y += 20
 
-    # 2. First couplet (on one line)
+    # 2. First couplet – MUST be drawn (with fallback)
     if verses:
         first = verses[0]
         m1 = first.get('misra1_urdu', '')
         m2 = first.get('misra2_urdu', '')
         if m1 and m2:
-            y = draw_couplet_on_one_line(draw, m1, m2, y, urdu_font, black, width, gap=60)
+            try:
+                y = draw_couplet_on_one_line(draw, m1, m2, y, urdu_font, black, width, gap=60)
+            except Exception as e:
+                # Fallback: draw each misra centered separately
+                print(f"Fallback: one-line drawing failed ({e})")
+                y = draw_centered(draw, m1, y, urdu_font, black, width, 6)
+                y = draw_centered(draw, m2, y, urdu_font, black, width, 6)
         elif m1:
             y = draw_centered(draw, m1, y, urdu_font, black, width)
         y += 15
 
-    # 3. Dedication
+    # 3. Dedication section (left‑aligned)
     if dedicator and dedicatee:
         left_margin = 40
         y += 10
@@ -126,26 +134,25 @@ def generate_ghazal_card(ghazal, verses, dedicator='', dedicatee=''):
         ded_line = f"Dedicated to: {dedicatee}"
         bbox_full = draw.textbbox((0, 0), ded_line, font=dedication_font)
         draw.text((left_margin, y), ded_line, font=dedication_font, fill=black)
-        underline_y_name = y + (bbox_full[3] - bbox_full[1]) + 8
-        draw.line([(left_margin, underline_y_name), (left_margin + (bbox_full[2] - bbox_full[0]), underline_y_name)], fill=black, width=4)
+        underline_y_name = y + (bbox_full[3] - bbox_full[1]) + 6
+        draw.line([(left_margin, underline_y_name), (left_margin + (bbox_full[2] - bbox_full[0]), underline_y_name)], fill=black, width=3)
         y += (bbox_full[3] - bbox_full[1]) + 15
 
-    # 4. Full ghazal (centered, but limited space)
-    # Only show first few couplets to fit in 630px height
-    max_y = height - 50
+    # 4. Full ghazal (all verses, centered) – fit within remaining space
+    max_y = height - 40
     for verse in verses:
         if y > max_y:
             break
         m1 = verse.get('misra1_urdu', '')
         m2 = verse.get('misra2_urdu', '')
         if m1:
-            y = draw_centered(draw, m1, y, urdu_font, black, width, 6)
+            y = draw_centered(draw, m1, y, urdu_font, black, width, 5)
         if m2:
-            y = draw_centered(draw, m2, y, urdu_font, black, width, 6)
-        y += 12
+            y = draw_centered(draw, m2, y, urdu_font, black, width, 5)
+        y += 10
 
     # 5. Watermark
     watermark = "UCPC Poetry Archive"
-    draw_centered(draw, watermark, height - 20, watermark_font, gray, width)
+    draw_centered(draw, watermark, height - 15, watermark_font, gray, width)
 
     return img
