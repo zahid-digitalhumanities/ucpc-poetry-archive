@@ -1,7 +1,6 @@
-﻿<nav class="bg-white border-b border-gold-light/30 sticky top-0 z-50 navbar">
-    <div class="max-w-6xl mx-auto px-4">
-        <div class="flex flex-wrap justify-center gap-2 py-3 relative">
-           
+<nav class="navbar" id="mainNavbar">
+    <div class="navbar-inner">
+        <div class="navbar-links">
 
             <a href="/" class="nav-link {% if request and request.endpoint == 'main.index' %}active{% endif %}">
                 <i class="fas fa-home"></i> Home
@@ -12,53 +11,135 @@
             <a href="/search" class="nav-link {% if request and request.endpoint == 'search.search_page' %}active{% endif %}">
                 <i class="fas fa-search"></i> Search
             </a>
+
+            <span class="nav-separator"></span>
+
             <a href="/ghazals/add" class="nav-link {% if request and request.endpoint == 'ghazals.add_ghazal' %}active{% endif %}">
                 <i class="fas fa-plus-circle"></i> Add
             </a>
             <a href="/bulk" class="nav-link {% if request and request.endpoint == 'bulk.bulk_upload' %}active{% endif %}">
                 <i class="fas fa-cloud-upload-alt"></i> Bulk
             </a>
+            <a href="/random" class="nav-link nav-link-accent">
+                <i class="fas fa-dice"></i> Random
+            </a>
+
         </div>
     </div>
 </nav>
 
 <style>
+    .navbar {
+        background: white;
+        border-bottom: 1px solid rgba(212,175,55,0.12);
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        transition: box-shadow 0.3s ease;
+    }
+    .navbar.scrolled {
+        box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+    }
+    .navbar-inner {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 0 1.5rem;
+    }
+    .navbar-links {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+        gap: 4px;
+        padding: 0.65rem 0;
+    }
+
+    /* Separator between browse and contribute */
+    .nav-separator {
+        width: 1px;
+        height: 20px;
+        background: rgba(212,175,55,0.2);
+        margin: 0 6px;
+        flex-shrink: 0;
+    }
+
+    /* Link base */
     .nav-link {
-        padding: 8px 20px;
-        border-radius: 40px;
+        padding: 7px 16px;
+        border-radius: 50px;
         font-weight: 600;
-        font-size: 0.85rem;
-        transition: all 0.2s;
+        font-size: 0.82rem;
+        transition: all 0.2s ease;
         display: inline-flex;
         align-items: center;
-        gap: 8px;
-        color: #1E3C72;
-        background: none;
-        border: none;
-        cursor: pointer;
+        gap: 7px;
+        color: #4b5563;
+        text-decoration: none;
+        border: 1.5px solid transparent;
+        white-space: nowrap;
     }
     .nav-link i {
+        font-size: 0.75rem;
+        color: var(--gold);
+        transition: color 0.2s;
+    }
+
+    /* Hover */
+    .nav-link:hover {
+        color: var(--primary);
+        background: rgba(212,175,55,0.06);
+        border-color: rgba(212,175,55,0.12);
+    }
+    .nav-link:hover i {
         color: var(--gold);
     }
-    .nav-link:hover, .nav-link.active {
+
+    /* Active state */
+    .nav-link.active {
         background: var(--primary);
         color: white;
+        border-color: var(--primary);
+        box-shadow: 0 2px 8px rgba(30,60,114,0.2);
     }
-    .nav-link:hover i, .nav-link.active i {
+    .nav-link.active i {
         color: var(--gold-light);
     }
-    button.nav-link {
-        background: none;
-        font-family: inherit;
+
+    /* Random accent link — always gold-tinted */
+    .nav-link-accent {
+        color: var(--gold);
+        border-color: rgba(212,175,55,0.2);
+        background: rgba(212,175,55,0.04);
+    }
+    .nav-link-accent:hover {
+        background: linear-gradient(135deg, var(--gold), var(--gold-light));
+        color: var(--primary-dark);
+        border-color: var(--gold);
+        box-shadow: 0 2px 10px rgba(212,175,55,0.25);
+    }
+    .nav-link-accent:hover i {
+        color: var(--primary-dark);
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 768px) {
+        .navbar-inner { padding: 0 0.75rem; }
+        .navbar-links { gap: 2px; padding: 0.5rem 0; }
+        .nav-link {
+            padding: 6px 10px;
+            font-size: 0.76rem;
+            gap: 5px;
+        }
+        .nav-link i { font-size: 0.7rem; }
+        .nav-separator { margin: 0 3px; height: 16px; }
+        .nav-link span.link-label { display: none; }
     }
 </style>
 
 <script>
-    function goBack() {
-        if (document.referrer && document.referrer !== "") {
-            window.history.back();
-        } else {
-            window.location.href = "/";
-        }
-    }
+    // Scroll shadow
+    const navbar = document.getElementById('mainNavbar');
+    window.addEventListener('scroll', () => {
+        navbar.classList.toggle('scrolled', window.scrollY > 10);
+    }, { passive: true });
 </script>
