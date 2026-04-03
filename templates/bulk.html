@@ -1,36 +1,682 @@
-﻿{% extends "base.html" %}
+{% extends "base.html" %}
 {% block title %}Bulk Upload | UCPC Poetry Archive{% endblock %}
+
 {% block extra_css %}
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 <style>
-    .urdu-text { font-family: 'Noto Nastaliq Urdu', 'Jameel Noori Nastaleeq', serif; }
-    .transition-all { transition: all 0.3s ease; }
-    .hover-lift:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
-    .dropzone { border: 2px dashed #cbd5e1; transition: all 0.2s; }
-    .dropzone.drag-over { border-color: var(--gold); background: #fef9e6; }
-    .result-table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
-    .result-table th, .result-table td { padding: 0.75rem; text-align: left; border-bottom: 1px solid #e2e8f0; }
-    .result-table th { background-color: #f7fafc; font-weight: 600; }
-    .success-badge { background-color: #c6f6d5; color: #22543d; padding: 0.25rem 0.5rem; border-radius: 9999px; font-size: 0.75rem; }
-    .duplicate-badge { background-color: #feebc8; color: #7b341e; padding: 0.25rem 0.5rem; border-radius: 9999px; font-size: 0.75rem; }
+    /* ═══════════════════════════════════════
+       PAGE HEADER
+       ═══════════════════════════════════════ */
+    .page-header {
+        text-align: center;
+        margin-bottom: 2.5rem;
+    }
+    .page-header h2 {
+        font-size: 1.8rem;
+        font-weight: 800;
+        color: #1e3c72;
+        letter-spacing: -0.3px;
+    }
+    .page-header .urdu-subtitle {
+        font-family: 'Jameel Noori Nastaleeq', 'Noto Nastaliq Urdu', serif;
+        font-size: 1.5rem;
+        color: var(--gold);
+        direction: rtl;
+        line-height: 2.4;
+        margin-top: 0.25rem;
+    }
+    .page-header .en-subtitle {
+        font-size: 0.88rem;
+        color: #9ca3af;
+        margin-top: 0.35rem;
+    }
+    .page-header::after {
+        content: '';
+        display: block;
+        width: 60px;
+        height: 3px;
+        background: linear-gradient(90deg, transparent, var(--gold), transparent);
+        margin: 1.25rem auto 0;
+        border-radius: 4px;
+    }
+
+    /* ═══════════════════════════════════════
+       WELCOME BANNER
+       ═══════════════════════════════════════ */
+    .welcome-banner {
+        background: linear-gradient(135deg, #fefcf8, #faf7f0);
+        border: 1px solid rgba(212,175,55,0.2);
+        border-radius: 20px;
+        padding: 1.5rem 2rem;
+        margin-bottom: 2rem;
+        text-align: center;
+    }
+    .welcome-banner .urdu-line {
+        font-family: 'Jameel Noori Nastaleeq', 'Noto Nastaliq Urdu', serif;
+        font-size: 1.2rem;
+        direction: rtl;
+        color: var(--primary-dark);
+        line-height: 2;
+        margin-bottom: 0.35rem;
+    }
+    .welcome-banner .en-line {
+        font-size: 0.85rem;
+        color: #9ca3af;
+    }
+
+    /* ═══════════════════════════════════════
+       MAIN FORM CARD
+       ═══════════════════════════════════════ */
+    .upload-card {
+        background: white;
+        border-radius: 28px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+        border: 1px solid rgba(0,0,0,0.04);
+        overflow: hidden;
+        margin-bottom: 2.5rem;
+    }
+
+    /* ── Form Section ── */
+    .upload-section {
+        padding: 2rem 2.25rem;
+        border-bottom: 1px solid #f0ebe0;
+    }
+    .upload-section:last-child {
+        border-bottom: none;
+    }
+    .section-label {
+        font-size: 0.78rem;
+        font-weight: 700;
+        color: #9ca3af;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .section-label i {
+        color: var(--gold);
+        font-size: 0.7rem;
+    }
+
+    /* ── Form Inputs (matching add_ghazal) ── */
+    .form-select,
+    .form-input {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border: 1.5px solid #e5e7eb;
+        border-radius: 16px;
+        font-size: 0.95rem;
+        font-family: 'Inter', sans-serif;
+        color: #1e3c72;
+        background: #fefef8;
+        transition: border-color 0.2s, box-shadow 0.2s;
+        appearance: none;
+        -webkit-appearance: none;
+        box-sizing: border-box;
+    }
+    .form-select {
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23D4AF37' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 16px center;
+        padding-right: 40px;
+        cursor: pointer;
+    }
+    .form-select:focus,
+    .form-input:focus {
+        outline: none;
+        border-color: var(--gold);
+        box-shadow: 0 0 0 3px rgba(212,175,55,0.12);
+    }
+    .form-label {
+        display: block;
+        font-size: 0.82rem;
+        font-weight: 600;
+        color: #4b5563;
+        margin-bottom: 0.5rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    .form-label .required {
+        color: #ef4444;
+        margin-left: 2px;
+    }
+    .help-text {
+        font-size: 0.78rem;
+        color: #9ca3af;
+        margin-top: 0.4rem;
+    }
+    .help-text i {
+        color: var(--gold);
+        margin-right: 4px;
+        font-size: 0.68rem;
+    }
+
+    /* ═══════════════════════════════════════
+       METHOD TABS (pill style — like mode switcher)
+       ═══════════════════════════════════════ */
+    .tab-bar {
+        display: flex;
+        gap: 0;
+        background: #f8f6f2;
+        border-bottom: 1px solid #f0ebe0;
+    }
+    .method-tab {
+        flex: 1;
+        padding: 0.9rem 1.5rem;
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #9ca3af;
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        transition: all 0.25s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        position: relative;
+    }
+    .method-tab:hover {
+        color: #1e3c72;
+        background: rgba(255,255,255,0.4);
+    }
+    .method-tab.active {
+        color: white;
+        background: var(--primary);
+        box-shadow: inset 0 -3px 0 var(--gold);
+    }
+    .method-tab.active i {
+        color: var(--gold-light);
+    }
+
+    /* ═══════════════════════════════════════
+       DROPZONE
+       ═══════════════════════════════════════ */
+    .dropzone {
+        border: 2px dashed #d6cfc0;
+        border-radius: 20px;
+        padding: 3rem 2rem;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        background: #fefef8;
+    }
+    .dropzone:hover {
+        border-color: var(--gold);
+        background: #fffdf5;
+    }
+    .dropzone.drag-over {
+        border-color: var(--gold);
+        background: rgba(212,175,55,0.06);
+        transform: scale(1.01);
+    }
+    .dropzone-icon {
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, rgba(212,175,55,0.1), rgba(212,175,55,0.04));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+        font-size: 1.5rem;
+        color: var(--gold);
+    }
+    .dropzone-text {
+        font-size: 0.95rem;
+        font-weight: 500;
+        color: #6b7280;
+    }
+    .dropzone-hint {
+        font-size: 0.78rem;
+        color: #b0a890;
+        margin-top: 0.35rem;
+    }
+    .file-names {
+        margin-top: 1rem;
+        font-size: 0.85rem;
+        color: #1e3c72;
+        font-weight: 500;
+    }
+    .file-names i {
+        color: #22c55e;
+        margin-right: 4px;
+    }
+
+    /* ═══════════════════════════════════════
+       PASTE TEXTAREA
+       ═══════════════════════════════════════ */
+    .paste-textarea {
+        width: 100%;
+        padding: 1.25rem;
+        border: 1.5px solid #e5e7eb;
+        border-radius: 20px;
+        font-family: 'Jameel Noori Nastaleeq', 'Noto Nastaliq Urdu', 'Courier New', monospace;
+        direction: rtl;
+        line-height: 2;
+        resize: vertical;
+        font-size: 1.1rem;
+        background: #fefef8;
+        color: var(--primary-dark);
+        transition: border-color 0.2s, box-shadow 0.2s;
+        box-sizing: border-box;
+    }
+    .paste-textarea::placeholder {
+        color: #c4b99a;
+        direction: ltr;
+        text-align: left;
+        font-family: 'Inter', sans-serif;
+        font-size: 0.85rem;
+    }
+    .paste-textarea:focus {
+        outline: none;
+        border-color: var(--gold);
+        box-shadow: 0 0 0 3px rgba(212,175,55,0.12);
+    }
+
+    /* ═══════════════════════════════════════
+       SUBMIT AREA
+       ═══════════════════════════════════════ */
+    .submit-area {
+        padding: 1.5rem 2.25rem;
+        background: linear-gradient(135deg, #fefcf8, #faf7f0);
+        display: flex;
+        justify-content: flex-end;
+    }
+    .btn-preview {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 28px;
+        border-radius: 50px;
+        font-weight: 700;
+        font-size: 0.92rem;
+        cursor: pointer;
+        border: none;
+        background: linear-gradient(135deg, var(--gold), #e6c44a);
+        color: var(--primary-dark);
+        box-shadow: 0 4px 14px rgba(212,175,55,0.3);
+        transition: all 0.25s ease;
+    }
+    .btn-preview:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(212,175,55,0.4);
+    }
+    .btn-preview:active { transform: translateY(0); }
+
+    /* ═══════════════════════════════════════
+       PREVIEW SECTION
+       ═══════════════════════════════════════ */
+    .preview-card {
+        background: white;
+        border-radius: 28px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+        border: 1px solid rgba(0,0,0,0.04);
+        overflow: hidden;
+        margin-bottom: 2.5rem;
+    }
+    .preview-header {
+        padding: 1.5rem 2.25rem;
+        background: linear-gradient(135deg, #fefcf8, #faf7f0);
+        border-bottom: 1px solid #f0ebe0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    .preview-header h3 {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #1e3c72;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .count-badge {
+        background: var(--gold);
+        color: white;
+        padding: 3px 14px;
+        border-radius: 50px;
+        font-size: 0.82rem;
+        font-weight: 700;
+    }
+    .btn-clear {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 7px 18px;
+        border-radius: 50px;
+        font-size: 0.82rem;
+        font-weight: 600;
+        color: #6b7280;
+        background: white;
+        border: 1.5px solid #e5e7eb;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .btn-clear:hover {
+        border-color: #ef4444;
+        color: #ef4444;
+        background: #fef2f2;
+    }
+
+    /* Preview grid */
+    .preview-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 16px;
+        padding: 1.75rem 2.25rem;
+    }
+    .preview-item {
+        background: white;
+        border-radius: 20px;
+        padding: 1.25rem;
+        border: 1px solid rgba(0,0,0,0.04);
+        transition: all 0.2s;
+        position: relative;
+        overflow: hidden;
+    }
+    .preview-item::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 4px;
+        height: 100%;
+        border-radius: 4px 0 0 4px;
+    }
+    .preview-item.new::before { background: #22c55e; }
+    .preview-item.duplicate {
+        background: linear-gradient(135deg, #fffdf5, #fff9e6);
+        border-color: rgba(212,175,55,0.2);
+    }
+    .preview-item.duplicate::before { background: var(--gold); }
+
+    .preview-item .urdu-title {
+        font-family: 'Jameel Noori Nastaleeq', 'Noto Nastaliq Urdu', serif;
+        font-size: 1.15rem;
+        direction: rtl;
+        text-align: right;
+        color: var(--primary-dark);
+        line-height: 1.9;
+        margin-bottom: 0.75rem;
+        word-break: break-word;
+    }
+    .preview-item .item-meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 0.78rem;
+        color: #9ca3af;
+    }
+    .preview-item .item-meta i {
+        color: var(--gold);
+        margin-right: 4px;
+    }
+    .status-new {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 2px 10px;
+        border-radius: 50px;
+        background: #dcfce7;
+        color: #166534;
+        font-size: 0.72rem;
+        font-weight: 600;
+    }
+    .status-dup {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 2px 10px;
+        border-radius: 50px;
+        background: rgba(212,175,55,0.12);
+        color: #92400e;
+        font-size: 0.72rem;
+        font-weight: 600;
+    }
+    .duplicate-link {
+        display: block;
+        margin-top: 0.5rem;
+        font-size: 0.75rem;
+        color: var(--gold);
+        text-decoration: none;
+        font-weight: 500;
+    }
+    .duplicate-link:hover { text-decoration: underline; }
+
+    /* Duplicate warning box */
+    .duplicate-warning-box {
+        margin: 0 2.25rem 1.75rem;
+        padding: 1rem 1.25rem;
+        background: linear-gradient(135deg, #fffdf5, #fff9e6);
+        border: 1px solid rgba(212,175,55,0.25);
+        border-left: 4px solid var(--gold);
+        border-radius: 0 16px 16px 0;
+    }
+    .duplicate-warning-box .warn-title {
+        font-size: 0.9rem;
+        font-weight: 700;
+        color: #92400e;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .duplicate-warning-box .warn-title i { color: var(--gold); }
+    .duplicate-warning-box ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    .duplicate-warning-box li {
+        font-size: 0.82rem;
+        color: #a16207;
+        padding: 2px 0;
+    }
+    .duplicate-warning-box li a {
+        color: var(--primary);
+        text-decoration: none;
+        font-weight: 500;
+    }
+    .duplicate-warning-box li a:hover { text-decoration: underline; }
+
+    /* Insert button area */
+    .insert-area {
+        padding: 1.5rem 2.25rem;
+        border-top: 1px solid #f0ebe0;
+        display: flex;
+        justify-content: flex-end;
+    }
+    .btn-insert {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 28px;
+        border-radius: 50px;
+        font-weight: 700;
+        font-size: 0.92rem;
+        cursor: pointer;
+        border: none;
+        background: linear-gradient(135deg, #1e3c72, #2c5a8c);
+        color: white;
+        box-shadow: 0 4px 14px rgba(30,60,114,0.25);
+        transition: all 0.25s ease;
+    }
+    .btn-insert:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(30,60,114,0.35);
+    }
+
+    /* ═══════════════════════════════════════
+       RESULTS TABLE
+       ═══════════════════════════════════════ */
+    .results-card {
+        background: white;
+        border-radius: 28px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+        border: 1px solid rgba(0,0,0,0.04);
+        overflow: hidden;
+        margin-bottom: 2.5rem;
+    }
+    .results-header {
+        padding: 1.5rem 2.25rem;
+        background: linear-gradient(135deg, #fefcf8, #faf7f0);
+        border-bottom: 1px solid #f0ebe0;
+    }
+    .results-header h3 {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #1e3c72;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .results-header h3 i { color: var(--gold); }
+
+    .result-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+    .result-table th {
+        background: #fefcf8;
+        padding: 10px 16px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: #9ca3af;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        text-align: left;
+        border-bottom: 1px solid #f0ebe0;
+    }
+    .result-table td {
+        padding: 14px 16px;
+        font-size: 0.88rem;
+        color: #4b5563;
+        border-bottom: 1px solid #f5f0e8;
+        vertical-align: middle;
+    }
+    .result-table tr:last-child td { border-bottom: none; }
+    .result-table tr:hover td { background: rgba(212,175,55,0.02); }
+
+    .result-table .urdu-cell {
+        font-family: 'Jameel Noori Nastaleeq', serif;
+        direction: rtl;
+        text-align: right;
+        font-size: 0.95rem;
+        line-height: 1.8;
+        color: var(--primary-dark);
+    }
+
+    .badge-inserted {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 3px 12px;
+        border-radius: 50px;
+        background: #dcfce7;
+        color: #166534;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+    .badge-duplicate {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 3px 12px;
+        border-radius: 50px;
+        background: rgba(212,175,55,0.12);
+        color: #92400e;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+    .badge-error {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 3px 12px;
+        border-radius: 50px;
+        background: #fef2f2;
+        color: #991b1b;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+    .view-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 4px 14px;
+        border-radius: 50px;
+        background: var(--primary);
+        color: white;
+        text-decoration: none;
+        font-size: 0.78rem;
+        font-weight: 600;
+        transition: all 0.2s;
+    }
+    .view-link:hover {
+        background: var(--gold);
+        color: var(--primary-dark);
+    }
+    .view-link-muted {
+        color: #9ca3af;
+        text-decoration: none;
+        font-size: 0.82rem;
+        font-weight: 500;
+    }
+    .view-link-muted:hover { color: var(--gold); text-decoration: underline; }
+
+    /* ═══════════════════════════════════════
+       RESPONSIVE
+       ═══════════════════════════════════════ */
+    @media (max-width: 768px) {
+        .page-header h2 { font-size: 1.5rem; }
+        .page-header .urdu-subtitle { font-size: 1.2rem; }
+        .upload-section { padding: 1.5rem; }
+        .tab-bar { flex-direction: column; }
+        .method-tab { padding: 0.75rem; }
+        .preview-grid { grid-template-columns: 1fr; padding: 1.25rem; }
+        .preview-header { padding: 1.25rem; flex-direction: column; align-items: flex-start; }
+        .submit-area { padding: 1.25rem; justify-content: center; }
+        .insert-area { padding: 1.25rem; justify-content: center; }
+        .duplicate-warning-box { margin: 0 1.25rem 1.25rem; }
+        .results-header { padding: 1.25rem; }
+        .dropzone { padding: 2rem 1.25rem; }
+        .upload-card, .preview-card, .results-card { border-radius: 20px; }
+    }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="max-w-5xl mx-auto">
-    <!-- Welcome message in Urdu and English -->
-    <div class="bg-green-50 p-4 rounded-lg mb-6 text-center">
-        <p class="urdu-text text-lg">خوش آمدید! آپ ایک وقت میں ہزاروں غزلیں اپلوڈ کر سکتے ہیں۔</p>
-        <p class="text-sm text-gray-600">Welcome! You can upload thousands of ghazals at once with automatic processing.</p>
+<div class="watermark-container" style="max-width:1100px; margin:0 auto;">
+
+    <!-- ═══ PAGE HEADER ═══ -->
+    <div class="page-header">
+        <h2>Bulk Upload</h2>
+        <div class="urdu-subtitle">ہزاروں غزلیں ایک وقت میں شامل کریں</div>
+        <div class="en-subtitle">Upload thousands of ghazals at once with automatic processing</div>
     </div>
 
-    <div class="bg-white rounded-2xl shadow-md overflow-hidden">
+    <!-- ═══ WELCOME BANNER ═══ -->
+    <div class="welcome-banner">
+        <div class="urdu-line">خوش آمدید! آپ ایک وقت میں ہزاروں غزلیں اپلوڈ کر سکتے ہیں۔</div>
+        <div class="en-line">Welcome! You can upload thousands of ghazals at once with automatic processing.</div>
+    </div>
+
+    <!-- ═══ UPLOAD FORM ═══ -->
+    <div class="upload-card">
         <form method="POST" action="{{ url_for('bulk.bulk_preview') }}" enctype="multipart/form-data" id="bulkForm">
-            <div class="bg-gray-50 p-6 border-b">
-                <div class="grid md:grid-cols-2 gap-6">
+
+            <!-- Poet & Book Selection -->
+            <div class="upload-section">
+                <div class="section-label"><i class="fas fa-circle"></i> Step 1 — Identify the Poet</div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Poet <span class="text-red-500">*</span></label>
-                        <select name="poet_id" id="poetSelect" required class="w-full px-4 py-2 border rounded-lg focus:border-gold focus:ring focus:ring-gold-light">
+                        <label class="form-label">Poet <span class="required">*</span></label>
+                        <select name="poet_id" id="poetSelect" required class="form-select">
                             <option value="">-- Select a Poet --</option>
                             {% for poet in poets %}
                             <option value="{{ poet.id }}">{{ poet.name_urdu }} ({{ poet.name }})</option>
@@ -38,109 +684,137 @@
                         </select>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Book (Optional)</label>
-                        <select name="book_id" id="bookSelect" class="w-full px-4 py-2 border rounded-lg">
+                        <label class="form-label">Book</label>
+                        <select name="book_id" id="bookSelect" class="form-select">
                             <option value="">-- Not associated with a book --</option>
                         </select>
-                        <p class="text-xs text-gray-500 mt-1">Books belonging to the selected poet will appear here.</p>
+                        <p class="help-text"><i class="fas fa-info-circle"></i>Books belonging to the selected poet will appear here.</p>
                     </div>
                 </div>
-                <div class="mt-4 grid md:grid-cols-2 gap-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Contributor Name</label>
-                        <input type="text" name="contributor" class="w-full px-4 py-2 border rounded-lg" placeholder="Your name (will be credited)">
+                        <label class="form-label">Contributor Name</label>
+                        <input type="text" name="contributor" class="form-input" placeholder="Your name (will be credited)">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Contributor Email (Optional)</label>
-                        <input type="email" name="contributor_email" class="w-full px-4 py-2 border rounded-lg" placeholder="your@email.com">
+                        <label class="form-label">Contributor Email</label>
+                        <input type="email" name="contributor_email" class="form-input" placeholder="your@email.com">
                     </div>
                 </div>
             </div>
 
-            <div class="border-b border-gray-200">
-                <div class="flex">
-                    <button type="button" class="method-tab active px-6 py-3 font-medium text-gold border-b-2 border-gold" data-method="file"><i class="fas fa-file-upload mr-2"></i> Upload Files</button>
-                    <button type="button" class="method-tab px-6 py-3 font-medium text-gray-600 hover:text-gold" data-method="paste"><i class="fas fa-paste mr-2"></i> Paste Text</button>
-                </div>
+            <!-- Method Tabs -->
+            <div class="tab-bar">
+                <button type="button" class="method-tab active" data-method="file">
+                    <i class="fas fa-file-upload"></i> Upload Files
+                </button>
+                <button type="button" class="method-tab" data-method="paste">
+                    <i class="fas fa-paste"></i> Paste Text
+                </button>
             </div>
 
-            <div id="filePanel" class="p-6">
-                <div id="dropzone" class="dropzone border-2 border-dashed rounded-xl p-8 text-center cursor-pointer">
-                    <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-4"></i>
-                    <p class="text-gray-600">Click or drag & drop files here</p>
-                    <p class="text-xs text-gray-400 mt-1">Supported: .txt, .zip, .pdf</p>
+            <!-- File Panel -->
+            <div id="filePanel" class="upload-section">
+                <div id="dropzone" class="dropzone">
+                    <div class="dropzone-icon"><i class="fas fa-cloud-upload-alt"></i></div>
+                    <div class="dropzone-text">Click or drag & drop files here</div>
+                    <div class="dropzone-hint">Supported: .txt, .zip, .pdf</div>
                     <input type="file" name="files" id="fileInput" multiple accept=".txt,.zip,.pdf" class="hidden">
-                    <div id="fileNames" class="mt-3 text-sm text-gold"></div>
+                    <div id="fileNames" class="file-names"></div>
                 </div>
             </div>
 
-            <div id="pastePanel" class="p-6 hidden">
-                <textarea name="pasted_text" rows="12" class="w-full px-4 py-3 border rounded-lg font-mono" placeholder="Paste ghazals here...&#10;Separate with blank lines or ###GHZ###"></textarea>
-                <p class="text-xs text-gray-500 mt-2"><i class="fas fa-info-circle"></i> Use blank lines or ###GHZ### to separate ghazals</p>
+            <!-- Paste Panel -->
+            <div id="pastePanel" class="upload-section" style="display:none;">
+                <textarea
+                    name="pasted_text"
+                    rows="12"
+                    class="paste-textarea"
+                    placeholder="Paste ghazals here...&#10;Separate with blank lines or ###GHZ###"
+                ></textarea>
+                <p class="help-text"><i class="fas fa-info-circle"></i> Use blank lines or ###GHZ### to separate ghazals</p>
             </div>
 
-            <div class="p-6 bg-gray-50 flex justify-end">
-                <button type="submit" class="px-6 py-2 bg-gold text-primary-dark rounded-full hover:bg-gold-dark transition shadow-md flex items-center gap-2"><i class="fas fa-eye"></i> Preview Ghazals</button>
+            <!-- Submit -->
+            <div class="submit-area">
+                <button type="submit" class="btn-preview">
+                    <i class="fas fa-eye"></i> Preview Ghazals
+                </button>
             </div>
+
         </form>
     </div>
 
-    <!-- Preview section (if any) -->
+    <!-- ═══ PREVIEW SECTION ═══ -->
     {% if preview_data %}
-    <div class="mt-10 bg-white rounded-2xl shadow-md overflow-hidden">
-        <div class="p-6 border-b bg-gray-50 flex justify-between items-center">
-            <h2 class="text-xl font-semibold">Preview <span class="bg-gold text-white px-3 py-1 rounded-full text-sm">{{ preview_data|length }} ghazals</span></h2>
+    <div class="preview-card">
+        <div class="preview-header">
+            <h3>
+                <i class="fas fa-search" style="color:var(--gold);"></i>
+                Preview
+                <span class="count-badge">{{ preview_data|length }} ghazals</span>
+            </h3>
             <form method="POST" action="{{ url_for('bulk.bulk_clear') }}">
-                <button type="submit" class="px-4 py-1 text-sm bg-gray-200 text-gray-700 rounded-full hover:bg-gray-300"><i class="fas fa-times"></i> Clear Preview</button>
+                <button type="submit" class="btn-clear">
+                    <i class="fas fa-times"></i> Clear
+                </button>
             </form>
         </div>
-        <div class="p-6">
-            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {% for item in preview_data %}
-                <div class="border rounded-lg p-4 {% if item.is_duplicate %}bg-yellow-50 border-yellow-200{% else %}bg-white{% endif %}">
-                    <div class="urdu-text text-right text-gray-800 mb-2">{{ item.title_urdu }}</div>
-                    <div class="flex justify-between items-center text-sm">
-                        <span class="text-gray-500"><i class="fas fa-feather"></i> {{ item.verses }} verses</span>
-                        {% if item.is_duplicate %}
-                        <span class="text-yellow-700 bg-yellow-100 px-2 py-0.5 rounded-full text-xs"><i class="fas fa-copy"></i> Duplicate</span>
-                        {% endif %}
-                    </div>
+
+        <div class="preview-grid">
+            {% for item in preview_data %}
+            <div class="preview-item {% if item.is_duplicate %}duplicate{% else %}new{% endif %}">
+                <div class="urdu-title">{{ item.title_urdu }}</div>
+                <div class="item-meta">
+                    <span><i class="fas fa-feather"></i> {{ item.verses }} verses</span>
                     {% if item.is_duplicate %}
-                    <div class="text-xs text-yellow-600 mt-1">Already exists: <a href="/ghazals/view/{{ item.existing_id }}" target="_blank" class="underline">View existing</a></div>
+                    <span class="status-dup"><i class="fas fa-copy"></i> Duplicate</span>
+                    {% else %}
+                    <span class="status-new"><i class="fas fa-check"></i> New</span>
                     {% endif %}
                 </div>
-                {% endfor %}
+                {% if item.is_duplicate %}
+                <a href="/ghazals/view/{{ item.existing_id }}" target="_blank" class="duplicate-link">
+                    <i class="fas fa-external-link-alt"></i> View existing ghazal
+                </a>
+                {% endif %}
             </div>
-
-            {% if duplicates_found %}
-            <div class="mt-6 p-4 bg-yellow-50 border-l-4 border-yellow-500 rounded">
-                <p class="font-medium text-yellow-800"><i class="fas fa-exclamation-triangle mr-2"></i> {{ duplicates_found|length }} duplicate(s) detected:</p>
-                <ul class="list-disc list-inside mt-2 text-sm text-yellow-700">
-                    {% for dup in duplicates_found %}
-                    <li><a href="/ghazals/view/{{ dup.existing_id }}" class="underline hover:text-yellow-900">{{ dup.title }}</a> (already in database)</li>
-                    {% endfor %}
-                </ul>
-            </div>
-            {% endif %}
-
-            {% if session.get('valid_ghazals_count', 0) > 0 %}
-            <div class="mt-6 flex justify-end">
-                <form method="POST" action="{{ url_for('bulk.bulk_insert') }}">
-                    <button type="submit" class="px-6 py-2 bg-green-600 text-white rounded-full hover:bg-green-700 transition"><i class="fas fa-database"></i> Insert New Ghazals</button>
-                </form>
-            </div>
-            {% endif %}
+            {% endfor %}
         </div>
+
+        {% if duplicates_found %}
+        <div class="duplicate-warning-box">
+            <div class="warn-title">
+                <i class="fas fa-exclamation-triangle"></i>
+                {{ duplicates_found|length }} duplicate(s) detected
+            </div>
+            <ul>
+                {% for dup in duplicates_found %}
+                <li><i class="fas fa-copy" style="color:var(--gold);margin-right:6px;font-size:0.7rem;"></i> <a href="/ghazals/view/{{ dup.existing_id }}" target="_blank">{{ dup.title }}</a> — already in database</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+
+        {% if session.get('valid_ghazals_count', 0) > 0 %}
+        <div class="insert-area">
+            <form method="POST" action="{{ url_for('bulk.bulk_insert') }}">
+                <button type="submit" class="btn-insert">
+                    <i class="fas fa-database"></i> Insert New Ghazals
+                </button>
+            </form>
+        </div>
+        {% endif %}
     </div>
     {% endif %}
 
-    <!-- Insertion results (if any) -->
+    <!-- ═══ INSERTION RESULTS ═══ -->
     {% if insert_results %}
-    <div class="mt-10 bg-white rounded-2xl shadow-md overflow-hidden">
-        <div class="p-6 border-b bg-gray-50">
-            <h2 class="text-xl font-semibold">Insertion Results</h2>
+    <div class="results-card">
+        <div class="results-header">
+            <h3><i class="fas fa-clipboard-check"></i> Insertion Results</h3>
         </div>
-        <div class="p-6 overflow-x-auto">
+        <div style="overflow-x:auto;">
             <table class="result-table">
                 <thead>
                     <tr>
@@ -156,23 +830,23 @@
                     <tr>
                         <td>
                             {% if result.status == 'inserted' %}
-                            <span class="success-badge"><i class="fas fa-check-circle"></i> Inserted</span>
+                            <span class="badge-inserted"><i class="fas fa-check-circle"></i> Inserted</span>
                             {% elif result.status == 'duplicate' %}
-                            <span class="duplicate-badge"><i class="fas fa-copy"></i> Duplicate</span>
+                            <span class="badge-duplicate"><i class="fas fa-copy"></i> Duplicate</span>
                             {% else %}
-                            <span class="text-red-500"><i class="fas fa-exclamation-triangle"></i> Error</span>
+                            <span class="badge-error"><i class="fas fa-exclamation-triangle"></i> Error</span>
                             {% endif %}
                         </td>
-                        <td class="urdu-text">{{ result.title_urdu }}</td>
+                        <td class="urdu-cell">{{ result.title_urdu }}</td>
                         <td>{{ result.title_english }}</td>
                         <td>{{ result.verse_count }}</td>
                         <td>
                             {% if result.status == 'inserted' %}
-                            <a href="/ghazals/view/{{ result.text_id }}" target="_blank" class="text-gold hover:underline">View</a>
+                            <a href="/ghazals/view/{{ result.text_id }}" target="_blank" class="view-link"><i class="fas fa-book-open"></i> View</a>
                             {% elif result.status == 'duplicate' %}
-                            <a href="/ghazals/view/{{ result.existing_id }}" target="_blank" class="text-gray-500 hover:underline">View existing</a>
+                            <a href="/ghazals/view/{{ result.existing_id }}" target="_blank" class="view-link-muted">View existing →</a>
                             {% else %}
-                            <span class="text-gray-400">—</span>
+                            <span style="color:#d1d5db;">—</span>
                             {% endif %}
                         </td>
                     </tr>
@@ -182,10 +856,11 @@
         </div>
     </div>
     {% endif %}
+
 </div>
 
 <script>
-    // Tab switching
+    // ── Tab Switching ──
     const tabs = document.querySelectorAll('.method-tab');
     const filePanel = document.getElementById('filePanel');
     const pastePanel = document.getElementById('pastePanel');
@@ -196,21 +871,17 @@
     const bookSelect = document.getElementById('bookSelect');
 
     function setActiveMethod(method) {
-        tabs.forEach(tab => {
-            tab.classList.remove('active', 'text-gold', 'border-gold');
-            tab.classList.add('text-gray-600');
-        });
-        const activeTab = document.querySelector(`.method-tab[data-method="${method}"]`);
-        activeTab.classList.add('active', 'text-gold', 'border-gold');
-        activeTab.classList.remove('text-gray-600');
+        tabs.forEach(tab => tab.classList.remove('active'));
+        document.querySelector(`.method-tab[data-method="${method}"]`).classList.add('active');
+
         if (method === 'file') {
-            filePanel.classList.remove('hidden');
-            pastePanel.classList.add('hidden');
+            filePanel.style.display = 'block';
+            pastePanel.style.display = 'none';
             fileInput.required = true;
             document.querySelector('textarea[name="pasted_text"]').required = false;
         } else {
-            filePanel.classList.add('hidden');
-            pastePanel.classList.remove('hidden');
+            filePanel.style.display = 'none';
+            pastePanel.style.display = 'block';
             fileInput.required = false;
             document.querySelector('textarea[name="pasted_text"]').required = true;
         }
@@ -218,25 +889,28 @@
 
     tabs.forEach(tab => tab.addEventListener('click', () => setActiveMethod(tab.dataset.method)));
 
-    // File drag & drop
+    // ── Drag & Drop ──
     dropzone.addEventListener('click', () => fileInput.click());
-    dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.classList.add('drag-over'); });
+    dropzone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropzone.classList.add('drag-over');
+    });
     dropzone.addEventListener('dragleave', () => dropzone.classList.remove('drag-over'));
     dropzone.addEventListener('drop', (e) => {
         e.preventDefault();
         dropzone.classList.remove('drag-over');
-        const files = e.dataTransfer.files;
-        fileInput.files = files;
-        updateFileNames(files);
+        fileInput.files = e.dataTransfer.files;
+        updateFileNames(e.dataTransfer.files);
     });
     fileInput.addEventListener('change', () => updateFileNames(fileInput.files));
+
     function updateFileNames(files) {
         if (!files.length) { fileNamesDiv.innerHTML = ''; return; }
         const names = Array.from(files).map(f => f.name).join(', ');
-        fileNamesDiv.innerHTML = `<i class="fas fa-check-circle text-green-600"></i> Selected: ${names}`;
+        fileNamesDiv.innerHTML = `<i class="fas fa-check-circle"></i> ${names}`;
     }
 
-    // Book dropdown based on poet selection
+    // ── Dynamic Book Loading ──
     poetSelect.addEventListener('change', function() {
         const poetId = this.value;
         if (!poetId) {
@@ -255,10 +929,10 @@
             .catch(err => console.error('Error loading books:', err));
     });
 
-    // Form validation
+    // ── Form Validation ──
     document.getElementById('bulkForm').addEventListener('submit', function(e) {
         const activeMethod = document.querySelector('.method-tab.active').dataset.method;
-        if (activeMethod === 'file' && (!fileInput.files.length)) {
+        if (activeMethod === 'file' && !fileInput.files.length) {
             e.preventDefault();
             alert('Please select at least one file');
         } else if (activeMethod === 'paste' && !document.querySelector('textarea[name="pasted_text"]').value.trim()) {
