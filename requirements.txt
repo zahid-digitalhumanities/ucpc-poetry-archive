@@ -14,6 +14,9 @@ chardet>=5.2
 gunicorn>=21.2
 
 elevenlabs==0.2.27
+transformers
+torch
+sentencepiece
 arabic_reshaper
 python-bidi
 python-dotenv>=1.0
