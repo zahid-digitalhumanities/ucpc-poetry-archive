@@ -2,6 +2,7 @@ from flask import Flask, redirect, url_for, render_template, request, jsonify, m
 import os
 import base64
 import time
+import re
 
 # Blueprints
 from routes.main_routes import main_bp
@@ -13,6 +14,7 @@ from routes.listen_routes import listen_bp
 
 # Models
 from models.stats_model import get_stats
+from models.ghazal_model import get_ghazal_with_verses
 
 def create_app():
     app = Flask(__name__)
@@ -38,9 +40,18 @@ def create_app():
     # Share page for social previews (OG tags)
     @app.route('/share/<filename>')
     def share_page(filename):
+        # Extract text_id from filename (e.g., "123_4567890.png")
+        match = re.match(r'(\d+)_', filename)
+        if match:
+            text_id = int(match.group(1))
+            ghazal, _ = get_ghazal_with_verses(text_id)
+        else:
+            ghazal = None
+
         image_url = request.host_url + f"static/generated/{filename}"
-        response = make_response(render_template('share.html', image_url=image_url))
-        # Force Facebook to re-fetch the image
+        response = make_response(render_template('share.html',
+                                                  image_url=image_url,
+                                                  ghazal=ghazal))
         response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
         response.headers['Pragma'] = 'no-cache'
         response.headers['Expires'] = '0'
