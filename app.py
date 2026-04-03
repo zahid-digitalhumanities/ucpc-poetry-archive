@@ -40,18 +40,22 @@ def create_app():
     # Share page for social previews (OG tags)
     @app.route('/share/<filename>')
     def share_page(filename):
-        # Extract text_id from filename (e.g., "123_4567890.png")
+        # Extract text_id from filename (e.g., "1616_1775237070.png")
         match = re.match(r'(\d+)_', filename)
+        ghazal = None
         if match:
             text_id = int(match.group(1))
-            ghazal, _ = get_ghazal_with_verses(text_id)
-        else:
-            ghazal = None
+            try:
+                ghazal, _ = get_ghazal_with_verses(text_id)
+            except Exception as e:
+                print(f"⚠️ Could not fetch ghazal {text_id}: {e}")
+        # If ghazal is None, we still render the page – the template will use defaults
 
         image_url = request.host_url + f"static/generated/{filename}"
         response = make_response(render_template('share.html',
                                                   image_url=image_url,
                                                   ghazal=ghazal))
+        # Prevent caching to force Facebook to re‑scrape
         response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
         response.headers['Pragma'] = 'no-cache'
         response.headers['Expires'] = '0'
