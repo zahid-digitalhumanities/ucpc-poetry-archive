@@ -3,22 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta property="og:title" content="UCPC Poetry Archive">
-    <meta property="og:description" content="A beautiful ghazal shared with love">
+
+    <!-- Open Graph (Facebook) -->
+    <meta property="og:title" content="{{ ghazal.title_english or ghazal.title_urdu or 'UCPC Poetry Archive' }}">
+    <meta property="og:description" content="{{ ghazal.poet_name or 'Beautiful Urdu Ghazal' }}">
     <meta property="og:image" content="{{ image_url }}">
     <meta property="og:image:secure_url" content="{{ image_url }}">
-    <meta property="og:image:width" content="1080">
-    <meta property="og:image:height" content="1920">
+    <meta property="og:image:type" content="image/png">
+
+    <!-- Facebook BEST SIZE -->
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+
     <meta property="og:url" content="{{ request.url }}">
-    <meta property="og:type" content="website">
+    <meta property="og:type" content="article">
+
+    <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ ghazal.title_english or 'UCPC Ghazal' }}">
+    <meta name="twitter:description" content="{{ ghazal.poet_name or 'Urdu Poetry' }}">
     <meta name="twitter:image" content="{{ image_url }}">
-    <title>UCPC Ghazal</title>
+
+    <title>{{ ghazal.title_english or "UCPC Ghazal" }}</title>
+
     <style>
-        body { margin: 0; background: #0a0a0a; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
-        img { max-width: 100%; height: auto; border-radius: 14px; box-shadow: 0 6px 20px rgba(0,0,0,0.4); }
+        body {
+            margin: 0;
+            background: #0a0a0a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 14px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+        }
     </style>
 </head>
+
 <body>
     <img src="{{ image_url }}" alt="Ghazal Image">
 </body>
