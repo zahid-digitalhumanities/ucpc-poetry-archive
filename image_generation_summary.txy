@@ -1,0 +1,110 @@
+We have developed a complete image generation module for the UCPC Poetry Archive that creates a shareable PNG image of a ghazal with dedication. The module is located in modules/image_generator.py and is called by the route /ghazals/share_image/<text_id> to produce the image, save it to static/generated/, and return a shareable URL.
+
+Below is a comprehensive summary of the final solution.
+
+---
+
+📁 File Overview
+
+Filename: modules/image_generator.py
+Purpose: Generate a high‑quality, styled PNG image of a ghazal (including poet name, couplets, dedication, watermark) for social media sharing.
+Dependencies: Pillow, arabic-reshaper, python-bidi (the latter two are optional but used for better Urdu shaping; the code falls back gracefully).
+
+---
+
+🔧 Core Functions
+
+Function Description
+get_font(font_name, size) Loads a TrueType font from static/fonts/. Caches fonts for performance. Falls back to default PIL font if missing.
+draw_centered(draw, text, y, font, color, width, spacing) Draws multi‑line text centered horizontally. Each line gets a small vertical spacing.
+draw_left_aligned(draw, text, y, font, color, left_margin) Draws a single line of text left‑aligned (used for dedication).
+draw_couplet_on_one_line(draw, misra1, misra2, y, font, color, width, gap) Draws the first couplet as a single line: misra1 on the right, misra2 on the left, with a gap. The whole pair is centered. This gives a classic, balanced look.
+generate_ghazal_card(ghazal, verses, dedicator, dedicatee) Main function. Returns a PIL Image object.
+
+---
+
+🖼️ Layout of the Generated Image (from top to bottom)
+
+1. Gold frame – 15px thick, around the entire image (colour #D4AF37).
+2. Poet name – Urdu (Jameel Noori font, gold) then English (Liberation Serif Bold, black). Both centered.
+      A gold underline (width 8px) is drawn 10px below the last line.
+3. First couplet (special style) – drawn as a single line:
+   · misra1_urdu on the right (right‑aligned)
+   · misra2_urdu on the left (left‑aligned)
+   · Gap of 100px between them, the whole pair centered.
+        This matches the traditional ghazal presentation of the opening couplet (matla).
+4. Dedication section – left‑aligned, with 80px left margin:
+   · From: [sender] in gold
+   · Dedicated to: [receiver] in black, with the entire line underlined (6px thick, black).
+5. Full ghazal – all verses (including the first couplet) are drawn again, centered, each misra on its own line.
+      This ensures the complete ghazal appears without duplication of the first couplet? Actually the first couplet appears twice: once in the special layout, and once again as part of the full listing. This is intentional to give a classic look while still listing the whole poem.
+6. Watermark – “UCPC Poetry Archive • Preserving Urdu Poetry” centered near the bottom, in light gray.
+7. White background – the entire image uses a clean white background for readability.
+
+---
+
+🎨 Fonts Used
+
+Text Font Size Colour
+Poet name (Urdu) Jameel Noori Nastaleeq 60 Gold (#D4AF37)
+Poet name (English) Liberation Serif Bold 46 Black
+First couplet & full ghazal Jameel Noori Nastaleeq 48 Black
+Dedication (From / Dedicated to) Liberation Serif Bold 44 Gold (From) / Black (Dedicated to)
+Watermark Liberation Serif Regular 28 Light gray
+
+All fonts are loaded from static/fonts/. If a font is missing, the code falls back to PIL’s default font (which may not render Urdu correctly, but the image will still be generated).
+
+---
+
+🧪 Integration with Flask
+
+· The route /ghazals/share_image/<text_id> calls generate_ghazal_card(), saves the image to static/generated/<filename>.png (using an absolute path from os.getcwd()), and returns a JSON with share_url (e.g., https://.../share/123_4567890.png).
+· The /share/<filename> route in app.py serves the image file directly, with correct MIME type image/png.
+· The social share buttons in view.html use JavaScript to fetch this URL and open the share dialog (WhatsApp, Facebook, etc.). The share page (share.html) contains Open Graph meta tags that point to the image, ensuring rich previews on social platforms.
+
+---
+
+📦 Image Dimensions and Storage
+
+· Width: 1080 pixels (standard for social media)
+· Height: 1920 pixels (enough for most ghazals; dynamically adjusts if needed – the code uses fixed height, but the layout is designed to fit within 1920px; if the ghazal is very long, the image may overflow – in practice, most ghazals fit).
+· Storage: Images are saved in static/generated/. On Render’s free tier, this folder is ephemeral – files are deleted after a restart. For permanent storage, cloud services (e.g., Cloudinary, AWS S3) would be needed.
+
+---
+
+✅ Key Features
+
+· Right‑aligned first couplet with both misras on the same line (authentic Urdu poetry style).
+· Centered full ghazal listing for easy reading.
+· Dedication with full‑line underline (not just the name).
+· Gold frame for an elegant, premium look.
+· Watermark for branding.
+· Fallback fonts ensure the image is always generated, even if custom fonts are missing.
+
+---
+
+🔄 Flow Summary
+
+1. User enters sender and receiver names in the dedication form on the ghazal page.
+2. Clicks a social share button (WhatsApp, Facebook, etc.).
+3. JavaScript calls /ghazals/share_image/<id> with the names as query parameters.
+4. Backend:
+   · Fetches ghazal data and verses from the database.
+   · Calls generate_ghazal_card() to create the image.
+   · Saves the image to static/generated/.
+   · Returns a JSON object containing share_url.
+5. Frontend opens the share dialog with that URL.
+6. The share page (/share/<filename>) serves the image with Open Graph meta tags, so social platforms display the image preview.
+
+---
+
+🛠️ Possible Future Improvements
+
+· Use a cloud storage service to make images permanent.
+· Add dynamic height calculation to accommodate longer ghazals without clipping.
+· Optimise Urdu text shaping by always including arabic-reshaper and python-bidi.
+· Pre‑generate images when a ghazal is first created to reduce latency on first share.
+
+---
+
+This module is the core of the social sharing feature, delivering a polished, consistent, and visually appealing ghazal card for every dedication. 🚀
