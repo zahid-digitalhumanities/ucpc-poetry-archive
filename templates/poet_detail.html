@@ -1,16 +1,16 @@
-﻿{% extends "base.html" %}
+{% extends "base.html" %}
 {% block title %}{{ poet.name_urdu }} - UCPC Poetry Archive{% endblock %}
+
 {% block extra_css %}
 <style>
-    .poet-detail-container {
-        max-width: 1200px;
-        margin: 0 auto;
-    }
+    /* ═══════════════════════════════════════
+       POET HEADER
+       ═══════════════════════════════════════ */
     .poet-header {
         background: linear-gradient(135deg, #fefcf8, #faf7f0);
-        border-radius: 60px;
-        padding: 25px 35px;
-        margin-bottom: 45px;
+        border-radius: 28px;
+        padding: 28px 36px;
+        margin-bottom: 2.5rem;
         border: 1px solid rgba(212,175,55,0.3);
         display: flex;
         justify-content: space-between;
@@ -18,11 +18,25 @@
         flex-wrap: wrap;
         gap: 20px;
         box-shadow: 0 8px 20px rgba(0,0,0,0.02);
+        position: relative;
+        overflow: hidden;
     }
-    .poet-name {
+    .poet-header::after {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -10%;
+        width: 200px;
+        height: 200px;
+        background: radial-gradient(circle, rgba(212,175,55,0.06) 0%, transparent 70%);
+        pointer-events: none;
+    }
+    .poet-header > * { position: relative; z-index: 1; }
+
+    .poet-identity {
         display: flex;
         align-items: baseline;
-        gap: 15px;
+        gap: 14px;
         flex-wrap: wrap;
     }
     .poet-name-en {
@@ -32,163 +46,331 @@
         letter-spacing: -0.5px;
     }
     .poet-name-urdu {
-        font-family: 'Jameel Noori Nastaleeq', serif;
+        font-family: 'Jameel Noori Nastaleeq', 'Noto Nastaliq Urdu', serif;
         font-size: 1.5rem;
         font-weight: 700;
         color: var(--gold);
         direction: rtl;
     }
     .poet-years {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
         background: rgba(212,175,55,0.12);
-        padding: 6px 18px;
-        border-radius: 40px;
-        font-size: 0.9rem;
+        padding: 5px 16px;
+        border-radius: 50px;
+        font-size: 0.85rem;
         font-weight: 500;
+        color: #6b5a2e;
     }
+    .poet-years i { color: var(--gold); font-size: 0.75rem; }
+
     .poet-stats {
         display: flex;
-        gap: 20px;
+        gap: 0;
         background: white;
-        padding: 8px 20px;
         border-radius: 50px;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        overflow: hidden;
+        border: 1px solid rgba(212,175,55,0.1);
     }
-    .poet-stats div {
+    .poet-stat-item {
         display: flex;
-        align-items: baseline;
-        gap: 6px;
-        font-size: 0.9rem;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 20px;
+        font-size: 0.88rem;
         font-weight: 600;
         color: #1e3c72;
     }
-    .poet-stats i {
-        color: var(--gold);
+    .poet-stat-item + .poet-stat-item {
+        border-left: 1px solid rgba(212,175,55,0.15);
     }
+    .poet-stat-item i {
+        color: var(--gold);
+        font-size: 0.8rem;
+    }
+
+    /* ═══════════════════════════════════════
+       SECTION TITLE
+       ═══════════════════════════════════════ */
+    .section-title {
+        text-align: center;
+        margin-bottom: 2.5rem;
+    }
+    .section-title h2 {
+        font-size: 1.7rem;
+        font-weight: 700;
+        color: #1e3c72;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .section-title .count-badge {
+        background: var(--gold);
+        color: white;
+        padding: 3px 14px;
+        border-radius: 50px;
+        font-size: 0.85rem;
+        font-weight: 700;
+    }
+
+    /* ═══════════════════════════════════════
+       POEMS GRID
+       ═══════════════════════════════════════ */
     .poems-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
-        gap: 30px;
-        margin-top: 30px;
+        grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+        gap: 24px;
     }
+
+    /* ═══════════════════════════════════════
+       POEM CARD
+       ═══════════════════════════════════════ */
     .poem-card {
-        background: var(--paper);
-        border-radius: 22px;
-        padding: 22px;
-        border: 1px solid rgba(0,0,0,0.05);
-        transition: all 0.25s ease;
+        background: white;
+        border-radius: 28px;
+        padding: 28px;
+        border: 1px solid rgba(0,0,0,0.04);
+        transition: all 0.3s ease;
         text-decoration: none;
         display: block;
-        box-shadow: 0 8px 20px rgba(0,0,0,0.04);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+        position: relative;
+        overflow: hidden;
+    }
+    .poem-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 50px;
+        height: 3px;
+        background: linear-gradient(90deg, transparent, var(--gold), transparent);
+        border-radius: 0 0 4px 4px;
+        opacity: 0;
+        transition: opacity 0.3s ease;
     }
     .poem-card:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 10px 25px rgba(0,0,0,0.06);
-        border-color: var(--gold);
+        transform: translateY(-4px);
+        box-shadow: 0 16px 32px rgba(0,0,0,0.07);
+        border-color: rgba(212,175,55,0.25);
     }
-    .poem-english-text {
-        font-size: 0.95rem;
-        opacity: 0.7;
-        color: #1e3c72;
-        margin-bottom: 10px;
+    .poem-card:hover::before {
+        opacity: 1;
     }
-    .poem-urdu-text {
-        font-family: 'Jameel Noori Nastaleeq', serif;
-        font-size: 1.5rem;
-        line-height: 2.4rem;
+
+    .poem-title-en {
+        font-size: 0.82rem;
         font-weight: 600;
-        color: #1e3c72;
+        color: #9ca3af;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        margin-bottom: 2px;
+    }
+    .poem-title-urdu {
+        font-family: 'Jameel Noori Nastaleeq', 'Noto Nastaliq Urdu', serif;
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: var(--gold);
         direction: rtl;
         text-align: right;
+        margin-bottom: 16px;
+        line-height: 1.8;
+    }
+    .poem-matla {
+        font-family: 'Jameel Noori Nastaleeq', 'Noto Nastaliq Urdu', serif;
+        font-size: 1.55rem;
+        line-height: 2.5rem;
+        font-weight: 600;
+        direction: rtl;
+        text-align: center;
+        color: var(--primary-dark);
+        padding: 16px 0;
+        margin-bottom: 16px;
+        border-top: 1px solid rgba(212,175,55,0.12);
+        border-bottom: 1px solid rgba(212,175,55,0.12);
+        word-break: break-word;
+    }
+    .poem-en-snippet {
+        font-family: 'Georgia', 'Cambria', serif;
+        font-size: 0.85rem;
+        line-height: 1.5;
+        color: #7e8c8f;
+        font-style: italic;
+        text-align: center;
+        margin-bottom: 16px;
     }
     .poem-meta {
         display: flex;
-        gap: 15px;
-        justify-content: flex-start;
-        padding-top: 12px;
-        margin-top: 12px;
-        border-top: 1px solid rgba(212,175,55,0.15);
-        font-size: 0.8rem;
+        gap: 16px;
+        justify-content: center;
+        font-size: 0.78rem;
         font-weight: 500;
-        color: #4a5568;
+        color: #9ca3af;
     }
     .poem-meta i {
         color: var(--gold);
         margin-right: 4px;
     }
-    .section-title {
-        text-align: center;
-        margin-bottom: 35px;
+    .poem-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 18px;
+        padding-top: 16px;
+        border-top: 1px solid #f0ebe0;
     }
-    .section-title h2 {
-        font-size: 1.8rem;
-        font-weight: 700;
-        color: #1e3c72;
-        display: inline-block;
-        background: linear-gradient(120deg, #fff, #faf7f0);
-        padding: 0 20px;
+    .btn-read {
+        flex: 1;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        padding: 10px 16px;
+        border-radius: 50px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: white;
+        background: var(--primary);
+        text-decoration: none;
+        transition: all 0.25s ease;
+        box-shadow: 0 3px 10px rgba(30,60,114,0.2);
     }
-    .section-title span {
+    .btn-read:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 5px 14px rgba(30,60,114,0.3);
+    }
+    .btn-share {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        padding: 10px 18px;
+        border-radius: 50px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--primary);
+        background: white;
+        text-decoration: none;
+        border: 1.5px solid rgba(212,175,55,0.3);
+        transition: all 0.25s ease;
+    }
+    .btn-share:hover {
         background: var(--gold);
         color: white;
-        padding: 4px 12px;
-        border-radius: 40px;
-        font-size: 0.9rem;
-        margin-left: 8px;
+        border-color: var(--gold);
+        transform: translateY(-1px);
+        box-shadow: 0 5px 14px rgba(212,175,55,0.3);
     }
+
+    /* ═══════════════════════════════════════
+       EMPTY STATE
+       ═══════════════════════════════════════ */
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        color: #9ca3af;
+    }
+    .empty-state i {
+        font-size: 3rem;
+        color: rgba(212,175,55,0.3);
+        margin-bottom: 1rem;
+        display: block;
+    }
+    .empty-state p {
+        font-size: 1.1rem;
+        font-weight: 500;
+    }
+
+    /* ═══════════════════════════════════════
+       RESPONSIVE
+       ═══════════════════════════════════════ */
     @media (max-width: 768px) {
         .poet-header {
             flex-direction: column;
             text-align: center;
-            padding: 20px;
+            padding: 22px 20px;
+            border-radius: 20px;
         }
-        .poet-name-en {
-            font-size: 1.6rem;
+        .poet-identity {
+            justify-content: center;
         }
-        .poet-name-urdu {
-            font-size: 1.3rem;
-        }
+        .poet-name-en { font-size: 1.6rem; }
+        .poet-name-urdu { font-size: 1.3rem; }
         .poems-grid {
             grid-template-columns: 1fr;
         }
-        .poem-urdu-text {
-            font-size: 1.3rem;
+        .poem-card {
+            padding: 22px 18px;
+            border-radius: 20px;
         }
+        .poem-matla {
+            font-size: 1.3rem;
+            line-height: 2rem;
+        }
+        .poem-title-urdu { font-size: 1.05rem; }
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="poet-detail-container">
+<div class="watermark-container" style="max-width:1200px; margin:0 auto;">
+
+    <!-- ═══ POET HEADER ═══ -->
     <div class="poet-header">
-        <div class="poet-name">
+        <div class="poet-identity">
             <span class="poet-name-en">{{ poet.name }}</span>
-            <span class="poet-name-urdu">({{ poet.name_urdu }})</span>
+            <span class="poet-name-urdu">{{ poet.name_urdu }}</span>
             {% if poet.birth_year or poet.death_year %}
-            <span class="poet-years"><i class="fas fa-calendar-alt"></i> {{ poet.birth_year or '?' }} – {{ poet.death_year or 'Present' }}</span>
+            <span class="poet-years">
+                <i class="fas fa-calendar-alt"></i>
+                {{ poet.birth_year or '?' }} – {{ poet.death_year or 'Present' }}
+            </span>
             {% endif %}
         </div>
         <div class="poet-stats">
-            <div><i class="fas fa-book"></i> {{ texts|length }} Poems</div>
-            <div><i class="fas fa-pen-fancy"></i> {{ texts|sum(attribute='verse_count') }} Verses</div>
+            <div class="poet-stat-item">
+                <i class="fas fa-book-open"></i>
+                {{ texts|length }} Poems
+            </div>
+            <div class="poet-stat-item">
+                <i class="fas fa-pen-fancy"></i>
+                {{ texts|sum(attribute='verse_count') }} Verses
+            </div>
         </div>
     </div>
 
+    <!-- ═══ SECTION TITLE ═══ -->
     <div class="section-title">
-        <h2>All Poems <span>{{ texts|length }}</span></h2>
+        <h2>
+            <i class="fas fa-feather-alt" style="color:var(--gold);font-size:1.2rem;"></i>
+            All Poems
+            <span class="count-badge">{{ texts|length }}</span>
+        </h2>
     </div>
 
+    <!-- ═══ POEMS GRID ═══ -->
+    {% if texts %}
     <div class="poems-grid">
         {% for item in texts %}
-        <div class="poem-card">
-            <div class="poem-english-text">{{ item.title_english or 'Untitled' }}</div>
-            <div class="poem-urdu-text">{{ item.title_urdu or 'عنوان' }}</div>
+        <a href="/view/{{ item.id }}" class="poem-card">
 
-            <!-- MATLA (first two lines) from text_urdu -->
+            <div class="poem-title-en">{{ item.title_english or 'Untitled' }}</div>
+            <div class="poem-title-urdu">{{ item.title_urdu or 'عنوان' }}</div>
+
             {% set lines = item.text_urdu.split('\n') if item.text_urdu else [] %}
             {% if lines %}
-            <div class="urdu-text text-sm mt-2 text-gray-500" style="font-size:0.9rem; direction:rtl;">
+            <div class="poem-matla">
                 {{ lines[0] }}
                 {% if lines|length > 1 %}<br>{{ lines[1] }}{% endif %}
+            </div>
+            {% endif %}
+
+            {% if item.text_english %}
+            {% set en_lines = item.text_english.split('\n') %}
+            <div class="poem-en-snippet">
+                "{{ en_lines[0] if en_lines else '' }}{% if en_lines|length > 1 %} {{ en_lines[1] }}{% endif %}"
             </div>
             {% endif %}
 
@@ -196,15 +378,27 @@
                 <span><i class="fas fa-pen-fancy"></i> {{ item.verse_count }} verses</span>
             </div>
 
-            <!-- Actions: View Full and WhatsApp Share -->
-            <div class="flex gap-4 mt-4">
-                <a href="/view/{{ item.id }}" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm">View Full</a>
+            <div class="poem-actions" onclick="event.stopPropagation();">
+                <span class="btn-read">
+                    <i class="fas fa-book-open"></i> Read Full
+                </span>
                 <a target="_blank"
                    href="https://wa.me/?text={{ (poet.name ~ '\n\n' ~ (item.title_urdu or item.title_english) ~ '\n\n' ~ item.text_urdu ~ '\n\nRead more: ' ~ request.url_root ~ 'view/' ~ item.id) | urlencode }}"
-                   class="px-4 py-2 bg-green-500 text-white rounded-lg text-sm">Share</a>
+                   class="btn-share" onclick="event.stopPropagation();">
+                    <i class="fab fa-whatsapp"></i> Share
+                </a>
             </div>
-        </div>
+
+        </a>
         {% endfor %}
     </div>
+
+    {% else %}
+    <div class="empty-state">
+        <i class="fas fa-book-open"></i>
+        <p>No poems available yet for this poet.</p>
+    </div>
+    {% endif %}
+
 </div>
 {% endblock %}
