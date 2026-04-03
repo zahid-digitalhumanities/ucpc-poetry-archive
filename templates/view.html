@@ -280,7 +280,7 @@ async function getShareUrl(textId) {
         const res = await fetch(url);
         const data = await res.json();
         if (!data.share_url) throw new Error('No share_url');
-        return data.share_url;
+        return data.image_url;
     } catch (err) { console.error(err); alert('Failed to generate share link'); return null; }
 }
 
