@@ -11,84 +11,98 @@ def get_font(font_name, size):
         logging.warning(f"Could not load {font_name}: {e}")
         return ImageFont.load_default()
 
-def draw_centered_text(draw, text, y, font, color, width):
+def draw_centered_text(draw, text, y, font, color, width, line_spacing=10):
+    """Draw centered text (supports multiline)."""
     lines = text.split('\n')
     for line in lines:
         bbox = draw.textbbox((0, 0), line, font=font)
         line_width = bbox[2] - bbox[0]
         x = (width - line_width) // 2
         draw.text((x, y), line, font=font, fill=color)
-        y += bbox[3] - bbox[1] + 10
+        y += bbox[3] - bbox[1] + line_spacing
     return y
 
 def generate_ghazal_card(ghazal, verses, dedicator='', dedicatee=''):
     width = 1080
     height = 1920
-    bg_color = (10, 10, 20)
+    bg_color = (10, 10, 20)        # dark background
     text_color = (255, 255, 255)
     gold = (212, 175, 55)
+    black = (0, 0, 0)
 
     # Fonts
-    poet_font = get_font('LiberationSerif-Bold.ttf', 60)
-    urdu_font = get_font('JameelNooriNastaleeq.ttf', 48)
-    english_font = get_font('LiberationSerif-Regular.ttf', 36)
     dedication_font = get_font('LiberationSerif-Bold.ttf', 42)
+    urdu_font = get_font('JameelNooriNastaleeq.ttf', 48)
+    poet_font = get_font('LiberationSerif-Bold.ttf', 56)
+    poet_eng_font = get_font('LiberationSerif-Italic.ttf', 40)
     watermark_font = get_font('LiberationSerif-Regular.ttf', 30)
 
     img = Image.new('RGB', (width, height), bg_color)
     draw = ImageDraw.Draw(img)
 
-    # 1. Thick gold border around the whole image
-    border_width = 10
+    # 1. Thick dark border around the whole image
+    border_width = 12
     draw.rectangle([border_width, border_width, width - border_width, height - border_width],
-                   outline=gold, width=border_width)
+                   outline=black, width=border_width)
 
-    # 2. Poet name (Urdu + English)
+    # 2. Dedication section (top)
+    y = 120
+    if dedicator and dedicatee:
+        draw_centered_text(draw, f"From: {dedicator}", y, dedication_font, gold, width)
+        y += 70
+        draw_centered_text(draw, f"Dedicated to: {dedicatee}", y, dedication_font, text_color, width)
+        y += 120
+    else:
+        y = 150
+
+    # 3. First couplet (example or actual first verse)
+    if verses:
+        first_couplet = verses[0].get('misra1_urdu', '')
+        if first_couplet:
+            draw_centered_text(draw, first_couplet, y, urdu_font, text_color, width)
+            y += 100
+    else:
+        y += 100
+
+    # 4. Thick black line
+    line_y = y
+    draw.line([(100, line_y), (width - 100, line_y)], fill=black, width=8)
+    y += 60
+
+    # 5. Poet name (Urdu + English) with underline
     poet_ur = ghazal.get('poet_name_urdu', '')
     poet_en = ghazal.get('poet_name', '')
-    poet_text = f"{poet_ur}\n{poet_en}" if poet_ur else poet_en
-    y = draw_centered_text(draw, poet_text, 140, poet_font, gold, width)
-
-    # 3. Bilingual verses with vertical dashed line
-    margin = 100
-    urdu_x = width - margin
-    english_x = margin
-    y = max(y + 60, 300)
-    line_spacing = 100
-    couplet_spacing = 50
-
-    # Draw vertical dashed line in the middle
-    middle_x = width // 2
-    dash_height = 20
-    dash_gap = 20
-    for dash_y in range(y, height - 200, dash_height + dash_gap):
-        draw.line((middle_x, dash_y, middle_x, dash_y + dash_height), fill=gold, width=3)
-
-    for verse in verses:
-        m1_ur = verse.get('misra1_urdu', '')
-        m2_ur = verse.get('misra2_urdu', '')
-        m1_en = verse.get('misra1_english', '')
-        m2_en = verse.get('misra2_english', '')
-        if m1_ur:
-            draw.text((urdu_x, y), m1_ur, font=urdu_font, fill=text_color, anchor='rt')
-            draw.text((english_x, y), m1_en, font=english_font, fill=text_color, anchor='lt')
-            y += line_spacing
-        if m2_ur:
-            draw.text((urdu_x, y), m2_ur, font=urdu_font, fill=text_color, anchor='rt')
-            draw.text((english_x, y), m2_en, font=english_font, fill=text_color, anchor='lt')
-            y += line_spacing
-        y += couplet_spacing
-
-    # 4. Dedication block
-    if dedicator and dedicatee:
-        y += 100
-        draw.text((width//2, y), f"From: {dedicator}", font=dedication_font, fill=gold, anchor='mt')
+    if poet_ur:
+        draw_centered_text(draw, poet_ur, y, poet_font, gold, width)
         y += 70
-        draw.text((width//2, y), f"Dedicated to: {dedicatee}", font=dedication_font, fill=text_color, anchor='mt')
-        y += 100
+    if poet_en:
+        draw_centered_text(draw, poet_en, y, poet_eng_font, text_color, width)
+        y += 50
+    # Underline below poet name
+    underline_y = y - 20
+    draw.line([(200, underline_y), (width - 200, underline_y)], fill=gold, width=4)
+    y += 80
 
-    # 5. Watermark
+    # 6. Full ghazal in Urdu (all verses)
+    verse_texts = []
+    for verse in verses:
+        m1 = verse.get('misra1_urdu', '')
+        m2 = verse.get('misra2_urdu', '')
+        if m1:
+            verse_texts.append(m1)
+        if m2:
+            verse_texts.append(m2)
+        verse_texts.append('')  # spacer between couplets
+
+    for line in verse_texts:
+        if line:
+            draw_centered_text(draw, line, y, urdu_font, text_color, width, line_spacing=20)
+            y += 80
+        else:
+            y += 50
+
+    # 7. Watermark at bottom
     watermark = "UCPC Poetry Archive • Preserving Urdu Poetry"
-    draw.text((width//2, height - 100), watermark, font=watermark_font, fill=(100,100,100), anchor='mt')
+    draw_centered_text(draw, watermark, height - 100, watermark_font, (100,100,100), width)
 
     return img
