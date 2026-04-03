@@ -73,7 +73,6 @@ def share_image(text_id):
 
         img = generate_ghazal_card(ghazal, verses, dedicator, dedicatee)
 
-        # Use absolute path
         generated_dir = os.path.join(os.getcwd(), 'static', 'generated')
         os.makedirs(generated_dir, exist_ok=True)
         print(f"📁 Generated directory: {generated_dir}")
