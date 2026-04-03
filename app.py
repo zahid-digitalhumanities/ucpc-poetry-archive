@@ -1,4 +1,4 @@
-from flask import Flask, redirect, url_for, render_template, request, jsonify
+from flask import Flask, redirect, url_for, render_template, request, jsonify, make_response
 import os
 import base64
 import time
@@ -39,7 +39,12 @@ def create_app():
     @app.route('/share/<filename>')
     def share_page(filename):
         image_url = request.host_url + f"static/generated/{filename}"
-        return render_template('share.html', image_url=image_url)
+        response = make_response(render_template('share.html', image_url=image_url))
+        # Force Facebook to re-fetch the image
+        response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+        response.headers['Pragma'] = 'no-cache'
+        response.headers['Expires'] = '0'
+        return response
 
     # Global stats
     @app.context_processor
