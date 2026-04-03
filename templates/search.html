@@ -1,60 +1,460 @@
 {% extends "base.html" %}
 {% block title %}Search | UCPC Poetry Archive{% endblock %}
+
 {% block extra_css %}
 <style>
-    .search-result { border-bottom: 1px solid #e2e8f0; padding: 1rem 0; }
-    .urdu { font-family: 'Jameel Noori Nastaleeq', serif; line-height: 2; }
-    .suggestions-box {
-        position: absolute;
-        z-index: 1000;
-        background: white;
-        border: 1px solid #ddd;
-        border-radius: 0.5rem;
-        width: 100%;
-        max-height: 300px;
-        overflow-y: auto;
+    /* ═══════════════════════════════════════
+       PAGE HEADER
+       ═══════════════════════════════════════ */
+    .page-header {
+        text-align: center;
+        margin-bottom: 2.5rem;
     }
-    .suggestion-item { padding: 0.5rem 1rem; cursor: pointer; }
-    .suggestion-item:hover { background: #f3f4f6; }
-    .relative { position: relative; }
+    .page-header h2 {
+        font-size: 1.8rem;
+        font-weight: 800;
+        color: #1e3c72;
+        letter-spacing: -0.3px;
+    }
+    .page-header .urdu-subtitle {
+        font-family: 'Jameel Noori Nastaleeq', 'Noto Nastaliq Urdu', serif;
+        font-size: 1.5rem;
+        color: var(--gold);
+        direction: rtl;
+        line-height: 2.4;
+        margin-top: 0.25rem;
+    }
+    .page-header .en-subtitle {
+        font-size: 0.88rem;
+        color: #9ca3af;
+        margin-top: 0.35rem;
+    }
+    .page-header::after {
+        content: '';
+        display: block;
+        width: 60px;
+        height: 3px;
+        background: linear-gradient(90deg, transparent, var(--gold), transparent);
+        margin: 1.25rem auto 0;
+        border-radius: 4px;
+    }
+
+    /* ═══════════════════════════════════════
+       SEARCH BOX
+       ═══════════════════════════════════════ */
+    .search-wrapper {
+        position: relative;
+        margin-bottom: 1.25rem;
+    }
+    .search-input {
+        width: 100%;
+        padding: 1rem 3.5rem 1rem 1.5rem;
+        border: 2px solid #e5e7eb;
+        border-radius: 50px;
+        font-size: 1.1rem;
+        font-family: 'Jameel Noori Nastaleeq', 'Noto Nastaliq Urdu', 'Inter', sans-serif;
+        color: var(--primary-dark);
+        background: white;
+        transition: border-color 0.2s, box-shadow 0.2s;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+        box-sizing: border-box;
+    }
+    .search-input::placeholder {
+        color: #b0a890;
+        font-size: 1rem;
+    }
+    .search-input:focus {
+        outline: none;
+        border-color: var(--gold);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.04), 0 0 0 4px rgba(212,175,55,0.12);
+    }
+
+    /* Voice button */
     .voice-btn {
         position: absolute;
-        right: 12px;
+        right: 8px;
         top: 50%;
         transform: translateY(-50%);
-        background: none;
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, rgba(212,175,55,0.1), rgba(212,175,55,0.04));
         border: none;
-        font-size: 1.5rem;
         cursor: pointer;
-        color: #666;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.15rem;
+        color: var(--gold);
+        transition: all 0.25s ease;
         z-index: 10;
     }
-    .voice-btn.listening { color: #ef4444; animation: pulse 1.5s infinite; }
-    @keyframes pulse {
-        0% { opacity: 0.5; transform: scale(1); }
-        50% { opacity: 1; transform: scale(1.1); }
-        100% { opacity: 0.5; transform: scale(1); }
+    .voice-btn:hover {
+        background: linear-gradient(135deg, rgba(212,175,55,0.2), rgba(212,175,55,0.08));
+        transform: translateY(-50%) scale(1.05);
+    }
+    .voice-btn.listening {
+        color: #ef4444;
+        background: rgba(239,68,68,0.08);
+        animation: voicePulse 1.5s ease-in-out infinite;
+    }
+    @keyframes voicePulse {
+        0%, 100% { box-shadow: 0 0 0 0 rgba(239,68,68,0.2); }
+        50% { box-shadow: 0 0 0 12px rgba(239,68,68,0); }
+    }
+
+    /* ═══════════════════════════════════════
+       FILTERS ROW
+       ═══════════════════════════════════════ */
+    .filters-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        align-items: center;
+    }
+    .form-select {
+        padding: 0.65rem 2.5rem 0.65rem 1rem;
+        border: 1.5px solid #e5e7eb;
+        border-radius: 50px;
+        font-size: 0.88rem;
+        font-family: 'Inter', sans-serif;
+        color: #1e3c72;
+        background-color: white;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23D4AF37' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 14px center;
+        appearance: none;
+        -webkit-appearance: none;
+        cursor: pointer;
+        transition: border-color 0.2s, box-shadow 0.2s;
+        min-width: 180px;
+    }
+    .form-select:focus {
+        outline: none;
+        border-color: var(--gold);
+        box-shadow: 0 0 0 3px rgba(212,175,55,0.12);
+    }
+    .btn-search {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 0.65rem 1.5rem;
+        border-radius: 50px;
+        font-weight: 700;
+        font-size: 0.88rem;
+        cursor: pointer;
+        border: none;
+        background: linear-gradient(135deg, var(--gold), #e6c44a);
+        color: var(--primary-dark);
+        box-shadow: 0 3px 10px rgba(212,175,55,0.25);
+        transition: all 0.25s ease;
+    }
+    .btn-search:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 5px 14px rgba(212,175,55,0.35);
+    }
+
+    /* ═══════════════════════════════════════
+       SUGGESTIONS DROPDOWN
+       ═══════════════════════════════════════ */
+    .suggestions-box {
+        position: absolute;
+        top: calc(100% + 6px);
+        left: 0;
+        right: 0;
+        z-index: 1000;
+        background: white;
+        border: 1px solid rgba(212,175,55,0.2);
+        border-radius: 20px;
+        max-height: 320px;
+        overflow-y: auto;
+        box-shadow: 0 12px 32px rgba(0,0,0,0.1);
+        display: none;
+        padding: 6px;
+    }
+    .suggestions-box.visible {
+        display: block;
+        animation: suggestFade 0.2s ease-out;
+    }
+    @keyframes suggestFade {
+        from { opacity: 0; transform: translateY(-6px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .suggestion-item {
+        padding: 0.7rem 1rem;
+        cursor: pointer;
+        border-radius: 14px;
+        font-family: 'Jameel Noori Nastaleeq', 'Noto Nastaliq Urdu', serif;
+        font-size: 1rem;
+        color: var(--primary-dark);
+        direction: rtl;
+        text-align: right;
+        transition: background 0.15s;
+    }
+    .suggestion-item:hover,
+    .suggestion-item.active {
+        background: rgba(212,175,55,0.08);
+    }
+
+    /* ═══════════════════════════════════════
+       RESULTS HEADER
+       ═══════════════════════════════════════ */
+    .results-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #f0ebe0;
+    }
+    .results-count {
+        font-size: 0.92rem;
+        color: #6b7280;
+        font-weight: 500;
+    }
+    .results-count strong {
+        color: #1e3c72;
+        font-weight: 700;
+    }
+    .results-keyword {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 14px;
+        border-radius: 50px;
+        background: rgba(212,175,55,0.08);
+        color: var(--gold);
+        font-size: 0.85rem;
+        font-weight: 600;
+        font-family: 'Jameel Noori Nastaleeq', serif;
+        direction: rtl;
+    }
+
+    /* ═══════════════════════════════════════
+       SEARCH RESULT CARD
+       ═══════════════════════════════════════ */
+    .results-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+    .search-result {
+        display: block;
+        background: white;
+        border: 1px solid rgba(0,0,0,0.04);
+        border-radius: 20px;
+        padding: 1.5rem 1.75rem;
+        text-decoration: none;
+        transition: all 0.25s ease;
+        position: relative;
+        overflow: hidden;
+        animation: resultSlide 0.35s ease-out both;
+    }
+    .search-result::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 4px;
+        height: 100%;
+        background: var(--gold);
+        opacity: 0;
+        transition: opacity 0.25s;
+        border-radius: 4px 0 0 4px;
+    }
+    .search-result:hover {
+        border-color: rgba(212,175,55,0.2);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+        transform: translateX(4px);
+    }
+    .search-result:hover::before {
+        opacity: 1;
+    }
+    /* Stagger animation */
+    .search-result:nth-child(1) { animation-delay: 0.02s; }
+    .search-result:nth-child(2) { animation-delay: 0.06s; }
+    .search-result:nth-child(3) { animation-delay: 0.10s; }
+    .search-result:nth-child(4) { animation-delay: 0.14s; }
+    .search-result:nth-child(5) { animation-delay: 0.18s; }
+    @keyframes resultSlide {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .result-title {
+        font-family: 'Jameel Noori Nastaleeq', 'Noto Nastaliq Urdu', serif;
+        font-size: 1.35rem;
+        font-weight: 700;
+        color: var(--primary-dark);
+        direction: rtl;
+        text-align: right;
+        line-height: 2;
+        margin-bottom: 0.25rem;
+    }
+    .result-poet {
+        font-size: 0.82rem;
+        color: var(--gold);
+        font-weight: 600;
+        margin-bottom: 0.75rem;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    .result-poet i {
+        font-size: 0.7rem;
+    }
+    .result-urdu {
+        font-family: 'Jameel Noori Nastaleeq', 'Noto Nastaliq Urdu', serif;
+        font-size: 1.15rem;
+        direction: rtl;
+        text-align: right;
+        color: #4b5563;
+        line-height: 2.2;
+        margin-bottom: 0.5rem;
+    }
+    .result-english {
+        font-family: 'Georgia', 'Cambria', serif;
+        font-size: 0.88rem;
+        color: #9ca3af;
+        font-style: italic;
+        line-height: 1.6;
+    }
+    .result-arrow {
+        position: absolute;
+        top: 50%;
+        right: 1.25rem;
+        transform: translateY(-50%);
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: rgba(212,175,55,0.08);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--gold);
+        font-size: 0.75rem;
+        opacity: 0;
+        transition: all 0.25s;
+    }
+    .search-result:hover .result-arrow {
+        opacity: 1;
+        transform: translateY(-50%) translateX(-4px);
+    }
+
+    /* ═══════════════════════════════════════
+       PAGINATION
+       ═══════════════════════════════════════ */
+    .pagination {
+        display: flex;
+        justify-content: center;
+        gap: 0.75rem;
+        margin-top: 2.5rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid #f0ebe0;
+    }
+    .btn-page {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 0.65rem 1.5rem;
+        border-radius: 50px;
+        font-weight: 600;
+        font-size: 0.88rem;
+        cursor: pointer;
+        text-decoration: none;
+        transition: all 0.25s ease;
+    }
+    .btn-page-prev,
+    .btn-page-next {
+        background: var(--primary);
+        color: white;
+        box-shadow: 0 3px 10px rgba(30,60,114,0.2);
+    }
+    .btn-page-prev:hover,
+    .btn-page-next:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 14px rgba(30,60,114,0.3);
+    }
+
+    /* ═══════════════════════════════════════
+       EMPTY STATE
+       ═══════════════════════════════════════ */
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+    }
+    .empty-state .empty-icon {
+        width: 72px;
+        height: 72px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, rgba(212,175,55,0.1), rgba(212,175,55,0.04));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.25rem;
+        font-size: 1.8rem;
+        color: rgba(212,175,55,0.4);
+    }
+    .empty-state .empty-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #4b5563;
+        margin-bottom: 0.35rem;
+    }
+    .empty-state .empty-desc {
+        font-size: 0.88rem;
+        color: #9ca3af;
+    }
+
+    /* ═══════════════════════════════════════
+       RESPONSIVE
+       ═══════════════════════════════════════ */
+    @media (max-width: 768px) {
+        .page-header h2 { font-size: 1.5rem; }
+        .page-header .urdu-subtitle { font-size: 1.2rem; }
+        .search-input { font-size: 1rem; padding: 0.85rem 3rem 0.85rem 1.25rem; }
+        .filters-row { flex-direction: column; }
+        .form-select { width: 100%; min-width: unset; }
+        .btn-search { width: 100%; justify-content: center; }
+        .search-result { padding: 1.25rem; border-radius: 16px; }
+        .result-title { font-size: 1.15rem; }
+        .result-urdu { font-size: 1rem; }
+        .result-arrow { display: none; }
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="max-w-4xl mx-auto">
-    <h2 class="text-2xl font-bold mb-6 text-center">Search Ghazals / Nazms</h2>
+<div class="watermark-container" style="max-width:860px; margin:0 auto;">
 
-    <form method="GET" action="{{ url_for('search.search_page') }}" class="mb-8" id="searchForm">
-        <div class="relative">
-            <input type="text" id="searchBox" name="keyword" value="{{ keyword }}" 
-                   placeholder="اردو یا رومن اردو میں لکھیں / بول کر تلاش کریں" 
-                   autocomplete="off"
-                   class="w-full px-6 py-4 text-lg rounded-full border shadow-sm focus:border-gold focus:ring focus:ring-gold-light pr-12">
+    <!-- ═══ PAGE HEADER ═══ -->
+    <div class="page-header">
+        <h2>Search</h2>
+        <div class="urdu-subtitle">غزلوں اور نظموں کی تلاش</div>
+        <div class="en-subtitle">Type in Urdu, Roman Urdu, or English — or use voice search</div>
+    </div>
+
+    <!-- ═══ SEARCH FORM ═══ -->
+    <form method="GET" action="{{ url_for('search.search_page') }}" id="searchForm">
+
+        <div class="search-wrapper">
+            <input
+                type="text"
+                id="searchBox"
+                name="keyword"
+                value="{{ keyword }}"
+                placeholder="اردو یا رومن اردو میں لکھیں / بول کر تلاش کریں"
+                autocomplete="off"
+                class="search-input"
+            >
             <button type="button" id="voiceBtn" class="voice-btn" title="Voice Search">
                 <i class="fas fa-microphone"></i>
             </button>
-            <div id="suggestionsBox" class="suggestions-box hidden"></div>
+            <div id="suggestionsBox" class="suggestions-box"></div>
         </div>
-        <div class="flex flex-wrap gap-4 mt-4">
-            <select name="poet_id" class="px-4 py-2 border rounded-lg">
+
+        <div class="filters-row">
+            <select name="poet_id" class="form-select">
                 <option value="">All Poets</option>
                 {% for poet in poets %}
                 <option value="{{ poet.id }}" {% if poet_id == poet.id %}selected{% endif %}>
@@ -62,7 +462,7 @@
                 </option>
                 {% endfor %}
             </select>
-            <select name="contributor_id" class="px-4 py-2 border rounded-lg">
+            <select name="contributor_id" class="form-select">
                 <option value="">All Contributors</option>
                 {% for c in contributors %}
                 <option value="{{ c.id }}" {% if contributor_id == c.id %}selected{% endif %}>
@@ -70,47 +470,77 @@
                 </option>
                 {% endfor %}
             </select>
-            <button type="submit" class="px-6 py-2 bg-gold text-primary-dark rounded-full hover:bg-gold-dark transition shadow-md">
+            <button type="submit" class="btn-search">
                 <i class="fas fa-search"></i> Search
             </button>
         </div>
+
     </form>
 
+    <!-- ═══ RESULTS ═══ -->
     {% if keyword or poet_id or contributor_id %}
-        <div class="mb-4 text-gray-600">
-            Found {{ total_results }} result(s)
+
+    <div class="results-header">
+        <div class="results-count">
+            Found <strong>{{ total_results }}</strong> result{{ 's' if total_results != 1 else '' }}
         </div>
-
-        {% if results %}
-            {% for r in results %}
-            <div class="search-result">
-                <a href="{{ url_for('ghazals.view_ghazal', text_id=r.text_id) }}" class="block">
-                    <div class="urdu text-xl font-semibold">{{ r.title_urdu }}</div>
-                    <div class="text-sm text-gray-600">{{ r.poet_name_urdu }} ({{ r.poet_name }})</div>
-                    <div class="urdu mt-2 text-gray-800">{{ r.first_verse_urdu|safe }}</div>
-                    <div class="mt-1 text-gray-600">{{ r.first_verse_english|safe }}</div>
-                </a>
-            </div>
-            {% endfor %}
-
-            <div class="mt-8 flex justify-between">
-                {% if offset > 0 %}
-                <a href="?keyword={{ keyword }}&poet_id={{ poet_id }}&contributor_id={{ contributor_id }}&offset={{ offset - limit }}" 
-                   class="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300">Previous</a>
-                {% endif %}
-                {% if offset + limit < total_results %}
-                <a href="?keyword={{ keyword }}&poet_id={{ poet_id }}&contributor_id={{ contributor_id }}&offset={{ offset + limit }}" 
-                   class="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300">Next</a>
-                {% endif %}
-            </div>
-        {% else %}
-            <p class="text-gray-500">No results found.</p>
+        {% if keyword %}
+        <div class="results-keyword">
+            <i class="fas fa-quote-right" style="font-size:0.65rem;"></i>
+            {{ keyword }}
+        </div>
         {% endif %}
+    </div>
+
+    {% if results %}
+    <div class="results-list">
+        {% for r in results %}
+        <a href="{{ url_for('ghazals.view_ghazal', text_id=r.text_id) }}" class="search-result">
+            <div class="result-title">{{ r.title_urdu }}</div>
+            <div class="result-poet">
+                <i class="fas fa-feather-alt"></i>
+                {{ r.poet_name_urdu }} ({{ r.poet_name }})
+            </div>
+            <div class="result-urdu">{{ r.first_verse_urdu|safe }}</div>
+            {% if r.first_verse_english %}
+            <div class="result-english">{{ r.first_verse_english|safe }}</div>
+            {% endif %}
+            <div class="result-arrow"><i class="fas fa-arrow-left"></i></div>
+        </a>
+        {% endfor %}
+    </div>
+
+    {% if offset > 0 or offset + limit < total_results %}
+    <div class="pagination">
+        {% if offset > 0 %}
+        <a href="?keyword={{ keyword }}&poet_id={{ poet_id }}&contributor_id={{ contributor_id }}&offset={{ offset - limit }}"
+           class="btn-page btn-page-prev">
+            <i class="fas fa-chevron-left"></i> Previous
+        </a>
+        {% endif %}
+        {% if offset + limit < total_results %}
+        <a href="?keyword={{ keyword }}&poet_id={{ poet_id }}&contributor_id={{ contributor_id }}&offset={{ offset + limit }}"
+           class="btn-page btn-page-next">
+            Next <i class="fas fa-chevron-right"></i>
+        </a>
+        {% endif %}
+    </div>
     {% endif %}
+
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-icon"><i class="fas fa-search"></i></div>
+        <div class="empty-title">No results found</div>
+        <div class="empty-desc">Try different keywords, check spelling, or remove filters.</div>
+    </div>
+    {% endif %}
+
+    {% endif %}
+
 </div>
 
 <script>
-    // Voice Search
+    // ── Voice Search ──
     const voiceBtn = document.getElementById('voiceBtn');
     const searchBox = document.getElementById('searchBox');
     const searchForm = document.getElementById('searchForm');
@@ -120,7 +550,7 @@
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (SpeechRecognition) {
         recognition = new SpeechRecognition();
-        recognition.lang = 'ur-PK';           // Urdu (works for Roman Urdu too)
+        recognition.lang = 'ur-PK';
         recognition.interimResults = false;
         recognition.maxAlternatives = 1;
 
@@ -136,7 +566,6 @@
         };
         recognition.onresult = (event) => {
             const transcript = event.results[0][0].transcript.trim();
-            console.log("VOICE INPUT:", transcript);   // debug
             if (transcript) {
                 searchBox.value = transcript;
                 searchForm.submit();
@@ -144,7 +573,6 @@
         };
         recognition.onerror = (event) => {
             console.error('Speech recognition error:', event.error);
-            alert('Voice recognition failed. Please try again or type your query.');
             voiceBtn.classList.remove('listening');
             voiceBtn.innerHTML = '<i class="fas fa-microphone"></i>';
             listening = false;
@@ -160,39 +588,39 @@
         voiceBtn.style.display = 'none';
     }
 
-    // Autocomplete Suggestions
+    // ── Autocomplete Suggestions ──
     const suggestionsBox = document.getElementById('suggestionsBox');
     let currentFocus = -1;
 
     async function fetchSuggestions() {
         const query = searchBox.value.trim();
         if (query.length < 2) {
-            suggestionsBox.classList.add('hidden');
+            suggestionsBox.classList.remove('visible');
             return;
         }
         try {
             const res = await fetch(`/search/suggest?q=${encodeURIComponent(query)}`);
             const data = await res.json();
             if (data.suggestions.length === 0) {
-                suggestionsBox.classList.add('hidden');
+                suggestionsBox.classList.remove('visible');
                 return;
             }
             suggestionsBox.innerHTML = '';
-            data.suggestions.forEach((s, idx) => {
+            data.suggestions.forEach((s) => {
                 const div = document.createElement('div');
                 div.className = 'suggestion-item';
                 div.innerText = s;
                 div.onclick = () => {
                     searchBox.value = s;
-                    suggestionsBox.classList.add('hidden');
+                    suggestionsBox.classList.remove('visible');
+                    searchForm.submit();
                 };
                 suggestionsBox.appendChild(div);
             });
-            suggestionsBox.classList.remove('hidden');
+            suggestionsBox.classList.add('visible');
             currentFocus = -1;
         } catch (err) {
-            console.error('Suggestion error:', err);
-            suggestionsBox.classList.add('hidden');
+            suggestionsBox.classList.remove('visible');
         }
     }
 
@@ -219,9 +647,11 @@
             e.preventDefault();
             if (currentFocus >= 0 && items[currentFocus]) {
                 searchBox.value = items[currentFocus].innerText;
-                suggestionsBox.classList.add('hidden');
+                suggestionsBox.classList.remove('visible');
                 searchForm.submit();
             }
+        } else if (e.key === 'Escape') {
+            suggestionsBox.classList.remove('visible');
         }
     });
 
@@ -236,9 +666,10 @@
         });
     }
 
+    // Close suggestions on outside click
     document.addEventListener('click', function(e) {
         if (!searchBox.contains(e.target) && !suggestionsBox.contains(e.target)) {
-            suggestionsBox.classList.add('hidden');
+            suggestionsBox.classList.remove('visible');
         }
     });
 </script>
