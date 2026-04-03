@@ -16,14 +16,45 @@
     <meta name="twitter:description" content="{{ self.og_description() }}">
     <meta name="twitter:image" content="{{ self.og_image() }}">
 
-    <!-- Tailwind CSS -->
+    <!-- Tailwind CSS + Config -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        gold:        '#D4AF37',
+                        'gold-light':'#F5E7B2',
+                        'primary-dark':'#0F2B3D',
+                        primary:     '#1E3C72',
+                        paper:       '#fdfbf7',
+                        parchment:   '#faf7f0',
+                    },
+                    fontFamily: {
+                        urdu: ['"Jameel Noori Nastaleeq"', '"Noto Nastaliq Urdu"', 'serif'],
+                        body: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+                        literary: ['Georgia', 'Cambria', 'serif'],
+                    },
+                    borderRadius: {
+                        'card': '28px',
+                        'pill': '50px',
+                        'hero': '60px',
+                    },
+                    boxShadow: {
+                        'card':  '0 8px 20px rgba(0,0,0,0.04), 0 2px 4px rgba(0,0,0,0.02)',
+                        'card-hover':'0 16px 32px rgba(0,0,0,0.08)',
+                        'app':   '0 30px 60px rgba(0,0,0,0.08)',
+                    }
+                }
+            }
+        }
+    </script>
+
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@400;700&display=swap" rel="stylesheet">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
     <style>
         @font-face {
             font-family: 'Jameel Noori Nastaleeq';
@@ -41,11 +72,6 @@
             font-family: 'Inter', system-ui, -apple-system, sans-serif;
             background: var(--paper);
             min-height: 100vh;
-            /* Disable text selection globally (optional) */
-            user-select: none;
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
         }
         .urdu-text, .urdu-font {
             font-family: 'Jameel Noori Nastaleeq', 'Noto Nastaliq Urdu', serif;
@@ -66,7 +92,8 @@
             padding: 60px 80px;
             background: white;
         }
-        /* Reading Mode Override */
+
+        /* ── Reading Mode ── */
         body.reading-mode .navbar,
         body.reading-mode footer,
         body.reading-mode .mode-switcher,
@@ -83,17 +110,165 @@
             max-width: 900px;
             margin: 0 auto;
         }
-        @media (max-width: 768px) {
-            .app-wrapper { margin: 10px; border-radius: 20px; }
-            .main-content { padding: 30px 18px; }
+
+        /* ── Shared Ornamental Divider ── */
+        .ornament-divider {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin: 2rem 0;
+            color: var(--gold);
+            opacity: 0.5;
         }
-        /* Custom scrollbar */
+        .ornament-divider::before,
+        .ornament-divider::after {
+            content: '';
+            flex: 1;
+            max-width: 120px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--gold), transparent);
+        }
+        .ornament-divider i {
+            font-size: 0.6rem;
+        }
+
+        /* ── Shared Watermark ── */
+        .watermark-container {
+            position: relative;
+            overflow: hidden;
+        }
+        .watermark-container::before {
+            content: "UCPC";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-20deg);
+            font-size: 120px;
+            font-weight: 800;
+            color: rgba(0, 0, 0, 0.025);
+            pointer-events: none;
+            z-index: 0;
+            white-space: nowrap;
+            font-family: 'Inter', sans-serif;
+            letter-spacing: 20px;
+        }
+        .watermark-container > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ── Shared Fade Transition ── */
+        .view-panel {
+            animation: fadeSlideIn 0.4s ease-out;
+        }
+        @keyframes fadeSlideIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ── Index page: Feature Cards ── */
+        .feature-card {
+            background: linear-gradient(135deg, #fefcf8, #faf7f0);
+            border: 1px solid rgba(212,175,55,0.2);
+            border-radius: 28px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+        }
+        .feature-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 16px 32px rgba(0,0,0,0.08);
+            border-color: rgba(212,175,55,0.4);
+        }
+        .feature-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--gold), var(--gold-light));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-size: 1.3rem;
+            color: var(--primary-dark);
+        }
+        .feature-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+        .feature-desc {
+            font-size: 0.9rem;
+            color: #6b7280;
+            line-height: 1.5;
+            margin-bottom: 1rem;
+        }
+        .feature-btn {
+            display: inline-block;
+            padding: 0.5rem 1.2rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--primary);
+            background: white;
+            border: 1px solid rgba(212,175,55,0.3);
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        .feature-btn:hover {
+            background: var(--gold);
+            color: white;
+            border-color: var(--gold);
+        }
+
+        /* ── Index page: Recent Ghazals ── */
+        .recent-ghazals {
+            background: linear-gradient(135deg, #fefcf8, #faf7f0);
+            border: 1px solid rgba(212,175,55,0.2);
+            border-radius: 28px;
+            padding: 2rem;
+        }
+        .ghazal-mini-card {
+            padding: 1rem 1.25rem;
+            border-radius: 16px;
+            text-decoration: none;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+        }
+        .ghazal-mini-card:hover {
+            background: white;
+            border-color: rgba(212,175,55,0.25);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+        }
+
+        /* ── Index page: Thanks Section ── */
+        .thanks-section {
+            background: linear-gradient(135deg, #0F2B3D, #1E3C72);
+            border-radius: 28px;
+            padding: 2rem 2.5rem;
+            color: white;
+            margin-top: 3rem;
+        }
+        .thanks-text {
+            font-size: 0.95rem;
+            color: #d1d5db;
+            line-height: 1.6;
+        }
+        .thanks-name {
+            color: var(--gold-light);
+            font-weight: 600;
+        }
+
+        /* ── Scrollbar ── */
         ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
         ::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
 
-        /* Marquee styles – exactly matching attached index.html */
+        /* ── Marquee ── */
         .nav-marquee {
             background: #1e293b;
             border-bottom: 1px solid rgba(212,175,55,0.5);
@@ -132,6 +307,11 @@
         }
         @media (max-width: 768px) {
             .marquee-content { animation-duration: 60s; font-size: 0.8rem; }
+        }
+        @media (max-width: 768px) {
+            .app-wrapper { margin: 10px; border-radius: 20px; }
+            .main-content { padding: 30px 18px; }
+            .watermark-container::before { font-size: 80px; }
         }
     </style>
     {% block extra_css %}{% endblock %}
