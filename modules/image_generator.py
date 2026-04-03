@@ -31,26 +31,18 @@ def draw_centered(draw, text, y, font, color, width, spacing=10):
         y += (bbox[3] - bbox[1]) + spacing
     return y
 
-def draw_right_aligned(draw, text, y, font, color, width, right_margin=80):
-    bbox = draw.textbbox((0, 0), text, font=font)
-    w = bbox[2] - bbox[0]
-    x = width - right_margin - w
-    draw.text((x, y), text, font=font, fill=color)
-    return y + (bbox[3] - bbox[1]) + 10
-
 def draw_left_aligned(draw, text, y, font, color, left_margin=80):
     bbox = draw.textbbox((0, 0), text, font=font)
     draw.text((left_margin, y), text, font=font, fill=color)
     return y + (bbox[3] - bbox[1]) + 10
 
-def draw_couplet_on_one_line(draw, misra1, misra2, y, font, color, width, gap=80):
+def draw_couplet_on_one_line(draw, misra1, misra2, y, font, color, width, gap=100):
     """Draw misra1 (right) and misra2 (left) on the same line, right‑aligned overall."""
     bbox1 = draw.textbbox((0, 0), misra1, font=font)
     bbox2 = draw.textbbox((0, 0), misra2, font=font)
     width1 = bbox1[2] - bbox1[0]
     width2 = bbox2[2] - bbox2[0]
     total_width = width1 + gap + width2
-    # Align the whole couplet to the right margin
     right_margin = 80
     start_x = width - right_margin - total_width
     draw.text((start_x + width2 + gap, y), misra1, font=font, fill=color, anchor='rt')
@@ -89,7 +81,6 @@ def generate_ghazal_card(ghazal, verses, dedicator='', dedicatee=''):
     if poet_en:
         y = draw_centered(draw, poet_en, y, poet_en_font, black, width, 10)
 
-    # Underline below poet name
     underline_y = y + 10
     margin_line = 200
     draw.line([(margin_line, underline_y), (width - margin_line, underline_y)], fill=gold, width=8)
@@ -103,7 +94,7 @@ def generate_ghazal_card(ghazal, verses, dedicator='', dedicatee=''):
         if m1 and m2:
             y = draw_couplet_on_one_line(draw, m1, m2, y, urdu_font, black, width, gap=100)
         elif m1:
-            y = draw_right_aligned(draw, m1, y, urdu_font, black, width, 80)
+            y = draw_centered(draw, m1, y, urdu_font, black, width)
         y += 40
 
     # 3. Dedication section (left‑aligned)
@@ -111,10 +102,8 @@ def generate_ghazal_card(ghazal, verses, dedicator='', dedicatee=''):
         y += 20
         left_margin = 80
 
-        # From
         y = draw_left_aligned(draw, f"From: {dedicator}", y, dedication_font, gold, left_margin)
 
-        # Dedicated to
         prefix = "Dedicated to: "
         full_text = prefix + dedicatee
         y = draw_left_aligned(draw, full_text, y, dedication_font, black, left_margin)
@@ -129,15 +118,15 @@ def generate_ghazal_card(ghazal, verses, dedicator='', dedicatee=''):
         draw.line([(name_start_x, underline_y_name), (name_end_x, underline_y_name)], fill=black, width=6)
         y += 20
 
-    # 4. Remaining verses (from second couplet onward) – each misra on its own line, right‑aligned
+    # 4. Remaining verses (from second couplet onward) – each misra centered
     for verse in verses[1:]:
         m1 = verse.get('misra1_urdu', '')
         m2 = verse.get('misra2_urdu', '')
         if m1:
-            y = draw_right_aligned(draw, m1, y, urdu_font, black, width, 80)
+            y = draw_centered(draw, m1, y, urdu_font, black, width, 10)
         if m2:
-            y = draw_right_aligned(draw, m2, y, urdu_font, black, width, 80)
-        y += 30  # extra space between couplets
+            y = draw_centered(draw, m2, y, urdu_font, black, width, 10)
+        y += 20  # extra space between couplets
         if y > height - 250:
             break
 
