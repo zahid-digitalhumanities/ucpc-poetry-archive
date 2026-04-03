@@ -10,11 +10,8 @@
     <meta property="og:image" content="{{ image_url }}">
     <meta property="og:image:secure_url" content="{{ image_url }}">
     <meta property="og:image:type" content="image/png">
-
-    <!-- Facebook BEST SIZE -->
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
-
     <meta property="og:url" content="{{ request.url }}">
     <meta property="og:type" content="article">
 
@@ -24,27 +21,267 @@
     <meta name="twitter:description" content="{{ ghazal.poet_name or 'Urdu Poetry' }}">
     <meta name="twitter:image" content="{{ image_url }}">
 
-    <title>{{ ghazal.title_english or "UCPC Ghazal" }}</title>
+    <title>{{ ghazal.title_english or "UCPC Ghazal" }} — UCPC Poetry Archive</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
-        body {
-            margin: 0;
-            background: #0a0a0a;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
+        :root {
+            --primary-dark: #0F2B3D;
+            --primary: #1E3C72;
+            --gold: #D4AF37;
+            --gold-light: #F5E7B2;
         }
-        img {
-            max-width: 100%;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background: #050508;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ═══ TOP BAR ═══ */
+        .top-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid rgba(212,175,55,0.1);
+            background: rgba(255,255,255,0.02);
+        }
+        .top-bar .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+        .top-bar .brand-icon {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--gold), var(--gold-light));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-dark);
+            font-size: 0.8rem;
+        }
+        .top-bar .brand-text {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: rgba(255,255,255,0.6);
+            letter-spacing: 1px;
+        }
+        .top-bar .home-link {
+            font-size: 0.8rem;
+            color: rgba(255,255,255,0.35);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: color 0.2s;
+        }
+        .top-bar .home-link:hover { color: var(--gold); }
+
+        /* ═══ MAIN CONTENT ═══ */
+        .share-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 1.5rem;
+            gap: 2rem;
+        }
+
+        /* Poet info above image */
+        .poet-info {
+            text-align: center;
+            animation: fadeUp 0.5s ease-out;
+        }
+        .poet-info .label {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: rgba(212,175,55,0.5);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 0.35rem;
+        }
+        .poet-info .name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: rgba(255,255,255,0.7);
+        }
+
+        /* Image wrapper */
+        .image-wrapper {
+            position: relative;
+            max-width: 680px;
+            width: 100%;
+            animation: fadeUp 0.5s ease-out 0.1s both;
+        }
+        .image-wrapper::before {
+            content: '';
+            position: absolute;
+            inset: -1px;
+            border-radius: 22px;
+            background: linear-gradient(135deg, rgba(212,175,55,0.2), transparent 40%, transparent 60%, rgba(212,175,55,0.15));
+            z-index: -1;
+        }
+        .image-wrapper img {
+            width: 100%;
             height: auto;
-            border-radius: 14px;
-            box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+            border-radius: 20px;
+            display: block;
+            box-shadow:
+                0 20px 60px rgba(0,0,0,0.5),
+                0 0 0 1px rgba(255,255,255,0.05);
+        }
+
+        /* ═══ ACTION BUTTONS ═══ */
+        .actions {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.75rem;
+            animation: fadeUp 0.5s ease-out 0.2s both;
+        }
+        .action-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 0.7rem 1.4rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            border: none;
+            transition: all 0.25s ease;
+        }
+        .action-btn i { font-size: 0.9rem; }
+
+        .btn-download {
+            background: linear-gradient(135deg, var(--gold), var(--gold-light));
+            color: var(--primary-dark);
+            box-shadow: 0 4px 14px rgba(212,175,55,0.2);
+        }
+        .btn-download:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(212,175,55,0.35);
+        }
+        .btn-facebook {
+            background: #1877f2;
+            color: white;
+        }
+        .btn-facebook:hover { background: #1565d8; transform: translateY(-2px); }
+        .btn-twitter {
+            background: #1da1f2;
+            color: white;
+        }
+        .btn-twitter:hover { background: #1a8cd8; transform: translateY(-2px); }
+        .btn-whatsapp {
+            background: #25d366;
+            color: white;
+        }
+        .btn-whatsapp:hover { background: #20bd5a; transform: translateY(-2px); }
+        .btn-view {
+            background: rgba(255,255,255,0.06);
+            color: rgba(255,255,255,0.6);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .btn-view:hover {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            border-color: rgba(212,175,55,0.3);
+            transform: translateY(-2px);
+        }
+
+        /* ═══ FOOTER ═══ */
+        .share-footer {
+            text-align: center;
+            padding: 1.25rem;
+            border-top: 1px solid rgba(255,255,255,0.04);
+        }
+        .share-footer p {
+            font-size: 0.7rem;
+            color: rgba(255,255,255,0.2);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        /* ═══ ANIMATIONS ═══ */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ═══ RESPONSIVE ═══ */
+        @media (max-width: 640px) {
+            .share-content { padding: 1.5rem 1rem; gap: 1.5rem; }
+            .image-wrapper img { border-radius: 16px; }
+            .image-wrapper::before { border-radius: 18px; }
+            .actions { gap: 0.5rem; }
+            .action-btn { padding: 0.6rem 1rem; font-size: 0.8rem; }
         }
     </style>
 </head>
 
 <body>
-    <img src="{{ image_url }}" alt="Ghazal Image">
+
+    <!-- Top Bar -->
+    <div class="top-bar">
+        <a href="/" class="brand">
+            <div class="brand-icon"><i class="fas fa-feather-alt"></i></div>
+            <span class="brand-text">UCPC</span>
+        </a>
+        <a href="/" class="home-link">
+            <i class="fas fa-arrow-left"></i> Back to Archive
+        </a>
+    </div>
+
+    <!-- Main Content -->
+    <div class="share-content">
+
+        <div class="poet-info">
+            <div class="label">Shared from UCPC Poetry Archive</div>
+            {% if ghazal.poet_name %}
+            <div class="name">{{ ghazal.poet_name }}</div>
+            {% endif %}
+        </div>
+
+        <div class="image-wrapper">
+            <img src="{{ image_url }}" alt="{{ ghazal.title_english or 'UCPC Ghazal' }}">
+        </div>
+
+        <div class="actions">
+            <a href="{{ image_url }}" download="ucpc-ghazal.png" class="action-btn btn-download">
+                <i class="fas fa-download"></i> Download
+            </a>
+            <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.url | urlencode }}" target="_blank" class="action-btn btn-facebook">
+                <i class="fab fa-facebook-f"></i> Facebook
+            </a>
+            <a href="https://twitter.com/intent/tweet?url={{ request.url | urlencode }}" target="_blank" class="action-btn btn-twitter">
+                <i class="fab fa-twitter"></i> Twitter
+            </a>
+            <a href="https://wa.me/?text={{ request.url | urlencode }}" target="_blank" class="action-btn btn-whatsapp">
+                <i class="fab fa-whatsapp"></i> WhatsApp
+            </a>
+            {% if ghazal_id %}
+            <a href="/view/{{ ghazal_id }}" class="action-btn btn-view">
+                <i class="fas fa-book-open"></i> Read Full
+            </a>
+            {% endif %}
+        </div>
+
+    </div>
+
+    <!-- Footer -->
+    <div class="share-footer">
+        <p>UCPC Poetry Archive &bull; Preserving Urdu Poetry</p>
+    </div>
+
 </body>
 </html>
