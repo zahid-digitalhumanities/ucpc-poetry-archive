@@ -1,15 +1,12 @@
-console.log('✅ UCPC Poetry Archive main.js loaded');
+document.addEventListener('DOMContentLoaded', function () {
 
-document.addEventListener('DOMContentLoaded', function() {
-    const currentPath = window.location.pathname;
-    const navLinks = document.querySelectorAll('.nav-link');
-    navLinks.forEach(link => {
-        const href = link.getAttribute('href');
-        if (href === currentPath || 
-            (currentPath === '/' && href === '/') ||
-            (currentPath.startsWith('/poet') && href === '/poets') ||
-            (currentPath.startsWith('/view') && href === '/poets')) {
+    const current = window.location.pathname;
+    const links = document.querySelectorAll('.nav-link');
+
+    links.forEach(link => {
+        if (link.getAttribute('href') === current) {
             link.classList.add('active');
         }
     });
+
 });
