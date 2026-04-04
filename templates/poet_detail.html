@@ -137,7 +137,7 @@
         display: block;
         box-shadow: 0 4px 12px rgba(0,0,0,0.03);
         position: relative;
-        overflow: hidden;
+        overflow: visible;
     }
     .poem-card::before {
         content: '';
@@ -214,12 +214,17 @@
         color: var(--gold);
         margin-right: 4px;
     }
+
+    /* ═══════════════════════════════════════
+       CARD ACTIONS
+       ═══════════════════════════════════════ */
     .poem-actions {
         display: flex;
         gap: 10px;
         margin-top: 18px;
         padding-top: 16px;
         border-top: 1px solid #f0ebe0;
+        position: relative;
     }
     .btn-read {
         flex: 1;
@@ -241,7 +246,9 @@
         transform: translateY(-1px);
         box-shadow: 0 5px 14px rgba(30,60,114,0.3);
     }
-    .btn-share {
+
+    /* ── Share Trigger Button ── */
+    .btn-share-trigger {
         display: inline-flex;
         align-items: center;
         justify-content: center;
@@ -252,16 +259,102 @@
         font-weight: 600;
         color: var(--primary);
         background: white;
-        text-decoration: none;
         border: 1.5px solid rgba(212,175,55,0.3);
+        cursor: pointer;
         transition: all 0.25s ease;
+        position: relative;
     }
-    .btn-share:hover {
+    .btn-share-trigger:hover {
         background: var(--gold);
         color: white;
         border-color: var(--gold);
         transform: translateY(-1px);
         box-shadow: 0 5px 14px rgba(212,175,55,0.3);
+    }
+    .btn-share-trigger.open {
+        background: var(--gold);
+        color: white;
+        border-color: var(--gold);
+    }
+    .btn-share-trigger .share-chevron {
+        font-size: 0.6rem;
+        transition: transform 0.2s;
+    }
+    .btn-share-trigger.open .share-chevron {
+        transform: rotate(180deg);
+    }
+
+    /* ── Share Popover ── */
+    .share-popover {
+        position: absolute;
+        bottom: calc(100% + 10px);
+        right: 0;
+        background: white;
+        border: 1px solid rgba(212,175,55,0.2);
+        border-radius: 18px;
+        padding: 8px;
+        box-shadow: 0 12px 32px rgba(0,0,0,0.12);
+        display: flex;
+        gap: 6px;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(6px) scale(0.95);
+        transition: all 0.2s ease;
+        z-index: 20;
+    }
+    .share-popover.visible {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0) scale(1);
+    }
+    /* Popover arrow */
+    .share-popover::after {
+        content: '';
+        position: absolute;
+        bottom: -6px;
+        right: 18px;
+        width: 12px;
+        height: 12px;
+        background: white;
+        border-right: 1px solid rgba(212,175,55,0.2);
+        border-bottom: 1px solid rgba(212,175,55,0.2);
+        transform: rotate(45deg);
+    }
+
+    /* ── Individual Share Buttons inside Popover ── */
+    .share-btn {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+        color: white;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        border: none;
+        cursor: pointer;
+    }
+    .share-btn:hover {
+        transform: translateY(-2px) scale(1.08);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    .share-btn:active {
+        transform: translateY(0) scale(1);
+    }
+    .share-btn-wa  { background: #25d366; }
+    .share-btn-fb  { background: #1877f2; }
+    .share-btn-li  { background: #0a66c2; }
+    .share-btn-copy {
+        background: #f3f4f6;
+        color: #6b7280;
+        font-size: 0.85rem;
+    }
+    .share-btn-copy:hover { background: #e5e7eb; }
+    .share-btn-copy.copied {
+        background: #dcfce7;
+        color: #166534;
     }
 
     /* ═══════════════════════════════════════
@@ -293,23 +386,28 @@
             padding: 22px 20px;
             border-radius: 20px;
         }
-        .poet-identity {
-            justify-content: center;
-        }
+        .poet-identity { justify-content: center; }
         .poet-name-en { font-size: 1.6rem; }
         .poet-name-urdu { font-size: 1.3rem; }
-        .poems-grid {
-            grid-template-columns: 1fr;
-        }
+        .poems-grid { grid-template-columns: 1fr; }
         .poem-card {
             padding: 22px 18px;
             border-radius: 20px;
         }
-        .poem-matla {
-            font-size: 1.3rem;
-            line-height: 2rem;
-        }
+        .poem-matla { font-size: 1.3rem; line-height: 2rem; }
         .poem-title-urdu { font-size: 1.05rem; }
+        .share-popover {
+            right: auto;
+            left: 50%;
+            transform: translateX(-50%) translateY(6px) scale(0.95);
+        }
+        .share-popover.visible {
+            transform: translateX(-50%) translateY(0) scale(1);
+        }
+        .share-popover::after {
+            right: auto;
+            left: calc(50% - 6px);
+        }
     }
 </style>
 {% endblock %}
@@ -354,7 +452,7 @@
     {% if texts %}
     <div class="poems-grid">
         {% for item in texts %}
-        <a href="/view/{{ item.id }}" class="poem-card">
+        <a href="/view/{{ item.id }}" class="poem-card" data-item-id="{{ item.id }}">
 
             <div class="poem-title-en">{{ item.title_english or 'Untitled' }}</div>
             <div class="poem-title-urdu">{{ item.title_urdu or 'عنوان' }}</div>
@@ -382,11 +480,31 @@
                 <span class="btn-read">
                     <i class="fas fa-book-open"></i> Read Full
                 </span>
-                <a target="_blank"
-                   href="https://wa.me/?text={{ (poet.name ~ '\n\n' ~ (item.title_urdu or item.title_english) ~ '\n\n' ~ item.text_urdu ~ '\n\nRead more: ' ~ request.url_root ~ 'view/' ~ item.id) | urlencode }}"
-                   class="btn-share" onclick="event.stopPropagation();">
-                    <i class="fab fa-whatsapp"></i> Share
-                </a>
+
+                <!-- Share trigger + popover -->
+                <button class="btn-share-trigger" onclick="toggleShare(this, event)">
+                    <i class="fas fa-share-alt"></i> Share <i class="fas fa-chevron-up share-chevron"></i>
+                </button>
+                <div class="share-popover" onclick="event.stopPropagation();">
+                    <a target="_blank"
+                       href="https://wa.me/?text={{ (poet.name ~ '\n\n' ~ (item.title_urdu or item.title_english) ~ '\n\n' ~ item.text_urdu ~ '\n\nRead more: ' ~ request.url_root ~ 'view/' ~ item.id) | urlencode }}"
+                       class="share-btn share-btn-wa" title="WhatsApp">
+                        <i class="fab fa-whatsapp"></i>
+                    </a>
+                    <a target="_blank"
+                       href="https://www.facebook.com/sharer/sharer.php?u={{ (request.url_root ~ 'view/' ~ item.id) | urlencode }}&quote={{ (poet.name ~ ': ' ~ (item.title_urdu or item.title_english)) | urlencode }}"
+                       class="share-btn share-btn-fb" title="Facebook">
+                        <i class="fab fa-facebook-f"></i>
+                    </a>
+                    <a target="_blank"
+                       href="https://www.linkedin.com/sharing/share-offsite/?url={{ (request.url_root ~ 'view/' ~ item.id) | urlencode }}"
+                       class="share-btn share-btn-li" title="LinkedIn">
+                        <i class="fab fa-linkedin-in"></i>
+                    </a>
+                    <button class="share-btn share-btn-copy" title="Copy Link" onclick="copyLink({{ item.id }}, this)">
+                        <i class="fas fa-link"></i>
+                    </button>
+                </div>
             </div>
 
         </a>
@@ -401,4 +519,74 @@
     {% endif %}
 
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // ── Toggle Share Popover ──
+    function toggleShare(btn, e) {
+        e.stopPropagation();
+        e.preventDefault();
+
+        // Close all other popovers first
+        document.querySelectorAll('.share-popover.visible').forEach(p => {
+            if (p !== btn.nextElementSibling) {
+                p.classList.remove('visible');
+                p.previousElementSibling.classList.remove('open');
+            }
+        });
+
+        const popover = btn.nextElementSibling;
+        const isOpen = popover.classList.contains('visible');
+        popover.classList.toggle('visible', !isOpen);
+        btn.classList.toggle('open', !isOpen);
+    }
+
+    // ── Copy Link ──
+    function copyLink(itemId, btn) {
+        const url = window.location.origin + '/view/' + itemId;
+        navigator.clipboard.writeText(url).then(() => {
+            btn.classList.add('copied');
+            btn.innerHTML = '<i class="fas fa-check"></i>';
+            setTimeout(() => {
+                btn.classList.remove('copied');
+                btn.innerHTML = '<i class="fas fa-link"></i>';
+            }, 2000);
+        }).catch(() => {
+            // Fallback
+            const input = document.createElement('input');
+            input.value = url;
+            document.body.appendChild(input);
+            input.select();
+            document.execCommand('copy');
+            document.body.removeChild(input);
+            btn.classList.add('copied');
+            btn.innerHTML = '<i class="fas fa-check"></i>';
+            setTimeout(() => {
+                btn.classList.remove('copied');
+                btn.innerHTML = '<i class="fas fa-link"></i>';
+            }, 2000);
+        });
+    }
+
+    // ── Close popovers on outside click ──
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.btn-share-trigger') && !e.target.closest('.share-popover')) {
+            document.querySelectorAll('.share-popover.visible').forEach(p => {
+                p.classList.remove('visible');
+                p.previousElementSibling.classList.remove('open');
+            });
+        }
+    });
+
+    // ── Close popovers on Escape ──
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            document.querySelectorAll('.share-popover.visible').forEach(p => {
+                p.classList.remove('visible');
+                p.previousElementSibling.classList.remove('open');
+            });
+        }
+    });
+</script>
 {% endblock %}
