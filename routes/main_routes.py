@@ -6,12 +6,6 @@ main_bp = Blueprint('main', __name__)
 
 @main_bp.route('/')
 def index():
-    stats = get_stats() or {}
-    poets = fetch_all_poets(limit=12)
-
-    return render_template(
-        'index.html',
-        poets=poets,
-        stats=stats,
-        page_title="UCPC Poetry Archive"
-    )
+    stats = get_stats()
+    poets = fetch_all_poets()
+    return render_template('index.html', poets=poets, stats=stats)
