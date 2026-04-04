@@ -20,7 +20,6 @@ def create_app():
     app = Flask(__name__)
     app.secret_key = os.getenv('SECRET_KEY', 'dev-secret-key')
 
-    # Register blueprints
     app.register_blueprint(main_bp)
     app.register_blueprint(poets_bp)
     app.register_blueprint(ghazals_bp)
@@ -28,7 +27,6 @@ def create_app():
     app.register_blueprint(bulk_bp)
     app.register_blueprint(listen_bp)
 
-    # Redirects
     @app.route('/admin/add_ghazal')
     def redirect_add_ghazal():
         return redirect(url_for('ghazals.add_ghazal'))
@@ -37,10 +35,8 @@ def create_app():
     def redirect_view(text_id):
         return redirect(url_for('ghazals.view_ghazal', text_id=text_id))
 
-    # Share page for social previews (OG tags)
     @app.route('/share/<filename>')
     def share_page(filename):
-        # Extract text_id from filename (e.g., "1616_1775238303.png")
         match = re.match(r'(\d+)_', filename)
         ghazal = None
         if match:
@@ -56,7 +52,6 @@ def create_app():
         response.headers['Expires'] = '0'
         return response
 
-    # Global stats
     @app.context_processor
     def inject_stats():
         try:
@@ -65,7 +60,6 @@ def create_app():
             print("⚠️ Stats error:", str(e))
             return dict(stats=None)
 
-    # Error handlers
     @app.errorhandler(404)
     def page_not_found(e):
         return render_template('404.html'), 404
@@ -79,9 +73,7 @@ def create_app():
 app = create_app()
 
 if __name__ == "__main__":
-    # Render sets the PORT environment variable; default to 10000 for local development
     port = int(os.environ.get("PORT", 10000))
-    # Debug mode should be False in production (Render sets FLASK_ENV=production)
     debug_mode = os.environ.get("FLASK_ENV") != "production" and not os.environ.get("RENDER")
     print(f"🔥 Running on port {port} (debug={debug_mode})")
     app.run(host="0.0.0.0", port=port, debug=debug_mode)
