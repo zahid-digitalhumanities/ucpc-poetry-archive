@@ -1,4 +1,4 @@
-l{% extends "base.html" %}
+{% extends "base.html" %}
 
 {% block content %}
 
@@ -9,14 +9,10 @@ l{% extends "base.html" %}
     {% for verse in verses %}
     <div class="verse-item">
 
+        <!-- ✅ ONE LINE COUPLET -->
         <div class="urdu-couplet">
-            {{ verse.misra1_urdu }}<br>
+            {{ verse.misra1_urdu }} &nbsp;&nbsp;&nbsp;
             {{ verse.misra2_urdu }}
-        </div>
-
-        <div class="english-couplet">
-            {{ verse.misra1_english or '' }}<br>
-            {{ verse.misra2_english or '' }}
         </div>
 
     </div>
@@ -25,8 +21,8 @@ l{% extends "base.html" %}
     <!-- Facebook Share -->
     <div style="text-align:center; margin-top:20px;">
         <div class="fb-share-button"
-             data-href="https://ucpc-poetry-archive.onrender.com/view/{{ ghazal.id }}"
-             data-layout="button_count">
+             data-href="https://ucpc-poetry-archive.onrender.com/share/{{ ghazal.id }}"
+             data-layout="button">
         </div>
     </div>
 
