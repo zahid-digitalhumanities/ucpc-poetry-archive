@@ -1,6 +1,6 @@
-﻿from flask import Blueprint, render_template, flash, redirect, url_for
+from flask import Blueprint, render_template, flash, redirect, url_for
 from models.poets_model import fetch_poet_by_id, fetch_all_poets
-from models.ghazal_model import fetch_ghazals_by_poet_with_text   # new function
+from models.ghazal_model import fetch_texts_by_poet   # ✅ use existing function
 from models.stats_model import get_stats
 
 poets_bp = Blueprint('poets', __name__)
@@ -17,5 +17,5 @@ def poet_detail(poet_id):
     if not poet:
         flash('Poet not found', 'error')
         return redirect(url_for('main.index'))
-    texts = fetch_ghazals_by_poet_with_text(poet_id)   # now returns id, title_urdu, text_urdu, verse_count
+    texts = fetch_texts_by_poet(poet_id)
     return render_template('poet_detail.html', poet=poet, texts=texts)
