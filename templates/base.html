@@ -2,18 +2,47 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+
+    <!-- Mobile Responsive -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Title -->
     <title>{{ page_title or "UCPC Poetry Archive" }}</title>
+
+    <!-- SEO Basic -->
+    <meta name="description" content="UCPC Poetry Archive — Explore, read and share Urdu ghazals.">
+
+    <!-- Open Graph Default (fallback) -->
+    <meta property="og:title" content="UCPC Poetry Archive">
+    <meta property="og:description" content="Explore beautiful Urdu poetry.">
+    <meta property="og:type" content="website">
+
+    <!-- CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
 </head>
 
 <body>
 
-<!-- Facebook SDK -->
+<!-- Facebook SDK (FIXED VERSION) -->
 <div id="fb-root"></div>
-<script async defer crossorigin="anonymous"
-src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v18.0">
+<script>
+    window.fbAsyncInit = function() {
+        FB.init({
+            xfbml: true,
+            version: 'v18.0'
+        });
+    };
 </script>
 
+<script async defer crossorigin="anonymous"
+    src="https://connect.facebook.net/en_US/sdk.js">
+</script>
+
+<!-- MAIN CONTENT -->
 {% block content %}{% endblock %}
 
 </body>
