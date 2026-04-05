@@ -1,0 +1,288 @@
+﻿{% extends "base.html" %}
+{% block title %}{{ poet.name_urdu }} - UCPC Poetry Archive{% endblock %}
+{% block extra_css %}
+<style>
+    .poet-detail-container {
+        position: relative;
+        overflow: hidden;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    /* Watermark: large "UCPC" rotated, centered, low opacity */
+    .poet-detail-container::before {
+        content: "UCPC";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) rotate(-20deg);
+        font-size: 120px;
+        font-weight: bold;
+        color: rgba(0, 0, 0, 0.03);
+        pointer-events: none;
+        z-index: 0;
+        white-space: nowrap;
+        font-family: 'Inter', sans-serif;
+    }
+
+    /* Ensure content sits above the watermark */
+    .poet-header,
+    .section-title,
+    .poems-grid {
+        position: relative;
+        z-index: 1;
+    }
+
+    /* Poet header – unchanged (elegant light gradient) */
+    .poet-header {
+        background: linear-gradient(135deg, #fefcf8, #faf7f0);
+        border-radius: 60px;
+        padding: 25px 35px;
+        margin-bottom: 45px;
+        border: 1px solid rgba(212,175,55,0.3);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 20px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.02);
+    }
+    .poet-name {
+        display: flex;
+        align-items: baseline;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+    .poet-name-en {
+        font-size: 2rem;
+        font-weight: 800;
+        color: #1e3c72;
+        letter-spacing: -0.5px;
+    }
+    .poet-name-urdu {
+        font-family: 'Jameel Noori Nastaleeq', serif;
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--gold);
+        direction: rtl;
+    }
+    .poet-years {
+        background: rgba(212,175,55,0.12);
+        padding: 6px 18px;
+        border-radius: 40px;
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+    .poet-stats {
+        display: flex;
+        gap: 20px;
+        background: white;
+        padding: 8px 20px;
+        border-radius: 50px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    }
+    .poet-stats div {
+        display: flex;
+        align-items: baseline;
+        gap: 6px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #1e3c72;
+    }
+    .poet-stats i {
+        color: var(--gold);
+    }
+
+    /* Section title */
+    .section-title {
+        text-align: center;
+        margin-bottom: 35px;
+    }
+    .section-title h2 {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #1e3c72;
+        display: inline-block;
+        background: linear-gradient(120deg, #fff, #faf7f0);
+        padding: 0 20px;
+    }
+    .section-title span {
+        background: var(--gold);
+        color: white;
+        padding: 4px 12px;
+        border-radius: 40px;
+        font-size: 0.9rem;
+        margin-left: 8px;
+    }
+
+    /* Elegant Poem Cards (light, minimal, couplet‑focused) */
+    .poems-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+        gap: 30px;
+        margin-top: 30px;
+    }
+    .poem-card {
+        background: #ffffff;
+        border-radius: 28px;
+        padding: 28px;
+        transition: transform 0.25s ease, box-shadow 0.25s ease;
+        text-decoration: none;
+        display: block;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.04);
+        border: 1px solid rgba(0,0,0,0.03);
+    }
+    .poem-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 16px 32px rgba(0,0,0,0.08);
+        border-color: rgba(212,175,55,0.2);
+    }
+
+    /* Urdu couplet – large, elegant, centered */
+    .urdu-couplet {
+        font-family: 'Jameel Noori Nastaleeq', 'Noto Nastaliq Urdu', serif;
+        font-size: 1.6rem;
+        line-height: 2.4rem;
+        font-weight: 600;
+        direction: rtl;
+        text-align: center;
+        color: #2c3e4e;
+        margin-bottom: 20px;
+        word-break: break-word;
+        padding: 8px 0;
+    }
+
+    /* English translation (if present) – subtle */
+    .english-couplet {
+        font-size: 0.9rem;
+        line-height: 1.5;
+        color: #5f6c7a;
+        margin-top: 12px;
+        padding-top: 12px;
+        border-top: 1px solid #eef2f5;
+        font-style: italic;
+        text-align: center;
+    }
+
+    /* Meta info */
+    .poem-meta {
+        display: flex;
+        gap: 15px;
+        justify-content: flex-start;
+        padding-top: 12px;
+        margin-top: 12px;
+        border-top: 1px solid #eef2f5;
+        font-size: 0.8rem;
+        font-weight: 500;
+        color: #7e8c8f;
+    }
+    .poem-meta i {
+        color: var(--gold);
+        margin-right: 4px;
+    }
+
+    /* Buttons – refined, gold accents */
+    .action-buttons {
+        display: flex;
+        gap: 12px;
+        margin-top: 20px;
+    }
+    .btn-view, .btn-share {
+        flex: 1;
+        text-align: center;
+        padding: 10px 16px;
+        border-radius: 40px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        transition: all 0.2s;
+        background: #f8f5f0;
+        color: #1e3c72;
+        text-decoration: none;
+        border: 1px solid rgba(212,175,55,0.3);
+    }
+    .btn-view:hover, .btn-share:hover {
+        background: var(--gold);
+        color: white;
+        border-color: var(--gold);
+    }
+
+    @media (max-width: 768px) {
+        .poet-header {
+            flex-direction: column;
+            text-align: center;
+            padding: 20px;
+        }
+        .poet-name-en {
+            font-size: 1.6rem;
+        }
+        .poet-name-urdu {
+            font-size: 1.3rem;
+        }
+        .poems-grid {
+            grid-template-columns: 1fr;
+        }
+        .urdu-couplet {
+            font-size: 1.2rem;
+            line-height: 1.8rem;
+        }
+        .poet-detail-container::before {
+            font-size: 80px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="poet-detail-container">
+    <div class="poet-header">
+        <div class="poet-name">
+            <span class="poet-name-en">{{ poet.name }}</span>
+            <span class="poet-name-urdu">{{ poet.name_urdu }}</span>
+            {% if poet.birth_year or poet.death_year %}
+            <span class="poet-years"><i class="fas fa-calendar-alt"></i> {{ poet.birth_year or '?' }} – {{ poet.death_year or 'Present' }}</span>
+            {% endif %}
+        </div>
+        <div class="poet-stats">
+            <div><i class="fas fa-book"></i> {{ texts|length }} Poems</div>
+            <div><i class="fas fa-pen-fancy"></i> {{ texts|sum(attribute='verse_count') }} Verses</div>
+        </div>
+    </div>
+
+    <div class="section-title">
+        <h2>✨ All Poems <span>{{ texts|length }}</span></h2>
+    </div>
+
+    <div class="poems-grid">
+        {% for item in texts %}
+        <div class="poem-card">
+            <!-- First two lines of the ghazal -->
+            {% set lines = item.text_urdu.split('\n') if item.text_urdu else [] %}
+            <div class="urdu-couplet">
+                {{ lines[0] if lines else '' }}
+                {% if lines|length > 1 %}<br>{{ lines[1] }}{% endif %}
+            </div>
+
+            <!-- Optional English translation -->
+            {% if item.text_english %}
+            {% set en_lines = item.text_english.split('\n') %}
+            <div class="english-couplet">
+                “{{ en_lines[0] if en_lines else '' }}
+                {% if en_lines|length > 1 %}<br>{{ en_lines[1] }}{% endif %}”
+            </div>
+            {% endif %}
+
+            <div class="poem-meta">
+                <span><i class="fas fa-pen-fancy"></i> {{ item.verse_count }} verses</span>
+            </div>
+
+            <div class="action-buttons">
+                <a href="/view/{{ item.id }}" class="btn-view">📖 Read Full</a>
+                <a target="_blank"
+                   href="https://wa.me/?text={{ (poet.name ~ '\n\n' ~ (item.title_urdu or item.title_english) ~ '\n\n' ~ item.text_urdu ~ '\n\nRead more: ' ~ request.url_root ~ 'view/' ~ item.id) | urlencode }}"
+                   class="btn-share">💬 Share</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
