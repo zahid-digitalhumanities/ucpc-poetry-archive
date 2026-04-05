@@ -1,8 +1,7 @@
-from flask import Flask, redirect, url_for, render_template, request, jsonify, make_response
+from flask import Flask, redirect, url_for, render_template, request, jsonify
 import os
 import base64
 import time
-import re
 
 # Blueprints
 from routes.main_routes import main_bp
@@ -14,12 +13,15 @@ from routes.listen_routes import listen_bp
 
 # Models
 from models.stats_model import get_stats
-from models.ghazal_model import get_ghazal_with_verses
+
 
 def create_app():
     app = Flask(__name__)
+
+    # 🔐 Secret Key
     app.secret_key = os.getenv('SECRET_KEY', 'dev-secret-key')
 
+    # ✅ Register Blueprints
     app.register_blueprint(main_bp)
     app.register_blueprint(poets_bp)
     app.register_blueprint(ghazals_bp)
@@ -27,6 +29,9 @@ def create_app():
     app.register_blueprint(bulk_bp)
     app.register_blueprint(listen_bp)
 
+    print("🔥 Blueprints registered successfully")
+
+    # 🔁 Redirect routes
     @app.route('/admin/add_ghazal')
     def redirect_add_ghazal():
         return redirect(url_for('ghazals.add_ghazal'))
@@ -35,23 +40,50 @@ def create_app():
     def redirect_view(text_id):
         return redirect(url_for('ghazals.view_ghazal', text_id=text_id))
 
-    @app.route('/share/<filename>')
-    def share_page(filename):
-        match = re.match(r'(\d+)_', filename)
-        ghazal = None
-        if match:
-            text_id = int(match.group(1))
-            try:
-                ghazal, _ = get_ghazal_with_verses(text_id)
-            except Exception as e:
-                print(f"⚠️ Could not fetch ghazal {text_id}: {e}")
-        image_url = request.host_url + f"static/generated/{filename}"
-        response = make_response(render_template('share.html', image_url=image_url, ghazal=ghazal))
-        response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
-        response.headers['Pragma'] = 'no-cache'
-        response.headers['Expires'] = '0'
-        return response
+    # 🧪 Debug route
+    @app.route('/check')
+    def check():
+        return "OK WORKING"
 
+    # 🔥 ROUTE DEBUG (VERY IMPORTANT)
+    @app.route('/routes')
+    def show_routes():
+        return "<br>".join([str(rule) for rule in app.url_map.iter_rules()])
+
+    # 📤 Image upload route (for social sharing)
+    @app.route('/upload_image', methods=['POST'])
+    def upload_image():
+        data = request.json.get('image')
+        if not data:
+            return jsonify({'error': 'No image data'}), 400
+
+        # Extract base64 data
+        header, encoded = data.split(',', 1)
+        binary = base64.b64decode(encoded)
+
+        # Ensure generated folder exists
+        generated_dir = os.path.join(os.path.dirname(__file__), 'static', 'generated')
+        os.makedirs(generated_dir, exist_ok=True)
+
+        # Generate unique filename
+        filename = f"{int(time.time())}.png"
+        filepath = os.path.join(generated_dir, filename)
+
+        with open(filepath, 'wb') as f:
+            f.write(binary)
+
+        # Return the full public URL
+        full_url = request.host_url + f"static/generated/{filename}"
+        return jsonify({'url': full_url})
+
+    # 📤 Share page route (for rich social previews)
+    @app.route('/share/<filename>')
+    def share_image_page(filename):
+        """Serve a share page with OG meta tags pointing to the image."""
+        image_url = request.host_url + f"static/generated/{filename}"
+        return render_template('share.html', image_url=image_url)
+
+    # 📊 Global stats
     @app.context_processor
     def inject_stats():
         try:
@@ -60,20 +92,21 @@ def create_app():
             print("⚠️ Stats error:", str(e))
             return dict(stats=None)
 
+    # ❌ 404
     @app.errorhandler(404)
     def page_not_found(e):
         return render_template('404.html'), 404
 
+    # ❌ 500
     @app.errorhandler(500)
     def internal_server_error(e):
         return render_template('500.html'), 500
 
     return app
 
+
+# 🚀 Run App
 app = create_app()
 
-if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 10000))
-    debug_mode = os.environ.get("FLASK_ENV") != "production" and not os.environ.get("RENDER")
-    print(f"🔥 Running on port {port} (debug={debug_mode})")
-    app.run(host="0.0.0.0", port=port, debug=debug_mode)
+if __name__ == '__main__':
+    app.run(debug=True)

@@ -42,18 +42,6 @@ def fetch_texts_by_poet(poet_id):
             cur.execute("SELECT id, public_id, title_urdu, title_english, verse_count FROM texts WHERE poet_id = %s AND form = 'ghazal' ORDER BY id", (poet_id,))
             return cur.fetchall()
 
-def fetch_ghazals_by_poet_with_text(poet_id):
-    """Fetch ghazals for a poet including the full text_urdu."""
-    with get_db_connection() as conn:
-        with conn.cursor() as cur:
-            cur.execute("""
-                SELECT id, title_urdu, text_urdu, verse_count
-                FROM texts
-                WHERE poet_id = %s AND form = 'ghazal'
-                ORDER BY id DESC
-            """, (poet_id,))
-            return cur.fetchall()
-
 def get_ghazal_with_verses(text_id):
     with get_db_connection() as conn:
         with conn.cursor() as cur:

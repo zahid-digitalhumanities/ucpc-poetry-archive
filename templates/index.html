@@ -1,135 +1,141 @@
 ﻿{% extends "base.html" %}
+{% block title %}UCPC – Urdu Computational Philology Corpus{% endblock %}
+
+{% block extra_head %}
+<!-- Open Graph / Social Media Meta Tags -->
+<meta property="og:title" content="UCPC Poetry Archive - Urdu Poetry Research Corpus" />
+<meta property="og:description" content="A digital archive for Urdu poetry with bilingual display, voice search, bulk upload, and computational analysis." />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="{{ request.url }}" />
+<meta property="og:image" content="{{ url_for('static', filename='images/og-image.jpg', _external=True) }}" />
+<meta property="og:image:alt" content="UCPC Poetry Archive Logo" />
+<meta name="twitter:card" content="summary_large_image" />
+{% endblock %}
 
 {% block extra_css %}
 <style>
-    /* Poet Card Styles */
-    .poet-card {
+    /* Feature cards (new) */
+    .feature-card {
         background: white;
-        border-radius: 1.5rem;
-        overflow: hidden;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        border-radius: 28px;
+        padding: 30px 20px;
+        text-align: center;
+        transition: transform 0.3s, box-shadow 0.3s;
         border: 1px solid rgba(212,175,55,0.2);
-    }
-    .poet-card:hover {
-        transform: translateY(-6px);
-        box-shadow: 0 20px 35px rgba(0,0,0,0.1);
-    }
-    .poet-image {
-        height: 220px;
-        background: #f3f4f6;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        overflow: hidden;
-    }
-    .poet-image img {
-        width: 100%;
         height: 100%;
-        object-fit: cover;
-        transition: transform 0.5s ease;
     }
-    .poet-card:hover .poet-image img {
-        transform: scale(1.05);
+    .feature-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 35px rgba(212,175,55,0.1);
     }
-    .poet-name {
-        font-weight: 700;
+    .feature-icon {
+        font-size: 2.5rem;
+        color: var(--gold);
+        margin-bottom: 1rem;
+    }
+    .feature-title {
         font-size: 1.25rem;
+        font-weight: 700;
+        margin-bottom: 0.75rem;
         color: #1e3c72;
-        text-align: center;
-        padding: 0.75rem 1rem 0;
     }
-    .poet-name-urdu {
-        font-family: 'Jameel Noori Nastaleeq', 'Noto Nastaliq Urdu', serif;
-        font-size: 1.1rem;
-        color: #8b5a2b;
-        text-align: center;
-        margin-top: -0.25rem;
-        margin-bottom: 0.5rem;
-    }
-    .poet-couplet {
-        font-family: 'Jameel Noori Nastaleeq', 'Noto Nastaliq Urdu', serif;
+    .feature-desc {
+        color: #4a5568;
         font-size: 0.95rem;
-        line-height: 1.8;
-        text-align: center;
-        direction: rtl;
-        padding: 0 1rem 1.25rem;
-        color: #4b5563;
-        border-top: 1px solid #f0e6d2;
-        margin-top: 0.5rem;
-        min-height: 80px;
+        line-height: 1.5;
+        margin-bottom: 1.25rem;
     }
-    @media (max-width: 768px) {
-        .poet-image { height: 180px; }
-        .poet-name { font-size: 1rem; }
-        .poet-couplet { font-size: 0.85rem; }
+    .feature-btn {
+        background: #f5f5f5;
+        color: #1e3c72;
+        border-radius: 9999px;
+        padding: 0.5rem 1.5rem;
+        font-weight: 600;
+        transition: all 0.2s;
+        display: inline-block;
+    }
+    .feature-btn:hover {
+        background: var(--gold);
+        color: #1e3c72;
+        text-decoration: none;
+    }
+    /* Thanks Section */
+    .thanks-section {
+        background: linear-gradient(120deg, #f8f9fa 0%, #e9ecef 100%);
+        border-radius: 2rem;
+        padding: 2rem;
+        margin-top: 4rem;
+        margin-bottom: 2rem;
+        border-left: 6px solid var(--gold);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+    .thanks-icon {
+        font-size: 2rem;
+        color: var(--gold);
+        margin-right: 1rem;
+    }
+    .thanks-text {
+        font-size: 1.1rem;
+        font-style: italic;
+        color: #1a202c;
+    }
+    .thanks-name {
+        font-weight: 700;
+        color: #8b5a2b;
+    }
+    /* Recent ghazals */
+    .recent-ghazals {
+        margin-top: 60px;
+    }
+    .ghazal-mini-card {
+        background: white;
+        border-radius: 20px;
+        padding: 20px;
+        margin-bottom: 20px;
+        border-left: 4px solid var(--gold);
+        transition: all 0.2s;
+    }
+    .ghazal-mini-card:hover {
+        background: #fefcf8;
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="max-w-7xl mx-auto">
-    <!-- Poets Grid Section -->
-    <div class="mb-16">
-        <h2 class="text-2xl md:text-3xl font-bold text-[#1e3c72] mb-8 flex items-center gap-3">
-            <i class="fas fa-feather-alt text-gold"></i>
-            Featured Poets
-        </h2>
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {% for poet in poets %}
-            <a href="{{ url_for('poets.poet_detail', poet_id=poet.id) }}" class="block poet-card group">
-                <div class="poet-image">
-                    {% if poet.image_filename %}
-                        <img src="{{ url_for('static', filename='images/poets/' + poet.image_filename) }}" 
-                             alt="{{ poet.name }}" 
-                             loading="lazy">
-                    {% else %}
-                        <div class="w-full h-full bg-gradient-to-br from-amber-50 to-amber-100 flex items-center justify-center">
-                            <i class="fas fa-feather-alt text-4xl text-amber-300"></i>
-                        </div>
-                    {% endif %}
-                </div>
-                <div class="poet-name">{{ poet.name }}</div>
-                {% if poet.name_urdu %}
-                <div class="poet-name-urdu">{{ poet.name_urdu }}</div>
-                {% endif %}
-                <div class="poet-couplet">
-                    {{ poet.display_couplet|truncate(100) if poet.display_couplet else '✨' }}
-                </div>
-            </a>
-            {% endfor %}
-        </div>
-    </div>
-
-    <!-- Optional: Action Cards (unchanged, but can be kept) -->
+<div class="max-w-6xl mx-auto">
+    <!-- Four Action Cards -->
     <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
+        <!-- Poets Card -->
+        <div class="feature-card">
+            <div class="feature-icon"><i class="fas fa-feather-alt"></i></div>
+            <div class="feature-title">Poets</div>
+            <div class="feature-desc">Click to view a complete list of poets. Select your favorite poet to read their Ghazals.</div>
+            <a href="/poets" class="feature-btn">Explore Poets →</a>
+        </div>
+        <!-- Add Card -->
         <div class="feature-card">
             <div class="feature-icon"><i class="fas fa-plus-circle"></i></div>
-            <div class="feature-title">Add Ghazal</div>
-            <div class="feature-desc">Contribute your own ghazal to the archive.</div>
+            <div class="feature-title">Add</div>
+            <div class="feature-desc">Click to submit your own Ghazal and share it with the community.</div>
             <a href="/ghazals/add" class="feature-btn">Contribute →</a>
         </div>
+        <!-- Search Card -->
         <div class="feature-card">
             <div class="feature-icon"><i class="fas fa-microphone-alt"></i></div>
-            <div class="feature-title">Voice Search</div>
-            <div class="feature-desc">Search by speaking – AI‑powered.</div>
+            <div class="feature-title">Search</div>
+            <div class="feature-desc">Search by voice or type any keyword to find specific poems.</div>
             <a href="/search" class="feature-btn">Search Now →</a>
         </div>
+        <!-- Bulk Card -->
         <div class="feature-card">
             <div class="feature-icon"><i class="fas fa-upload"></i></div>
-            <div class="feature-title">Bulk Upload</div>
-            <div class="feature-desc">Upload multiple ghazals at once.</div>
+            <div class="feature-title">Bulk</div>
+            <div class="feature-desc">Use this option to upload or write multiple Ghazals at once.</div>
             <a href="/bulk" class="feature-btn">Bulk Upload →</a>
-        </div>
-        <div class="feature-card">
-            <div class="feature-icon"><i class="fas fa-book-open"></i></div>
-            <div class="feature-title">Random Ghazal</div>
-            <div class="feature-desc">Discover a random poem from our corpus.</div>
-            <a href="/random" class="feature-btn">Surprise Me →</a>
         </div>
     </div>
 
-    <!-- Recent Ghazals Section (keep as is) -->
+    <!-- Recent Ghazals -->
     <div class="recent-ghazals">
         <h2 class="text-2xl font-bold text-[#1e3c72] mb-6 flex items-center gap-2">
             <i class="fas fa-clock text-gold"></i> Recently Added
@@ -153,17 +159,19 @@
         </div>
     </div>
 
-    <!-- Thanks Section (keep as is) -->
-    <div class="thanks-section">
-        <div class="flex flex-wrap items-center justify-between gap-4">
-            <div class="flex items-center gap-3">
-                <i class="fas fa-star-of-life fa-2x text-gold"></i>
-                <div class="thanks-text">
-                    Special Thanks to <span class="thanks-name">Dr. Muhammad Riaz (establishment Punjab SPU Lahore)</span>,
-                    for his invaluable inspiration and guidance.
-                </div>
+    <!-- Special Thanks Section -->
+    <div class="thanks-section d-flex flex-wrap align-items-center justify-content-between">
+        <div class="d-flex align-items-center mb-3 mb-md-0">
+            <div class="thanks-icon">
+                <i class="fas fa-star-of-life"></i>
             </div>
-            <i class="fas fa-hand-sparkles fa-2x text-gray-400 opacity-70"></i>
+            <div class="thanks-text">
+                Special Thanks to <span class="thanks-name"> Dr. Muhammad Riaz establishment Punjab SPU Lahore</span>,
+                for his invaluable inspiration and guidance.
+            </div>
+        </div>
+        <div>
+            <i class="fas fa-hand-sparkles fa-2x text-muted opacity-50"></i>
         </div>
     </div>
 </div>

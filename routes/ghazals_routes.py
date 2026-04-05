@@ -1,6 +1,4 @@
 ﻿import hashlib
-import os
-import time
 from io import BytesIO
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session, jsonify, send_file
 from markupsafe import Markup
@@ -13,9 +11,7 @@ from modules.analysis import split_verses
 from modules.ai_tools import translate_urdu_to_english
 from modules.image_generator import generate_ghazal_card
 
-# ---------- Blueprint definition first! ----------
 ghazals_bp = Blueprint('ghazals', __name__, url_prefix='/ghazals')
-# -----------------------------------------------
 
 def clean_translation(text: str) -> str:
     if not text:
@@ -170,35 +166,16 @@ def set_mode(mode):
 
 @ghazals_bp.route('/share_image/<int:text_id>')
 def share_image(text_id):
-    """Generate ghazal PNG, save it, and return shareable URL."""
+    """Generate and return a PNG image of the ghazal card with dedication names."""
     dedicator = request.args.get('dedicator', '').strip()
     dedicatee = request.args.get('dedicatee', '').strip()
 
     ghazal, verses = get_ghazal_with_verses(text_id)
     if not ghazal:
-        return jsonify({"error": "Ghazal not found"}), 404
+        return "Ghazal not found", 404
 
-    # Generate image
     img = generate_ghazal_card(ghazal, verses, dedicator, dedicatee)
-
-    # Ensure directory exists
-    generated_dir = os.path.join(os.path.dirname(__file__), '..', 'static', 'generated')
-    generated_dir = os.path.abspath(generated_dir)
-    os.makedirs(generated_dir, exist_ok=True)
-
-    # Unique filename
-    filename = f"{text_id}_{int(time.time())}.png"
-    filepath = os.path.join(generated_dir, filename)
-
-    # Save image
-    img.save(filepath, 'PNG')
-
-    # Build URLs
-    base_url = request.host_url.rstrip('/')
-    image_url = f"{base_url}/static/generated/{filename}"
-    share_url = f"{base_url}/share/{filename}"
-
-    return jsonify({
-        "image_url": image_url,
-        "share_url": share_url
-    })
+    img_io = BytesIO()
+    img.save(img_io, 'PNG')
+    img_io.seek(0)
+    return send_file(img_io, mimetype='image/png')
