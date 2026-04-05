@@ -1,9 +1,9 @@
-﻿# models/ghazal_model.py
-import uuid                     # ✅ Added missing import
+# models/ghazal_model.py
+import uuid
+import hashlib
 from models.base import get_db_connection
 
 def get_db():
-    """Legacy function – uses new connection. For backward compatibility."""
     return get_db_connection()
 
 def get_stats():
@@ -37,6 +37,7 @@ def get_poet_by_id(poet_id):
             return cur.fetchone()
 
 def fetch_texts_by_poet(poet_id):
+    """Return all ghazals for a poet."""
     with get_db_connection() as conn:
         with conn.cursor() as cur:
             cur.execute("SELECT id, public_id, title_urdu, title_english, verse_count FROM texts WHERE poet_id = %s AND form = 'ghazal' ORDER BY id", (poet_id,))
@@ -119,7 +120,7 @@ def insert_ghazal(poet_id, book_id, contributor_id, title_urdu, title_english,
                   text_urdu, text_english, content_hash, verse_count):
     with get_db_connection() as conn:
         with conn.cursor() as cur:
-            public_id = str(uuid.uuid4())[:8]   # ✅ uuid imported
+            public_id = str(uuid.uuid4())[:8]
             cur.execute("""
                 INSERT INTO texts (public_id, poet_id, book_id, contributor_id,
                                    title_urdu, title_english, text_urdu, text_english,
