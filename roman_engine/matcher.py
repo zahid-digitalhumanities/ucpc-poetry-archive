@@ -18,4 +18,8 @@ def process_query(query):
             result_words.append(matches[0])
         else:
             result_words.append(w)
+<<<<<<< HEAD
     return " ".join(result_words)
+=======
+    return " ".join(result_words)
+>>>>>>> a881c909ad9bd51fcab3855c8cea05c524f253d2
