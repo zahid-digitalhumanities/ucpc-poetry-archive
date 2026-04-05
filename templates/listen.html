@@ -1,531 +1,73 @@
 {% extends "base.html" %}
-{% block title %}{{ ghazal.title_urdu or ghazal.title_english }} - Listen | UCPC Poetry{% endblock %}
-
-{% block extra_css %}
-<style>
-    /* ═══════════════════════════════════════
-       HERO
-       ═══════════════════════════════════════ */
-    .ghazal-hero {
-        position: relative;
-        background: linear-gradient(160deg, #0a1f2e 0%, #0F2B3D 30%, #1E3C72 70%, #244a82 100%);
-        padding: 3rem 2.5rem;
-        text-align: center;
-        color: white;
-        overflow: hidden;
-        border-radius: 28px;
-        margin-bottom: 2rem;
-    }
-    .ghazal-hero::before {
-        content: '';
-        position: absolute;
-        inset: 0;
-        background:
-            radial-gradient(circle at 20% 80%, rgba(212,175,55,0.08) 0%, transparent 50%),
-            radial-gradient(circle at 80% 20%, rgba(212,175,55,0.06) 0%, transparent 50%);
-        pointer-events: none;
-    }
-    .ghazal-hero::after {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 120px;
-        height: 3px;
-        background: linear-gradient(90deg, transparent, var(--gold), transparent);
-        border-radius: 0 0 4px 4px;
-    }
-    .ghazal-hero > * { position: relative; z-index: 1; }
-
-    .hero-poet {
-        font-size: 0.8rem;
-        letter-spacing: 4px;
-        color: var(--gold);
-        text-transform: uppercase;
-        font-weight: 600;
-        margin-bottom: 0.5rem;
-    }
-    .hero-title-english {
-        font-size: 1.8rem;
-        font-weight: 700;
-        margin: 0.75rem 0 0.5rem;
-        letter-spacing: -0.3px;
-    }
-    .hero-title-urdu {
-        font-family: 'Jameel Noori Nastaleeq', 'Noto Nastaliq Urdu', serif;
-        font-size: 2rem;
-        color: var(--gold-light);
-        direction: rtl;
-        line-height: 2.8;
-    }
-    .hero-metadata {
-        display: flex;
-        justify-content: center;
-        gap: 0.75rem;
-        flex-wrap: wrap;
-        margin-top: 1.25rem;
-    }
-    .hero-metadata span {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        padding: 0.35rem 1rem;
-        border-radius: 50px;
-        background: rgba(255,255,255,0.08);
-        backdrop-filter: blur(8px);
-        border: 1px solid rgba(255,255,255,0.1);
-        font-size: 0.8rem;
-        font-weight: 500;
-        color: rgba(255,255,255,0.85);
-    }
-    .hero-metadata span i {
-        color: var(--gold);
-        font-size: 0.7rem;
-    }
-
-    /* ═══════════════════════════════════════
-       LISTEN BUTTON (hero inline)
-       ═══════════════════════════════════════ */
-    .listen-hero-btn {
-        display: inline-flex;
-        align-items: center;
-        gap: 10px;
-        margin-top: 1.5rem;
-        padding: 0.85rem 2.5rem;
-        border-radius: 50px;
-        border: none;
-        background: linear-gradient(135deg, var(--gold), var(--gold-light));
-        color: var(--primary-dark);
-        font-weight: 700;
-        font-size: 1rem;
-        cursor: pointer;
-        box-shadow: 0 4px 14px rgba(212,175,55,0.3);
-        transition: all 0.25s ease;
-    }
-    .listen-hero-btn:hover {
-        transform: translateY(-2px) scale(1.02);
-        box-shadow: 0 6px 20px rgba(212,175,55,0.4);
-    }
-    .listen-hero-btn:active { transform: translateY(0) scale(1); }
-    .listen-hero-btn.playing {
-        background: rgba(255,255,255,0.12);
-        color: white;
-        border: 1.5px solid rgba(255,255,255,0.2);
-        box-shadow: none;
-    }
-    .listen-hero-btn.playing:hover {
-        background: rgba(255,255,255,0.18);
-        box-shadow: none;
-    }
-    .listen-hero-btn .pulse-ring {
-        display: none;
-        width: 10px;
-        height: 10px;
-        border-radius: 50%;
-        background: #22c55e;
-        animation: pulseRing 1.5s ease-in-out infinite;
-    }
-    .listen-hero-btn.playing .pulse-ring { display: block; }
-    .listen-hero-btn.playing .btn-icon-static { display: none; }
-    @keyframes pulseRing {
-        0%, 100% { box-shadow: 0 0 0 0 rgba(34,197,94,0.4); }
-        50% { box-shadow: 0 0 0 6px rgba(34,197,94,0); }
-    }
-
-    /* ═══════════════════════════════════════
-       AUDIO PLAYER
-       ═══════════════════════════════════════ */
-    .audio-player-container {
-        display: none;
-        background: linear-gradient(135deg, #fefcf8, #faf7f0);
-        border: 1px solid rgba(212,175,55,0.25);
-        border-radius: 20px;
-        padding: 1.5rem 2rem;
-        margin-bottom: 2rem;
-        text-align: center;
-    }
-    .audio-player-container.visible {
-        display: block;
-        animation: fadeSlideIn 0.3s ease-out;
-    }
-    .audio-player-container audio {
-        width: 100%;
-        max-width: 600px;
-        border-radius: 50px;
-        height: 44px;
-        margin: 0 auto;
-        display: block;
-    }
-    .audio-loading {
-        display: inline-flex;
-        align-items: center;
-        gap: 10px;
-        color: var(--primary);
-        font-size: 0.92rem;
-        font-weight: 500;
-        margin-bottom: 0.75rem;
-    }
-    .audio-loading .spinner {
-        width: 18px;
-        height: 18px;
-        border: 2px solid rgba(30,60,114,0.2);
-        border-top-color: var(--primary);
-        border-radius: 50%;
-        animation: spin 0.8s linear infinite;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .audio-error {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        color: #ef4444;
-        font-size: 0.88rem;
-        font-weight: 500;
-        margin-bottom: 0.75rem;
-    }
-
-    /* ═══════════════════════════════════════
-       VERSES CARD
-       ═══════════════════════════════════════ */
-    .verses-card {
-        background: white;
-        border: 1px solid rgba(0,0,0,0.04);
-        border-radius: 28px;
-        padding: 2.5rem 2rem;
-        margin-bottom: 2rem;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-        position: relative;
-        overflow: hidden;
-    }
-    .verses-card::before {
-        content: "UCPC";
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%) rotate(-20deg);
-        font-size: 140px;
-        font-weight: 800;
-        color: rgba(0,0,0,0.02);
-        pointer-events: none;
-        z-index: 0;
-        white-space: nowrap;
-        font-family: 'Inter', sans-serif;
-        letter-spacing: 24px;
-    }
-    .verses-card > * { position: relative; z-index: 1; }
-
-    .bilingual-verse {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 2rem;
-        padding: 1.5rem 0;
-        border-bottom: 1px solid #f0ebe0;
-        align-items: center;
-        transition: background 0.2s;
-    }
-    .bilingual-verse:last-child {
-        border-bottom: none;
-    }
-    .bilingual-verse:hover {
-        background: rgba(212,175,55,0.03);
-        border-radius: 16px;
-        margin: 0 -0.75rem;
-        padding: 1.5rem 0.75rem;
-    }
-    .bilingual-verse.active-verse {
-        background: rgba(212,175,55,0.06);
-        border-radius: 16px;
-        margin: 0 -0.75rem;
-        padding: 1.5rem 0.75rem;
-        border-left: 3px solid var(--gold);
-    }
-    .urdu-couplet {
-        font-family: 'Jameel Noori Nastaleeq', 'Noto Nastaliq Urdu', serif;
-        font-size: 1.5rem;
-        line-height: 2.4rem;
-        direction: rtl;
-        color: var(--primary-dark);
-        text-align: center;
-    }
-    .english-couplet {
-        font-family: 'Georgia', 'Cambria', serif;
-        font-size: 0.95rem;
-        line-height: 1.6rem;
-        color: #4a5568;
-        text-align: left;
-        padding-left: 1rem;
-        border-left: 2px solid rgba(212,175,55,0.2);
-    }
-
-    /* Card footer */
-    .card-footer {
-        margin-top: 2rem;
-        padding-top: 1.5rem;
-        border-top: 1px solid #f0ebe0;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        flex-wrap: wrap;
-        gap: 1rem;
-    }
-    .tribute {
-        font-size: 0.82rem;
-        color: #9ca3af;
-        font-style: italic;
-    }
-    .tribute i { color: #e74c3c; margin-right: 4px; }
-    .social-icons {
-        display: flex;
-        gap: 0.5rem;
-    }
-    .social-icons a {
-        width: 34px;
-        height: 34px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #9a7b4b;
-        font-size: 0.85rem;
-        background: #f8f6f2;
-        border: 1px solid rgba(212,175,55,0.15);
-        transition: all 0.2s;
-        text-decoration: none;
-    }
-    .social-icons a:hover {
-        background: var(--gold);
-        color: white;
-        border-color: var(--gold);
-        transform: translateY(-2px);
-    }
-    .ucpc-watermark {
-        font-size: 0.7rem;
-        color: #d4c9b0;
-        text-align: center;
-        margin-top: 1.25rem;
-        letter-spacing: 1px;
-        text-transform: uppercase;
-    }
-
-    /* ═══════════════════════════════════════
-       NAV BUTTONS
-       ═══════════════════════════════════════ */
-    .nav-buttons {
-        display: flex;
-        justify-content: center;
-        gap: 0.75rem;
-        margin: 2rem 0;
-        flex-wrap: wrap;
-    }
-    .nav-btn {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        padding: 0.7rem 1.5rem;
-        border-radius: 50px;
-        text-decoration: none;
-        font-weight: 600;
-        font-size: 0.88rem;
-        transition: all 0.25s ease;
-    }
-    .nav-btn-primary {
-        background: var(--primary);
-        color: white;
-        box-shadow: 0 4px 12px rgba(30,60,114,0.2);
-    }
-    .nav-btn-primary:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 18px rgba(30,60,114,0.3);
-    }
-    .nav-btn-gold {
-        background: white;
-        color: var(--primary);
-        border: 1.5px solid rgba(212,175,55,0.35);
-    }
-    .nav-btn-gold:hover {
-        background: var(--gold);
-        color: white;
-        border-color: var(--gold);
-        transform: translateY(-2px);
-        box-shadow: 0 6px 18px rgba(212,175,55,0.3);
-    }
-
-    /* ═══════════════════════════════════════
-       RESPONSIVE
-       ═══════════════════════════════════════ */
-    @media (max-width: 768px) {
-        .ghazal-hero { padding: 2rem 1.25rem; border-radius: 20px; }
-        .hero-title-english { font-size: 1.4rem; }
-        .hero-title-urdu { font-size: 1.6rem; }
-        .hero-metadata { gap: 0.5rem; }
-        .hero-metadata span { font-size: 0.72rem; padding: 0.3rem 0.75rem; }
-        .bilingual-verse { grid-template-columns: 1fr; gap: 0.75rem; }
-        .english-couplet {
-            padding-left: 0;
-            border-left: none;
-            border-top: 1px solid rgba(212,175,55,0.15);
-            padding-top: 0.75rem;
-            text-align: center;
-        }
-        .urdu-couplet { font-size: 1.2rem; line-height: 1.9rem; }
-        .verses-card { padding: 1.5rem 1.25rem; border-radius: 20px; }
-        .card-footer { flex-direction: column; text-align: center; }
-        .listen-hero-btn { padding: 0.75rem 1.5rem; font-size: 0.9rem; }
-    }
-</style>
-{% endblock %}
 
 {% block content %}
-<div class="watermark-container" style="max-width:1000px; margin:0 auto;">
+<div class="view-container">
 
-    <!-- ═══ HERO ═══ -->
+    <!-- HERO -->
     <div class="ghazal-hero">
-        <div class="hero-poet">{{ ghazal.poet_name | upper }}</div>
-        <div class="hero-title-english">{{ ghazal.title_english or 'Untitled' }}</div>
-        <div class="hero-title-urdu">{{ ghazal.title_urdu }}</div>
-        <div class="hero-metadata">
-            {% if ghazal.radif %}<span><i class="fas fa-repeat"></i> Radif: {{ ghazal.radif }}</span>{% endif %}
-            {% if ghazal.qaafiya %}<span><i class="fas fa-ruler"></i> Qaafiya: {{ ghazal.qaafiya }}</span>{% endif %}
-            <span><i class="fas fa-book-open"></i> {{ verses|length }} verses</span>
-        </div>
-        <button class="listen-hero-btn" id="listenBtn" onclick="playAudio({{ ghazal.id }})">
-            <span class="pulse-ring"></span>
-            <i class="fas fa-headphones btn-icon-static"></i>
-            <span class="btn-label">Listen Ghazal</span>
+        <h2>{{ ghazal.title_english or "Untitled" }}</h2>
+        <h3 style="font-family:'Jameel Noori Nastaleeq'; direction:rtl;">
+            {{ ghazal.title_urdu }}
+        </h3>
+
+        <p>{{ ghazal.poet_name }}</p>
+
+        <!-- 🎧 LISTEN BUTTON -->
+        <button class="listen-btn" onclick="playAudio({{ ghazal.id }})">
+            🎧 Listen Ghazal (AI Voice)
         </button>
     </div>
 
-    <!-- ═══ AUDIO PLAYER ═══ -->
-    <div class="audio-player-container" id="audioContainer">
-        <div class="audio-loading" id="loading" style="display:none;">
-            <div class="spinner"></div>
-            <span>Generating AI voice...</span>
-        </div>
-        <div class="audio-error" id="audioError" style="display:none;">
-            <i class="fas fa-exclamation-circle"></i>
-            <span>Failed to load audio. Please try again.</span>
-        </div>
-        <audio id="audioPlayer" controls preload="none" style="display:none;"></audio>
+    <!-- AUDIO PLAYER -->
+    <div id="audioContainer" style="display:none; margin:20px 0;">
+        <p id="loading">⏳ Generating AI voice...</p>
+        <audio id="audioPlayer" controls style="width:100%;"></audio>
     </div>
 
-    <!-- ═══ VERSES ═══ -->
-    <div class="verses-card">
-        {% for verse in verses %}
-        <div class="bilingual-verse" data-verse="{{ loop.index }}">
-            <div class="urdu-couplet">
-                <div>{{ verse.misra1_urdu }}</div>
-                <div>{{ verse.misra2_urdu }}</div>
+    <!-- VERSES -->
+    {% for verse in verses %}
+    <div class="verse-card">
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+            
+            <!-- Urdu -->
+            <div style="direction:rtl; font-family:'Jameel Noori Nastaleeq'; font-size:20px;">
+                {{ verse.misra1_urdu }}<br>
+                {{ verse.misra2_urdu }}
             </div>
-            <div class="english-couplet">
-                <div>{{ verse.misra1_english or 'Translation coming soon...' }}</div>
-                <div>{{ verse.misra2_english or 'Translation coming soon...' }}</div>
-            </div>
-        </div>
-        {% endfor %}
 
-        <div class="card-footer">
-            <div class="tribute">
-                <i class="fas fa-heart"></i> Preserved with love for Urdu poetry lovers worldwide.
+            <!-- English -->
+            <div>
+                {{ verse.misra1_english or "..." }}<br>
+                {{ verse.misra2_english or "..." }}
             </div>
-            <div class="social-icons">
-                <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.url }}" target="_blank" title="Facebook"><i class="fab fa-facebook-f"></i></a>
-                <a href="https://twitter.com/intent/tweet?text=UCPC%20Poetry&url={{ request.url }}" target="_blank" title="Twitter"><i class="fab fa-twitter"></i></a>
-                <a href="https://wa.me/?text=Explore%20UCPC%20Poetry%3A%20{{ request.url }}" target="_blank" title="WhatsApp"><i class="fab fa-whatsapp"></i></a>
-            </div>
-        </div>
-        <div class="ucpc-watermark">UCPC Poetry Archive &bull; Preserving Urdu Poetry</div>
-    </div>
 
-    <!-- ═══ NAV BUTTONS ═══ -->
-    <div class="nav-buttons">
-        {% if prev_id %}<a href="/listen/{{ prev_id }}" class="nav-btn nav-btn-primary"><i class="fas fa-chevron-left"></i> Previous</a>{% endif %}
-        <a href="/view/{{ ghazal.id }}" class="nav-btn nav-btn-gold"><i class="fas fa-book-open"></i> View Page</a>
-        {% if next_id %}<a href="/listen/{{ next_id }}" class="nav-btn nav-btn-primary">Next <i class="fas fa-chevron-right"></i></a>{% endif %}
+        </div>
     </div>
+    {% endfor %}
 
 </div>
 
 <script>
-    let isPlaying = false;
-    const listenBtn = document.getElementById('listenBtn');
+function playAudio(id) {
+    const container = document.getElementById('audioContainer');
+    const player = document.getElementById('audioPlayer');
+    const loading = document.getElementById('loading');
 
-    function playAudio(id) {
-        const container = document.getElementById('audioContainer');
-        const player = document.getElementById('audioPlayer');
-        const loading = document.getElementById('loading');
-        const audioError = document.getElementById('audioError');
+    container.style.display = 'block';
+    loading.innerText = "⏳ Generating AI voice...";
+    loading.style.display = 'block';
 
-        // Reset states
+    player.src = `/listen/${id}`;
+
+    player.oncanplay = () => {
         loading.style.display = 'none';
-        audioError.style.display = 'none';
-        player.style.display = 'none';
+        player.play();
+    };
 
-        container.classList.add('visible');
-        loading.style.display = 'inline-flex';
-
-        // Update button to loading state
-        listenBtn.disabled = true;
-        listenBtn.querySelector('.btn-label').textContent = 'Loading...';
-
-        const url = `/listen/${id}?t=${Date.now()}`;
-        player.pause();
-        player.currentTime = 0;
-        player.src = url;
-        player.load();
-
-        player.oncanplay = () => {
-            loading.style.display = 'none';
-            player.style.display = 'block';
-            player.play().catch(err => console.warn('Autoplay blocked:', err));
-
-            // Update button to playing state
-            isPlaying = true;
-            listenBtn.disabled = false;
-            listenBtn.classList.add('playing');
-            listenBtn.querySelector('.btn-label').textContent = 'Now Playing';
-        };
-
-        player.onerror = () => {
-            loading.style.display = 'none';
-            audioError.style.display = 'inline-flex';
-
-            // Reset button
-            isPlaying = false;
-            listenBtn.disabled = false;
-            listenBtn.classList.remove('playing');
-            listenBtn.querySelector('.btn-label').textContent = 'Listen Ghazal';
-        };
-
-        player.onended = () => {
-            isPlaying = false;
-            listenBtn.classList.remove('playing');
-            listenBtn.querySelector('.btn-label').textContent = 'Listen Again';
-        };
-    }
-
-    // ── Highlight active verse during playback ──
-    const audioPlayer = document.getElementById('audioPlayer');
-    const verseElements = document.querySelectorAll('.bilingual-verse');
-
-    audioPlayer.addEventListener('timeupdate', function() {
-        if (!verseElements.length) return;
-        const duration = this.duration || 1;
-        const progress = this.currentTime / duration;
-        const activeIndex = Math.min(
-            Math.floor(progress * verseElements.length),
-            verseElements.length - 1
-        );
-
-        verseElements.forEach((el, i) => {
-            el.classList.toggle('active-verse', i === activeIndex);
-        });
-
-        // Scroll active verse into view
-        const activeEl = verseElements[activeIndex];
-        if (activeEl) {
-            activeEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-    });
+    player.onerror = () => {
+        loading.innerText = "❌ Failed to load audio";
+    };
+}
 </script>
+
 {% endblock %}

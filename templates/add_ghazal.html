@@ -1,572 +1,119 @@
-{% extends "base.html" %}
+﻿{% extends "base.html" %}
 {% block title %}Add New Ghazal / Nazm - UCPC Poetry Archive{% endblock %}
-
 {% block extra_css %}
 <style>
-    /* ═══════════════════════════════════════
-       PAGE HEADER
-       ═══════════════════════════════════════ */
-    .page-header {
-        text-align: center;
-        margin-bottom: 2.5rem;
-        position: relative;
-    }
-    .page-header h2 {
-        font-size: 1.8rem;
-        font-weight: 800;
-        color: #1e3c72;
-        letter-spacing: -0.3px;
-    }
-    .page-header .urdu-subtitle {
-        font-family: 'Jameel Noori Nastaleeq', 'Noto Nastaliq Urdu', serif;
-        font-size: 1.6rem;
-        color: var(--gold);
-        direction: rtl;
-        line-height: 2.4;
-        margin-top: 0.25rem;
-    }
-    .page-header .en-subtitle {
-        font-size: 0.9rem;
-        color: #9ca3af;
-        margin-top: 0.35rem;
-        font-weight: 400;
-    }
-    .page-header::after {
-        content: '';
-        display: block;
-        width: 60px;
-        height: 3px;
-        background: linear-gradient(90deg, transparent, var(--gold), transparent);
-        margin: 1.25rem auto 0;
-        border-radius: 4px;
-    }
-
-    /* ═══════════════════════════════════════
-       FORM CARD
-       ═══════════════════════════════════════ */
-    .form-card {
-        background: white;
-        border-radius: 28px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-        padding: 2rem 2.25rem;
-        margin-bottom: 1.5rem;
-        border: 1px solid rgba(0,0,0,0.04);
-        transition: border-color 0.3s ease, box-shadow 0.3s ease;
-        position: relative;
-    }
-    .form-card:hover {
-        border-color: rgba(212,175,55,0.15);
-        box-shadow: 0 8px 20px rgba(0,0,0,0.05);
-    }
-    .form-card:focus-within {
-        border-color: rgba(212,175,55,0.35);
-        box-shadow: 0 8px 20px rgba(0,0,0,0.05), 0 0 0 3px rgba(212,175,55,0.08);
-    }
-
-    .card-title {
-        font-size: 1.1rem;
-        font-weight: 700;
-        color: #1e3c72;
-        margin-bottom: 1.25rem;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-    .card-title i {
-        width: 36px;
-        height: 36px;
-        border-radius: 50%;
-        background: linear-gradient(135deg, rgba(212,175,55,0.12), rgba(212,175,55,0.05));
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 0.85rem;
-        color: var(--gold);
-    }
-
-    /* ═══════════════════════════════════════
-       FORM INPUTS
-       ═══════════════════════════════════════ */
-    .form-label {
-        display: block;
-        font-size: 0.82rem;
-        font-weight: 600;
-        color: #4b5563;
-        margin-bottom: 0.5rem;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-    .form-label .required {
-        color: #ef4444;
-        margin-left: 2px;
-    }
-
-    .form-select,
-    .form-input {
-        width: 100%;
-        padding: 0.75rem 1rem;
-        border: 1.5px solid #e5e7eb;
-        border-radius: 16px;
-        font-size: 0.95rem;
-        font-family: 'Inter', sans-serif;
-        color: #1e3c72;
-        background: #fefef8;
-        transition: border-color 0.2s, box-shadow 0.2s;
-        appearance: none;
-        -webkit-appearance: none;
-        box-sizing: border-box;
-    }
-    .form-select {
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23D4AF37' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
-        background-repeat: no-repeat;
-        background-position: right 16px center;
-        padding-right: 40px;
-        cursor: pointer;
-    }
-    .form-select:focus,
-    .form-input:focus {
-        outline: none;
-        border-color: var(--gold);
-        box-shadow: 0 0 0 3px rgba(212,175,55,0.12);
-    }
-
-    .help-text {
-        font-size: 0.8rem;
-        color: #9ca3af;
-        margin-top: 0.5rem;
-        line-height: 1.5;
-        padding-left: 2px;
-    }
-    .help-text i {
-        color: var(--gold);
-        margin-right: 4px;
-        font-size: 0.7rem;
-    }
-
-    /* ═══════════════════════════════════════
-       URDU TEXTAREA
-       ═══════════════════════════════════════ */
-    .ghazal-textarea {
-        width: 100%;
-        padding: 1.5rem;
-        border: 1.5px solid #e5e7eb;
-        border-radius: 20px;
-        font-family: 'Jameel Noori Nastaleeq', 'Noto Nastaliq Urdu', serif;
-        direction: rtl;
-        line-height: 2;
-        resize: vertical;
-        font-size: 1.2rem;
-        background: #fefef8;
-        color: var(--primary-dark);
-        transition: border-color 0.2s, box-shadow 0.2s;
-        box-sizing: border-box;
-    }
-    .ghazal-textarea::placeholder {
-        color: #c4b99a;
-        font-size: 1.1rem;
-    }
-    .ghazal-textarea:focus {
-        outline: none;
-        border-color: var(--gold);
-        box-shadow: 0 0 0 3px rgba(212,175,55,0.12);
-    }
-
-    .font-controls {
-        display: flex;
-        justify-content: flex-end;
-        gap: 6px;
-        margin-top: 0.75rem;
-    }
-    .font-btn {
-        width: 36px;
-        height: 36px;
-        border-radius: 50%;
-        border: 1.5px solid #e5e7eb;
-        background: white;
-        cursor: pointer;
-        font-size: 0.75rem;
-        font-weight: 700;
-        color: #6b7280;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.2s;
-    }
-    .font-btn:hover {
-        border-color: var(--gold);
-        color: var(--primary);
-        background: rgba(212,175,55,0.06);
-    }
-
-    /* ═══════════════════════════════════════
-       SUBMIT BUTTON
-       ═══════════════════════════════════════ */
-    .btn-submit {
-        background: linear-gradient(135deg, #1e3c72, #2c5a8c);
-        color: white;
-        padding: 14px 40px;
-        border-radius: 50px;
-        font-weight: 700;
-        font-size: 1rem;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        width: 100%;
-        max-width: 320px;
-        margin: 0.5rem auto 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 10px;
-        border: none;
-        box-shadow: 0 4px 14px rgba(30,60,114,0.25);
-        letter-spacing: 0.3px;
-    }
-    .btn-submit:hover:not(:disabled) {
-        background: linear-gradient(135deg, var(--gold), #e6c44a);
-        color: var(--primary-dark);
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(212,175,55,0.35);
-    }
-    .btn-submit:active:not(:disabled) {
-        transform: translateY(0);
-    }
-    .btn-submit:disabled {
-        opacity: 0.7;
-        cursor: not-allowed;
-    }
-
-    /* ═══════════════════════════════════════
-       DUPLICATE WARNING
-       ═══════════════════════════════════════ */
-    .duplicate-warning {
-        background: linear-gradient(135deg, #fffdf5, #fff9e6);
-        border: 1.5px solid rgba(212,175,55,0.4);
-        border-radius: 28px;
-        padding: 2rem 2.25rem;
-        margin-bottom: 2rem;
-        animation: fadeSlideIn 0.4s ease-out;
-    }
-    .duplicate-warning .warn-header {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        margin-bottom: 0.75rem;
-    }
-    .duplicate-warning .warn-icon {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        background: rgba(245,158,11,0.12);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #d97706;
-        font-size: 1rem;
-        flex-shrink: 0;
-    }
-    .duplicate-warning .warn-title {
-        font-size: 1.05rem;
-        font-weight: 700;
-        color: #92400e;
-    }
-    .duplicate-warning .warn-desc {
-        font-size: 0.9rem;
-        color: #a16207;
-        margin-bottom: 1.25rem;
-        line-height: 1.5;
-    }
-    .duplicate-table {
-        width: 100%;
-        border-collapse: separate;
-        border-spacing: 0;
-        border-radius: 16px;
-        overflow: hidden;
-        border: 1px solid rgba(212,175,55,0.25);
-    }
-    .duplicate-table th {
-        background: rgba(212,175,55,0.1);
-        padding: 10px 14px;
-        font-size: 0.78rem;
-        font-weight: 700;
-        color: #92400e;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        text-align: left;
-        border-bottom: 1px solid rgba(212,175,55,0.2);
-    }
-    .duplicate-table td {
-        padding: 12px 14px;
-        font-size: 0.9rem;
-        color: #78350f;
-        border-bottom: 1px solid rgba(212,175,55,0.1);
-        background: white;
-    }
-    .duplicate-table tr:last-child td {
-        border-bottom: none;
-    }
-    .duplicate-table .urdu-cell {
-        font-family: 'Jameel Noori Nastaleeq', serif;
-        direction: rtl;
-        text-align: right;
-        font-size: 1rem;
-        line-height: 1.8;
-    }
-    .duplicate-table .link-cell a {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        padding: 6px 14px;
-        border-radius: 50px;
-        background: var(--primary);
-        color: white;
-        text-decoration: none;
-        font-size: 0.8rem;
-        font-weight: 600;
-        transition: all 0.2s;
-    }
-    .duplicate-table .link-cell a:hover {
-        background: var(--gold);
-        color: var(--primary-dark);
-    }
-    .btn-go-back {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        margin-top: 1.25rem;
-        padding: 10px 24px;
-        border-radius: 50px;
-        background: white;
-        color: #78350f;
-        font-weight: 600;
-        font-size: 0.88rem;
-        border: 1.5px solid rgba(212,175,55,0.3);
-        cursor: pointer;
-        transition: all 0.2s;
-    }
-    .btn-go-back:hover {
-        background: rgba(212,175,55,0.1);
-        border-color: var(--gold);
-    }
-
-    /* ═══════════════════════════════════════
-       STEP INDICATOR
-       ═══════════════════════════════════════ */
-    .step-number {
-        width: 24px;
-        height: 24px;
-        border-radius: 50%;
-        background: var(--primary);
-        color: white;
-        font-size: 0.72rem;
-        font-weight: 700;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-shrink: 0;
-    }
-    .card-title .step-text {
-        font-size: 0.75rem;
-        font-weight: 500;
-        color: #9ca3af;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-
-    /* ═══════════════════════════════════════
-       RESPONSIVE
-       ═══════════════════════════════════════ */
-    @media (max-width: 768px) {
-        .page-header h2 { font-size: 1.5rem; }
-        .page-header .urdu-subtitle { font-size: 1.3rem; }
-        .form-card { padding: 1.5rem; border-radius: 20px; }
-        .duplicate-warning { padding: 1.5rem; border-radius: 20px; }
-        .duplicate-table { font-size: 0.8rem; }
-        .duplicate-table th, .duplicate-table td { padding: 8px 10px; }
-    }
+    .add-ghazal-container { max-width: 1000px; margin: 0 auto; }
+    .form-card { background: white; border-radius: 20px; box-shadow: 0 8px 30px rgba(0,0,0,0.08); padding: 30px; margin-bottom: 25px; border: 1px solid #eef2f6; }
+    .card-title { font-size: 1.3rem; font-weight: 600; color: #1e3c72; margin-bottom: 20px; border-bottom: 2px solid var(--gold); display: inline-block; }
+    .ghazal-textarea { width: 100%; padding: 20px; border: 2px solid #e2e8f0; border-radius: 16px; font-family: 'Jameel Noori Nastaleeq', serif; direction: rtl; line-height: 2; resize: vertical; font-size: 1.2rem; background: #fefef8; }
+    .btn-submit { background: linear-gradient(135deg, #1e3c72, #2c5a8c); color: white; padding: 14px 40px; border-radius: 50px; font-weight: 600; cursor: pointer; transition: all 0.3s; width: 100%; max-width: 300px; margin: 0 auto; display: block; }
+    .btn-submit:hover { background: var(--gold); color: #1e3c72; transform: translateY(-2px); }
+    .duplicate-warning { background: #fff3cd; border: 2px solid #ffc107; border-radius: 20px; padding: 25px; margin-bottom: 25px; }
+    .duplicate-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+    .duplicate-table th, .duplicate-table td { border: 1px solid #ffc107; padding: 10px; text-align: left; }
+    .duplicate-table th { background: #ffe6a3; }
+    .help-text { font-size: 0.85rem; color: #6c757d; margin-top: 5px; }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="watermark-container" style="max-width:1000px; margin:0 auto;">
-
-    <!-- ═══ PAGE HEADER ═══ -->
-    <div class="page-header">
-        <h2>Add New Ghazal / Nazm</h2>
-        <div class="urdu-subtitle">نئی غزل یا نظم شامل کریں</div>
-        <div class="en-subtitle">Contribute to the Urdu Poetry Archive</div>
+<div class="add-ghazal-container">
+    <div class="text-center mb-8">
+        <h2 class="text-3xl font-bold text-primary-dark">Add New Ghazal / Nazm</h2>
+        <p class="urdu text-xl mt-2 text-[#C9A646]">نئی غزل یا نظم شامل کریں</p>
+        <p class="text-gray-600 mt-1">Contribute to the Urdu Poetry Archive</p>
     </div>
 
-    <!-- ═══ DUPLICATE WARNING ═══ -->
     {% if duplicate_found and existing_ghazal %}
     <div class="duplicate-warning">
-        <div class="warn-header">
-            <div class="warn-icon"><i class="fas fa-exclamation-triangle"></i></div>
-            <div class="warn-title">This Ghazal Already Exists</div>
-        </div>
-        <div class="warn-desc">
-            This ghazal is already present in our archive. Please review the details below before submitting again.
-        </div>
+        <h4 class="text-yellow-800"><i class="fas fa-exclamation-triangle"></i> ⚠️ Ghazal Already Exists!</h4>
+        <p>This ghazal is already present in our archive. Please see details below:</p>
         <table class="duplicate-table">
             <thead>
-                <tr>
-                    <th>Poet</th>
-                    <th>Urdu Title</th>
-                    <th>English Title</th>
-                    <th>Action</th>
-                </tr>
+                <tr><th>Poet</th><th>Urdu Title</th><th>English Title</th><th>Action</th> </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td>{{ existing_ghazal.poet_name_urdu }} ({{ existing_ghazal.poet_name }})</td>
-                    <td class="urdu-cell">{{ existing_ghazal.title_urdu }}</td>
+                <tr><td>{{ existing_ghazal.poet_name_urdu }} ({{ existing_ghazal.poet_name }})</td>
+                    <td class="urdu">{{ existing_ghazal.title_urdu }}</td>
                     <td>{{ existing_ghazal.title_english }}</td>
-                    <td class="link-cell"><a href="/view/{{ existing_ghazal.id }}" target="_blank"><i class="fas fa-book-open"></i> Read</a></td>
-                </tr>
+                    <td><a href="/view/{{ existing_ghazal.id }}" target="_blank" class="text-blue-600 underline">Read Ghazal</a></td>
+                 </tr>
             </tbody>
         </table>
-        <button onclick="history.back()" class="btn-go-back">
-            <i class="fas fa-arrow-left"></i> Go Back
-        </button>
+        <button onclick="history.back()" class="mt-3 px-4 py-2 bg-gray-600 text-white rounded-full">Go Back</button>
     </div>
     {% endif %}
 
-    <!-- ═══ FORM ═══ -->
     <form method="POST" id="addGhazalForm">
-
-        <!-- Step 1: Poet -->
+        <!-- Poet Dropdown -->
         <div class="form-card">
-            <div class="card-title">
-                <span class="step-number">1</span>
-                <div>
-                    <div>Select Poet</div>
-                    <div class="step-text">Choose from the archive</div>
-                </div>
-            </div>
-            <label class="form-label">Poet <span class="required">*</span></label>
-            <select name="poet_id" id="poet_id" class="form-select" required>
-                <option value="">-- Select Poet --</option>
-                {% for poet in poets %}
-                <option value="{{ poet.id }}" {% if selected_poet_id == poet.id %}selected{% endif %}>
-                    {{ poet.name_urdu }} ({{ poet.name }})
-                </option>
-                {% endfor %}
-            </select>
-        </div>
-
-        <!-- Step 2: Book -->
-        <div class="form-card">
-            <div class="card-title">
-                <span class="step-number">2</span>
-                <div>
-                    <div>Select Book</div>
-                    <div class="step-text">Optional — associate with a collection</div>
-                </div>
-            </div>
-            <select name="book_id" id="book_id" class="form-select">
-                <option value="">-- Not associated with a book --</option>
-                {% if books %}
-                    {% for book in books %}
-                    <option value="{{ book.id }}" {% if selected_book_id == book.id %}selected{% endif %}>
-                        {{ book.name_urdu or book.name }}
-                    </option>
+            <div class="card-title"><i class="fas fa-user-circle"></i> Select Poet</div>
+            <div class="form-group">
+                <label class="block font-semibold mb-2">Poet <span class="text-red-500">*</span></label>
+                <select name="poet_id" id="poet_id" class="w-full px-4 py-2 border rounded-lg" required>
+                    <option value="">-- Select Poet --</option>
+                    {% for poet in poets %}
+                    <option value="{{ poet.id }}" {% if selected_poet_id == poet.id %}selected{% endif %}>{{ poet.name_urdu }} ({{ poet.name }})</option>
                     {% endfor %}
-                {% endif %}
-            </select>
-            <p class="help-text"><i class="fas fa-info-circle"></i>If this ghazal belongs to a specific book of the poet, select it here.</p>
-        </div>
-
-        <!-- Step 3: Ghazal Text -->
-        <div class="form-card">
-            <div class="card-title">
-                <span class="step-number">3</span>
-                <div>
-                    <div>Ghazal / Nazm Text</div>
-                    <div class="step-text">Paste the Urdu text below</div>
-                </div>
-            </div>
-            <label class="form-label">Urdu Text <span class="required">*</span></label>
-            <textarea
-                name="ghazal_text"
-                id="ghazalText"
-                class="ghazal-textarea"
-                rows="12"
-                required
-                placeholder="دلِ ناداں تجھے ہوا کیا ہے..."
-            >{{ form_data.ghazal_text if form_data else '' }}</textarea>
-            <div class="font-controls">
-                <button type="button" id="fontDecrease" class="font-btn" title="Decrease font">A−</button>
-                <button type="button" id="fontIncrease" class="font-btn" title="Increase font">A+</button>
+                </select>
             </div>
         </div>
 
-        <!-- Step 4: Contributor -->
+        <!-- Book Dropdown (dynamic) -->
         <div class="form-card">
-            <div class="card-title">
-                <span class="step-number">4</span>
-                <div>
-                    <div>Your Information</div>
-                    <div class="step-text">Optional — get credited</div>
+            <div class="card-title"><i class="fas fa-book"></i> Select Book (Optional)</div>
+            <div class="form-group">
+                <select name="book_id" id="book_id" class="w-full px-4 py-2 border rounded-lg">
+                    <option value="">-- Not associated with a book --</option>
+                    {% if books %}
+                        {% for book in books %}
+                        <option value="{{ book.id }}" {% if selected_book_id == book.id %}selected{% endif %}>{{ book.name_urdu or book.name }}</option>
+                        {% endfor %}
+                    {% endif %}
+                </select>
+                <p class="help-text">If this ghazal belongs to a specific book of the poet, you can select it here.</p>
+            </div>
+        </div>
+
+        <!-- Ghazal Text -->
+        <div class="form-card">
+            <div class="card-title"><i class="fas fa-pen-fancy"></i> Ghazal / Nazm Text (Urdu)</div>
+            <div class="form-group">
+                <textarea name="ghazal_text" id="ghazalText" class="ghazal-textarea" rows="12" required placeholder="دلِ ناداں تجھے ہوا کیا ہے...">{{ form_data.ghazal_text if form_data else '' }}</textarea>
+                <div class="flex justify-end gap-2 mt-2">
+                    <button type="button" id="fontDecrease" class="px-3 py-1 bg-gray-200 rounded-full">A-</button>
+                    <button type="button" id="fontIncrease" class="px-3 py-1 bg-gray-200 rounded-full">A+</button>
                 </div>
             </div>
+        </div>
+
+        <!-- Contributor Info -->
+        <div class="form-card">
+            <div class="card-title"><i class="fas fa-user-edit"></i> Your Information (Optional)</div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                    <label class="form-label">Name</label>
-                    <input
-                        type="text"
-                        name="contributor_name"
-                        class="form-input"
-                        value="{{ form_data.contributor_name if form_data else '' }}"
-                        placeholder="Enter your name"
-                    >
+                    <label class="block font-semibold mb-2">Name</label>
+                    <input type="text" name="contributor_name" class="w-full px-4 py-2 border rounded-lg" value="{{ form_data.contributor_name if form_data else '' }}" placeholder="Enter your name">
                 </div>
                 <div>
-                    <label class="form-label">Email</label>
-                    <input
-                        type="email"
-                        name="contributor_email"
-                        class="form-input"
-                        value="{{ form_data.contributor_email if form_data else '' }}"
-                        placeholder="your@email.com"
-                    >
+                    <label class="block font-semibold mb-2">Email</label>
+                    <input type="email" name="contributor_email" class="w-full px-4 py-2 border rounded-lg" value="{{ form_data.contributor_email if form_data else '' }}" placeholder="your@email.com">
                 </div>
             </div>
-            <p class="help-text"><i class="fas fa-info-circle"></i>Your name will be credited for this contribution. Email is optional and will not be displayed publicly.</p>
+            <p class="help-text mt-2">Your name will be credited for this contribution. Email is optional and will not be displayed publicly.</p>
         </div>
 
-        <!-- Submit -->
-        <button type="submit" class="btn-submit" id="submitBtn">
-            <i class="fas fa-paper-plane"></i>
-            Submit Ghazal
-        </button>
-
+        <button type="submit" class="btn-submit" id="submitBtn"><i class="fas fa-save"></i> Submit Ghazal</button>
     </form>
 </div>
 
 <script>
-    // ── Font Size Controls ──
     const textarea = document.getElementById('ghazalText');
     let currentFontSize = 1.2;
+    function updateFontSize() { textarea.style.fontSize = currentFontSize + 'rem'; textarea.style.lineHeight = (currentFontSize * 1.6) + 'rem'; }
+    document.getElementById('fontIncrease').addEventListener('click', () => { if (currentFontSize < 2.2) { currentFontSize += 0.1; updateFontSize(); } });
+    document.getElementById('fontDecrease').addEventListener('click', () => { if (currentFontSize > 0.9) { currentFontSize -= 0.1; updateFontSize(); } });
 
-    function updateFontSize() {
-        textarea.style.fontSize = currentFontSize + 'rem';
-        textarea.style.lineHeight = (currentFontSize * 1.65) + 'rem';
-    }
-
-    document.getElementById('fontIncrease').addEventListener('click', () => {
-        if (currentFontSize < 2.2) {
-            currentFontSize += 0.1;
-            updateFontSize();
-        }
-    });
-
-    document.getElementById('fontDecrease').addEventListener('click', () => {
-        if (currentFontSize > 0.9) {
-            currentFontSize -= 0.1;
-            updateFontSize();
-        }
-    });
-
-    // ── Dynamic Book Loading ──
     const poetSelect = document.getElementById('poet_id');
     const bookSelect = document.getElementById('book_id');
 
@@ -588,11 +135,9 @@
             .catch(err => console.error('Error loading books:', err));
     });
 
-    // ── Submit State ──
     document.getElementById('addGhazalForm').addEventListener('submit', function() {
-        const btn = document.getElementById('submitBtn');
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
-        btn.disabled = true;
+        document.getElementById('submitBtn').innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+        document.getElementById('submitBtn').disabled = true;
     });
 </script>
 {% endblock %}
