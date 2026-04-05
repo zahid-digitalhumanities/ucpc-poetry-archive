@@ -1,6 +1,6 @@
-﻿from flask import Blueprint, render_template, flash, redirect, url_for
+from flask import Blueprint, render_template, flash, redirect, url_for
 from models.poets_model import fetch_poet_by_id, fetch_all_poets
-from models.ghazals_model import fetch_texts_by_poet
+from models.ghazal_model import fetch_texts_by_poet
 from models.stats_model import get_stats
 
 poets_bp = Blueprint('poets', __name__)
