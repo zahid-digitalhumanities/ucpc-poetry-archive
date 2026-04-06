@@ -154,7 +154,15 @@ def get_books_by_poet(poet_id):
     with get_db_connection() as conn:
         with conn.cursor() as cur:
             cur.execute("SELECT id, name, name_urdu FROM books WHERE poet_id = %s ORDER BY name", (poet_id,))
-            return cur.fetchall()
+            rows = cur.fetchall()
+            # Convert to list of dicts for JSON serialization
+            if rows:
+                # If using RealDictCursor, rows are already dicts; otherwise convert tuples
+                if isinstance(rows[0], dict):
+                    return rows
+                else:
+                    return [{'id': r[0], 'name': r[1], 'name_urdu': r[2]} for r in rows]
+            return []
 
 # ==================== DUPLICATE CHECK (by content_hash) ====================
 def check_duplicate_ghazal(content_hash):
@@ -169,6 +177,9 @@ def check_duplicate_ghazal(content_hash):
             """, (content_hash,))
             row = cur.fetchone()
             if row:
-                return True, {'id': row['id'], 'poet_id': row['poet_id'],
-                              'title_urdu': row['title_urdu'], 'title_english': row['title_english']}
+                # If using RealDictCursor, row is dict; else convert
+                if isinstance(row, dict):
+                    return True, row
+                else:
+                    return True, {'id': row[0], 'poet_id': row[1], 'title_urdu': row[2], 'title_english': row[3]}
             return False, None

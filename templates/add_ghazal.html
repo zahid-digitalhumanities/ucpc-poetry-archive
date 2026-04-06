@@ -37,7 +37,7 @@
                     <td class="urdu">{{ existing_ghazal.title_urdu }}</td>
                     <td>{{ existing_ghazal.title_english }}</td>
                     <td><a href="/view/{{ existing_ghazal.id }}" target="_blank" class="text-blue-600 underline">Read Ghazal</a></td>
-                 </tr>
+                </tr>
             </tbody>
         </table>
         <button onclick="history.back()" class="mt-3 px-4 py-2 bg-gray-600 text-white rounded-full">Go Back</button>
@@ -123,13 +123,16 @@
             bookSelect.innerHTML = '<option value="">-- Not associated with a book --</option>';
             return;
         }
-        fetch(`/admin/books/${poetId}`)
+        // ✅ FIXED: use correct endpoint with /ghazals prefix
+        fetch(`/ghazals/books/${poetId}`)
             .then(response => response.json())
             .then(data => {
                 let options = '<option value="">-- Not associated with a book --</option>';
-                data.books.forEach(book => {
-                    options += `<option value="${book.id}">${book.name_urdu || book.name}</option>`;
-                });
+                if (data.books && data.books.length) {
+                    data.books.forEach(book => {
+                        options += `<option value="${book.id}">${book.name_urdu || book.name}</option>`;
+                    });
+                }
                 bookSelect.innerHTML = options;
             })
             .catch(err => console.error('Error loading books:', err));
