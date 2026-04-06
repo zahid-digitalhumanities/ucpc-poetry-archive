@@ -13,15 +13,12 @@ chardet>=5.2
 
 gunicorn>=21.2
 
-<<<<<<< HEAD
-elevenlabs==0.2.27.
 
-=======
+
 elevenlabs==0.2.27
 transformers
 torch
 sentencepiece
 arabic_reshaper
 python-bidi
->>>>>>> a881c909ad9bd51fcab3855c8cea05c524f253d2
 python-dotenv>=1.0

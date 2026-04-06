@@ -93,12 +93,14 @@ def insert_ghazal_bulk(conn, poet_id, book_id, contributor_id, ghazal_text, titl
         cur.close()
 
 def get_books_by_poet(poet_id):
-    """Return list of books for a given poet."""
+    """Return list of books for a given poet as dictionaries."""
     conn = get_db()
     try:
         cur = conn.cursor()
         cur.execute("SELECT id, name, name_urdu FROM books WHERE poet_id = %s ORDER BY name", (poet_id,))
-        return cur.fetchall()
+        rows = cur.fetchall()
+        # Convert to list of dicts for JSON response
+        return [{'id': row[0], 'name': row[1], 'name_urdu': row[2]} for row in rows]
     except Exception as e:
         print(f"Error fetching books: {e}")
         return []
