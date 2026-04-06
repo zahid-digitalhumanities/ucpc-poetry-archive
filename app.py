@@ -6,7 +6,7 @@ import time
 # Blueprints
 from routes.main_routes import main_bp
 from routes.poets_routes import poets_bp
-from routes.ghazals_routes import ghazals_bp
+from routes.ghazals_routes import ghazals_bp          # ✅ UNCOMMENTED
 from routes.search_routes import search_bp
 from routes.bulk_routes import bulk_bp
 from routes.listen_routes import listen_bp
@@ -26,7 +26,7 @@ def create_app():
     # ✅ Register Blueprints
     app.register_blueprint(main_bp)
     app.register_blueprint(poets_bp)
-    app.register_blueprint(ghazals_bp)
+    app.register_blueprint(ghazals_bp)                # ✅ UNCOMMENTED
     app.register_blueprint(search_bp)
     app.register_blueprint(bulk_bp)
     app.register_blueprint(listen_bp)
@@ -125,6 +125,7 @@ def create_app():
             print("⚠️ Stats error:", str(e))
             return dict(stats=None)
 
+
     # =========================================================
     # ❌ ERROR HANDLERS
     # =========================================================
@@ -137,6 +138,7 @@ def create_app():
         return render_template('500.html'), 500
 
     return app
+
 
 
 # =========================================================
