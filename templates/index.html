@@ -1,11 +1,9 @@
-﻿{% extends "base.html" %}
+{% extends "base.html" %}
 
 {% block extra_css %}
 <style>
-    /* Poet Card Styles */
     .poet-card {
         background: white;
-        border-radius: 1.5rem;
         overflow: hidden;
         transition: all 0.3s ease;
         box-shadow: 0 4px 12px rgba(0,0,0,0.05);
@@ -27,10 +25,6 @@
         width: 100%;
         height: 100%;
         object-fit: cover;
-        transition: transform 0.5s ease;
-    }
-    .poet-card:hover .poet-image img {
-        transform: scale(1.05);
     }
     .poet-name {
         font-weight: 700;
@@ -64,12 +58,22 @@
         .poet-name { font-size: 1rem; }
         .poet-couplet { font-size: 0.85rem; }
     }
+    .feature-card { background: #f9fafb; border-radius: 1rem; padding: 1.5rem; text-align: center; transition: 0.2s; }
+    .feature-icon { font-size: 2rem; color: #D4AF37; margin-bottom: 0.75rem; }
+    .feature-title { font-weight: bold; margin-bottom: 0.5rem; }
+    .feature-desc { font-size: 0.85rem; color: #6b7280; margin-bottom: 1rem; }
+    .feature-btn { background: #1e3c72; color: white; padding: 0.5rem 1rem; border-radius: 2rem; text-decoration: none; font-size: 0.8rem; }
+    .ghazal-mini-card { background: white; border-radius: 1rem; padding: 1rem; margin-bottom: 0.5rem; border: 1px solid #e5e7eb; transition: 0.2s; }
+    .ghazal-mini-card:hover { background: #fef9e6; }
+    .thanks-section { background: #fef9e6; border-radius: 1.5rem; padding: 1.5rem; margin-top: 2rem; }
+    .text-gold { color: #D4AF37; }
+    .urdu-text { font-family: 'Jameel Noori Nastaleeq', serif; direction: rtl; }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="max-w-7xl mx-auto">
-    <!-- Poets Grid Section -->
+    <!-- Poets Grid -->
     <div class="mb-16">
         <h2 class="text-2xl md:text-3xl font-bold text-[#1e3c72] mb-8 flex items-center gap-3">
             <i class="fas fa-feather-alt text-gold"></i>
@@ -80,9 +84,7 @@
             <a href="{{ url_for('poets.poet_detail', poet_id=poet.id) }}" class="block poet-card group">
                 <div class="poet-image">
                     {% if poet.image_filename %}
-                        <img src="{{ url_for('static', filename='images/poets/' + poet.image_filename) }}" 
-                             alt="{{ poet.name }}" 
-                             loading="lazy">
+                        <img src="{{ url_for('static', filename='images/poets/' + poet.image_filename) }}" alt="{{ poet.name }}" loading="lazy">
                     {% else %}
                         <div class="w-full h-full bg-gradient-to-br from-amber-50 to-amber-100 flex items-center justify-center">
                             <i class="fas fa-feather-alt text-4xl text-amber-300"></i>
@@ -94,14 +96,14 @@
                 <div class="poet-name-urdu">{{ poet.name_urdu }}</div>
                 {% endif %}
                 <div class="poet-couplet">
-                    {{ poet.display_couplet|truncate(100) if poet.display_couplet else '✨' }}
+                    {{ poet.display_couplet|safe if poet.display_couplet else '✨' }}
                 </div>
             </a>
             {% endfor %}
         </div>
     </div>
 
-    <!-- Optional: Action Cards (unchanged, but can be kept) -->
+    <!-- Action Cards -->
     <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
         <div class="feature-card">
             <div class="feature-icon"><i class="fas fa-plus-circle"></i></div>
@@ -129,18 +131,18 @@
         </div>
     </div>
 
-    <!-- Recent Ghazals Section (keep as is) -->
+    <!-- Recent Ghazals -->
     <div class="recent-ghazals">
         <h2 class="text-2xl font-bold text-[#1e3c72] mb-6 flex items-center gap-2">
             <i class="fas fa-clock text-gold"></i> Recently Added
         </h2>
         <div class="space-y-4">
             {% for ghazal in recent_ghazals %}
-            <a href="/view/{{ ghazal.id }}" class="ghazal-mini-card block">
+            <a href="/ghazals/view/{{ ghazal.id }}" class="ghazal-mini-card block">
                 <div class="flex justify-between items-center flex-wrap gap-2">
                     <div>
-                        <div class="font-bold text-lg">{{ ghazal.title_english }}</div>
-                        <div class="urdu-text text-md">{{ ghazal.title_urdu }}</div>
+                        <div class="font-bold text-lg">{{ ghazal.title_english or 'Untitled' }}</div>
+                        <div class="urdu-text text-md">{{ ghazal.title_urdu or '' }}</div>
                     </div>
                     <div class="text-sm text-gray-500">
                         <i class="fas fa-user"></i> {{ ghazal.poet_name }}
@@ -153,7 +155,7 @@
         </div>
     </div>
 
-    <!-- Thanks Section (keep as is) -->
+    <!-- Thanks Section -->
     <div class="thanks-section">
         <div class="flex flex-wrap items-center justify-between gap-4">
             <div class="flex items-center gap-3">

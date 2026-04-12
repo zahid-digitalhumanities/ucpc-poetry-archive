@@ -1,48 +1,46 @@
-﻿# routes/main_routes.py
 from flask import Blueprint, render_template
 from models.stats_model import get_stats
-from models.poets_model import fetch_poets_with_sample
-from models.ghazal_model import get_db
+from models.poets_model import get_all_poets
+from models.ghazal_model import get_recent_ghazals
+from models.base import get_db_connection   # ← FIX: import from base
 import os
 
 main_bp = Blueprint('main', __name__)
 
+def get_sample_couplet_for_poet(poet_id):
+    conn = get_db_connection()
+    cur = conn.cursor()
+    try:
+        cur.execute("""
+            SELECT v.misra1_urdu, v.misra2_urdu
+            FROM verses v
+            JOIN texts t ON v.text_id = t.id
+            WHERE t.poet_id = %s AND t.form = 'ghazal'
+            ORDER BY t.id, v.couplet_index
+            LIMIT 1
+        """, (poet_id,))
+        row = cur.fetchone()
+        if row and row[0]:
+            return f"{row[0]}<br>{row[1]}"
+    except Exception as e:
+        print(f"Error fetching couplet: {e}")
+    finally:
+        cur.close()
+        conn.close()
+    return "✨"
+
 @main_bp.route('/')
 def index():
     stats = get_stats()
-    
-    # 1. Fetch all poets with a sample text for the home page grid
-    poets_data = fetch_poets_with_sample()
+    poets_data = get_all_poets()
     poets = []
     for p in poets_data:
-        img_filename = None
-        id_path = f"images/poets/{p['id']}.jpg"
-        name_path = f"images/poets/{p['name'].replace(' ', '_')}.jpg"
-        if os.path.exists(os.path.join('static', id_path)):
-            img_filename = f"{p['id']}.jpg"
-        elif os.path.exists(os.path.join('static', name_path)):
-            img_filename = f"{p['name'].replace(' ', '_')}.jpg"
         poets.append({
             'id': p['id'],
             'name': p['name'],
-            'name_urdu': p['name_urdu'],
-            'image_filename': img_filename,
-            'text_urdu': p['text_urdu']
+            'name_urdu': p.get('name_urdu', ''),
+            'image_filename': None,
+            'display_couplet': get_sample_couplet_for_poet(p['id'])
         })
-    
-    # 2. Fetch recent ghazals from the `texts` table (not `ghazals`)
-    conn = get_db()
-    cur = conn.cursor()
-    cur.execute("""
-        SELECT t.id, t.title_english, t.title_urdu, p.name as poet_name
-        FROM texts t
-        JOIN poets p ON t.poet_id = p.id
-        WHERE t.text_urdu IS NOT NULL
-        ORDER BY t.created_at DESC
-        LIMIT 10
-    """)
-    recent_ghazals = cur.fetchall()
-    cur.close()
-    conn.close()
-    
+    recent_ghazals = get_recent_ghazals(limit=10)
     return render_template('index.html', poets=poets, recent_ghazals=recent_ghazals, stats=stats)

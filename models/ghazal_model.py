@@ -1,4 +1,3 @@
-﻿# models/ghazal_model.py
 from models.base import get_db_connection
 import uuid
 import hashlib
@@ -30,16 +29,23 @@ def get_all_poets():
                 LEFT JOIN texts t ON t.poet_id = p.id AND t.form = 'ghazal'
                 GROUP BY p.id ORDER BY p.name
             """)
-            return cur.fetchall()
+            rows = cur.fetchall()
+            return [dict(row) for row in rows]
 
 def get_poet_by_id(poet_id):
     with get_db_connection() as conn:
         with conn.cursor() as cur:
             cur.execute("""
-                SELECT id, name, name_urdu, bio_english, bio_urdu, birth_year, death_year
+                SELECT id, name, name_urdu, bio_english, bio_urdu, 
+                       birth_year, death_year, wikipedia_url
                 FROM poets WHERE id = %s
             """, (poet_id,))
-            return cur.fetchone()
+            row = cur.fetchone()
+            if not row:
+                return None
+            poet = dict(row)
+            poet['biography'] = poet.get('bio_english', '')
+            return poet
 
 # ==================== GHAZALS ====================
 def fetch_texts_by_poet(poet_id):
@@ -49,21 +55,69 @@ def fetch_texts_by_poet(poet_id):
                 SELECT id, public_id, title_urdu, title_english, verse_count
                 FROM texts WHERE poet_id = %s AND form = 'ghazal' ORDER BY id
             """, (poet_id,))
-            return cur.fetchall()
+            texts = cur.fetchall()
+            result = []
+            for text in texts:
+                text_dict = dict(text)
+                cur.execute("""
+                    SELECT misra1_urdu, misra2_urdu
+                    FROM verses
+                    WHERE text_id = %s
+                    ORDER BY couplet_index ASC
+                    LIMIT 2
+                """, (text_dict['id'],))
+                verses = cur.fetchall()
+                first_verse = None
+                second_verse = None
+                if len(verses) >= 1:
+                    first_verse = {'misra1_urdu': verses[0]['misra1_urdu'] or '', 'misra2_urdu': verses[0]['misra2_urdu'] or ''}
+                if len(verses) >= 2:
+                    second_verse = {'misra1_urdu': verses[1]['misra1_urdu'] or '', 'misra2_urdu': verses[1]['misra2_urdu'] or ''}
+                text_dict['first_verse'] = first_verse
+                text_dict['second_verse'] = second_verse
+                result.append(text_dict)
+            return result
 
+# ✅ FIXED: get_ghazal_with_verses with debug prints
 def get_ghazal_with_verses(text_id):
     with get_db_connection() as conn:
         with conn.cursor() as cur:
+            # Fetch ghazal
             cur.execute("""
-                SELECT t.*, p.name AS poet_name, p.name_urdu AS poet_name_urdu
-                FROM texts t JOIN poets p ON t.poet_id = p.id WHERE t.id = %s
+                SELECT t.id, t.title_urdu, t.title_english, t.poet_id, t.verse_count, t.text_urdu,
+                       p.name AS poet_name, p.name_urdu AS poet_name_urdu
+                FROM texts t
+                JOIN poets p ON t.poet_id = p.id
+                WHERE t.id = %s
             """, (text_id,))
-            ghazal = cur.fetchone()
-            if ghazal:
-                cur.execute("SELECT * FROM verses WHERE text_id = %s ORDER BY couplet_index", (text_id,))
-                verses = cur.fetchall()
-            else:
-                verses = []
+            ghazal_row = cur.fetchone()
+            if not ghazal_row:
+                print(f"DEBUG: No ghazal found for text_id {text_id}")
+                return None, []
+
+            ghazal = dict(ghazal_row)
+            print(f"DEBUG: Ghazal fetched, poet={ghazal.get('poet_name')}")
+
+            # Fetch verses
+            cur.execute("""
+                SELECT couplet_index, misra1_urdu, misra2_urdu
+                FROM verses
+                WHERE text_id = %s
+                ORDER BY couplet_index
+            """, (text_id,))
+            rows = cur.fetchall()
+            print(f"DEBUG: Found {len(rows)} verse rows for text_id {text_id}")
+            if rows:
+                print(f"DEBUG: First row columns: {rows[0].keys()}")
+                print(f"DEBUG: First misra1_urdu sample: {rows[0].get('misra1_urdu', '')[:50]}")
+            verses = []
+            for row in rows:
+                verses.append({
+                    'misra1_urdu': row.get('misra1_urdu', ''),
+                    'misra2_urdu': row.get('misra2_urdu', ''),
+                    'misra1_english': '',
+                    'misra2_english': ''
+                })
             return ghazal, verses
 
 def get_navigation(current_id, poet_id):
@@ -81,7 +135,7 @@ def get_navigation(current_id, poet_id):
             next_id = ids[index+1] if index<len(ids)-1 else None
             return prev_id, next_id, len(ids)
 
-# ✅ INSERT GHAZAL (matches routes call)
+# ==================== INSERT GHAZAL & VERSE ====================
 def insert_ghazal(poet_id, book_id, contributor_id, title_urdu, title_english,
                   text_urdu, text_english, content_hash, verse_count):
     public_id = str(uuid.uuid4())[:8]
@@ -97,7 +151,6 @@ def insert_ghazal(poet_id, book_id, contributor_id, title_urdu, title_english,
                   text_urdu, text_english, content_hash, verse_count, datetime.now()))
             conn.commit()
             text_id = cur.fetchone()['id']
-            # If contributor_id provided, add to contributions
             if contributor_id:
                 cur.execute("""
                     INSERT INTO contributions (text_id, contributor_id, role)
@@ -106,7 +159,6 @@ def insert_ghazal(poet_id, book_id, contributor_id, title_urdu, title_english,
                 conn.commit()
             return text_id
 
-# ✅ INSERT VERSE (matches routes call)
 def insert_verse(text_id, couplet_index, m1, m2, m1_en, m2_en):
     with get_db_connection() as conn:
         with conn.cursor() as cur:
@@ -124,7 +176,7 @@ def get_all_contributors():
     with get_db_connection() as conn:
         with conn.cursor() as cur:
             cur.execute("SELECT id, name FROM contributors ORDER BY name")
-            return cur.fetchall()
+            return [dict(row) for row in cur.fetchall()]
 
 def get_or_create_contributor(name, email=None):
     with get_db_connection() as conn:
@@ -133,7 +185,6 @@ def get_or_create_contributor(name, email=None):
             row = cur.fetchone()
             if row:
                 return row['id']
-            # Insert new contributor
             cur.execute("""
                 INSERT INTO contributors (name, email) VALUES (%s, %s) RETURNING id
             """, (name, email))
@@ -155,18 +206,10 @@ def get_books_by_poet(poet_id):
         with conn.cursor() as cur:
             cur.execute("SELECT id, name, name_urdu FROM books WHERE poet_id = %s ORDER BY name", (poet_id,))
             rows = cur.fetchall()
-            # Convert to list of dicts for JSON serialization
-            if rows:
-                # If using RealDictCursor, rows are already dicts; otherwise convert tuples
-                if isinstance(rows[0], dict):
-                    return rows
-                else:
-                    return [{'id': r[0], 'name': r[1], 'name_urdu': r[2]} for r in rows]
-            return []
+            return [dict(row) for row in rows]
 
-# ==================== DUPLICATE CHECK (by content_hash) ====================
+# ==================== DUPLICATE CHECK ====================
 def check_duplicate_ghazal(content_hash):
-    """Return (is_duplicate, existing_ghazal_dict_or_None)"""
     with get_db_connection() as conn:
         with conn.cursor() as cur:
             cur.execute("""
@@ -177,9 +220,20 @@ def check_duplicate_ghazal(content_hash):
             """, (content_hash,))
             row = cur.fetchone()
             if row:
-                # If using RealDictCursor, row is dict; else convert
-                if isinstance(row, dict):
-                    return True, row
-                else:
-                    return True, {'id': row[0], 'poet_id': row[1], 'title_urdu': row[2], 'title_english': row[3]}
+                return True, dict(row)
             return False, None
+
+# ==================== RECENT GHAZALS ====================
+def get_recent_ghazals(limit=10):
+    with get_db_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute("""
+                SELECT t.id, t.title_english, t.title_urdu, p.name as poet_name
+                FROM texts t
+                JOIN poets p ON t.poet_id = p.id
+                WHERE t.form = 'ghazal'
+                ORDER BY t.created_at DESC
+                LIMIT %s
+            """, (limit,))
+            rows = cur.fetchall()
+            return [dict(row) for row in rows]

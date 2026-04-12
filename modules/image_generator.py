@@ -1,132 +1,98 @@
-# modules/image_generator.py
 import os
 import logging
 from PIL import Image, ImageDraw, ImageFont
 import arabic_reshaper
 from bidi.algorithm import get_display
 
+logging.basicConfig(level=logging.INFO)
+
 def reshape_urdu(text):
-    """Properly shape Urdu text for rendering."""
     if not text:
         return ""
     try:
-        reshaped = arabic_reshaper.reshape(text)
-        return get_display(reshaped)
-    except Exception as e:
-        logging.error(f"Urdu shaping error: {e}")
+        return get_display(arabic_reshaper.reshape(text))
+    except:
         return text
 
-def get_font(font_name, size):
-    """Try to load font from static/fonts, fallback to default."""
-    base_dir = os.path.dirname(os.path.dirname(__file__))
-    font_path = os.path.join(base_dir, 'static', 'fonts', font_name)
-    try:
-        return ImageFont.truetype(font_path, size)
-    except Exception as e:
-        logging.warning(f"Could not load font {font_name}: {e}")
-        return ImageFont.load_default()
+def get_urdu_font(size):
+    # Render's Linux system fonts
+    paths = [
+        '/usr/share/fonts/truetype/noto/NotoNastaliqUrdu.ttf',
+        '/usr/share/fonts/truetype/urdu/NotoNastaliqUrdu-Regular.ttf',
+    ]
+    for p in paths:
+        if os.path.exists(p):
+            try:
+                return ImageFont.truetype(p, size)
+            except:
+                pass
+    return ImageFont.load_default()
 
-def generate_ghazal_card(ghazal, verses, dedicator, dedicatee):
-    """
-    Returns a PIL Image object with the ghazal card.
-    """
-    # Dimensions (Instagram story size)
-    width = 1080
-    margin = 80
-    line_spacing = 80      # space between lines
-    verse_spacing = 100    # space between verses
+def get_poet_font(size):
+    paths = [
+        '/usr/share/fonts/truetype/liberation/LiberationSerif-Bold.ttf',
+    ]
+    for p in paths:
+        if os.path.exists(p):
+            try:
+                return ImageFont.truetype(p, size)
+            except:
+                pass
+    return ImageFont.load_default()
 
-    # Load fonts
-    urdu_font = get_font('JameelNooriNastaleeq.ttf', 48)
-    title_font = get_font('LiberationSerif-Bold.ttf', 44)
-    poet_font = get_font('LiberationSerif-Italic.ttf', 36)
-    dedication_font = get_font('LiberationSerif-Bold.ttf', 38)
+def generate_ghazal_card(ghazal, verses, dedicator='', dedicatee=''):
+    width = 600
+    top_margin = 80
+    bottom_margin = 120
+    line_spacing = 50
+    verse_spacing = 30
+    x_center = width // 2
 
-    # Estimate total height
-    y = 200  # start Y
-    lines = []
+    urdu_font = get_urdu_font(28)
+    poet_font = get_poet_font(24)
+    dedication_font = get_poet_font(20)
 
-    # Title (English)
-    title_en = ghazal.get('title_english', 'Untitled')
-    lines.append((title_en, title_font, (212, 175, 55)))
+    # Estimate height
+    y = top_margin
+    poet_name = ghazal.get('poet_name', '').upper()
+    if poet_name:
+        y += 45
+    for v in verses:
+        if v.get('misra1_urdu'):
+            y += line_spacing
+        if v.get('misra2_urdu'):
+            y += line_spacing
+        y += verse_spacing
+    if dedicator or dedicatee:
+        y += 60
+    y += bottom_margin
+    height = max(y, 800)
 
-    # Title (Urdu)
-    title_ur = ghazal.get('title_urdu', '')
-    if title_ur:
-        reshaped_title = reshape_urdu(title_ur)
-        lines.append((reshaped_title, urdu_font, (255, 255, 255)))
-
-    # Poet name
-    poet = ghazal.get('poet_name', '')
-    lines.append((poet, poet_font, (212, 175, 55)))
-
-    # Add space before verses
-    y += 100
-
-    # Verses
-    for verse in verses:
-        misra1 = reshape_urdu(verse['misra1_urdu'])
-        misra2 = reshape_urdu(verse['misra2_urdu'])
-        lines.append((misra1, urdu_font, (255, 255, 255)))
-        lines.append((misra2, urdu_font, (255, 255, 255)))
-        lines.append(("", None, None))  # spacer between verses
-
-    # Remove last spacer
-    if lines and lines[-1][0] == "":
-        lines.pop()
-
-    # Dedication block
-    if dedicator and dedicatee:
-        lines.append(("", None, None))  # spacer
-        ded_text = f"Shared by : {dedicator}"
-        ded_to_text = f"Dedicated to : {dedicatee}"
-        lines.append((ded_text, dedication_font, (212, 175, 55)))
-        lines.append((ded_to_text, dedication_font, (255, 255, 255)))
-
-    # Calculate total height
-    for text, font, _ in lines:
-        if text:
-            bbox = font.getbbox(text) if hasattr(font, 'getbbox') else (0, 0, 0, font.getsize(text)[1])
-            line_height = bbox[3] - bbox[1] if len(bbox) > 3 else font.getsize(text)[1]
-            y += line_height + line_spacing
-        else:
-            y += verse_spacing
-
-    y += 100  # bottom margin
-    height = max(y, 1920)  # ensure minimum height
-
-    # Create image with gradient background
-    from PIL import ImageDraw
-    img = Image.new('RGB', (width, height), (20, 20, 30))
+    img = Image.new('RGB', (width, height), (15, 35, 60))
     draw = ImageDraw.Draw(img)
 
-    # Draw gradient (optional)
-    for i in range(height):
-        ratio = i / height
-        r = int(20 * (1 - ratio) + 40 * ratio)
-        g = int(20 * (1 - ratio) + 35 * ratio)
-        b = int(30 * (1 - ratio) + 45 * ratio)
-        draw.rectangle([(0, i), (width, i+1)], fill=(r, g, b))
+    y = top_margin
+    if poet_name:
+        draw.text((x_center, y), poet_name, font=poet_font, fill=(212, 175, 55), anchor='mt')
+        y += 45
 
-    # Reset Y for drawing
-    y = 200
+    logging.info(f"Drawing {len(verses)} verses")
+    for v in verses:
+        m1 = reshape_urdu(v.get('misra1_urdu', ''))
+        m2 = reshape_urdu(v.get('misra2_urdu', ''))
+        if m1:
+            draw.text((x_center, y), m1, font=urdu_font, fill=(255, 255, 255), anchor='mt')
+            y += line_spacing
+        if m2:
+            draw.text((x_center, y), m2, font=urdu_font, fill=(255, 255, 255), anchor='mt')
+            y += line_spacing
+        y += verse_spacing
 
-    # Draw each line
-    for text, font, color in lines:
-        if not text:
-            y += verse_spacing
-            continue
-        # Get text width for centering
-        bbox = font.getbbox(text) if hasattr(font, 'getbbox') else (0, 0, 0, font.getsize(text)[1])
-        text_width = bbox[2] - bbox[0] if len(bbox) > 2 else font.getsize(text)[0]
-        x = (width - text_width) // 2
-        draw.text((x, y), text, font=font, fill=color)
-        # Advance Y
-        line_height = bbox[3] - bbox[1] if len(bbox) > 3 else font.getsize(text)[1]
-        y += line_height + line_spacing
+    if dedicator:
+        draw.text((30, height-70), f"from : {dedicator}", font=dedication_font, fill=(212, 175, 55))
+    if dedicatee:
+        draw.text((30, height-40), f"dedicated to : {dedicatee}", font=dedication_font, fill=(255, 255, 255))
 
-    # Watermark
-    watermark = "UCPC Poetry Archive • Preserving Urdu Poetry"
-    draw.text((width // 2, height - 60), watermark, fill=(150, 150, 150), anchor='mt', font=ImageFont.load_default())
-
+    watermark = "UCPC Archive • Preserving Urdu Poetry"
+    draw.text((x_center, height-20), watermark, font=dedication_font, fill=(212, 175, 55, 180), anchor='mb')
     return img
