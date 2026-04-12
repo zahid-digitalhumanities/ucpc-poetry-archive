@@ -247,9 +247,11 @@
             .then(response => response.json())
             .then(data => {
                 let options = '<option value="">-- Not associated with a book --</option>';
-                data.books.forEach(book => {
-                    options += `<option value="${book.id}">${book.name_urdu || book.name}</option>`;
-                });
+                if (data.books && data.books.length) {
+                    data.books.forEach(book => {
+                        options += `<option value="${book.id}">${book.name_urdu || book.name}</option>`;
+                    });
+                }
                 bookSelect.innerHTML = options;
             })
             .catch(err => console.error('Error loading books:', err));
