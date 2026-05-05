@@ -1,39 +1,32 @@
-# UCPC Poetry Archive
-
-A research‑grade digital archive for Urdu poetry with bilingual content, advanced search, voice input, and bulk upload. Built with Flask, PostgreSQL, and deployed on Render.
-
----
-
-## 🌟 Features
-
-- **Bilingual Display** – Every ghazal/nazm has Urdu and English titles and verses.
-- **Advanced Search** – Supports Urdu, Roman Urdu, and English queries with fuzzy matching and autocomplete suggestions.
-- **Voice Search** – Use your microphone to speak a query (browser‑based SpeechRecognition).
-- **Bulk Upload** – Upload multiple ghazals via text files, ZIP archives, or PDFs; automatic parsing and duplicate detection.
-- **Contributor Tracking** – Credit users who add ghazals (optional name/email).
-- **Book Linking** – Associate ghazals with books by poet.
-- **Responsive UI** – Tailwind CSS, custom Urdu font (Jameel Noori Nastaleeq).
-
----
-
-## 🛠️ Technology Stack
-
-| Layer       | Technology                          |
-|-------------|-------------------------------------|
-| Backend     | Python 3, Flask                     |
-| Database    | PostgreSQL (Render or local)        |
-| Frontend    | HTML5, Tailwind CSS, JavaScript     |
-| Search      | PostgreSQL `pg_trgm` (fuzzy) + `ILIKE` |
-| Translation | `deep-translator` (Google) + fallback dictionary |
-| Roman‑Urdu  | Custom mapping engine               |
-| Hosting     | Render                              |
-
----
-
-## 🚀 Quick Start (Local Development)
-
-### 1. Clone the repository
-
-```bash
-git clone https://github.com/zahid-digitalhumanities/ucpc-poetry-archive.git
-cd ucpc-poetry-archive
+ucpc-poetry-archive/
+├── app.py
+├── requirements.txt
+├── .gitignore
+├── README.md
+├── models/
+│   ├── base.py, ghazal_model.py, ingest_pipeline.py, ...
+│   ├── ai_engine/
+│   │   ├── poet_prediction_ai.py
+│   │   └── similarity_model.py
+│   └── ml/
+│       ├── poet_classifier_v7.pkl
+│       └── train_poet_classifier_v7.py
+├── modules/
+│   ├── embeddings.py
+│   ├── radif_qaafiya.py
+│   ├── meter.py, theme.py, ai_tools.py, image_generator.py
+├── routes/
+│   ├── ingest_routes.py
+│   ├── ai_routes.py
+│   ├── ask_ucpc_index.py
+│   └── ...
+├── static/
+│   ├── css/, js/, fonts/, images/
+├── templates/
+│   ├── base.html, index.html, view.html
+│   ├── ghazal_ingest.html, ask_ucpc.html
+│   └── ...
+└── scripts/
+    ├── export_training_data.py
+    ├── train_poet_classifier_v7.py
+    └── ... (utility scripts)
