@@ -1,172 +1,283 @@
 {% extends "base.html" %}
 
+{% block title %}UCPC – Computational Urdu Poetry Lab{% endblock %}
+
 {% block extra_css %}
 <style>
-    .poet-card {
-        background: white;
-        overflow: hidden;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-        border: 1px solid rgba(212,175,55,0.2);
+/* ===== Layout ===== */
+.dashboard {
+    max-width: 1200px;
+    margin: 1.5rem auto;
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 20px;
+}
+
+/* ===== Header ===== */
+.lab-header {
+    text-align: center;
+    margin-bottom: 1rem;
+}
+.lab-title {
+    font-size: 1.6rem;
+    font-weight: bold;
+    color: #1e3c72;
+}
+.lab-sub {
+    font-size: 0.85rem;
+    color: #777;
+}
+
+/* ===== Card ===== */
+.card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 18px;
+    border: 1px solid #eee;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.04);
+}
+
+/* ===== Workflow ===== */
+.workflow {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    margin-bottom: 10px;
+    color: #555;
+}
+
+/* ===== Ghazal Input ===== */
+textarea {
+    width: 100%;
+    min-height: 260px;
+    padding: 12px;
+    border-radius: 12px;
+    border: 1px solid #ddd;
+    font-family: 'Jameel Noori Nastaleeq','Noto Nastaliq Urdu', serif;
+    direction: rtl;
+    line-height: 2;
+}
+
+/* ===== Buttons ===== */
+.analyze-btn {
+    width: 100%;
+    margin-top: 10px;
+    padding: 10px;
+    border-radius: 30px;
+    background: linear-gradient(135deg,#1e3c72,#2c5a8c);
+    color: white;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+}
+.analyze-btn:hover {
+    background: #D4AF37;
+    color:#1e3c72;
+}
+
+/* ===== Tabs ===== */
+.tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+.tab {
+    padding: 6px 14px;
+    border-radius: 20px;
+    background: #eee;
+    cursor: pointer;
+    font-size: 0.8rem;
+}
+.tab.active {
+    background: #D4AF37;
+    color: #1e3c72;
+}
+
+/* ===== Result Box ===== */
+.result-box {
+    background: #f9fafb;
+    border-radius: 12px;
+    padding: 12px;
+    margin-bottom: 10px;
+    font-size: 0.9rem;
+    min-height: 200px;
+}
+
+/* ===== Highlight ===== */
+.highlight {
+    color: #D4AF37;
+    font-weight: bold;
+}
+
+/* ===== Similar list ===== */
+.similar-item {
+    padding: 6px 0;
+    border-bottom: 1px solid #eee;
+}
+
+/* ===== Responsive ===== */
+@media(max-width:900px){
+    .dashboard{
+        grid-template-columns:1fr;
     }
-    .poet-card:hover {
-        transform: translateY(-6px);
-        box-shadow: 0 20px 35px rgba(0,0,0,0.1);
-    }
-    .poet-image {
-        height: 220px;
-        background: #f3f4f6;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        overflow: hidden;
-    }
-    .poet-image img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
-    .poet-name {
-        font-weight: 700;
-        font-size: 1.25rem;
-        color: #1e3c72;
-        text-align: center;
-        padding: 0.75rem 1rem 0;
-    }
-    .poet-name-urdu {
-        font-family: 'Jameel Noori Nastaleeq', 'Noto Nastaliq Urdu', serif;
-        font-size: 1.1rem;
-        color: #8b5a2b;
-        text-align: center;
-        margin-top: -0.25rem;
-        margin-bottom: 0.5rem;
-    }
-    .poet-couplet {
-        font-family: 'Jameel Noori Nastaleeq', 'Noto Nastaliq Urdu', serif;
-        font-size: 0.95rem;
-        line-height: 1.8;
-        text-align: center;
-        direction: rtl;
-        padding: 0 1rem 1.25rem;
-        color: #4b5563;
-        border-top: 1px solid #f0e6d2;
-        margin-top: 0.5rem;
-        min-height: 80px;
-    }
-    @media (max-width: 768px) {
-        .poet-image { height: 180px; }
-        .poet-name { font-size: 1rem; }
-        .poet-couplet { font-size: 0.85rem; }
-    }
-    .feature-card { background: #f9fafb; border-radius: 1rem; padding: 1.5rem; text-align: center; transition: 0.2s; }
-    .feature-icon { font-size: 2rem; color: #D4AF37; margin-bottom: 0.75rem; }
-    .feature-title { font-weight: bold; margin-bottom: 0.5rem; }
-    .feature-desc { font-size: 0.85rem; color: #6b7280; margin-bottom: 1rem; }
-    .feature-btn { background: #1e3c72; color: white; padding: 0.5rem 1rem; border-radius: 2rem; text-decoration: none; font-size: 0.8rem; }
-    .ghazal-mini-card { background: white; border-radius: 1rem; padding: 1rem; margin-bottom: 0.5rem; border: 1px solid #e5e7eb; transition: 0.2s; }
-    .ghazal-mini-card:hover { background: #fef9e6; }
-    .thanks-section { background: #fef9e6; border-radius: 1.5rem; padding: 1.5rem; margin-top: 2rem; }
-    .text-gold { color: #D4AF37; }
-    .urdu-text { font-family: 'Jameel Noori Nastaleeq', serif; direction: rtl; }
+}
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="max-w-7xl mx-auto">
-    <!-- Poets Grid -->
-    <div class="mb-16">
-        <h2 class="text-2xl md:text-3xl font-bold text-[#1e3c72] mb-8 flex items-center gap-3">
-            <i class="fas fa-feather-alt text-gold"></i>
-            Featured Poets
-        </h2>
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {% for poet in poets %}
-            <a href="{{ url_for('poets.poet_detail', poet_id=poet.id) }}" class="block poet-card group">
-                <div class="poet-image">
-                    {% if poet.image_filename %}
-                        <img src="{{ url_for('static', filename='images/poets/' + poet.image_filename) }}" alt="{{ poet.name }}" loading="lazy">
-                    {% else %}
-                        <div class="w-full h-full bg-gradient-to-br from-amber-50 to-amber-100 flex items-center justify-center">
-                            <i class="fas fa-feather-alt text-4xl text-amber-300"></i>
-                        </div>
-                    {% endif %}
-                </div>
-                <div class="poet-name">{{ poet.name }}</div>
-                {% if poet.name_urdu %}
-                <div class="poet-name-urdu">{{ poet.name_urdu }}</div>
-                {% endif %}
-                <div class="poet-couplet">
-                    {{ poet.display_couplet|safe if poet.display_couplet else '✨' }}
-                </div>
-            </a>
-            {% endfor %}
-        </div>
-    </div>
 
-    <!-- Action Cards -->
-    <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
-        <div class="feature-card">
-            <div class="feature-icon"><i class="fas fa-plus-circle"></i></div>
-            <div class="feature-title">Add Ghazal</div>
-            <div class="feature-desc">Contribute your own ghazal to the archive.</div>
-            <a href="/ghazals/add" class="feature-btn">Contribute →</a>
-        </div>
-        <div class="feature-card">
-            <div class="feature-icon"><i class="fas fa-microphone-alt"></i></div>
-            <div class="feature-title">Voice Search</div>
-            <div class="feature-desc">Search by speaking – AI‑powered.</div>
-            <a href="/search" class="feature-btn">Search Now →</a>
-        </div>
-        <div class="feature-card">
-            <div class="feature-icon"><i class="fas fa-upload"></i></div>
-            <div class="feature-title">Bulk Upload</div>
-            <div class="feature-desc">Upload multiple ghazals at once.</div>
-            <a href="/bulk" class="feature-btn">Bulk Upload →</a>
-        </div>
-        <div class="feature-card">
-            <div class="feature-icon"><i class="fas fa-book-open"></i></div>
-            <div class="feature-title">Random Ghazal</div>
-            <div class="feature-desc">Discover a random poem from our corpus.</div>
-            <a href="/random" class="feature-btn">Surprise Me →</a>
-        </div>
-    </div>
-
-    <!-- Recent Ghazals -->
-    <div class="recent-ghazals">
-        <h2 class="text-2xl font-bold text-[#1e3c72] mb-6 flex items-center gap-2">
-            <i class="fas fa-clock text-gold"></i> Recently Added
-        </h2>
-        <div class="space-y-4">
-            {% for ghazal in recent_ghazals %}
-            <a href="/ghazals/view/{{ ghazal.id }}" class="ghazal-mini-card block">
-                <div class="flex justify-between items-center flex-wrap gap-2">
-                    <div>
-                        <div class="font-bold text-lg">{{ ghazal.title_english or 'Untitled' }}</div>
-                        <div class="urdu-text text-md">{{ ghazal.title_urdu or '' }}</div>
-                    </div>
-                    <div class="text-sm text-gray-500">
-                        <i class="fas fa-user"></i> {{ ghazal.poet_name }}
-                    </div>
-                </div>
-            </a>
-            {% else %}
-            <p class="text-gray-500">No recent ghazals yet.</p>
-            {% endfor %}
-        </div>
-    </div>
-
-    <!-- Thanks Section -->
-    <div class="thanks-section">
-        <div class="flex flex-wrap items-center justify-between gap-4">
-            <div class="flex items-center gap-3">
-                <i class="fas fa-star-of-life fa-2x text-gold"></i>
-                <div class="thanks-text">
-                    Special Thanks to <span class="thanks-name">Dr. Muhammad Riaz (establishment Punjab SPU Lahore)</span>,
-                    for his invaluable inspiration and guidance.
-                </div>
-            </div>
-            <i class="fas fa-hand-sparkles fa-2x text-gray-400 opacity-70"></i>
-        </div>
+<div class="lab-header">
+    <div class="lab-title">🧠 UCPC – Computational Urdu Poetry Lab</div>
+    <div class="lab-sub">
+        Analyze ghazals using AI, NLP & Computational Philology
     </div>
 </div>
+
+<div class="dashboard">
+
+    <!-- LEFT PANEL -->
+    <div class="card">
+        <div class="workflow">
+            <span>① Paste Ghazal</span>
+            <span>② Click Analyze</span>
+            <span>③ Explore Results</span>
+        </div>
+        <textarea id="ghazalInput" placeholder="یہاں غزل پیسٹ کریں..."></textarea>
+        <button onclick="analyze()" class="analyze-btn">🔍 Analyze Ghazal</button>
+    </div>
+
+    <!-- RIGHT PANEL -->
+    <div class="card">
+        <div class="tabs">
+            <div class="tab active" onclick="showTab('poet')">Poet</div>
+            <div class="tab" onclick="showTab('theme')">Theme</div>
+            <div class="tab" onclick="showTab('similar')">Similar</div>
+            <div class="tab" onclick="showTab('radif')">Radif/Qaafiya</div>
+        </div>
+
+        <div id="poet" class="tab-content result-box">Awaiting analysis...</div>
+        <div id="theme" class="tab-content result-box" style="display:none;"></div>
+        <div id="similar" class="tab-content result-box" style="display:none;"></div>
+        <div id="radif" class="tab-content result-box" style="display:none;"></div>
+    </div>
+</div>
+
+<script>
+function showTab(tabName) {
+    // Update active tab styling
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    event.target.classList.add('active');
+    // Hide all tab contents
+    document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
+    // Show selected
+    document.getElementById(tabName).style.display = 'block';
+}
+
+async function analyze() {
+    const text = document.getElementById('ghazalInput').value.trim();
+    if (!text) {
+        alert("Please paste a ghazal first.");
+        return;
+    }
+
+    // Show loading in all tabs
+    document.getElementById('poet').innerHTML = "Analyzing poet...";
+    document.getElementById('theme').innerHTML = "Analyzing theme...";
+    document.getElementById('similar').innerHTML = "Finding similar ghazals...";
+    document.getElementById('radif').innerHTML = "Extracting radif/qaafiya...";
+
+    // 1. Poet prediction
+    try {
+        const poetRes = await fetch('/ask-index/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ text: text, question: "poet name" })
+        });
+        const poetData = await poetRes.json();
+        if (poetData.type === 'poet' && poetData.data.length) {
+            let html = "<b>📜 Predicted Poet(s):</b><br>";
+            poetData.data.forEach(p => {
+                const name = p.poet_name_urdu ? `${p.poet_name} (${p.poet_name_urdu})` : p.poet_name;
+                html += `<div>${name} – ${(p.confidence * 100).toFixed(1)}% confidence</div>`;
+            });
+            document.getElementById('poet').innerHTML = html;
+        } else {
+            document.getElementById('poet').innerHTML = "Could not predict poet.";
+        }
+    } catch(e) {
+        document.getElementById('poet').innerHTML = "Error predicting poet.";
+        console.error(e);
+    }
+
+    // 2. Theme detection
+    try {
+        const themeRes = await fetch('/ask-index/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ text: text, question: "theme" })
+        });
+        const themeData = await themeRes.json();
+        if (themeData.type === 'theme') {
+            document.getElementById('theme').innerHTML = `
+                <b>🎭 Theme:</b> ${themeData.data.theme}<br>
+                <b>Reason:</b> ${themeData.data.reason}
+            `;
+        } else {
+            document.getElementById('theme').innerHTML = "Could not determine theme.";
+        }
+    } catch(e) {
+        document.getElementById('theme').innerHTML = "Error detecting theme.";
+        console.error(e);
+    }
+
+    // 3. Similar ghazals (semantic search)
+    try {
+        const similarRes = await fetch('/ask-index/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ text: text, question: "similar ghazals" })
+        });
+        const similarData = await similarRes.json();
+        if (similarData.type === 'search' && similarData.data.length) {
+            let html = "<b>🔗 Similar Ghazals:</b><br>";
+            similarData.data.forEach(s => {
+                html += `<div class="similar-item">
+                    <a href="/ghazals/view/${s.text_id}" target="_blank">${s.title}</a> – ${s.poet}
+                    <span class="highlight">(${(s.score * 100).toFixed(1)}% similarity)</span>
+                </div>`;
+            });
+            document.getElementById('similar').innerHTML = html;
+        } else {
+            document.getElementById('similar').innerHTML = "No similar ghazals found.";
+        }
+    } catch(e) {
+        document.getElementById('similar').innerHTML = "Error finding similar ghazals.";
+        console.error(e);
+    }
+
+    // 4. Radif / Qaafiya extraction
+    try {
+        const radifRes = await fetch('/ask-index/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ text: text, question: "radif qaafiya" })
+        });
+        const radifData = await radifRes.json();
+        if (radifData.type === 'radif') {
+            const qaafiyaList = radifData.data.qaafiya || [];
+            document.getElementById('radif').innerHTML = `
+                <b>📐 Radif:</b> ${radifData.data.radif || 'Not detected'}<br>
+                <b>Qaafiya:</b> ${qaafiyaList.join(', ') || 'Not detected'}<br>
+                <b>Confidence:</b> ${(radifData.data.confidence * 100).toFixed(1)}%
+            `;
+        } else {
+            document.getElementById('radif').innerHTML = "Could not extract radif/qaafiya.";
+        }
+    } catch(e) {
+        document.getElementById('radif').innerHTML = "Error extracting radif/qaafiya.";
+        console.error(e);
+    }
+}
+</script>
+
 {% endblock %}

@@ -2,177 +2,173 @@
 
 {% block extra_head %}
 <meta property="og:title" content="{{ ghazal.poet_name }} - {{ ghazal.title_urdu or ghazal.title_english }}">
-<meta property="og:description" content="{% if verses %}{{ verses[0].misra1_urdu }} {{ verses[0].misra2_urdu }}{% else %}Read this ghazal by {{ ghazal.poet_name }} at UCPC Poetry Archive.{% endif %}">
+<meta property="og:description" content="{% if verses %}{{ verses[0].misra1_urdu }} {{ verses[0].misra2_urdu }}{% endif %}">
 <meta property="og:image" content="{{ url_for('og_image', text_id=ghazal.id, _external=true) }}">
-<meta property="og:image:width" content="600">
-<meta property="og:image:height" content="800">
 <meta property="og:type" content="article">
 <meta property="og:url" content="{{ request.url }}">
 <meta property="og:site_name" content="UCPC Poetry Archive">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="{{ ghazal.poet_name }} - Ghazal">
-<meta name="twitter:description" content="{% if verses %}{{ verses[0].misra1_urdu }} {{ verses[0].misra2_urdu }}{% endif %}">
-<meta name="twitter:image" content="{{ url_for('og_image', text_id=ghazal.id, _external=true) }}">
 {% endblock %}
 
-{% block title %}{{ ghazal.poet_name }} - Ghazal - UCPC Poetry{% endblock %}
+{% block title %}{{ ghazal.poet_name }} - UCPC Poetry{% endblock %}
 
 {% block extra_css %}
 <style>
-    canvas { display: none; }
-    body, .view-container { background: #0a1a2a !important; }
-    .ghazal-hero { background: transparent; padding: 1.5rem 1rem 0.5rem; text-align: center; margin-bottom: 0; }
-    .poet-name-en { font-size: 1.8rem; letter-spacing: 3px; color: #D4AF37 !important; text-transform: uppercase; font-weight: 700; font-family: 'Georgia', serif; }
-    .hero-metadata { font-size: 0.8rem; color: #D4AF37; margin-top: 0.25rem; opacity: 0.8; }
-    .ghazal-card { background: linear-gradient(135deg, #0F2B3D, #1E3C72) !important; border: 1px solid rgba(212,175,55,0.3); border-radius: 1.5rem; padding: 1.5rem 1rem; margin-bottom: 1.5rem; max-width: 800px; margin-left: auto; margin-right: auto; box-shadow: 0 8px 20px rgba(0,0,0,0.3); }
-    .urdu-couplet { font-family: 'Jameel Noori Nastaleeq', 'Noto Nastaliq Urdu', serif; font-size: 1.5rem; line-height: 2.3rem; direction: rtl; color: #ffffff !important; text-align: center; margin-bottom: 1.5rem; padding-bottom: 0.8rem; border-bottom: 1px solid rgba(212,175,55,0.3); }
-    .urdu-couplet div { color: #ffffff !important; }
-    .urdu-couplet:last-child { border-bottom: none; margin-bottom: 0; }
-    .dedication-top { max-width: 800px; margin: 1rem auto 1.5rem; background: rgba(0,0,0,0.4); border-radius: 1rem; padding: 1rem; text-align: center; border: 1px solid rgba(212,175,55,0.3); }
-    .dedication-label { font-size: 0.9rem; color: #D4AF37; margin-bottom: 0.8rem; font-weight: 500; }
-    .dedication-form-top { display: flex; flex-wrap: wrap; gap: 0.8rem; justify-content: center; align-items: center; }
-    .dedication-form-top input { padding: 0.5rem 1rem; border: 1px solid #D4AF37; border-radius: 2rem; font-size: 0.9rem; width: 180px; background: rgba(0,0,0,0.5); color: white; }
-    .dedication-form-top input::placeholder { color: rgba(255,255,255,0.6); }
-    .dedication-form-top button { background: #D4AF37; border: none; padding: 0.5rem 1.2rem; border-radius: 2rem; font-weight: bold; cursor: pointer; color: #1e3c72; }
-    .dedication-display-top { margin-top: 0.8rem; font-size: 1rem; color: #D4AF37; font-style: italic; background: rgba(212,175,55,0.15); padding: 0.5rem; border-radius: 2rem; }
-    .watermark { text-align: center; font-size: 0.7rem; color: rgba(212,175,55,0.6); margin-top: 1rem; padding-top: 0.5rem; border-top: 1px solid rgba(212,175,55,0.2); font-family: 'Georgia', serif; }
-    .share-buttons { display: flex; justify-content: center; gap: 0.8rem; margin-top: 1rem; flex-wrap: wrap; }
-    .share-btn { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.4rem 1rem; border-radius: 2rem; text-decoration: none; font-weight: 600; font-size: 0.85rem; transition: 0.2s; color: white; cursor: pointer; }
-    .share-btn i { font-size: 1rem; }
-    .share-btn-facebook { background: #1877f2; }
-    .share-btn-linkedin { background: #0077b5; }
-    .share-btn-whatsapp { background: #25d366; }
-    .share-btn-x { background: #000000; }
-    .share-btn-x:hover { background: #1da1f2; }
-    .share-btn:hover { transform: translateY(-2px); filter: brightness(1.05); }
-    .share-btn.disabled { opacity: 0.5; pointer-events: none; }
-    .nav-buttons { display: flex; justify-content: center; gap: 1rem; margin: 2rem 0; flex-wrap: wrap; }
-    .nav-btn { padding: 0.6rem 1.5rem; border-radius: 2rem; text-decoration: none; font-weight: 600; }
-    .nav-btn-prev, .nav-btn-next { background: #D4AF37; color: #1e3c72; }
-    .nav-btn-all { background: rgba(255,255,255,0.15); color: #D4AF37; border: 1px solid #D4AF37; }
-    @media (max-width: 768px) {
-        .urdu-couplet { font-size: 1.2rem; line-height: 1.9rem; }
-        .poet-name-en { font-size: 1.2rem; }
-        .dedication-form-top input { width: 140px; font-size: 0.8rem; }
-    }
+body, .view-container { background: #0a1a2a !important; }
+
+.poet-name-en {
+    font-size: 1.8rem;
+    letter-spacing: 3px;
+    color: #D4AF37;
+    text-align:center;
+    font-weight:700;
+}
+
+.urdu-couplet {
+    font-family: 'Noto Nastaliq Urdu', serif;
+    font-size: 1.5rem;
+    direction: rtl;
+    text-align: center;
+    color: white;
+    margin-bottom: 1rem;
+}
+
+.ghazal-card {
+    background: linear-gradient(135deg, #0F2B3D, #1E3C72);
+    border-radius: 1.5rem;
+    padding: 1.5rem;
+    max-width: 800px;
+    margin: auto;
+}
+
+.ask-box {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 1rem;
+    background: rgba(0,0,0,0.3);
+    border-radius: 1rem;
+}
+
+.ask-box h3 {
+    font-weight: bold;
+    color: #D4AF37;
+}
+
+.ask-input-group {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.ask-input {
+    flex: 1;
+    padding: 0.5rem;
+    border-radius: 2rem;
+    border: 1px solid #D4AF37;
+    background: #1e2a3a;
+    color: white;
+}
+
+.ask-btn {
+    padding: 0.5rem 1rem;
+    border-radius: 2rem;
+    border: 1px solid #D4AF37;
+    color: #D4AF37;
+    background: transparent;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.ask-btn:hover {
+    background: #D4AF37;
+    color: #0a1a2a;
+}
+
+.answer-box {
+    margin-top: 1rem;
+    padding: 0.5rem;
+    background: rgba(0,0,0,0.4);
+    border-radius: 0.5rem;
+    display: none;
+    color: white;
+}
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="view-container">
-    <div class="ghazal-hero">
-        <div class="poet-name-en">{{ ghazal.poet_name | upper }}</div>
-        <div class="hero-metadata"><span><i class="fas fa-book"></i> {{ verses|length }} verses</span></div>
+    <!-- POET HEADER -->
+    <div class="poet-name-en">
+        {{ ghazal.poet_name | upper }}
     </div>
 
-    <div class="dedication-top">
-        <div class="dedication-label">💖 Dedicate this ghazal to your loved ones 💖</div>
-        <div class="dedication-form-top">
-            <input type="text" id="fromNameTop" placeholder="from : Your Name">
-            <input type="text" id="toNameTop" placeholder="to : Receiver Name">
-            <button id="setDedicationTopBtn">Set Dedication</button>
+    <div class="ghazal-card">
+        {% for verse in verses %}
+        <div class="urdu-couplet">
+            <div>{{ verse.misra1_urdu }}</div>
+            <div>{{ verse.misra2_urdu }}</div>
         </div>
-        <div id="dedicationDisplayTop" class="dedication-display-top" style="display: none;"></div>
+        {% endfor %}
     </div>
 
-    <div class="content-wrapper">
-        <div class="ghazal-card" id="ghazalCard">
-            {% for verse in verses %}
-            <div class="urdu-couplet"><div>{{ verse.misra1_urdu }}</div><div>{{ verse.misra2_urdu }}</div></div>
-            {% endfor %}
-            <div class="watermark">UCPC Archive • Preserving Urdu Poetry</div>
-            <div class="share-buttons">
-                <a href="#" id="fbShareBtn" class="share-btn share-btn-facebook"><i class="fab fa-facebook-f"></i> Facebook</a>
-                <a href="#" id="linkedinShareBtn" class="share-btn share-btn-linkedin"><i class="fab fa-linkedin-in"></i> LinkedIn</a>
-                <a href="#" id="whatsappShareBtn" class="share-btn share-btn-whatsapp"><i class="fab fa-whatsapp"></i> WhatsApp</a>
-                <a href="#" id="xShareBtn" class="share-btn share-btn-x"><i class="fab fa-twitter"></i> X</a>
-            </div>
+    <!-- Unified Ask UCPC Interface -->
+    <div class="ask-box">
+        <h3>💬 Ask UCPC</h3>
+        <div class="ask-input-group">
+            <input type="text" id="questionInput" class="ask-input" placeholder="e.g., Who is the poet? / Similar ghazals? / What is the theme?" />
+            <button onclick="askUCPC()" class="ask-btn">Ask</button>
         </div>
-        <div class="nav-buttons">
-            {% if prev_id %}<a href="/ghazals/view/{{ prev_id }}" class="nav-btn nav-btn-prev"><i class="fas fa-chevron-left"></i> Previous</a>{% endif %}
-            <a href="/poet/{{ ghazal.poet_id }}" class="nav-btn nav-btn-all"><i class="fas fa-list"></i> All Poems</a>
-            {% if next_id %}<a href="/ghazals/view/{{ next_id }}" class="nav-btn nav-btn-next">Next <i class="fas fa-chevron-right"></i></a>{% endif %}
-        </div>
+        <div id="answerBox" class="answer-box"></div>
     </div>
 </div>
 
 <script>
-    const fromInput = document.getElementById('fromNameTop');
-    const toInput = document.getElementById('toNameTop');
-    const setBtn = document.getElementById('setDedicationTopBtn');
-    const dedicationDisplay = document.getElementById('dedicationDisplayTop');
-    const shareButtons = document.querySelectorAll('.share-btn');
+async function askUCPC() {
+    const question = document.getElementById("questionInput").value;
+    const text_id = {{ ghazal.id }};
+    const answerDiv = document.getElementById("answerBox");
+    if (!question.trim()) {
+        answerDiv.style.display = "block";
+        answerDiv.innerHTML = "⚠️ Please enter a question.";
+        return;
+    }
+    answerDiv.style.display = "block";
+    answerDiv.innerHTML = "🤔 Thinking...";
 
-    function disableShareButtons(disabled) {
-        shareButtons.forEach(btn => {
-            if (disabled) btn.classList.add('disabled');
-            else btn.classList.remove('disabled');
+    try {
+        const response = await fetch("/ask/", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ question: question, text_id: text_id })
         });
+        const data = await response.json();
+
+        let html = "";
+        if (data.type === "poet_prediction") {
+            html = "<strong>📜 Predicted Poet(s):</strong><br>";
+            data.data.forEach(p => {
+                const name = p.poet_name_urdu ? `${p.poet_name} (${p.poet_name_urdu})` : p.poet_name;
+                html += `• ${name} – ${(p.confidence * 100).toFixed(1)}% confidence<br>`;
+            });
+        }
+        else if (data.type === "similar") {
+            html = "<strong>🔗 Similar Ghazals:</strong><br>";
+            data.data.forEach(s => {
+                html += `• “${s.title_urdu}” by ${s.poet_name} (${(s.similarity * 100).toFixed(1)}% similarity)<br>`;
+            });
+        }
+        else if (data.type === "theme") {
+            html = `<strong>🎭 Theme:</strong> ${data.data.theme}<br>`;
+            html += `<strong>📖 Reason:</strong> ${data.data.reason}`;
+        }
+        else {
+            html = data.data;
+        }
+        answerDiv.innerHTML = html;
+    } catch (err) {
+        answerDiv.innerHTML = "❌ Error: Could not process your request.";
+        console.error(err);
     }
-    disableShareButtons(true);
-
-    setBtn.addEventListener('click', () => {
-        const from = fromInput.value.trim();
-        const to = toInput.value.trim();
-        if (from || to) {
-            let displayText = '';
-            if (from && to) displayText = `<i class="fas fa-heart"></i> This ghazal dedicated from ${from} to : ${to} <i class="fas fa-heart"></i>`;
-            else if (from) displayText = `<i class="fas fa-heart"></i> This ghazal dedicated from ${from} <i class="fas fa-heart"></i>`;
-            else if (to) displayText = `<i class="fas fa-heart"></i> This ghazal dedicated to : ${to} <i class="fas fa-heart"></i>`;
-            dedicationDisplay.innerHTML = displayText;
-            dedicationDisplay.style.display = 'block';
-            disableShareButtons(false);
-        } else {
-            alert('Please enter at least one name (from or to) to enable sharing.');
-            disableShareButtons(true);
-        }
-    });
-
-    // ========== NEW TEXT-BASED SHARING ==========
-    async function shareWithDedication(platform) {
-        const from = fromInput.value.trim();
-        const to = toInput.value.trim();
-
-        if (!from && !to) {
-            alert('Please set dedication first');
-            return;
-        }
-
-        const textUrl = `/share_text/{{ ghazal.id }}?dedicator=${encodeURIComponent(from)}&dedicatee=${encodeURIComponent(to)}`;
-
-        try {
-            const res = await fetch(textUrl);
-            const text = await res.text();
-
-            let shareUrl = '';
-
-            if (platform === 'facebook') {
-                shareUrl = `https://www.facebook.com/sharer/sharer.php?quote=${encodeURIComponent(text)}`;
-            }
-            else if (platform === 'whatsapp') {
-                shareUrl = `https://wa.me/?text=${encodeURIComponent(text)}`;
-            }
-            else if (platform === 'x') {
-                shareUrl = `https://x.com/intent/post?text=${encodeURIComponent(text)}`;
-            }
-            else if (platform === 'linkedin') {
-                shareUrl = `https://www.linkedin.com/feed/?shareActive=true&text=${encodeURIComponent(text)}`;
-            }
-
-            if (shareUrl) window.open(shareUrl, '_blank');
-
-        } catch (err) {
-            console.error(err);
-            alert('Sharing failed. Please try again.');
-        }
-    }
-
-    // Attach event listeners (existing ones replaced)
-    document.getElementById('fbShareBtn').addEventListener('click', (e) => { e.preventDefault(); shareWithDedication('facebook'); });
-    document.getElementById('linkedinShareBtn').addEventListener('click', (e) => { e.preventDefault(); shareWithDedication('linkedin'); });
-    document.getElementById('whatsappShareBtn').addEventListener('click', (e) => { e.preventDefault(); shareWithDedication('whatsapp'); });
-    document.getElementById('xShareBtn').addEventListener('click', (e) => { e.preventDefault(); shareWithDedication('x'); });
+}
 </script>
-
-<canvas id="ghazalCanvas" width="600" height="800" style="display:none;"></canvas>
 {% endblock %}

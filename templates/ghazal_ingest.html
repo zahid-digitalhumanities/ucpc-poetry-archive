@@ -1,0 +1,333 @@
+{% extends "base.html" %}
+
+{% block title %}Ghazal Ingestion | UCPC{% endblock %}
+
+{% block extra_css %}
+<style>
+    .tab-btn { cursor: pointer; transition: all 0.2s; padding: 8px 20px; border-radius: 40px; }
+    .tab-btn.active { background: var(--gold); color: #1E3C72; }
+
+    .form-card {
+        background: white;
+        border-radius: 20px;
+        padding: 20px;
+        margin-bottom: 20px;
+        border: 1px solid #eef2f6;
+    }
+
+    .urdu-text {
+        font-family: 'Noto Nastaliq Urdu', 'Jameel Noori Nastaleeq', serif;
+        direction: rtl;
+        line-height: 2;
+    }
+
+    .btn-submit {
+        background: linear-gradient(135deg, #1e3c72, #2c5a8c);
+        color: white;
+        padding: 12px;
+        border-radius: 50px;
+        font-weight: 600;
+        width: 100%;
+        border: none;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+    .btn-submit:hover {
+        background: var(--gold);
+        color: #1E3C72;
+    }
+
+    .btn-secondary {
+        background: #6c757d;
+        color: white;
+        padding: 12px;
+        border-radius: 50px;
+        font-weight: 600;
+        width: 100%;
+        border: none;
+        cursor: pointer;
+        transition: 0.2s;
+        margin-top: 10px;
+    }
+
+    .btn-secondary:hover {
+        background: #5a6268;
+    }
+
+    .bulk-hint {
+        background: #fef9e6;
+        border-left: 4px solid var(--gold);
+        padding: 12px;
+        font-size: 0.85rem;
+        margin-top: 12px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+        font-size: 0.85rem;
+    }
+
+    th, td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+        vertical-align: top;
+    }
+
+    th {
+        background: #f9f9f9;
+    }
+
+    .duplicate-row {
+        background: #fff3cd;
+    }
+
+    .invalid-row {
+        background: #f8d7da;
+    }
+
+    .ready-row {
+        background: #e6fffa;
+    }
+
+    .button-group {
+        display: flex;
+        gap: 10px;
+        margin-top: 10px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="max-w-5xl mx-auto mt-6 px-4">
+
+    <h2 class="text-center text-2xl font-bold text-yellow-600">
+        📥 UCPC Ghazal Ingestion (Scalable Mode)
+    </h2>
+
+    <!-- Tabs -->
+    <div class="flex justify-center gap-4 my-6">
+        <button onclick="showTab('single')" id="singleTabBtn" class="tab-btn active">Single</button>
+        <button onclick="showTab('bulk')" id="bulkTabBtn" class="tab-btn">Bulk</button>
+    </div>
+
+    <!-- ================= SINGLE TAB ================= -->
+    <div id="singleTab">
+        <form method="POST" action="{{ url_for('ingest.add') }}" id="singleForm">
+            <div class="form-card">
+                <label>Select Poet *</label>
+                <select name="poet_id" required class="w-full border p-2 rounded">
+                    <option value="">-- Select --</option>
+                    {% for poet in poets %}
+                    <option value="{{ poet.id }}">{{ poet.name_urdu or poet.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-card">
+                <label>Ghazal Text (Urdu) *</label>
+                <textarea name="ghazal_text" rows="10" class="urdu-text w-full border p-2" required></textarea>
+            </div>
+
+            <div class="form-card">
+                <label>Source / Provenance *</label>
+                <input type="text" name="source" required class="w-full border p-2" placeholder="e.g., Rekhta.org">
+            </div>
+
+            <div class="form-card">
+                <label>Your Name (Optional)</label>
+                <input type="text" name="contributor_name" class="w-full border p-2" placeholder="Will be credited">
+            </div>
+
+            <div class="form-card">
+                <label>Your Email (Optional)</label>
+                <input type="email" name="contributor_email" class="w-full border p-2" placeholder="your@email.com">
+            </div>
+
+            <div class="button-group">
+                <button type="submit" class="btn-submit">Submit Ghazal</button>
+                <button type="button" class="btn-secondary" onclick="clearSingleForm()">Clear Form</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- ================= BULK TAB ================= -->
+    <div id="bulkTab" style="display:none;">
+        <form method="POST" action="{{ url_for('ingest.bulk_process') }}" enctype="multipart/form-data" id="bulkForm">
+            <div class="form-card">
+                <label>Poet (applies to all) *</label>
+                <select name="poet_id" id="bulkPoetSelect" required class="w-full border p-2 rounded">
+                    <option value="">-- Select --</option>
+                    {% for poet in poets %}
+                    <option value="{{ poet.id }}">{{ poet.name_urdu or poet.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-card">
+                <label>Source (applies to all) *</label>
+                <input type="text" name="source" required class="w-full border p-2" placeholder="Same source for all">
+            </div>
+
+            <div class="form-card">
+                <label>Book (Optional, same for all)</label>
+                <select name="book_id" id="bulkBookSelect" class="w-full border p-2 rounded">
+                    <option value="">-- Not associated with a book --</option>
+                </select>
+            </div>
+
+            <div class="form-card">
+                <label>Upload TXT Files</label>
+                <input type="file" name="files" multiple accept=".txt" class="w-full border p-2">
+                <small class="text-gray-500">Upload one or more .txt files (each may contain multiple ghazals separated by ###GHZ###)</small>
+            </div>
+
+            <div class="form-card">
+                <label>OR Paste Text</label>
+                <textarea name="pasted_text" rows="8" class="w-full border p-2"
+                    placeholder="Paste ghazals separated by ###GHZ###"></textarea>
+            </div>
+
+            <div class="bulk-hint">
+                <i class="fas fa-info-circle"></i> Rules:
+                <ul class="list-disc ml-5 mt-1">
+                    <li>Each ghazal must have an even number of lines (couplets).</li>
+                    <li>Separate ghazals with a line containing <code>###GHZ###</code>.</li>
+                    <li>System handles 1000+ ghazals safely.</li>
+                </ul>
+            </div>
+
+            <div class="button-group">
+                <button type="submit" class="btn-submit">Process Bulk</button>
+                <button type="button" class="btn-secondary" onclick="clearPreview()">Clear Preview</button>
+            </div>
+        </form>
+
+        <!-- Clear Preview via separate form (to avoid resubmitting the same data) -->
+        <form method="POST" action="{{ url_for('ingest.bulk_clear') }}" id="clearPreviewForm" style="display: none;">
+        </form>
+
+        <!-- ================= PREVIEW TABLE ================= -->
+        {% if preview_data %}
+        <div class="form-card">
+            <h3 class="font-bold text-lg mb-2">📊 Bulk Preview</h3>
+
+            {% set invalid_count = preview_data|selectattr("error", "defined")|list|length %}
+            {% set duplicate_count = preview_data|selectattr("is_duplicate", "equalto", true)|list|length %}
+            {% set ready_count = preview_data|length - invalid_count - duplicate_count %}
+
+            <p class="mb-2">
+                ✅ Ready: <b>{{ ready_count }}</b> |
+                ⚠️ Duplicate: <b>{{ duplicate_count }}</b> |
+                ❌ Invalid: <b>{{ invalid_count }}</b>
+            </p>
+
+            <div class="overflow-x-auto">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>First Couplet</th>
+                            <th>Verses</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for g in preview_data %}
+                        <tr class="
+                            {% if g.error %}invalid-row
+                            {% elif g.is_duplicate %}duplicate-row
+                            {% else %}ready-row{% endif %}
+                        ">
+                            <td>{{ loop.index }}</td>
+                            <td class="urdu-text">
+                                {% if g.misra1 and g.misra2 %}
+                                    {{ g.misra1 }}<br>{{ g.misra2 }}
+                                {% else %}
+                                    <em>Invalid format</em>
+                                {% endif %}
+                            </td>
+                            <td>{{ g.verses or '-' }}</td>
+                            <td>
+                                {% if g.error %}
+                                    ❌ {{ g.error }}
+                                {% elif g.is_duplicate %}
+                                    ⚠️ Already exists (duplicate)
+                                {% else %}
+                                    ✅ Ready to insert
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <form method="POST" action="{{ url_for('ingest.bulk_insert') }}">
+                <button class="btn-submit mt-4">🚀 Insert All Valid Ghazals</button>
+            </form>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+function showTab(tab) {
+    document.getElementById('singleTab').style.display = tab === 'single' ? 'block' : 'none';
+    document.getElementById('bulkTab').style.display = tab === 'bulk' ? 'block' : 'none';
+
+    document.getElementById('singleTabBtn').classList.toggle('active', tab === 'single');
+    document.getElementById('bulkTabBtn').classList.toggle('active', tab === 'bulk');
+}
+
+function clearSingleForm() {
+    document.getElementById('singleForm').reset();
+    // Reset poet select to default
+    const poetSelect = document.querySelector('#singleForm select[name="poet_id"]');
+    if (poetSelect) poetSelect.value = '';
+}
+
+function clearPreview() {
+    if (confirm('Are you sure you want to clear the current preview?')) {
+        document.getElementById('clearPreviewForm').submit();
+    }
+}
+
+// Load books dynamically when poet changes in bulk form
+const bulkPoetSelect = document.getElementById('bulkPoetSelect');
+const bulkBookSelect = document.getElementById('bulkBookSelect');
+if (bulkPoetSelect) {
+    bulkPoetSelect.addEventListener('change', function() {
+        const poetId = this.value;
+        if (poetId) {
+            fetch(`/ingest/books/${poetId}`)
+                .then(res => res.json())
+                .then(data => {
+                    let options = '<option value="">-- Not associated with a book --</option>';
+                    if (data.books && data.books.length) {
+                        data.books.forEach(book => {
+                            options += `<option value="${book.id}">${book.name_urdu || book.name}</option>`;
+                        });
+                    }
+                    bulkBookSelect.innerHTML = options;
+                })
+                .catch(err => console.error(err));
+        } else {
+            bulkBookSelect.innerHTML = '<option value="">-- Not associated with a book --</option>';
+        }
+    });
+}
+
+// If preview_data exists, automatically switch to bulk tab
+{% if preview_data %}
+showTab('bulk');
+{% else %}
+showTab('single');
+{% endif %}
+</script>
+
+{% endblock %}

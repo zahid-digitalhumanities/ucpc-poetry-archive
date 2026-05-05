@@ -3,23 +3,75 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta property="og:title" content="UCPC Poetry Archive">
-    <meta property="og:description" content="A beautiful ghazal shared with love">
+    <!-- Open Graph (Facebook, WhatsApp, LinkedIn) -->
+    <meta property="og:title" content="UCPC Poetry Archive – A Beautiful Ghazal">
+    <meta property="og:description" content="Share this exquisite Urdu ghazal with your loved ones. Preserving classical and contemporary Urdu poetry.">
     <meta property="og:image" content="{{ image_url }}">
     <meta property="og:image:secure_url" content="{{ image_url }}">
     <meta property="og:image:width" content="1080">
     <meta property="og:image:height" content="1920">
     <meta property="og:url" content="{{ request.url }}">
-    <meta property="og:type" content="website">
+    <meta property="og:type" content="article">
+    <meta property="og:site_name" content="UCPC Poetry Archive">
+    <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="UCPC Poetry – Ghazal Share">
+    <meta name="twitter:description" content="Urdu ghazal from UCPC Poetry Archive">
     <meta name="twitter:image" content="{{ image_url }}">
-    <title>UCPC Ghazal</title>
+    <!-- Canonical -->
+    <link rel="canonical" href="{{ request.url }}">
+    <title>UCPC Poetry – Ghazal Image</title>
     <style>
-        body { margin: 0; background: #0a0a0a; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
-        img { max-width: 100%; height: auto; border-radius: 14px; box-shadow: 0 6px 20px rgba(0,0,0,0.4); }
+        body {
+            margin: 0;
+            background: #0a1a2a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+        }
+        .container {
+            text-align: center;
+            color: #D4AF37;
+        }
+        img {
+            max-width: 90%;
+            height: auto;
+            border-radius: 14px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+            margin-top: 20px;
+        }
+        .info {
+            margin-top: 20px;
+            font-size: 0.9rem;
+            color: rgba(255,255,255,0.6);
+        }
+        .redirect-note {
+            margin-top: 15px;
+            font-size: 0.8rem;
+            color: rgba(255,255,255,0.4);
+        }
     </style>
+    <!-- Auto-redirect to the actual image after 2 seconds -->
+    <meta http-equiv="refresh" content="2; url={{ image_url }}">
 </head>
 <body>
-    <img src="{{ image_url }}" alt="Ghazal Image">
+    <div class="container">
+        <div class="info">
+            ✨ UCPC Archive • Preserving Urdu Poetry ✨
+        </div>
+        <img src="{{ image_url }}" alt="Ghazal Card">
+        <div class="redirect-note">
+            Redirecting to the image in 2 seconds...<br>
+            <a href="{{ image_url }}" style="color: #D4AF37;">Click here if not redirected</a>
+        </div>
+    </div>
+    <!-- Optional: JavaScript redirect (fallback) -->
+    <script>
+        setTimeout(function() {
+            window.location.href = "{{ image_url }}";
+        }, 2000);
+    </script>
 </body>
 </html>
