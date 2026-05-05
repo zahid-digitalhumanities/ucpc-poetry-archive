@@ -1,5 +1,8 @@
 ﻿# models/search_model.py
+import json
+import numpy as np
 from models.base import get_db_connection
+from modules.embeddings import generate_embedding   # for semantic search
 
 # Safely import roman engine; if missing, define dummy function
 try:
@@ -64,7 +67,6 @@ ROMAN_DICT = {
     "kazmi": "کاظمی",
     "sahir": "ساحر",
     "ludhianvi": "لدھیانوی",
-    # English words
     "night": "رات",
     "love": "محبت",
     "lonely": "تنہائی",
@@ -225,3 +227,78 @@ def get_suggestions(q):
                 """, (like_pattern, like_pattern))
             rows = cur.fetchall()
             return [r['suggestion'] for r in rows]
+
+# ================= HYBRID SEMANTIC SEARCH =================
+def cosine_similarity(v1, v2):
+    v1 = np.array(v1)
+    v2 = np.array(v2)
+    if v1.size == 0 or v2.size == 0:
+        return 0.0
+    norm1 = np.linalg.norm(v1)
+    norm2 = np.linalg.norm(v2)
+    if norm1 == 0 or norm2 == 0:
+        return 0.0
+    return float(np.dot(v1, v2) / (norm1 * norm2 + 1e-8))
+
+def semantic_search(query_embedding, top_n=50):
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute("SELECT text_id, embedding_vector FROM ghazal_embeddings")
+    rows = cur.fetchall()
+    cur.close()
+    conn.close()
+
+    results = []
+    for r in rows:
+        emb = r['embedding_vector']
+        if isinstance(emb, str):
+            try:
+                emb = json.loads(emb)
+            except:
+                continue
+        if not emb:
+            continue
+        sim = cosine_similarity(query_embedding, emb)
+        results.append((r['text_id'], sim))
+
+    results.sort(key=lambda x: x[1], reverse=True)
+    return results[:top_n]
+
+def smart_search(query, top_n=20):
+    """
+    Convert query to embedding, find top N semantically similar ghazals,
+    return list with titles, poets, and similarity scores.
+    """
+    query_emb = generate_embedding(query)
+    if not query_emb or len(query_emb) != 384:
+        return []
+
+    semantic = semantic_search(query_emb, top_n=50)
+    if not semantic:
+        return []
+
+    ids = [tid for tid, _ in semantic]
+    scores = {tid: score for tid, score in semantic}
+
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute("""
+        SELECT t.id, t.title_urdu, p.name as poet_name
+        FROM texts t
+        JOIN poets p ON t.poet_id = p.id
+        WHERE t.id = ANY(%s)
+    """, (ids,))
+    rows = cur.fetchall()
+    cur.close()
+    conn.close()
+
+    results = []
+    for r in rows:
+        results.append({
+            "text_id": r['id'],
+            "title": r['title_urdu'],
+            "poet": r['poet_name'],
+            "score": round(scores.get(r['id'], 0), 3)
+        })
+    results.sort(key=lambda x: x['score'], reverse=True)
+    return results[:top_n]

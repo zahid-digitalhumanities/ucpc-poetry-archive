@@ -78,27 +78,23 @@ def fetch_texts_by_poet(poet_id):
                 result.append(text_dict)
             return result
 
-# ✅ FIXED: get_ghazal_with_verses with debug prints
 def get_ghazal_with_verses(text_id):
     with get_db_connection() as conn:
         with conn.cursor() as cur:
-            # Fetch ghazal
             cur.execute("""
                 SELECT t.id, t.title_urdu, t.title_english, t.poet_id, t.verse_count, t.text_urdu,
-                       p.name AS poet_name, p.name_urdu AS poet_name_urdu
+                       p.name AS poet_name, p.name_urdu AS poet_name_urdu,
+                       pf.radif, pf.qaafiya, pf.theme,
+                       pf.meter_name, pf.meter_pattern, pf.meter_confidence
                 FROM texts t
                 JOIN poets p ON t.poet_id = p.id
+                LEFT JOIN poetic_features pf ON t.id = pf.text_id
                 WHERE t.id = %s
             """, (text_id,))
             ghazal_row = cur.fetchone()
             if not ghazal_row:
-                print(f"DEBUG: No ghazal found for text_id {text_id}")
                 return None, []
-
             ghazal = dict(ghazal_row)
-            print(f"DEBUG: Ghazal fetched, poet={ghazal.get('poet_name')}")
-
-            # Fetch verses
             cur.execute("""
                 SELECT couplet_index, misra1_urdu, misra2_urdu
                 FROM verses
@@ -106,10 +102,6 @@ def get_ghazal_with_verses(text_id):
                 ORDER BY couplet_index
             """, (text_id,))
             rows = cur.fetchall()
-            print(f"DEBUG: Found {len(rows)} verse rows for text_id {text_id}")
-            if rows:
-                print(f"DEBUG: First row columns: {rows[0].keys()}")
-                print(f"DEBUG: First misra1_urdu sample: {rows[0].get('misra1_urdu', '')[:50]}")
             verses = []
             for row in rows:
                 verses.append({
@@ -143,20 +135,14 @@ def insert_ghazal(poet_id, book_id, contributor_id, title_urdu, title_english,
         with conn.cursor() as cur:
             cur.execute("""
                 INSERT INTO texts
-                (public_id, poet_id, source_book_id, title_urdu, title_english,
+                (public_id, poet_id, book_id, contributor_id, title_urdu, title_english,
                  text_urdu, text_english, content_hash, verse_count, form, created_at)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, 'ghazal', %s)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 'ghazal', %s)
                 RETURNING id
-            """, (public_id, poet_id, book_id, title_urdu, title_english,
+            """, (public_id, poet_id, book_id, contributor_id, title_urdu, title_english,
                   text_urdu, text_english, content_hash, verse_count, datetime.now()))
             conn.commit()
             text_id = cur.fetchone()['id']
-            if contributor_id:
-                cur.execute("""
-                    INSERT INTO contributions (text_id, contributor_id, role)
-                    VALUES (%s, %s, 'editor')
-                """, (text_id, contributor_id))
-                conn.commit()
             return text_id
 
 def insert_verse(text_id, couplet_index, m1, m2, m1_en, m2_en):
@@ -164,8 +150,8 @@ def insert_verse(text_id, couplet_index, m1, m2, m1_en, m2_en):
         with conn.cursor() as cur:
             cur.execute("""
                 INSERT INTO verses
-                (text_id, couplet_index, verse_text_urdu_1, verse_text_urdu_2,
-                 verse_text_english_1, verse_text_english_2)
+                (text_id, couplet_index, misra1_urdu, misra2_urdu,
+                 misra1_english, misra2_english)
                 VALUES (%s, %s, %s, %s, %s, %s)
             """, (text_id, couplet_index, m1, m2, m1_en, m2_en))
             conn.commit()
@@ -228,10 +214,12 @@ def get_recent_ghazals(limit=10):
     with get_db_connection() as conn:
         with conn.cursor() as cur:
             cur.execute("""
-                SELECT t.id, t.title_english, t.title_urdu, p.name as poet_name
+                SELECT t.id, p.name as poet_name,
+                       v.misra1_urdu, v.misra2_urdu
                 FROM texts t
                 JOIN poets p ON t.poet_id = p.id
-                WHERE t.form = 'ghazal'
+                JOIN verses v ON v.text_id = t.id
+                WHERE t.form = 'ghazal' AND v.couplet_index = 1
                 ORDER BY t.created_at DESC
                 LIMIT %s
             """, (limit,))
