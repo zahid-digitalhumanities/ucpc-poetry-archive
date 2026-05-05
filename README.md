@@ -47,8 +47,81 @@ A research‑grade digital archive for Urdu poetry with bilingual content, advan
 
 ## 🚀 Quick Start (Local Development)
 
-### 1. Clone the repository
+ Clone the repository
 
 ```bash
 git clone https://github.com/zahid-digitalhumanities/ucpc-poetry-archive.git
 cd ucpc-poetry-archive
+
+python -m venv venv
+source venv/bin/activate      # Linux/Mac
+venv\Scripts\activate         # Windows
+pip install -r requirements.txt
+Set up the database
+Create a PostgreSQL database (e.g., ucpc_v3_db).
+
+Run the SQL schema (see database/schema.sql – not included in this repo; you need to create tables from your own export).
+
+Add environment variables (see .env.example – create a .env file with your DB_HOST, DB_NAME, DB_USER, DB_PASSWORD, and SECRET_KEY).
+Run the app
+bash
+python app.py
+Visit http://127.0.0.1:10000 (or the port you set).
+
+ Repository Structure (Public)
+This repository contains only code and trained models. The full Urdu ghazal corpus is not included due to copyright and research integrity.
+ucpc-poetry-archive/
+├── app.py
+├── requirements.txt
+├── .gitignore
+├── README.md
+├── models/
+│   ├── base.py, ghazal_model.py, ingest_pipeline.py, ...
+│   ├── ai_engine/
+│   │   ├── poet_prediction_ai.py
+│   │   └── similarity_model.py
+│   └── ml/
+│       ├── poet_classifier_v7.pkl
+│       └── train_poet_classifier_v7.py
+├── modules/
+│   ├── embeddings.py
+│   ├── radif_qaafiya.py
+│   ├── meter.py, theme.py, ai_tools.py, image_generator.py
+├── routes/
+│   ├── ingest_routes.py
+│   ├── ai_routes.py
+│   ├── ask_ucpc_index.py
+│   └── ...
+├── static/
+│   ├── css/, js/, fonts/, images/
+├── templates/
+│   ├── base.html, index.html, view.html
+│   ├── ghazal_ingest.html, ask_ucpc.html
+│   └── ...
+└── scripts/
+    ├── export_training_data.py
+    ├── train_poet_classifier_v7.py
+    └── ... (utility scripts)
+    Data Availability
+The complete Urdu ghazal corpus (5,800+ texts) is not publicly included in this repository.
+The repository contains:
+
+All source code
+
+The trained ML model (poet_classifier_v7.pkl)
+
+Sample frontend assets
+
+Utility scripts
+
+To train or retrain the model, you need your own dataset. The training script train_poet_classifier_v7.py reads from scripts/training_data.csv. You must generate this file from your own corpus (e.g., using export_training_data.py after importing ghazals into the database).
+
+Researchers may request access to the corpus for academic purposes – please contact the author.
+Contributing
+Contributions are welcome! Please open an issue or pull request.
+
+📧 Contact
+Muhammad Zahid – GitHub
+Project Link: https://github.com/zahid-digitalhumanities/ucpc-poetry-archive
+
+
