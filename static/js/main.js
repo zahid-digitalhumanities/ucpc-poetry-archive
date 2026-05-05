@@ -1,4 +1,8 @@
-﻿console.log('UCPC Poetry Archive Loaded');
+﻿// =======================================================
+// UCPC Poetry Archive – Main JavaScript
+// =======================================================
+
+console.log('UCPC Poetry Archive Loaded');
 
 document.addEventListener('DOMContentLoaded', function() {
     const currentPath = window.location.pathname;
@@ -127,4 +131,75 @@ function copyToClipboard(text) {
     navigator.clipboard.writeText(text)
         .then(() => alert("✅ Link copied!"))
         .catch(() => alert("❌ Copy failed"));
+}
+
+
+// =======================================================
+// 🤖 AI POET PREDICTION (Ingestion Page)
+// =======================================================
+
+async function predictPoet() {
+    const textarea = document.getElementById('ghazal_text');
+    if (!textarea) {
+        console.warn("predictPoet: element 'ghazal_text' not found on this page.");
+        return;
+    }
+    const text = textarea.value.trim();
+    if (!text) {
+        alert("Please enter ghazal text first.");
+        return;
+    }
+
+    const container = document.getElementById('prediction_results');
+    if (!container) return;
+
+    container.innerHTML = '<p>🔍 Predicting poet...</p>';
+
+    try {
+        const response = await fetch('/ingest/predict-poet', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ text: text })
+        });
+        const data = await response.json();
+
+        if (!data.success || !data.predictions || data.predictions.length === 0) {
+            container.innerHTML = '<p>❌ Could not predict poet. Please try again.</p>';
+            return;
+        }
+
+        let html = '<h4>🤖 AI Poet Suggestions</h4><ul style="list-style:none; padding-left:0;">';
+        data.predictions.forEach((pred, idx) => {
+            const percent = (pred.confidence * 100).toFixed(1);
+            // Display English name with Urdu name in parentheses
+            const displayName = pred.poet_name_urdu 
+                ? `${pred.poet_name} (${pred.poet_name_urdu})`
+                : pred.poet_name || `Poet ID: ${pred.poet_id}`;
+            const isTop = idx === 0;
+            html += `<li style="margin-bottom:10px;">
+                        <strong>${displayName}</strong> – ${percent}% confidence
+                        ${isTop ? `<button onclick="usePrediction(${pred.poet_id})" style="margin-left:10px;">✔ Use</button>` : ''}
+                     </li>`;
+        });
+        html += '</ul>';
+        container.innerHTML = html;
+
+    } catch (err) {
+        console.error(err);
+        container.innerHTML = '<p>❌ Error connecting to prediction service.</p>';
+    }
+}
+
+function usePrediction(poet_id) {
+    // The poet dropdown ID is 'poetSelect' (as in ghazal_ingest.html)
+    const poetSelect = document.getElementById('poetSelect');
+    if (poetSelect) {
+        poetSelect.value = poet_id;
+        // Trigger change event so book dropdown updates if needed
+        poetSelect.dispatchEvent(new Event('change'));
+        // Optional: give feedback
+        // alert(`Poet set to ID: ${poet_id}`);
+    } else {
+        console.warn("usePrediction: element 'poetSelect' not found.");
+    }
 }
