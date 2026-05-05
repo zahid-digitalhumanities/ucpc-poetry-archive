@@ -1,0 +1,174 @@
+{% extends "base.html" %}
+
+{% block extra_head %}
+<meta property="og:title" content="{{ ghazal.poet_name }} - {{ ghazal.title_urdu or ghazal.title_english }}">
+<meta property="og:description" content="{% if verses %}{{ verses[0].misra1_urdu }} {{ verses[0].misra2_urdu }}{% endif %}">
+<meta property="og:image" content="{{ url_for('og_image', text_id=ghazal.id, _external=true) }}">
+<meta property="og:type" content="article">
+<meta property="og:url" content="{{ request.url }}">
+<meta property="og:site_name" content="UCPC Poetry Archive">
+<meta name="twitter:card" content="summary_large_image">
+{% endblock %}
+
+{% block title %}{{ ghazal.poet_name }} - UCPC Poetry{% endblock %}
+
+{% block extra_css %}
+<style>
+body, .view-container { background: #0a1a2a !important; }
+
+.poet-name-en {
+    font-size: 1.8rem;
+    letter-spacing: 3px;
+    color: #D4AF37;
+    text-align:center;
+    font-weight:700;
+}
+
+.urdu-couplet {
+    font-family: 'Noto Nastaliq Urdu', serif;
+    font-size: 1.5rem;
+    direction: rtl;
+    text-align: center;
+    color: white;
+    margin-bottom: 1rem;
+}
+
+.ghazal-card {
+    background: linear-gradient(135deg, #0F2B3D, #1E3C72);
+    border-radius: 1.5rem;
+    padding: 1.5rem;
+    max-width: 800px;
+    margin: auto;
+}
+
+.ask-box {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 1rem;
+    background: rgba(0,0,0,0.3);
+    border-radius: 1rem;
+}
+
+.ask-box h3 {
+    font-weight: bold;
+    color: #D4AF37;
+}
+
+.ask-input-group {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.ask-input {
+    flex: 1;
+    padding: 0.5rem;
+    border-radius: 2rem;
+    border: 1px solid #D4AF37;
+    background: #1e2a3a;
+    color: white;
+}
+
+.ask-btn {
+    padding: 0.5rem 1rem;
+    border-radius: 2rem;
+    border: 1px solid #D4AF37;
+    color: #D4AF37;
+    background: transparent;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.ask-btn:hover {
+    background: #D4AF37;
+    color: #0a1a2a;
+}
+
+.answer-box {
+    margin-top: 1rem;
+    padding: 0.5rem;
+    background: rgba(0,0,0,0.4);
+    border-radius: 0.5rem;
+    display: none;
+    color: white;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="view-container">
+    <!-- POET HEADER -->
+    <div class="poet-name-en">
+        {{ ghazal.poet_name | upper }}
+    </div>
+
+    <div class="ghazal-card">
+        {% for verse in verses %}
+        <div class="urdu-couplet">
+            <div>{{ verse.misra1_urdu }}</div>
+            <div>{{ verse.misra2_urdu }}</div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Unified Ask UCPC Interface -->
+    <div class="ask-box">
+        <h3>💬 Ask UCPC</h3>
+        <div class="ask-input-group">
+            <input type="text" id="questionInput" class="ask-input" placeholder="e.g., Who is the poet? / Similar ghazals? / What is the theme?" />
+            <button onclick="askUCPC()" class="ask-btn">Ask</button>
+        </div>
+        <div id="answerBox" class="answer-box"></div>
+    </div>
+</div>
+
+<script>
+async function askUCPC() {
+    const question = document.getElementById("questionInput").value;
+    const text_id = {{ ghazal.id }};
+    const answerDiv = document.getElementById("answerBox");
+    if (!question.trim()) {
+        answerDiv.style.display = "block";
+        answerDiv.innerHTML = "⚠️ Please enter a question.";
+        return;
+    }
+    answerDiv.style.display = "block";
+    answerDiv.innerHTML = "🤔 Thinking...";
+
+    try {
+        const response = await fetch("/ask/", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ question: question, text_id: text_id })
+        });
+        const data = await response.json();
+
+        let html = "";
+        if (data.type === "poet_prediction") {
+            html = "<strong>📜 Predicted Poet(s):</strong><br>";
+            data.data.forEach(p => {
+                const name = p.poet_name_urdu ? `${p.poet_name} (${p.poet_name_urdu})` : p.poet_name;
+                html += `• ${name} – ${(p.confidence * 100).toFixed(1)}% confidence<br>`;
+            });
+        }
+        else if (data.type === "similar") {
+            html = "<strong>🔗 Similar Ghazals:</strong><br>";
+            data.data.forEach(s => {
+                html += `• “${s.title_urdu}” by ${s.poet_name} (${(s.similarity * 100).toFixed(1)}% similarity)<br>`;
+            });
+        }
+        else if (data.type === "theme") {
+            html = `<strong>🎭 Theme:</strong> ${data.data.theme}<br>`;
+            html += `<strong>📖 Reason:</strong> ${data.data.reason}`;
+        }
+        else {
+            html = data.data;
+        }
+        answerDiv.innerHTML = html;
+    } catch (err) {
+        answerDiv.innerHTML = "❌ Error: Could not process your request.";
+        console.error(err);
+    }
+}
+</script>
+{% endblock %}

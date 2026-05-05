@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% block title %}Top Radif - UCPC Research Insights{% endblock %}
+
+{% block extra_css %}
+<style>
+    .radif-card {
+        background: linear-gradient(135deg, #0F2B3D, #1E3C72);
+        border-radius: 1rem;
+        transition: all 0.2s ease;
+        border: 1px solid rgba(212, 175, 55, 0.2);
+    }
+    .radif-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 25px rgba(0, 0, 0, 0.2);
+        border-color: rgba(212, 175, 55, 0.6);
+    }
+    .radif-rank {
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: #D4AF37;
+        width: 3rem;
+        text-align: center;
+    }
+    .radif-text {
+        font-family: 'Jameel Noori Nastaleeq', serif;
+        font-size: 1.2rem;
+        color: #F5E7B2;
+        direction: rtl;
+        flex: 1;
+        text-align: right;
+        padding: 0 1rem;
+    }
+    .frequency-bar {
+        background: rgba(255,255,255,0.1);
+        border-radius: 1rem;
+        height: 8px;
+        overflow: hidden;
+        margin: 0.5rem 0;
+    }
+    .frequency-fill {
+        background: #D4AF37;
+        height: 100%;
+        width: 0%;
+        border-radius: 1rem;
+        transition: width 0.6s ease;
+    }
+    .frequency-count {
+        font-size: 0.8rem;
+        color: #D4AF37;
+        font-weight: 600;
+        margin-left: 0.5rem;
+    }
+    .hero-stats {
+        background: rgba(0,0,0,0.3);
+        border-radius: 2rem;
+        padding: 0.5rem 1rem;
+        display: inline-flex;
+        gap: 1rem;
+        backdrop-filter: blur(4px);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4 max-w-4xl mx-auto">
+    <!-- Header with stats -->
+    <div class="text-center mb-8">
+        <div class="inline-block p-4 bg-gradient-to-r from-gold/20 to-primary-dark/30 rounded-2xl backdrop-blur-sm">
+            <h1 class="text-3xl md:text-4xl font-bold text-gold mb-2">🏆 Most Common Radif</h1>
+            <p class="text-gray-300">Statistical analysis of radif patterns in the UCPC corpus</p>
+        </div>
+        <div class="hero-stats mt-4 mx-auto w-fit">
+            <span class="text-gold font-bold">📊 {{ total_ghazals }}</span>
+            <span class="text-gray-300">ghazals analysed</span>
+        </div>
+    </div>
+
+    <!-- Radif cards -->
+    <div class="space-y-3">
+        {% for radif, count in top_radif %}
+        <div class="radif-card p-3 flex flex-wrap items-center gap-3">
+            <div class="radif-rank">#{{ loop.index }}</div>
+            <div class="radif-text flex-1">{{ radif }}</div>
+            <div class="w-32 text-right">
+                <div class="frequency-bar">
+                    <div class="frequency-fill" style="width: {{ (count / top_radif[0][1] * 100) | round(0) }}%;"></div>
+                </div>
+                <div class="frequency-count">{{ count }} ghazals</div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Footer note -->
+    <div class="text-center text-gray-400 text-sm mt-8 pt-4 border-t border-gold/20">
+        Radif = the recurring word/phrase at the end of the second hemistich (misra).<br>
+        Only ghazals with a detected radif are included.
+    </div>
+</div>
+{% endblock %}

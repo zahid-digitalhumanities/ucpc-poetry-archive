@@ -1,0 +1,195 @@
+{% extends "base.html" %}
+{% block title %}Compare Poets - UCPC Research{% endblock %}
+
+{% block extra_css %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+    .compare-card {
+        background: linear-gradient(135deg, #0F2B3D, #1E3C72);
+        border-radius: 1.5rem;
+        padding: 1.5rem;
+        height: 100%;
+        border: 1px solid rgba(212,175,55,0.2);
+        transition: transform 0.2s;
+    }
+    .compare-card:hover {
+        transform: translateY(-3px);
+        border-color: rgba(212,175,55,0.5);
+    }
+    .stat-title {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #D4AF37;
+        border-bottom: 1px solid rgba(212,175,55,0.3);
+        display: inline-block;
+        margin-bottom: 0.75rem;
+        padding-bottom: 0.25rem;
+    }
+    .word-list {
+        max-height: 200px;
+        overflow-y: auto;
+    }
+    .word-item {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.85rem;
+        padding: 0.2rem 0;
+        border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .urdu-word {
+        font-family: 'Jameel Noori Nastaleeq', serif;
+        direction: rtl;
+    }
+    .emotion-badge {
+        display: inline-block;
+        padding: 0.2rem 0.6rem;
+        border-radius: 2rem;
+        font-size: 0.7rem;
+        margin-right: 0.5rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4 max-w-7xl mx-auto">
+    <div class="text-center mb-8">
+        <div class="inline-block p-4 bg-gradient-to-r from-gold/20 to-primary-dark/30 rounded-2xl backdrop-blur-sm">
+            <h1 class="text-3xl md:text-4xl font-bold text-gold mb-2">⚖️ Poet Style Comparison</h1>
+            <p class="text-gray-300">Analyse and compare stylistic fingerprints of two poets</p>
+        </div>
+    </div>
+
+    <!-- Selection Form -->
+    <div class="flex justify-center mb-8">
+        <form method="post" class="flex flex-wrap gap-4 bg-gray-800/30 p-4 rounded-2xl">
+            <select name="poet1" class="bg-gray-700/50 rounded-full px-4 py-2 text-white" required>
+                <option value="">-- Poet 1 --</option>
+                {% for poet in poets %}
+                <option value="{{ poet.name }}" {% if poet1 and poet.name == poet1.name %}selected{% endif %}>{{ poet.name_urdu }} ({{ poet.name }})</option>
+                {% endfor %}
+            </select>
+            <select name="poet2" class="bg-gray-700/50 rounded-full px-4 py-2 text-white" required>
+                <option value="">-- Poet 2 --</option>
+                {% for poet in poets %}
+                <option value="{{ poet.name }}" {% if poet2 and poet.name == poet2.name %}selected{% endif %}>{{ poet.name_urdu }} ({{ poet.name }})</option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="btn-gold px-6 py-2 rounded-full">Compare</button>
+        </form>
+    </div>
+
+    {% if poet1 and poet2 %}
+    <div class="grid lg:grid-cols-2 gap-6">
+        <!-- Poet 1 Column -->
+        <div class="compare-card">
+            <h2 class="text-2xl font-bold text-gold text-center">{{ poet1.name_urdu }}<br><span class="text-sm text-gray-300">{{ poet1.name }}</span></h2>
+            
+            <!-- Word Frequency -->
+            <div class="mt-4">
+                <div class="stat-title">📖 Top Words</div>
+                <div class="word-list">
+                    {% for w in stats1.top_words %}
+                    <div class="word-item">
+                        <span class="urdu-word">{{ w.word }}</span>
+                        <span class="text-gray-400">{{ w.freq }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Radif -->
+            <div class="mt-4">
+                <div class="stat-title">🏆 Common Radif</div>
+                <div class="word-list">
+                    {% for r in stats1.top_radif %}
+                    <div class="word-item">
+                        <span class="urdu-word">{{ r.radif }}</span>
+                        <span class="text-gray-400">{{ r.count }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Emotions -->
+            <div class="mt-4">
+                <div class="stat-title">🎭 Emotions</div>
+                <div class="flex gap-3 mt-2">
+                    <div><span class="emotion-badge bg-red-800/30">❤️ Love</span> {{ stats1.emotions.love }}</div>
+                    <div><span class="emotion-badge bg-blue-800/30">😢 Sadness</span> {{ stats1.emotions.sadness }}</div>
+                    <div><span class="emotion-badge bg-green-800/30">🌟 Hope</span> {{ stats1.emotions.hope }}</div>
+                </div>
+            </div>
+
+            <!-- Meter Distribution -->
+            {% if stats1.meter_dist %}
+            <div class="mt-4">
+                <div class="stat-title">📏 Meters</div>
+                <div class="space-y-1">
+                    {% for m in stats1.meter_dist %}
+                    <div class="word-item">
+                        <span>{{ m.meter }}</span>
+                        <span>{{ m.count }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Poet 2 Column (same structure) -->
+        <div class="compare-card">
+            <h2 class="text-2xl font-bold text-gold text-center">{{ poet2.name_urdu }}<br><span class="text-sm text-gray-300">{{ poet2.name }}</span></h2>
+            
+            <div class="mt-4">
+                <div class="stat-title">📖 Top Words</div>
+                <div class="word-list">
+                    {% for w in stats2.top_words %}
+                    <div class="word-item">
+                        <span class="urdu-word">{{ w.word }}</span>
+                        <span class="text-gray-400">{{ w.freq }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="mt-4">
+                <div class="stat-title">🏆 Common Radif</div>
+                <div class="word-list">
+                    {% for r in stats2.top_radif %}
+                    <div class="word-item">
+                        <span class="urdu-word">{{ r.radif }}</span>
+                        <span class="text-gray-400">{{ r.count }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="mt-4">
+                <div class="stat-title">🎭 Emotions</div>
+                <div class="flex gap-3 mt-2">
+                    <div><span class="emotion-badge bg-red-800/30">❤️ Love</span> {{ stats2.emotions.love }}</div>
+                    <div><span class="emotion-badge bg-blue-800/30">😢 Sadness</span> {{ stats2.emotions.sadness }}</div>
+                    <div><span class="emotion-badge bg-green-800/30">🌟 Hope</span> {{ stats2.emotions.hope }}</div>
+                </div>
+            </div>
+
+            {% if stats2.meter_dist %}
+            <div class="mt-4">
+                <div class="stat-title">📏 Meters</div>
+                <div class="space-y-1">
+                    {% for m in stats2.meter_dist %}
+                    <div class="word-item">
+                        <span>{{ m.meter }}</span>
+                        <span>{{ m.count }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Optional: Chart.js comparison (if you want to show bar charts for top words or emotions) -->
+    {% endif %}
+</div>
+{% endblock %}

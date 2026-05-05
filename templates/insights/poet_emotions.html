@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+{% block title %}Emotion Patterns - Poet Analysis | UCPC Research{% endblock %}
+
+{% block extra_css %}
+<style>
+    .emotion-card {
+        background: linear-gradient(135deg, #0F2B3D, #1E3C72);
+        border-radius: 1.5rem;
+        transition: all 0.2s ease;
+        border: 1px solid rgba(212, 175, 55, 0.2);
+        padding: 1.5rem;
+        text-align: center;
+        height: 100%;
+    }
+    .emotion-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+        border-color: rgba(212, 175, 55, 0.6);
+    }
+    .emotion-icon {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+    }
+    .emotion-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #D4AF37;
+        margin-bottom: 0.5rem;
+    }
+    .emotion-count {
+        font-size: 2.5rem;
+        font-weight: 800;
+        color: #F5E7B2;
+        margin-bottom: 0.25rem;
+    }
+    .emotion-bar-container {
+        background: rgba(255,255,255,0.1);
+        border-radius: 1rem;
+        height: 6px;
+        overflow: hidden;
+        margin: 1rem 0;
+    }
+    .emotion-bar {
+        background: #D4AF37;
+        height: 100%;
+        width: 0%;
+        border-radius: 1rem;
+        transition: width 0.6s ease;
+    }
+    .emotion-sub {
+        font-size: 0.7rem;
+        color: #9ca3af;
+    }
+    .poet-select {
+        background: rgba(255,255,255,0.05);
+        border: 1px solid rgba(212,175,55,0.3);
+        border-radius: 2rem;
+        padding: 0.6rem 1.2rem;
+        color: white;
+        font-size: 0.9rem;
+        transition: 0.2s;
+    }
+    .poet-select:focus {
+        outline: none;
+        border-color: #D4AF37;
+        box-shadow: 0 0 0 2px rgba(212,175,55,0.2);
+    }
+    .btn-gold {
+        background: #D4AF37;
+        color: #1E3C72;
+        font-weight: bold;
+        padding: 0.6rem 1.5rem;
+        border-radius: 2rem;
+        transition: 0.2s;
+        border: none;
+    }
+    .btn-gold:hover {
+        background: #c49f2a;
+        transform: translateY(-2px);
+    }
+    .hero-stats {
+        background: rgba(0,0,0,0.3);
+        border-radius: 2rem;
+        padding: 0.5rem 1rem;
+        display: inline-flex;
+        gap: 1rem;
+        backdrop-filter: blur(4px);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4 max-w-5xl mx-auto">
+    <div class="text-center mb-8">
+        <div class="inline-block p-4 bg-gradient-to-r from-gold/20 to-primary-dark/30 rounded-2xl backdrop-blur-sm">
+            <h1 class="text-3xl md:text-4xl font-bold text-gold mb-2">🎭 Emotion Patterns</h1>
+            <p class="text-gray-300">Keyword‑based emotion analysis of ghazals by poet</p>
+        </div>
+    </div>
+
+    <!-- Poet selector form -->
+    <form method="post" class="mb-8 flex flex-col sm:flex-row gap-4 justify-center">
+        <select name="poet" class="poet-select bg-gray-800/50 text-white px-5 py-2 rounded-full" required>
+            <option value="">-- Select a Poet --</option>
+            {% for poet in poets %}
+            <option value="{{ poet.name }}" {% if poet.name == selected_poet %}selected{% endif %}>{{ poet.name_urdu }} ({{ poet.name }})</option>
+            {% endfor %}
+        </select>
+        <button type="submit" class="btn-gold cursor-pointer">
+            <i class="fas fa-chart-pie mr-2"></i> Analyse
+        </button>
+    </form>
+
+    {% if emotion_counts %}
+    <div class="text-center mb-6">
+        <div class="hero-stats mx-auto w-fit">
+            <span class="text-gold font-bold">🎤 {{ poet_name_display }}</span>
+            <span class="text-gray-300">| {{ emotion_counts.values()|sum }} ghazals analysed</span>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Love Card -->
+        <div class="emotion-card">
+            <div class="emotion-icon">❤️</div>
+            <div class="emotion-title">Love</div>
+            <div class="emotion-count">{{ emotion_counts.love }}</div>
+            <div class="emotion-bar-container">
+                <div class="emotion-bar" style="width: {{ (emotion_counts.love / (emotion_counts.love + emotion_counts.sadness + emotion_counts.hope) * 100) | round(0) }}%;"></div>
+            </div>
+            <div class="emotion-sub">عشق / محبت</div>
+        </div>
+        <!-- Sadness Card -->
+        <div class="emotion-card">
+            <div class="emotion-icon">😢</div>
+            <div class="emotion-title">Sadness</div>
+            <div class="emotion-count">{{ emotion_counts.sadness }}</div>
+            <div class="emotion-bar-container">
+                <div class="emotion-bar" style="width: {{ (emotion_counts.sadness / (emotion_counts.love + emotion_counts.sadness + emotion_counts.hope) * 100) | round(0) }}%;"></div>
+            </div>
+            <div class="emotion-sub">غم / درد</div>
+        </div>
+        <!-- Hope Card -->
+        <div class="emotion-card">
+            <div class="emotion-icon">🌟</div>
+            <div class="emotion-title">Hope</div>
+            <div class="emotion-count">{{ emotion_counts.hope }}</div>
+            <div class="emotion-bar-container">
+                <div class="emotion-bar" style="width: {{ (emotion_counts.hope / (emotion_counts.love + emotion_counts.sadness + emotion_counts.hope) * 100) | round(0) }}%;"></div>
+            </div>
+            <div class="emotion-sub">امید / روشنی</div>
+        </div>
+    </div>
+
+    <div class="text-center text-gray-400 text-sm mt-8 pt-4 border-t border-gold/20">
+        Emotion detection is based on keyword matching (love, sadness, hope keywords in Urdu).<br>
+        A ghazal may be counted in multiple categories if it contains multiple emotion keywords.
+    </div>
+
+    {% elif selected_poet %}
+    <div class="text-center p-6 bg-red-900/30 rounded-xl border border-red-500/30">
+        <p class="text-red-300">⚠️ No ghazals found for the selected poet. Please check the name or add ghazals first.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
