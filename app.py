@@ -13,8 +13,13 @@ from routes.main_routes import main_bp
 from routes.poets_routes import poets_bp
 from routes.ghazals_routes import ghazals_bp
 from routes.search_routes import search_bp
-from routes.bulk_routes import bulk_bp
 from routes.listen_routes import listen_bp
+from routes.similarity_route import similarity_bp
+from routes.insights_routes import insights_bp
+from routes.ingest_routes import ingest_bp
+from routes.ai_routes import ai_bp
+from routes.ask_ucpc_route import ask_bp
+from routes.ask_ucpc_index import ask_index_bp
 
 # Models
 from models.stats_model import get_stats
@@ -39,6 +44,7 @@ def get_db_connection():
 def create_app():
     app = Flask(__name__)
     app.secret_key = os.getenv('SECRET_KEY', 'dev-secret-key')
+    app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024   # 50 MB
     app.config['GENERATED_FOLDER'] = GENERATED_FOLDER
 
     # Register Blueprints
@@ -46,20 +52,27 @@ def create_app():
     app.register_blueprint(poets_bp)
     app.register_blueprint(ghazals_bp)
     app.register_blueprint(search_bp)
-    app.register_blueprint(bulk_bp)
     app.register_blueprint(listen_bp)
+    app.register_blueprint(similarity_bp)
+    app.register_blueprint(insights_bp)
+    app.register_blueprint(ingest_bp)
+    app.register_blueprint(ai_bp)
+    app.register_blueprint(ask_bp)
+    app.register_blueprint(ask_index_bp)
+
     print("✅ Blueprints registered")
 
-    # ---------- AFTER REQUEST (allow Facebook bot) ----------
+    # ---------- AFTER REQUEST ----------
     @app.after_request
-    def allow_facebook_bot(response):
+    def add_security_headers(response):
         response.headers['Access-Control-Allow-Origin'] = '*'
+        response.headers['ngrok-skip-browser-warning'] = 'true'
         return response
 
     # ---------- Redirects ----------
     @app.route('/admin/add_ghazal')
     def redirect_add_ghazal():
-        return redirect(url_for('ghazals.add_ghazal'))
+        return redirect(url_for('ingest.add'))
 
     @app.route('/view/<int:text_id>')
     def redirect_view(text_id):
@@ -108,18 +121,12 @@ def create_app():
                 ghazal = result.get('ghazal')
                 verses = result.get('verses')
 
-            # Debug
-            print(f"Verses count: {len(verses)}")
-            if verses:
-                print(f"First verse keys: {verses[0].keys()}")
-
             img = generate_ghazal_card(ghazal, verses, dedicator, dedicatee)
 
             filename = f"share_{uuid.uuid4().hex}.png"
             filepath = os.path.join(GENERATED_FOLDER, filename)
             img.save(filepath)
 
-            # Remove .png from URL for Facebook (HTML page)
             name_without_ext = filename.replace('.png', '')
             share_url = url_for('share_page', filename=name_without_ext, _external=True)
             return jsonify({'share_url': share_url})
@@ -129,7 +136,7 @@ def create_app():
             traceback.print_exc()
             return jsonify({'error': str(e)}), 500
 
-    # ---------- Share page (HTML with OG tags) – no .png in URL ----------
+    # ---------- Share page (HTML with OG tags) ----------
     @app.route('/share_page/<filename>')
     def share_page(filename):
         if not filename.endswith('.png'):
@@ -158,12 +165,12 @@ def create_app():
         buf.seek(0)
         return send_file(buf, mimetype='image/png')
 
-    # ---------- robots.txt (allow Facebook crawler) ----------
+    # ---------- robots.txt ----------
     @app.route('/robots.txt')
     def robots():
         return send_from_directory('static', 'robots.txt')
 
-    # ---------- 🔥 NEW: TEXT SHARE (full ghazal as text) ----------
+    # ---------- TEXT SHARE (with dedication) ----------
     @app.route('/share_text/<int:text_id>')
     def share_text(text_id):
         dedicator = request.args.get('dedicator', '')
@@ -180,24 +187,22 @@ def create_app():
             verses = result.get('verses')
 
         text = ""
+        poet = ghazal.get('poet_name', '').upper()
+        text += f"{poet}\n"
+        text += "-" * len(poet) + "\n\n"
 
-        # Poet name (uppercase)
-        text += f"{ghazal.get('poet_name', '').upper()}\n\n"
+        if dedicator:
+            text += f"From: {dedicator}\n"
+        if dedicatee:
+            text += f"To: {dedicatee}\n"
+        text += "\n"
 
-        # Full ghazal verses
         for v in verses:
             m1 = v.get('misra1_urdu', '')
             m2 = v.get('misra2_urdu', '')
             text += f"{m1}\n{m2}\n\n"
 
-        # Dedication
-        if dedicator:
-            text += f"From: {dedicator}\n"
-        if dedicatee:
-            text += f"To: {dedicatee}\n"
-
-        text += "\n📖 UCPC Poetry Archive"
-
+        text += "📖 UCPC Poetry Archive"
         return text
 
     # ---------- Global stats ----------
@@ -208,6 +213,25 @@ def create_app():
         except Exception as e:
             print("⚠️ Stats error:", str(e))
             return dict(stats=None)
+
+    # ---------- Template filter for enumerate ----------
+    @app.template_filter('enumerate')
+    def jinja_enumerate(iterable, start=1):
+        return enumerate(iterable, start)
+
+    # ---------- Random Ghazal API ----------
+    @app.route('/api/random-ghazal')
+    def random_ghazal():
+        from models.base import get_db_connection
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute("SELECT id FROM texts ORDER BY RANDOM() LIMIT 1")
+        row = cur.fetchone()
+        cur.close()
+        conn.close()
+        if row:
+            return jsonify({'id': row['id']})
+        return jsonify({'error': 'No ghazals found'}), 404
 
     # ---------- Error handlers ----------
     @app.errorhandler(404)
