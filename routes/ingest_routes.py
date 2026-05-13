@@ -79,23 +79,26 @@ def add():
             ghazal_text=ghazal_text,
             source=source,
             book_id=book_id,
-            contributor_id=contributor_id
+            contributor_id=contributor_id,
+            run_nlp_flag=False,   # you can enable later
+            run_embedding=False    # you can enable later
         )
+
         if error:
             flash(error, 'error')
             return redirect(url_for('ingest.add'))
 
-        if result and result.get("duplicate"):
-            flash('⚠️ This ghazal already exists in the archive (duplicate).', 'warning')
+        if result.get('existing'):
+            flash(f'⚠️ This ghazal already exists in the archive (existing ID: {result["text_id"]}).', 'warning')
         else:
             flash('✅ Ghazal added successfully!', 'success')
-        return redirect(url_for('ghazals.view_ghazal', text_id=result.get('text_id')))
+        return redirect(url_for('ghazals.view_ghazal', text_id=result['text_id']))
 
     poets = get_all_poets()
     return render_template('ghazal_ingest.html', poets=poets)
 
 
-# ================= BULK PROCESS (PREVIEW) – FIXED DUPLICATE DETECTION =================
+# ================= BULK PROCESS (PREVIEW) =================
 @ingest_bp.route('/bulk-process', methods=['POST'])
 def bulk_process():
     try:
@@ -143,7 +146,7 @@ def bulk_process():
                 })
                 continue
 
-            # ✅ FIX: Hash the FULL normalized text, not just first couplet
+            # Use same normalisation as insert pipeline
             normalized_full = normalize_ghazal(block)
             content_hash = hashlib.sha256(normalized_full.encode('utf-8')).hexdigest()
 
@@ -219,17 +222,25 @@ def bulk_insert():
                 skipped += 1
                 continue
 
+            # Skip invalid blocks
+            if item.get('error'):
+                failed += 1
+                continue
+
             try:
-                result, err = insert_ghazal(
+                result, error = insert_ghazal(
                     poet_id=poet_id,
                     ghazal_text=item['text'],
                     source=source,
                     book_id=book_id,
-                    contributor_id=None
+                    contributor_id=None,
+                    run_nlp_flag=False,
+                    run_embedding=False
                 )
-                if err:
+                if error:
+                    print(f"Insert error: {error}")
                     failed += 1
-                elif result and result.get("duplicate"):
+                elif result.get('existing'):
                     skipped += 1
                 else:
                     inserted += 1

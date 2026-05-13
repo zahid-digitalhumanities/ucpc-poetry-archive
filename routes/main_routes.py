@@ -43,13 +43,25 @@ def index():
             'name_urdu': p.get('name_urdu', ''),
             'image_filename': None,
             'display_couplet': get_sample_couplet_for_poet(p['id']),
-            'ghazal_count': p.get('ghazal_count', 0)   # 🔥 passes ghazal count to template
+            'ghazal_count': p.get('ghazal_count', 0)
         })
     recent_ghazals = get_recent_ghazals(limit=10)
     return render_template('index.html', poets=poets, recent_ghazals=recent_ghazals, stats=stats)
 
-# ================= NEW RESEARCH DASHBOARD ROUTE =================
+# ================= AI ANALYSIS PAGE (Ask UCPC) =================
+@main_bp.route('/ask')
+def ask_page():
+    """Render the Ask UCPC interface (single ghazal analysis dashboard)."""
+    return render_template('ask_ucpc.html')
+
+# ================= RESEARCH DASHBOARD (CORPUS STATS) =================
+@main_bp.route('/research-dashboard')
+def research_dashboard_page():
+    """Render the corpus research dashboard with charts and embedding visualisation."""
+    return render_template('research_dashboard.html')
+
+# ================= LEGACY RESEARCH ROUTE (optional, points to ask page) =================
 @main_bp.route('/research')
 def research_dashboard():
-    """Render the AI research dashboard (ask_ucpc.html)."""
+    """Legacy route – redirects to the Ask UCPC page."""
     return render_template('ask_ucpc.html')
