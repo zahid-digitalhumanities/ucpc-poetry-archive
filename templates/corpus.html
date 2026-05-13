@@ -1,0 +1,298 @@
+{% extends "base.html" %}
+
+{% block title %}UCPC Corpus Browser{% endblock %}
+
+{% block extra_css %}
+<style>
+    .mode-toggle {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+    .mode-btn {
+        padding: 0.5rem 1.2rem;
+        border-radius: 2rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: 0.2s;
+        border: none;
+        background: #e2e8f0;
+        color: #4a5568;
+    }
+    .mode-btn.active {
+        background: #D4AF37;
+        color: #1e3c72;
+    }
+    .search-row {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 1.5rem;
+    }
+    .search-input {
+        flex: 1;
+        padding: 0.75rem 1rem;
+        border: 1px solid #cbd5e1;
+        border-radius: 2rem;
+        font-size: 0.9rem;
+    }
+    .search-btn {
+        background: #D4AF37;
+        border: none;
+        border-radius: 2rem;
+        padding: 0 1.5rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: 0.2s;
+        white-space: nowrap;
+    }
+    .search-btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+    .search-btn:hover:not(:disabled) {
+        background: #b8960c;
+    }
+    .summary-card {
+        background: #f8fafc;
+        border-radius: 1rem;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        border-left: 4px solid #D4AF37;
+    }
+    .results-table {
+        width: 100%;
+        border-collapse: collapse;
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 0.75rem;
+        overflow: hidden;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .results-table th {
+        background: #f1f5f9;
+        padding: 14px 10px;
+        text-align: center;
+        font-weight: 700;
+        font-size: 0.9rem;
+        border-bottom: 2px solid #D4AF37;
+        color: #1e3c72;
+    }
+    .results-table td {
+        padding: 14px 10px;
+        border-bottom: 1px solid #eef2f6;
+        vertical-align: middle;
+        font-size: 1rem;
+    }
+    .couplet-cell {
+        font-family: 'Jameel Noori Nastaleeq', 'Noto Nastaliq Urdu', serif;
+        direction: rtl;
+        text-align: center;
+        font-size: 1.2rem;
+        font-weight: 700;
+        line-height: 1.6;
+        color: #1e293b;
+    }
+    .poet-cell {
+        text-align: center;
+        white-space: nowrap;
+        font-weight: 500;
+    }
+    .score-cell {
+        text-align: center;
+        font-weight: 700;
+        color: #16a34a;
+        white-space: nowrap;
+    }
+    .link-cell {
+        text-align: center;
+        white-space: nowrap;
+    }
+    .link-cell a {
+        color: #D4AF37;
+        text-decoration: none;
+        font-weight: 600;
+    }
+    .link-cell a:hover {
+        text-decoration: underline;
+    }
+    .loading {
+        text-align: center;
+        padding: 2rem;
+        color: #64748b;
+    }
+    /* Spinner */
+    .loader-spinner {
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        border: 2px solid rgba(0,0,0,0.1);
+        border-top: 2px solid #D4AF37;
+        border-radius: 50%;
+        animation: spin 0.6s linear infinite;
+        margin-right: 8px;
+        vertical-align: middle;
+    }
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    @media (max-width: 640px) {
+        .results-table th, .results-table td {
+            padding: 8px 6px;
+            font-size: 0.8rem;
+        }
+        .couplet-cell {
+            font-size: 1rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto">
+    <h2 class="text-2xl font-bold text-primary mb-2">📚 UCPC Corpus Browser</h2>
+    <p class="text-gray-600 mb-4">Explore Urdu ghazals using keyword or AI semantic search.</p>
+
+    <div class="mode-toggle">
+        <button id="keywordModeBtn" class="mode-btn active">🔍 Keyword Search</button>
+        <button id="semanticModeBtn" class="mode-btn">🧠 Semantic Search</button>
+    </div>
+
+    <div class="search-row">
+        <input type="text" id="searchBox" class="search-input" placeholder="e.g., love, dil, رات, sad poetry...">
+        <button id="searchBtn" class="search-btn">🔍 Analyze</button>
+    </div>
+
+    <div id="results">
+        <div class="loading">Start searching...</div>
+    </div>
+</div>
+
+<script>
+let currentMode = "keyword";
+const searchBox = document.getElementById('searchBox');
+const resultsDiv = document.getElementById('results');
+const keywordBtn = document.getElementById('keywordModeBtn');
+const semanticBtn = document.getElementById('semanticModeBtn');
+const searchBtn = document.getElementById('searchBtn');
+
+function setActiveMode(mode) {
+    currentMode = mode;
+    if (mode === "keyword") {
+        keywordBtn.classList.add('active');
+        semanticBtn.classList.remove('active');
+    } else {
+        semanticBtn.classList.add('active');
+        keywordBtn.classList.remove('active');
+    }
+    performSearch();
+}
+
+keywordBtn.addEventListener('click', () => setActiveMode("keyword"));
+semanticBtn.addEventListener('click', () => setActiveMode("semantic"));
+searchBtn.addEventListener('click', () => performSearch());
+searchBox.addEventListener('keypress', e => { if (e.key === 'Enter') performSearch(); });
+
+async function performSearch() {
+    const q = searchBox.value.trim();
+    if (q.length < 2) {
+        resultsDiv.innerHTML = '<div class="loading">Type at least 2 characters...</div>';
+        return;
+    }
+
+    // Show loading indicator with spinner
+    resultsDiv.innerHTML = `
+        <div class="loading">
+            <span class="loader-spinner"></span> 
+            ${currentMode === "keyword" ? "🔍 Searching keyword matches..." : "🧠 Running AI semantic search..."}
+        </div>
+    `;
+    searchBtn.disabled = true;
+    searchBtn.innerHTML = '<span class="loader-spinner"></span> Processing...';
+
+    try {
+        const url = currentMode === "keyword" 
+            ? `/corpus/api/search?q=${encodeURIComponent(q)}`
+            : `/corpus/api/semantic?q=${encodeURIComponent(q)}`;
+        const res = await fetch(url);
+        const data = await res.json();
+        renderResults(data.results, currentMode);
+    } catch (err) {
+        resultsDiv.innerHTML = `<div class="text-red-500">❌ Error: ${err.message}</div>`;
+    } finally {
+        searchBtn.disabled = false;
+        searchBtn.innerHTML = "🔍 Analyze";
+    }
+}
+
+function renderResults(data, mode) {
+    if (!data || data.length === 0) {
+        resultsDiv.innerHTML = "<div class='loading'>No results found.</div>";
+        return;
+    }
+
+    // Summary
+    const poets = data.map(g => g.poet_name || g.poet).filter(Boolean);
+    const topPoet = poets.length ? 
+        Object.entries(poets.reduce((acc, p) => { acc[p] = (acc[p]||0)+1; return acc; }, {}))
+            .sort((a,b) => b[1]-a[1])[0][0] : "Multiple";
+    const dominantTheme = mode === "semantic" ? "Love / Ishq (semantic cluster)" : "Love / Grief";
+
+    let html = `
+        <div class="summary-card">
+            <p><strong>📊 Results found:</strong> ${data.length}</p>
+            <p><strong>🎭 Dominant theme:</strong> ${dominantTheme}</p>
+            <p><strong>🖋️ Top poet:</strong> ${escapeHtml(topPoet)}</p>
+            <p class="text-xs text-gray-500">${mode === "semantic" ? "🧠 AI semantic similarity" : "🔍 Keyword match (Roman/Urdu/English)"}</p>
+        </div>
+        <div style="overflow-x: auto;">
+            <table class="results-table">
+                <thead>
+                    <tr>
+                        <th style="width:5%;">#</th>
+                        <th style="width:55%;">First Couplet (Urdu)</th>
+                        <th style="width:20%;">Poet</th>
+                        ${mode === "semantic" ? '<th style="width:10%;">Similarity</th>' : ''}
+                        <th style="width:10%;">View</th>
+                    </tr>
+                </thead>
+                <tbody>
+    `;
+
+    data.forEach((item, idx) => {
+        const coupletHtml = item.first_couplet || item.title_urdu || item.title || '';
+        const poet = escapeHtml(item.poet_name || item.poet || '');
+        const similarity = mode === "semantic" ? (item.score * 100).toFixed(1) : null;
+        html += `
+            <tr>
+                <td style="text-align:center; font-weight:600;">${idx+1}</td>
+                <td class="couplet-cell">${coupletHtml}</td>
+                <td class="poet-cell">${poet}</td>
+                ${mode === "semantic" ? `<td class="score-cell">${similarity}%</td>` : ''}
+                <td class="link-cell"><a href="/ghazals/view/${item.text_id || item.id}" target="_blank">View →</a></td>
+            </tr>
+        `;
+    });
+
+    html += `
+                </tbody>
+            </table>
+        </div>
+    `;
+    resultsDiv.innerHTML = html;
+}
+
+function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/[&<>]/g, m => {
+        if (m === '&') return '&amp;';
+        if (m === '<') return '&lt;';
+        if (m === '>') return '&gt;';
+        return m;
+    });
+}
+
+// Initial search
+performSearch();
+</script>
+{% endblock %}

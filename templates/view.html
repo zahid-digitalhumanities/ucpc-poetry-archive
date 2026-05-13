@@ -10,165 +10,598 @@
 <meta name="twitter:card" content="summary_large_image">
 {% endblock %}
 
-{% block title %}{{ ghazal.poet_name }} - UCPC Poetry{% endblock %}
+{% block title %}
+{{ ghazal.poet_name }} - UCPC Poetry
+{% endblock %}
 
 {% block extra_css %}
 <style>
-body, .view-container { background: #0a1a2a !important; }
 
-.poet-name-en {
-    font-size: 1.8rem;
-    letter-spacing: 3px;
-    color: #D4AF37;
-    text-align:center;
-    font-weight:700;
+.view-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
 }
 
-.urdu-couplet {
-    font-family: 'Noto Nastaliq Urdu', serif;
-    font-size: 1.5rem;
-    direction: rtl;
-    text-align: center;
-    color: white;
-    margin-bottom: 1rem;
-}
+/* =========================================================
+   MAIN GHAZAL CARD – ULTRA ELEGANT WITH THICK GRADIENT BORDER
+========================================================= */
 
 .ghazal-card {
-    background: linear-gradient(135deg, #0F2B3D, #1E3C72);
-    border-radius: 1.5rem;
-    padding: 1.5rem;
-    max-width: 800px;
+    background: #ffffff;
+    border-radius: 36px;
+    padding: 2rem;
+    max-width: 950px;
     margin: auto;
+    position: relative;
+    /* Thick colourful gradient border (4px) */
+    border: 4px solid transparent;
+    background-clip: padding-box;
+    background-image: linear-gradient(white, white), 
+                      linear-gradient(135deg, 
+                        #e6b800,  /* gold */
+                        #d4af37,  /* classic gold */
+                        #b8860b,  /* dark goldenrod */
+                        #ffd700,  /* bright gold */
+                        #daa520,  /* goldenrod */
+                        #cd7f32   /* bronze */
+                      );
+    background-origin: border-box;
+    background-clip: padding-box, border-box;
+    /* Outer glow */
+    box-shadow: 0 20px 35px -12px rgba(0,0,0,0.3), 
+                0 0 0 1px rgba(212,175,55,0.2) inset;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
+.ghazal-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 28px 40px -14px rgba(0,0,0,0.35), 
+                0 0 0 2px rgba(212,175,55,0.3) inset;
+}
+
+/* Inner decorative shine (pseudo-element) */
+.ghazal-card::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 6px;
+    background: linear-gradient(90deg, 
+        #e6b800, #d4af37, #b8860b, #ffd700, #daa520);
+    border-radius: 36px 36px 0 0;
+    opacity: 0.8;
+}
+
+.poet-header {
+    text-align: center;
+    border-bottom: 2px solid rgba(212,175,55,0.5);
+    padding-bottom: 1rem;
+    margin-bottom: 1.5rem;
+    position: relative;
+}
+
+.poet-name-en {
+    font-size: 2.3rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #1e3c72, #2a5298, #0f2b3d);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.05);
+}
+
+.poet-metadata {
+    margin-top: 0.5rem;
+    color: #64748b;
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+/* Features row – elegant badges */
+.features-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1.2rem;
+    background: linear-gradient(120deg, #fff9e8, #fff5e0);
+    border-radius: 60px;
+    padding: 0.9rem 1.5rem;
+    margin-bottom: 2rem;
+    border: 1px solid rgba(212,175,55,0.4);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+}
+
+.feature-item {
+    color: #1e293b;
+    font-size: 1rem;
+    font-weight: 600;
+    background: white;
+    padding: 0.3rem 1rem;
+    border-radius: 40px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    transition: all 0.2s;
+}
+
+.feature-item:hover {
+    transform: scale(1.02);
+    background: #fffdf7;
+}
+
+.feature-label {
+    font-weight: 800;
+    color: #b8860b;
+    margin-right: 0.4rem;
+}
+
+.feature-value {
+    color: #1e3c72;
+    font-weight: 600;
+}
+
+/* Urdu couplets – refined with subtle calligraphy feel */
+.urdu-couplet {
+    text-align: center;
+    direction: rtl;
+    margin-bottom: 2rem;
+    padding-bottom: 1.2rem;
+    border-bottom: 1px dashed rgba(212,175,55,0.5);
+    position: relative;
+}
+
+.urdu-couplet:last-child {
+    border-bottom: none;
+}
+
+.urdu-couplet div {
+    font-family: 'Jameel Noori Nastaleeq',
+                 'Noto Nastaliq Urdu',
+                 serif;
+    font-size: 2.1rem;
+    line-height: 2.6;
+    color: #1e293b;
+    font-weight: 700;
+    text-shadow: 0 1px 1px rgba(0,0,0,0.05);
+    letter-spacing: 0.5px;
+}
+
+/* =========================================================
+   SIMILAR GHAZALS TABLE – LARGER & BOLDER
+========================================================= */
+
+.table-responsive {
+    overflow-x: auto;
+    margin-top: 1rem;
+}
+
+.semantic-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: white;
+    border: 2px solid #d4af37;
+    border-radius: 28px;
+    overflow: hidden;
+    box-shadow: 0 12px 28px rgba(0,0,0,0.1);
+}
+
+.semantic-table th {
+    background: linear-gradient(135deg, #1e3c72, #0f2b3d);
+    color: #ffd966;
+    padding: 18px 12px;
+    text-align: center;
+    font-weight: 800;
+    font-size: 1.1rem;
+    letter-spacing: 1px;
+}
+
+.semantic-table td {
+    padding: 20px 14px;
+    border-bottom: 1px solid #eef2f6;
+    vertical-align: middle;
+}
+
+.semantic-table tr:last-child td {
+    border-bottom: none;
+}
+
+.semantic-table tr:hover td {
+    background-color: rgba(212,175,55,0.08);
+}
+
+.couplet-cell {
+    direction: rtl;
+    text-align: center;
+    padding: 22px 16px;
+    min-width: 420px;
+}
+
+.misra-line {
+    font-family: 'Jameel Noori Nastaleeq',
+                 'Noto Nastaliq Urdu',
+                 serif;
+    font-size: 1.8rem;
+    font-weight: 700;
+    line-height: 2.4;
+    color: #1e293b;
+    margin-bottom: 8px;
+    word-break: break-word;
+}
+
+.misra-line:last-child {
+    margin-bottom: 0;
+}
+
+.poet-cell {
+    text-align: center;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #2c3e2f;
+    white-space: nowrap;
+}
+
+.score-cell {
+    text-align: center;
+    font-weight: 800;
+    color: #16a34a;
+    font-size: 1.3rem;
+    white-space: nowrap;
+}
+
+.link-cell a {
+    text-decoration: none;
+    color: #d4af37;
+    font-weight: 800;
+    font-size: 1rem;
+    padding: 0.5rem 1rem;
+    border-radius: 30px;
+    transition: 0.2s;
+    border: 1px solid #d4af37;
+}
+
+.link-cell a:hover {
+    background: #d4af37;
+    color: #1e3c72;
+    border-color: #d4af37;
+}
+
+/* =========================================================
+   ASK BOX – keep clean
+========================================================= */
+
 .ask-box {
-    max-width: 800px;
+    background: white;
+    border-radius: 28px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.04);
+    padding: 1.5rem;
+    max-width: 950px;
     margin: 2rem auto;
-    padding: 1rem;
-    background: rgba(0,0,0,0.3);
-    border-radius: 1rem;
 }
 
 .ask-box h3 {
-    font-weight: bold;
-    color: #D4AF37;
+    color: #1e3c72;
+    margin-bottom: 1rem;
 }
 
 .ask-input-group {
     display: flex;
-    gap: 0.5rem;
-    margin-top: 0.5rem;
+    gap: 0.7rem;
 }
 
 .ask-input {
     flex: 1;
-    padding: 0.5rem;
-    border-radius: 2rem;
-    border: 1px solid #D4AF37;
-    background: #1e2a3a;
-    color: white;
+    border-radius: 999px;
+    border: 1px solid #cbd5e1;
+    padding: 0.9rem 1.2rem;
+    font-size: 0.95rem;
+}
+
+.ask-input:focus {
+    outline: none;
+    border-color: #d4af37;
+    box-shadow: 0 0 0 4px rgba(212,175,55,0.18);
 }
 
 .ask-btn {
-    padding: 0.5rem 1rem;
-    border-radius: 2rem;
-    border: 1px solid #D4AF37;
-    color: #D4AF37;
-    background: transparent;
+    background: #d4af37;
+    color: #1e3c72;
+    border: none;
+    border-radius: 999px;
+    padding: 0 1.5rem;
+    font-weight: 700;
     cursor: pointer;
-    transition: all 0.2s;
 }
 
 .ask-btn:hover {
-    background: #D4AF37;
-    color: #0a1a2a;
+    background: #b8960c;
+}
+
+.quick-buttons {
+    margin-top: 1rem;
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.quick-btn {
+    border: 1px solid #e2e8f0;
+    background: #f8fafc;
+    border-radius: 999px;
+    padding: 0.45rem 1rem;
+    cursor: pointer;
+    font-size: 0.8rem;
+}
+
+.quick-btn:hover {
+    background: #d4af37;
+    color: #1e3c72;
 }
 
 .answer-box {
     margin-top: 1rem;
-    padding: 0.5rem;
-    background: rgba(0,0,0,0.4);
-    border-radius: 0.5rem;
+    padding: 1rem;
+    background: #f8fafc;
+    border-left: 4px solid #d4af37;
+    border-radius: 14px;
     display: none;
-    color: white;
 }
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 768px) {
+    .ghazal-card {
+        padding: 1.5rem;
+        border-width: 3px;
+    }
+    .urdu-couplet div {
+        font-size: 1.6rem;
+        line-height: 2.2;
+    }
+    .couplet-cell {
+        min-width: 280px;
+    }
+    .misra-line {
+        font-size: 1.3rem;
+    }
+    .poet-cell {
+        font-size: 1rem;
+    }
+    .score-cell {
+        font-size: 1.1rem;
+    }
+    .ask-input-group {
+        flex-direction: column;
+    }
+    .nav-share-row {
+        flex-direction: column;
+    }
+    .features-row {
+        gap: 0.8rem;
+        padding: 0.7rem 1rem;
+    }
+    .feature-item {
+        font-size: 0.85rem;
+    }
+}
+
+.nav-share-row {
+    max-width: 950px;
+    margin: 1.5rem auto;
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.nav-buttons {
+    display: flex;
+    gap: 0.7rem;
+}
+
+.nav-btn {
+    background: #1e3c72;
+    color: white;
+    border: none;
+    border-radius: 999px;
+    padding: 0.65rem 1.3rem;
+    text-decoration: none;
+    font-weight: 700;
+    transition: 0.2s ease;
+    cursor: pointer;
+}
+
+.nav-btn:hover {
+    background: #d4af37;
+    color: #1e3c72;
+}
+
 </style>
 {% endblock %}
 
 {% block content %}
+
 <div class="view-container">
-    <!-- POET HEADER -->
-    <div class="poet-name-en">
-        {{ ghazal.poet_name | upper }}
-    </div>
 
     <div class="ghazal-card">
+
+        <div class="poet-header">
+            <div class="poet-name-en">
+                {{ ghazal.poet_name | upper }}
+            </div>
+            <div class="poet-metadata">
+                {% if ghazal.verse_count %}
+                {{ ghazal.verse_count }} verses
+                {% endif %}
+                {% if ghazal.source %}
+                • {{ ghazal.source }}
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="features-row">
+            {% if ghazal.radif %}
+            <div class="feature-item">
+                <span class="feature-label">Radif:</span>
+                <span class="feature-value">{{ ghazal.radif }}</span>
+            </div>
+            {% endif %}
+            {% if ghazal.qaafiya %}
+            <div class="feature-item">
+                <span class="feature-label">Qaafiya:</span>
+                <span class="feature-value">{{ ghazal.qaafiya|join(', ') }}</span>
+            </div>
+            {% endif %}
+            {% if ghazal.theme %}
+            <div class="feature-item">
+                <span class="feature-label">Theme:</span>
+                <span class="feature-value">{{ ghazal.theme }}</span>
+            </div>
+            {% endif %}
+        </div>
+
         {% for verse in verses %}
         <div class="urdu-couplet">
             <div>{{ verse.misra1_urdu }}</div>
             <div>{{ verse.misra2_urdu }}</div>
         </div>
         {% endfor %}
+
     </div>
 
-    <!-- Unified Ask UCPC Interface -->
+    <!-- NAVIGATION -->
+    <div class="nav-share-row">
+        <div class="nav-buttons">
+            {% if prev_id %}
+            <a href="/ghazals/view/{{ prev_id }}" class="nav-btn">← Previous</a>
+            {% endif %}
+            {% if next_id %}
+            <a href="/ghazals/view/{{ next_id }}" class="nav-btn">Next →</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- ASK BOX -->
     <div class="ask-box">
-        <h3>💬 Ask UCPC</h3>
+        <h3>💬 Ask UCPC – AI Poetry Assistant</h3>
         <div class="ask-input-group">
-            <input type="text" id="questionInput" class="ask-input" placeholder="e.g., Who is the poet? / Similar ghazals? / What is the theme?" />
+            <input type="text" id="questionInput" class="ask-input" placeholder="Ask about poet, theme, similar ghazals...">
             <button onclick="askUCPC()" class="ask-btn">Ask</button>
+        </div>
+        <div class="quick-buttons">
+            <button class="quick-btn" onclick="setQuestion('Who is the poet?')">Poet</button>
+            <button class="quick-btn" onclick="setQuestion('Theme?')">Theme</button>
+            <button class="quick-btn" onclick="setQuestion('Similar ghazals')">Similar</button>
         </div>
         <div id="answerBox" class="answer-box"></div>
     </div>
+
 </div>
 
 <script>
+function setQuestion(q) {
+    document.getElementById('questionInput').value = q;
+}
+
 async function askUCPC() {
-    const question = document.getElementById("questionInput").value;
-    const text_id = {{ ghazal.id }};
+    const question = document.getElementById("questionInput").value.trim();
     const answerDiv = document.getElementById("answerBox");
-    if (!question.trim()) {
-        answerDiv.style.display = "block";
-        answerDiv.innerHTML = "⚠️ Please enter a question.";
-        return;
-    }
+    if (!question) return;
+
     answerDiv.style.display = "block";
-    answerDiv.innerHTML = "🤔 Thinking...";
+    answerDiv.innerHTML = "Thinking...";
 
     try {
         const response = await fetch("/ask/", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ question: question, text_id: text_id })
+            body: JSON.stringify({
+                question: question,
+                text_id: {{ ghazal.id }}
+            })
         });
         const data = await response.json();
-
         let html = "";
-        if (data.type === "poet_prediction") {
-            html = "<strong>📜 Predicted Poet(s):</strong><br>";
-            data.data.forEach(p => {
-                const name = p.poet_name_urdu ? `${p.poet_name} (${p.poet_name_urdu})` : p.poet_name;
-                html += `• ${name} – ${(p.confidence * 100).toFixed(1)}% confidence<br>`;
-            });
-        }
-        else if (data.type === "similar") {
-            html = "<strong>🔗 Similar Ghazals:</strong><br>";
+
+        if (data.type === "similar") {
+            html = `
+                <strong>🔗 Similar Ghazals</strong>
+                <div class="table-responsive">
+                <table class="semantic-table">
+                    <thead>
+                        <tr><th>First Couplet (Urdu)</th><th>Poet</th><th>Similarity</th><th>View</th></tr>
+                    </thead>
+                    <tbody>
+            `;
+
             data.data.forEach(s => {
-                html += `• “${s.title_urdu}” by ${s.poet_name} (${(s.similarity * 100).toFixed(1)}% similarity)<br>`;
+                let couplet = s.first_couplet || s.first_verse_urdu || s.title || '';
+                couplet = couplet.replace(/<br\s*\/?>/gi, '\n');
+                const lines = couplet.split('\n');
+                const misra1 = lines[0] || '';
+                const misra2 = lines[1] || '';
+                const poet = s.poet_name || s.poet || '';
+                const similarityPercent = ((s.similarity || s.score || 0) * 100).toFixed(1);
+
+                html += `
+                    <tr>
+                        <td class="couplet-cell">
+                            <div class="misra-line">${escapeHtml(misra1)}</div>
+                            ${misra2 ? `<div class="misra-line">${escapeHtml(misra2)}</div>` : ''}
+                        </td>
+                        <td class="poet-cell">${escapeHtml(poet)}</td>
+                        <td class="score-cell">${similarityPercent}%</td>
+                        <td class="link-cell"><a href="/ghazals/view/${s.text_id}" target="_blank">View →</a></td>
+                    </tr>
+                `;
             });
+
+            html += `</tbody>${'<tr>'}</div>`;
+        } else {
+            // Improved fallback for poet/theme responses
+            if (data.type === "poet_prediction" && data.data && data.data.length) {
+                const top = data.data[0];
+                const confidencePercent = (top.confidence * 100).toFixed(1);
+                html = `
+                    <div style="font-family: inherit;">
+                        <strong>🖋️ Likely Poet</strong><br>
+                        ${escapeHtml(top.poet_name)} (${escapeHtml(top.poet_name_urdu || '')})<br>
+                        <span style="color: #16a34a; font-weight: bold;">Confidence: ${confidencePercent}%</span>
+                        ${top.explanation ? `<div style="margin-top: 0.5rem; font-size: 0.85rem; color: #64748b;">${top.explanation.join(' • ')}</div>` : ''}
+                    </div>
+                `;
+            } else if (data.type === "theme" && data.data) {
+                html = `
+                    <div>
+                        <strong>🎭 Theme:</strong> ${escapeHtml(data.data.primary_theme || 'Unknown')}
+                        ${data.data.keywords ? `<br><strong>Keywords:</strong> ${escapeHtml(data.data.keywords.join(', '))}` : ''}
+                    </div>
+                `;
+            } else {
+                html = `<pre style="white-space: pre-wrap;">${JSON.stringify(data, null, 2)}</pre>`;
+            }
         }
-        else if (data.type === "theme") {
-            html = `<strong>🎭 Theme:</strong> ${data.data.theme}<br>`;
-            html += `<strong>📖 Reason:</strong> ${data.data.reason}`;
-        }
-        else {
-            html = data.data;
-        }
+
         answerDiv.innerHTML = html;
     } catch (err) {
-        answerDiv.innerHTML = "❌ Error: Could not process your request.";
         console.error(err);
+        answerDiv.innerHTML = "❌ Error processing request.";
     }
+}
+
+function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/[&<>]/g, function(m) {
+        if (m === '&') return '&amp;';
+        if (m === '<') return '&lt;';
+        if (m === '>') return '&gt;';
+        return m;
+    });
 }
 </script>
 {% endblock %}

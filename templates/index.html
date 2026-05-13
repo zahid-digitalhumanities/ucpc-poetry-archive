@@ -1,124 +1,261 @@
 {% extends "base.html" %}
 
-{% block title %}UCPC – Computational Urdu Poetry Lab{% endblock %}
+{% block title %}UCPC – Urdu Computational Poetry Corpus{% endblock %}
 
 {% block extra_css %}
 <style>
-/* ===== Layout ===== */
-.dashboard {
-    max-width: 1200px;
-    margin: 1.5rem auto;
-    display: grid;
-    grid-template-columns: 1.2fr 1fr;
-    gap: 20px;
+/* ================= BASE STYLES ================= */
+* {
+    box-sizing: border-box;
 }
 
-/* ===== Header ===== */
-.lab-header {
+body {
+    overflow-x: hidden;
+    width: 100%;
+    max-width: 100%;
+}
+
+/* ================= HERO SECTION ================= */
+.hero {
     text-align: center;
-    margin-bottom: 1rem;
+    margin-bottom: 30px;
+    padding: 0 15px;
 }
-.lab-title {
-    font-size: 1.6rem;
+
+.hero h1 {
+    font-size: 1.8rem;
     font-weight: bold;
-    color: #1e3c72;
-}
-.lab-sub {
-    font-size: 0.85rem;
-    color: #777;
-}
-
-/* ===== Card ===== */
-.card {
-    background: #fff;
-    border-radius: 16px;
-    padding: 18px;
-    border: 1px solid #eee;
-    box-shadow: 0 6px 18px rgba(0,0,0,0.04);
+    background: linear-gradient(135deg, #1e3c72, #2a5298);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1.3;
 }
 
-/* ===== Workflow ===== */
+.hero p {
+    color: #555;
+    max-width: 100%;
+    margin: 10px 0;
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+.hero p:first-of-type {
+    font-size: 1rem;
+}
+
+/* ================= WORKFLOW STEPS ================= */
 .workflow {
     display: flex;
-    justify-content: space-between;
-    font-size: 0.8rem;
-    margin-bottom: 10px;
-    color: #555;
+    justify-content: center;
+    gap: 12px;
+    margin: 20px 0;
+    flex-wrap: wrap;
 }
 
-/* ===== Ghazal Input ===== */
-textarea {
-    width: 100%;
-    min-height: 260px;
-    padding: 12px;
-    border-radius: 12px;
-    border: 1px solid #ddd;
-    font-family: 'Jameel Noori Nastaleeq','Noto Nastaliq Urdu', serif;
-    direction: rtl;
-    line-height: 2;
+.step {
+    background: #f8fafc;
+    padding: 8px 12px;
+    border-radius: 25px;
+    font-size: 0.75rem;
+    border: 1px solid #e2e8f0;
+    white-space: nowrap;
 }
 
-/* ===== Buttons ===== */
-.analyze-btn {
-    width: 100%;
-    margin-top: 10px;
-    padding: 10px;
-    border-radius: 30px;
-    background: linear-gradient(135deg,#1e3c72,#2c5a8c);
+@media (max-width: 600px) {
+    .step {
+        font-size: 0.7rem;
+        padding: 6px 10px;
+        white-space: normal;
+        text-align: center;
+    }
+}
+
+/* ================= BUTTON ================= */
+.btn-primary-custom {
+    background: linear-gradient(135deg, #1e3c72, #2a5298);
     color: white;
-    border: none;
+    padding: 12px 20px;
+    border-radius: 30px;
+    text-decoration: none;
+    display: inline-block;
+    margin-top: 15px;
     font-weight: bold;
-    cursor: pointer;
-}
-.analyze-btn:hover {
-    background: #D4AF37;
-    color:#1e3c72;
-}
-
-/* ===== Tabs ===== */
-.tabs {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 10px;
-}
-.tab {
-    padding: 6px 14px;
-    border-radius: 20px;
-    background: #eee;
-    cursor: pointer;
-    font-size: 0.8rem;
-}
-.tab.active {
-    background: #D4AF37;
-    color: #1e3c72;
-}
-
-/* ===== Result Box ===== */
-.result-box {
-    background: #f9fafb;
-    border-radius: 12px;
-    padding: 12px;
-    margin-bottom: 10px;
+    transition: 0.2s;
     font-size: 0.9rem;
-    min-height: 200px;
+    width: auto;
 }
 
-/* ===== Highlight ===== */
-.highlight {
-    color: #D4AF37;
+.btn-primary-custom:hover {
+    transform: scale(1.02);
+    color: white;
+    background: linear-gradient(135deg, #2a5298, #1e3c72);
+}
+
+/* ================= FEATURE HIGHLIGHT BOX ================= */
+.feature-highlight {
+    background: linear-gradient(135deg, #f0f9ff, #e6f3ff);
+    border: 1px solid #b8dff0;
+    border-radius: 16px;
+    padding: 15px 18px;
+    margin: 20px 15px;
+}
+
+.feature-highlight strong {
+    font-size: 1rem;
+    color: #1e3c72;
+    display: block;
+    margin-bottom: 10px;
+}
+
+.feature-highlight ul {
+    margin: 0;
+    padding-left: 0;
+    list-style: none;
+}
+
+.feature-highlight li {
+    margin: 8px 0;
+    padding-left: 22px;
+    position: relative;
+    font-size: 0.85rem;
+    line-height: 1.4;
+}
+
+.feature-highlight li:before {
+    content: "✓";
+    color: #2a7f2a;
+    position: absolute;
+    left: 0;
     font-weight: bold;
 }
 
-/* ===== Similar list ===== */
-.similar-item {
-    padding: 6px 0;
-    border-bottom: 1px solid #eee;
+/* ================= SECTION TITLE ================= */
+.section-title {
+    margin-top: 35px;
+    margin-bottom: 15px;
+    font-weight: bold;
+    color: #1e3c72;
+    font-size: 1.3rem;
+    padding: 0 15px;
 }
 
-/* ===== Responsive ===== */
-@media(max-width:900px){
-    .dashboard{
-        grid-template-columns:1fr;
+/* ================= CARD GRID (Mobile First) ================= */
+.card-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 15px;
+    padding: 0 15px;
+}
+
+@media (min-width: 480px) {
+    .card-grid {
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    }
+}
+
+.card {
+    background: white;
+    padding: 18px;
+    border-radius: 14px;
+    border: 1px solid #eef2f6;
+    text-align: center;
+    transition: 0.2s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    text-decoration: none;
+    display: block;
+}
+
+.card:active {
+    transform: scale(0.98);
+    background: #fafafa;
+}
+
+.card h2 {
+    color: #1e3c72;
+    margin-top: 8px;
+    margin-bottom: 10px;
+    font-size: 1.2rem;
+}
+
+.card p {
+    font-size: 0.85rem;
+    color: #666;
+    line-height: 1.5;
+    margin-bottom: 10px;
+}
+
+/* ================= METHOD BADGES ================= */
+.method-badge {
+    display: inline-block;
+    background: #e9ecef;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    margin: 3px;
+    color: #495057;
+}
+
+/* ================= HIGHLIGHT BOX ================= */
+.highlight-box {
+    background: #fffbea;
+    border-left: 4px solid #D4AF37;
+    padding: 15px;
+    border-radius: 10px;
+    margin: 20px 15px;
+}
+
+.highlight-box p {
+    font-size: 0.85rem;
+    line-height: 1.6;
+    margin-bottom: 10px;
+}
+
+/* ================= CITATION BOX ================= */
+.citation-box {
+    background: #f8fafc;
+    border-radius: 12px;
+    padding: 15px;
+    margin: 20px 15px;
+    overflow-x: auto;
+}
+
+.citation-box pre {
+    margin: 0;
+    font-size: 0.7rem;
+    white-space: pre-wrap;
+    word-break: break-all;
+    background: transparent;
+    border: none;
+    font-family: monospace;
+    line-height: 1.4;
+}
+
+/* ================= SPACING FIXES ================= */
+.container-mobile {
+    padding-left: 0;
+    padding-right: 0;
+    overflow-x: hidden;
+}
+
+/* ================= TOUCH FRIENDLY ================= */
+a, button, .card {
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* ================= RESPONSIVE TYPOGRAPHY ================= */
+@media (max-width: 480px) {
+    .hero h1 {
+        font-size: 1.5rem;
+    }
+    
+    .section-title {
+        font-size: 1.2rem;
+    }
+    
+    .workflow {
+        gap: 8px;
     }
 }
 </style>
@@ -126,158 +263,136 @@ textarea {
 
 {% block content %}
 
-<div class="lab-header">
-    <div class="lab-title">🧠 UCPC – Computational Urdu Poetry Lab</div>
-    <div class="lab-sub">
-        Analyze ghazals using AI, NLP & Computational Philology
-    </div>
-</div>
+<div class="container-mobile">
 
-<div class="dashboard">
+    <!-- ================= HERO ================= -->
+    <div class="hero">
+        <h1>🧠 Urdu Computational Poetry Corpus (UCPC)</h1>
 
-    <!-- LEFT PANEL -->
-    <div class="card">
+        <p style="font-size:0.95rem; line-height:1.6;">
+            An AI-powered Digital Humanities platform for computational analysis of Urdu poetry.
+            Paste a ghazal or nazm to explore poet prediction, thematic analysis,
+            semantic similarity, stylometric patterns, and radif/qaafiya extraction.
+        </p>
+
+        <p style="margin-top:12px; color:#1e3c72; font-weight:600; font-size:0.9rem;">
+            📌 Example: Paste an unknown ghazal to estimate its most likely poet using
+            machine learning and corpus-based stylometric analysis.
+        </p>
+
+        <!-- Workflow -->
         <div class="workflow">
-            <span>① Paste Ghazal</span>
-            <span>② Click Analyze</span>
-            <span>③ Explore Results</span>
-        </div>
-        <textarea id="ghazalInput" placeholder="یہاں غزل پیسٹ کریں..."></textarea>
-        <button onclick="analyze()" class="analyze-btn">🔍 Analyze Ghazal</button>
-    </div>
-
-    <!-- RIGHT PANEL -->
-    <div class="card">
-        <div class="tabs">
-            <div class="tab active" onclick="showTab('poet')">Poet</div>
-            <div class="tab" onclick="showTab('theme')">Theme</div>
-            <div class="tab" onclick="showTab('similar')">Similar</div>
-            <div class="tab" onclick="showTab('radif')">Radif/Qaafiya</div>
+            <div class="step">① Paste Urdu Ghazal</div>
+            <div class="step">② Run AI Analysis</div>
+            <div class="step">③ Explore Poet, Themes & Similarity</div>
         </div>
 
-        <div id="poet" class="tab-content result-box">Awaiting analysis...</div>
-        <div id="theme" class="tab-content result-box" style="display:none;"></div>
-        <div id="similar" class="tab-content result-box" style="display:none;"></div>
-        <div id="radif" class="tab-content result-box" style="display:none;"></div>
+        <a href="/ask" class="btn-primary-custom">🎯 Start Poet Prediction →</a>
     </div>
+
+    <!-- ================= FEATURE HIGHLIGHT BOX ================= -->
+    <div class="feature-highlight">
+        <strong>✨ What can UCPC do?</strong>
+        <ul>
+            <li>Predict the probable poet of an unknown ghazal</li>
+            <li>Detect themes such as love, separation, mysticism, resistance, or melancholy</li>
+            <li>Extract radif and qaafiya patterns automatically</li>
+            <li>Find semantically similar ghazals from the corpus</li>
+            <li>Explore stylometric and linguistic patterns across poets</li>
+            <li>Support Digital Humanities research on Urdu literature</li>
+        </ul>
+    </div>
+
+    <!-- ================= CORE MODULES ================= -->
+    <div class="section-title">🚀 Research Modules</div>
+
+    <div class="card-grid">
+
+        <a href="/ask" class="card">
+            <div style="font-size:28px;">🤖</div>
+            <h2>Ask UCPC</h2>
+            <p>
+                Predict the likely poet of a ghazal, detect themes,
+                extract radif & qaafiya, and discover semantically related poetry
+                using AI and Digital Humanities methods.
+            </p>
+            <div>
+                <span class="method-badge">Ensemble ML</span>
+                <span class="method-badge">Stylometry</span>
+                <span class="method-badge">TF-IDF</span>
+            </div>
+        </a>
+
+        <a href="/research-dashboard" class="card">
+            <div style="font-size:28px;">📊</div>
+            <h2>Research Dashboard</h2>
+            <p>Corpus-level computational analysis: poet distribution, thematic modeling, radif frequency, and embedding clusters.</p>
+            <div class="method-badge">Corpus Statistics</div>
+            <div class="method-badge">Visualization</div>
+        </a>
+
+        <a href="/corpus" class="card">
+            <div style="font-size:28px;">📚</div>
+            <h2>Corpus Browser</h2>
+            <p>Explore 5,000+ canonical ghazals with full-text access, poet metadata, and verse-level navigation.</p>
+            <div class="method-badge">5,031 Ghazals</div>
+            <div class="method-badge">27 Poets</div>
+        </a>
+
+        <a href="/poets" class="card">
+            <div style="font-size:28px;">🖋️</div>
+            <h2>Poets Directory</h2>
+            <p>Browse ghazals by classical and modern Urdu poets. Analyze stylistic variation across authors.</p>
+            <div class="method-badge">Ghalib • Mir • Faiz • Iqbal</div>
+        </a>
+
+        <a href="/search" class="card">
+            <div style="font-size:28px;">🔍</div>
+            <h2>Semantic Search</h2>
+            <p>Search by keyword, matla, or whole ghazal. Find thematically and stylistically similar texts.</p>
+            <div class="method-badge">TF-IDF</div>
+            <div class="method-badge">Embeddings</div>
+        </a>
+
+        <a href="/integrity" class="card">
+            <div style="font-size:28px;">🛡️</div>
+            <h2>Integrity Dashboard</h2>
+            <p>Corpus quality management: duplicate detection, attribution conflict resolution, and soft-delete governance.</p>
+            <div class="method-badge">Provenance</div>
+        </a>
+
+    </div>
+
+    <!-- ================= RESEARCH CONTRIBUTION ================= -->
+    <div class="section-title">📖 Research Contribution</div>
+
+    <div class="highlight-box">
+        <p><strong>UCPC</strong> is a research-grade Digital Humanities infrastructure for Urdu literary studies.
+        The platform combines corpus linguistics, stylometry, semantic embeddings,
+        machine learning, and computational text analysis to support large-scale exploration
+        of classical and modern Urdu poetry.</p>
+        
+        <p style="margin-top:10px;">The system is designed for researchers, students, and general readers interested in
+        AI-assisted literary analysis, authorship attribution, intertextuality,
+        and computational philology.</p>
+    </div>
+
+    <!-- ================= CITE UCPC ================= -->
+    <div class="section-title">📖 Cite UCPC</div>
+
+    <div class="citation-box">
+        <pre>UCPC Digital Humanities Infrastructure. (2026). Urdu Computational Poetry Corpus.
+Retrieved from http://localhost:10000
+
+@software{ucpc_2026,
+    author = {UCPC Research Team},
+    title = {Urdu Computational Poetry Corpus},
+    year = {2026},
+    url = {http://localhost:10000},
+    note = {Digital Humanities infrastructure for Urdu literary analysis}
+}</pre>
+    </div>
+
 </div>
-
-<script>
-function showTab(tabName) {
-    // Update active tab styling
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    event.target.classList.add('active');
-    // Hide all tab contents
-    document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
-    // Show selected
-    document.getElementById(tabName).style.display = 'block';
-}
-
-async function analyze() {
-    const text = document.getElementById('ghazalInput').value.trim();
-    if (!text) {
-        alert("Please paste a ghazal first.");
-        return;
-    }
-
-    // Show loading in all tabs
-    document.getElementById('poet').innerHTML = "Analyzing poet...";
-    document.getElementById('theme').innerHTML = "Analyzing theme...";
-    document.getElementById('similar').innerHTML = "Finding similar ghazals...";
-    document.getElementById('radif').innerHTML = "Extracting radif/qaafiya...";
-
-    // 1. Poet prediction
-    try {
-        const poetRes = await fetch('/ask-index/', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ text: text, question: "poet name" })
-        });
-        const poetData = await poetRes.json();
-        if (poetData.type === 'poet' && poetData.data.length) {
-            let html = "<b>📜 Predicted Poet(s):</b><br>";
-            poetData.data.forEach(p => {
-                const name = p.poet_name_urdu ? `${p.poet_name} (${p.poet_name_urdu})` : p.poet_name;
-                html += `<div>${name} – ${(p.confidence * 100).toFixed(1)}% confidence</div>`;
-            });
-            document.getElementById('poet').innerHTML = html;
-        } else {
-            document.getElementById('poet').innerHTML = "Could not predict poet.";
-        }
-    } catch(e) {
-        document.getElementById('poet').innerHTML = "Error predicting poet.";
-        console.error(e);
-    }
-
-    // 2. Theme detection
-    try {
-        const themeRes = await fetch('/ask-index/', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ text: text, question: "theme" })
-        });
-        const themeData = await themeRes.json();
-        if (themeData.type === 'theme') {
-            document.getElementById('theme').innerHTML = `
-                <b>🎭 Theme:</b> ${themeData.data.theme}<br>
-                <b>Reason:</b> ${themeData.data.reason}
-            `;
-        } else {
-            document.getElementById('theme').innerHTML = "Could not determine theme.";
-        }
-    } catch(e) {
-        document.getElementById('theme').innerHTML = "Error detecting theme.";
-        console.error(e);
-    }
-
-    // 3. Similar ghazals (semantic search)
-    try {
-        const similarRes = await fetch('/ask-index/', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ text: text, question: "similar ghazals" })
-        });
-        const similarData = await similarRes.json();
-        if (similarData.type === 'search' && similarData.data.length) {
-            let html = "<b>🔗 Similar Ghazals:</b><br>";
-            similarData.data.forEach(s => {
-                html += `<div class="similar-item">
-                    <a href="/ghazals/view/${s.text_id}" target="_blank">${s.title}</a> – ${s.poet}
-                    <span class="highlight">(${(s.score * 100).toFixed(1)}% similarity)</span>
-                </div>`;
-            });
-            document.getElementById('similar').innerHTML = html;
-        } else {
-            document.getElementById('similar').innerHTML = "No similar ghazals found.";
-        }
-    } catch(e) {
-        document.getElementById('similar').innerHTML = "Error finding similar ghazals.";
-        console.error(e);
-    }
-
-    // 4. Radif / Qaafiya extraction
-    try {
-        const radifRes = await fetch('/ask-index/', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ text: text, question: "radif qaafiya" })
-        });
-        const radifData = await radifRes.json();
-        if (radifData.type === 'radif') {
-            const qaafiyaList = radifData.data.qaafiya || [];
-            document.getElementById('radif').innerHTML = `
-                <b>📐 Radif:</b> ${radifData.data.radif || 'Not detected'}<br>
-                <b>Qaafiya:</b> ${qaafiyaList.join(', ') || 'Not detected'}<br>
-                <b>Confidence:</b> ${(radifData.data.confidence * 100).toFixed(1)}%
-            `;
-        } else {
-            document.getElementById('radif').innerHTML = "Could not extract radif/qaafiya.";
-        }
-    } catch(e) {
-        document.getElementById('radif').innerHTML = "Error extracting radif/qaafiya.";
-        console.error(e);
-    }
-}
-</script>
 
 {% endblock %}

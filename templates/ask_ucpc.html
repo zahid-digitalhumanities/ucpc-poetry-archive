@@ -1,0 +1,749 @@
+{% extends "base.html" %}
+
+{% block title %}UCPC Research Lab – Computational Urdu Poetry Analysis{% endblock %}
+
+{% block extra_css %}
+<style>
+
+:root{
+    --primary:#0f172a;
+    --secondary:#1e293b;
+    --accent:#d4af37;
+    --muted:#64748b;
+    --border:#e2e8f0;
+    --bg:#f8fafc;
+    --card:#ffffff;
+    --success:#16a34a;
+    --warning:#ca8a04;
+}
+
+.research-wrapper{
+    max-width:1400px;
+    margin:auto;
+    padding:2rem;
+}
+
+/* Loading overlay */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(15,23,42,0.9);
+    backdrop-filter: blur(3px);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    color: white;
+    font-size: 1.2rem;
+}
+.loading-spinner {
+    width: 48px;
+    height: 48px;
+    border: 4px solid rgba(212,175,55,0.2);
+    border-top: 4px solid #d4af37;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin-bottom: 1rem;
+}
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Hero */
+.lab-hero{
+    background:linear-gradient(135deg,#0f172a,#1e293b);
+    color:white;
+    border-radius:24px;
+    padding:3rem;
+    margin-bottom:2rem;
+    position:relative;
+    overflow:hidden;
+}
+.lab-title{
+    font-size:2.5rem;
+    font-weight:800;
+    margin-bottom:1rem;
+}
+.lab-subtitle{
+    color:#cbd5e1;
+    max-width:850px;
+    line-height:1.8;
+    font-size:1rem;
+}
+.lab-badges{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    margin-top:1.5rem;
+}
+.lab-badge{
+    background:rgba(255,255,255,0.1);
+    border:1px solid rgba(255,255,255,0.15);
+    padding:0.45rem 0.9rem;
+    border-radius:999px;
+    font-size:0.8rem;
+}
+
+/* Grid */
+.research-grid{
+    display:grid;
+    grid-template-columns:1.3fr 0.7fr;
+    gap:1.5rem;
+}
+
+@media(max-width:1000px){
+    .research-grid{
+        grid-template-columns:1fr;
+    }
+}
+
+/* Cards */
+.research-card{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:22px;
+    padding:1.5rem;
+    box-shadow:0 8px 30px rgba(15,23,42,0.05);
+}
+.card-title{
+    font-size:1.1rem;
+    font-weight:700;
+    color:var(--primary);
+    margin-bottom:1rem;
+}
+
+/* Textarea */
+textarea{
+    width:100%;
+    min-height:320px;
+    border:1px solid var(--border);
+    border-radius:18px;
+    padding:1.5rem;
+    direction:rtl;
+    resize:vertical;
+    font-size:1.6rem;
+    line-height:2.4;
+    font-family:'Jameel Noori Nastaleeq', serif;
+    background:#fcfcfc;
+}
+textarea:focus{
+    outline:none;
+    border-color:var(--accent);
+    box-shadow:0 0 0 4px rgba(212,175,55,0.12);
+}
+
+/* Buttons */
+.action-row{
+    display:flex;
+    gap:1rem;
+    margin-top:1rem;
+}
+.btn-primary{
+    flex:1;
+    background:var(--accent);
+    color:#111827;
+    border:none;
+    border-radius:14px;
+    padding:1rem;
+    font-weight:700;
+    cursor:pointer;
+    transition:0.2s;
+}
+.btn-primary:disabled{
+    opacity:0.6;
+    cursor:not-allowed;
+}
+.btn-primary:hover:not(:disabled){
+    transform:translateY(-1px);
+}
+.btn-secondary{
+    flex:1;
+    background:var(--primary);
+    color:white;
+    border:none;
+    border-radius:14px;
+    padding:1rem;
+    font-weight:700;
+    cursor:pointer;
+}
+
+/* Sidebar */
+.sidebar-box{
+    margin-bottom:1rem;
+}
+.sidebar-label{
+    font-size:0.75rem;
+    color:var(--muted);
+    text-transform:uppercase;
+    margin-bottom:0.4rem;
+}
+.sidebar-value{
+    font-weight:700;
+    color:var(--primary);
+}
+.metric{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:0.8rem 0;
+    border-bottom:1px solid var(--border);
+}
+.metric:last-child{
+    border-bottom:none;
+}
+.metric-name{
+    color:var(--muted);
+}
+.metric-value{
+    font-weight:700;
+    color:var(--primary);
+}
+
+/* Tabs */
+.result-tabs{
+    display:flex;
+    flex-wrap:wrap;
+    gap:0.5rem;
+    margin-top:2rem;
+    margin-bottom:1rem;
+}
+.result-tab{
+    background:#f1f5f9;
+    border:none;
+    padding:0.75rem 1rem;
+    border-radius:12px;
+    cursor:pointer;
+    font-weight:600;
+    transition:0.2s;
+}
+.result-tab.active{
+    background:var(--primary);
+    color:white;
+}
+.result-panel{
+    display:none;
+}
+.result-panel.active{
+    display:block;
+}
+
+/* ========== AUTHORSHIP CARDS ========== */
+.authorship-card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 1.2rem;
+    margin-bottom: 1rem;
+    transition: all 0.2s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+}
+.authorship-card:hover {
+    border-color: var(--accent);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+}
+.poet-name {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--primary);
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    flex-wrap: wrap;
+    margin-bottom: 0.3rem;
+}
+.poet-name-en {
+    letter-spacing: 0.5px;
+}
+.poet-name-urdu {
+    font-family: 'Jameel Noori Nastaleeq', 'Noto Nastaliq Urdu', serif;
+    font-size: 1.15rem;
+    color: var(--accent);
+    direction: rtl;
+}
+.confidence-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0.75rem 0;
+}
+.confidence-percent {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--accent);
+}
+.confidence-label {
+    font-size: 0.8rem;
+    color: var(--muted);
+}
+.progress-bar {
+    flex: 1;
+    height: 8px;
+    background: #e2e8f0;
+    border-radius: 20px;
+    overflow: hidden;
+    margin: 0 1rem;
+}
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #d4af37, #facc15);
+    width: 0%;
+    border-radius: 20px;
+}
+.low-confidence-warning {
+    background: #fefce8;
+    border-left: 4px solid var(--warning);
+    padding: 0.75rem;
+    border-radius: 12px;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    color: #854d0e;
+}
+.low-confidence-warning i {
+    color: var(--warning);
+}
+.method-tag {
+    display: inline-block;
+    background: #eff6ff;
+    color: #1d4ed8;
+    padding: 0.3rem 0.7rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    margin-top: 0.7rem;
+}
+
+/* ========== THEME / PROSODY CARDS ========== */
+.analysis-card{
+    background:white;
+    border:1px solid var(--border);
+    border-radius:20px;
+    padding:1.5rem;
+    margin-bottom:1rem;
+}
+.analysis-title{
+    font-size:1.1rem;
+    font-weight:700;
+    margin-bottom:1rem;
+    color:var(--primary);
+}
+.keyword{
+    display:inline-block;
+    background:#f8fafc;
+    border:1px solid #e2e8f0;
+    padding:0.4rem 0.7rem;
+    border-radius:999px;
+    margin:0.2rem;
+    font-size:0.85rem;
+}
+
+/* ========== ENHANCED SEMANTIC TABLE ========== */
+.table-responsive {
+    overflow-x: auto;
+    margin-top: 0.5rem;
+}
+.semantic-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: white;
+    border: 2px solid #d4af37;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+}
+.semantic-table th {
+    background: linear-gradient(135deg, #1e3c72, #0f2b3d);
+    color: #D4AF37;
+    padding: 16px 12px;
+    text-align: center;
+    font-weight: 700;
+    font-size: 1rem;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid rgba(212,175,55,0.3);
+}
+.semantic-table td {
+    padding: 18px 12px;
+    border-bottom: 1px solid #eef2f6;
+    vertical-align: middle;
+    background: white;
+}
+.semantic-table tr:last-child td {
+    border-bottom: none;
+}
+.semantic-table tr:hover td {
+    background-color: rgba(212,175,55,0.05);
+}
+.couplet-cell {
+    font-family: 'Jameel Noori Nastaleeq', 'Noto Nastaliq Urdu', serif;
+    direction: rtl;
+    text-align: right;
+    font-size: 1.6rem;
+    font-weight: 600;
+    line-height: 1.8;
+    color: #1e293b;
+    white-space: pre-wrap;
+}
+.poet-cell {
+    text-align: center;
+    white-space: nowrap;
+    font-weight: 500;
+    color: #2c3e2f;
+}
+.score-cell {
+    text-align: center;
+    font-weight: 700;
+    color: #16a34a;
+    white-space: nowrap;
+    font-size: 1.1rem;
+}
+.link-cell {
+    text-align: center;
+    white-space: nowrap;
+}
+.link-cell a {
+    color: #d4af37;
+    text-decoration: none;
+    font-weight: 700;
+    padding: 0.3rem 0.8rem;
+    border-radius: 30px;
+    transition: 0.2s;
+}
+.link-cell a:hover {
+    background: #d4af37;
+    color: #1e3c72;
+    text-decoration: none;
+}
+.meta-footer{
+    margin-top:2rem;
+    background:#f8fafc;
+    border:1px solid var(--border);
+    border-radius:18px;
+    padding:1rem;
+    font-size:0.9rem;
+    color:var(--muted);
+}
+.loader{
+    text-align:center;
+    padding:3rem;
+    color:var(--muted);
+}
+
+@media (max-width: 640px) {
+    .research-wrapper { padding: 1rem; }
+    .lab-hero { padding: 1.5rem; }
+    .lab-title { font-size: 1.8rem; }
+    .semantic-table th, .semantic-table td { padding: 8px 6px; }
+    .couplet-cell { font-size: 1.2rem; }
+    .poet-name-en { font-size: 1rem; }
+    .confidence-percent { font-size: 1.2rem; }
+    .score-cell { font-size: 0.9rem; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="research-wrapper">
+
+    <!-- HERO -->
+    <div class="lab-hero">
+        <div class="lab-title">🧠 UCPC Research Lab</div>
+        <div class="lab-subtitle">
+            Computational analysis environment for Urdu poetry using
+            authorship attribution, semantic embeddings, thematic modeling,
+            radif/qaafiya extraction, and Digital Humanities methodologies.
+        </div>
+        <div class="lab-badges">
+            <div class="lab-badge">DH Infrastructure</div>
+            <div class="lab-badge">Urdu NLP</div>
+            <div class="lab-badge">Semantic Search</div>
+            <div class="lab-badge">Stylometry</div>
+            <div class="lab-badge">Poetic Analysis</div>
+        </div>
+    </div>
+
+    <!-- MAIN GRID -->
+    <div class="research-grid">
+        <!-- INPUT -->
+        <div class="research-card">
+            <div class="card-title">Urdu Ghazal Input</div>
+            <textarea id="ghazal" placeholder="اردو غزل یہاں درج کریں..."></textarea>
+            <div class="action-row">
+                <button class="btn-primary" id="analyzeBtn" onclick="analyze()">🔬 Run Computational Analysis</button>
+                <button class="btn-secondary" onclick="clearText()">Clear</button>
+            </div>
+        </div>
+
+        <!-- SIDEBAR -->
+        <div class="research-card">
+            <div class="card-title">Analysis Environment</div>
+            <div class="sidebar-box"><div class="sidebar-label">Pipeline</div><div class="sidebar-value">UCPC DH Research Stack</div></div>
+            <div class="metric"><div class="metric-name">Authorship Model</div><div class="metric-value">XGBoost + TF-IDF</div></div>
+            <div class="metric"><div class="metric-name">Semantic Engine</div><div class="metric-value">Sentence Embeddings</div></div>
+            <div class="metric"><div class="metric-name">Prosodic Analysis</div><div class="metric-value">Rule-Based</div></div>
+            <div class="metric"><div class="metric-name">Theme Analysis</div><div class="metric-value">Lexical + DH</div></div>
+            <div class="metric"><div class="metric-name">Corpus Type</div><div class="metric-value">Research Corpus</div></div>
+        </div>
+    </div>
+
+    <!-- TABS -->
+    <div class="result-tabs">
+        <button class="result-tab active" data-tab="poet">🖋️ Authorship</button>
+        <button class="result-tab" data-tab="theme">🎭 Themes</button>
+        <button class="result-tab" data-tab="semantic">🔍 Semantic</button>
+        <button class="result-tab" data-tab="prosody">📐 Prosody</button>
+    </div>
+
+    <div id="poet-panel" class="result-panel active"></div>
+    <div id="theme-panel" class="result-panel"></div>
+    <div id="semantic-panel" class="result-panel"></div>
+    <div id="prosody-panel" class="result-panel"></div>
+
+    <div id="meta-footer" class="meta-footer" style="display:none;"></div>
+</div>
+
+<script>
+let startTime = 0;
+let loadingOverlay = null;
+
+function showLoading() {
+    if (loadingOverlay) return;
+    loadingOverlay = document.createElement('div');
+    loadingOverlay.className = 'loading-overlay';
+    loadingOverlay.innerHTML = `
+        <div class="loading-spinner"></div>
+        <div>🧠 Computational analysis in progress...</div>
+        <div style="margin-top:0.5rem; font-size:0.85rem; opacity:0.7;">Running ML models, semantic retrieval, prosodic extraction</div>
+    `;
+    document.body.appendChild(loadingOverlay);
+    document.getElementById('analyzeBtn').disabled = true;
+}
+
+function hideLoading() {
+    if (loadingOverlay) {
+        loadingOverlay.remove();
+        loadingOverlay = null;
+    }
+    document.getElementById('analyzeBtn').disabled = false;
+}
+
+function clearText(){
+    document.getElementById('ghazal').value = '';
+}
+
+async function analyze(){
+    const text = document.getElementById('ghazal').value.trim();
+    if(!text){
+        alert('Please enter a ghazal.');
+        return;
+    }
+
+    showLoading();
+    startTime = performance.now();
+
+    try{
+        const requests = [
+            fetch('/ask-index/',{
+                method:'POST',
+                headers:{'Content-Type':'application/json'},
+                body:JSON.stringify({ text, question:'poet' })
+            }),
+            fetch('/ask-index/',{
+                method:'POST',
+                headers:{'Content-Type':'application/json'},
+                body:JSON.stringify({ text, question:'theme' })
+            }),
+            fetch('/ask-index/',{
+                method:'POST',
+                headers:{'Content-Type':'application/json'},
+                body:JSON.stringify({ text, question:'similar ghazals' })
+            }),
+            fetch('/ask-index/',{
+                method:'POST',
+                headers:{'Content-Type':'application/json'},
+                body:JSON.stringify({ text, question:'radif qaafiya' })
+            })
+        ];
+
+        const responses = await Promise.all(requests);
+        const poet = await responses[0].json();
+        const theme = await responses[1].json();
+        const semantic = await responses[2].json();
+        const prosody = await responses[3].json();
+
+        renderPoet(poet);
+        renderTheme(theme);
+        renderSemantic(semantic);
+        renderProsody(prosody);
+
+        const seconds = ((performance.now() - startTime)/1000).toFixed(2);
+        document.getElementById('meta-footer').style.display = 'block';
+        document.getElementById('meta-footer').innerHTML = `
+            <strong>Research Metadata</strong><br>
+            Analysis Runtime: ${seconds}s<br>
+            Framework: UCPC Digital Humanities Infrastructure<br>
+            Pipeline: Authorship Attribution + Semantic Retrieval + Prosodic Analysis
+        `;
+    } catch(err){
+        console.error(err);
+        document.getElementById('poet-panel').innerHTML = `<div class="analysis-card">❌ Analysis pipeline error.</div>`;
+    } finally {
+        hideLoading();
+    }
+}
+
+function renderPoet(data){
+    const panel = document.getElementById('poet-panel');
+    if(!data.data || !data.data.length){
+        panel.innerHTML = `<div class="analysis-card">No authorship predictions available.</div>`;
+        return;
+    }
+
+    let html = `<div class="analysis-card"><div class="analysis-title">🖋️ Authorship Attribution</div>`;
+    if(data.data[0].confidence < 0.5){
+        html += `<div class="low-confidence-warning">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    Low confidence prediction detected. Interpret results cautiously.
+                </div>`;
+    }
+    data.data.forEach(item => {
+        const pct = (item.confidence * 100).toFixed(1);
+        const poetNameEn = escapeHtml(item.poet_name);
+        const poetNameUrdu = escapeHtml(item.poet_name_urdu || '');
+        html += `
+            <div class="authorship-card">
+                <div class="poet-name">
+                    <span class="poet-name-en">${poetNameEn}</span>
+                    ${poetNameUrdu ? `<span class="poet-name-urdu">${poetNameUrdu}</span>` : ''}
+                </div>
+                <div class="confidence-row">
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${pct}%;"></div>
+                    </div>
+                    <div class="confidence-percent">${pct}%</div>
+                </div>
+                <div class="confidence-label">Authorship confidence</div>
+            </div>
+        `;
+    });
+    html += `<div class="method-tag">${escapeHtml(data.method || 'ML authorship attribution')}</div></div>`;
+    panel.innerHTML = html;
+}
+
+function renderTheme(data){
+    const panel = document.getElementById('theme-panel');
+    if(!data.data){
+        panel.innerHTML = `<div class="analysis-card">Theme analysis unavailable.</div>`;
+        return;
+    }
+    let keywords = '';
+    if(data.data.keywords && data.data.keywords.length){
+        data.data.keywords.forEach(k=>{
+            keywords += `<span class="keyword">${escapeHtml(k)}</span>`;
+        });
+    }
+    let primaryTheme = escapeHtml(data.data.primary_theme) || 'Unknown';
+    panel.innerHTML = `
+        <div class="analysis-card">
+            <div class="analysis-title">🎭 Thematic Analysis</div>
+            <p><strong>Primary Theme:</strong> ${primaryTheme}</p>
+            <div style="margin-top:1rem;">${keywords}</div>
+            <div class="method-tag">${escapeHtml(data.method || 'Lexical thematic analysis')}</div>
+        </div>
+    `;
+}
+
+function renderSemantic(data){
+    const panel = document.getElementById('semantic-panel');
+    if(!data.data || !data.data.length){
+        panel.innerHTML = `<div class="analysis-card">No semantically related ghazals found.</div>`;
+        return;
+    }
+    let html = `
+        <div class="analysis-card">
+            <div class="analysis-title">🔍 Semantic Similarity Retrieval</div>
+            <div class="table-responsive">
+                <table class="semantic-table">
+                    <thead>
+                        <tr>
+                            <th>First Couplet (Urdu)</th>
+                            <th>Poet</th>
+                            <th>Similarity</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+    `;
+    data.data.forEach(item => {
+        let coupletText = item.first_couplet || item.title || '';
+        let coupletHtml = coupletText.replace(/\n/g, '<br>');
+        if (!coupletHtml.trim()) coupletHtml = '—';
+        const poet = escapeHtml(item.poet || '');
+        const score = (item.score * 100).toFixed(1);
+        html += `
+            <tr>
+                <td class="couplet-cell">${coupletHtml}</td>
+                <td class="poet-cell">${poet}</td>
+                <td class="score-cell">${score}%</td>
+                <td class="link-cell"><a href="/ghazals/view/${item.text_id}" target="_blank">View →</a></td>
+            </tr>
+        `;
+    });
+    html += `
+                    </tbody>
+                </table>
+            </div>
+            <div class="method-tag">${escapeHtml(data.method || 'Transformer embeddings')}</div>
+        </div>
+    `;
+    panel.innerHTML = html;
+}
+
+function renderProsody(data){
+    const panel = document.getElementById('prosody-panel');
+    if(!data.data){
+        panel.innerHTML = `<div class="analysis-card">Prosodic extraction unavailable.</div>`;
+        return;
+    }
+    const radif = escapeHtml(data.data.radif) || 'Not detected';
+    const qaafiya = data.data.qaafiya ? data.data.qaafiya.map(escapeHtml).join(', ') : 'Not detected';
+    const confidence = ((data.data.confidence || 0)*100).toFixed(1);
+    panel.innerHTML = `
+        <div class="analysis-card">
+            <div class="analysis-title">📐 Prosodic Structure</div>
+            <p><strong>Radif:</strong> ${radif}</p>
+            <p><strong>Qaafiya:</strong> ${qaafiya}</p>
+            <p><strong>Confidence:</strong> ${confidence}%</p>
+            <div class="method-tag">${escapeHtml(data.method || 'Rule-based extraction')}</div>
+        </div>
+    `;
+}
+
+function escapeHtml(str){
+    if(!str) return '';
+    return str.replace(/[&<>]/g, m => {
+        if(m === '&') return '&amp;';
+        if(m === '<') return '&lt;';
+        if(m === '>') return '&gt;';
+        return m;
+    });
+}
+
+// Tab system
+document.querySelectorAll('.result-tab').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.querySelectorAll('.result-tab').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        document.querySelectorAll('.result-panel').forEach(p => p.classList.remove('active'));
+        document.getElementById(btn.dataset.tab + '-panel').classList.add('active');
+    });
+});
+</script>
+{% endblock %}

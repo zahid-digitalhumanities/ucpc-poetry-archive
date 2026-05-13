@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}UCPC – Home{% endblock %}
+
+{% block content %}
+<div class="text-center mb-12">
+    <h1 class="text-4xl font-bold text-primary mb-3">🧠 Urdu Computational Poetry Corpus</h1>
+    <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+        A research platform for analyzing Urdu ghazals using computational linguistics, NLP, and AI.
+        Explore, analyse, and contribute to a growing digital archive.
+    </p>
+</div>
+
+<div class="grid md:grid-cols-3 gap-6">
+    <a href="/ask" class="card block">
+        <div class="text-3xl mb-2">🤖</div>
+        <h2 class="text-xl font-bold text-primary">Ask UCPC</h2>
+        <p class="text-gray-600 mt-1">Paste a ghazal – get poet prediction, theme, radif/qaafiya, and similar poems.</p>
+    </a>
+
+    <a href="/research-dashboard" class="card block">
+        <div class="text-3xl mb-2">📊</div>
+        <h2 class="text-xl font-bold text-primary">Research Dashboard</h2>
+        <p class="text-gray-600 mt-1">Corpus‑wide statistics: radif frequency, theme distribution, embedding clusters.</p>
+    </a>
+
+    <a href="/corpus" class="card block">
+        <div class="text-3xl mb-2">📚</div>
+        <h2 class="text-xl font-bold text-primary">Corpus Browser</h2>
+        <p class="text-gray-600 mt-1">Search and browse all ghazals in the archive.</p>
+    </a>
+
+    <a href="/ingest/add" class="card block">
+        <div class="text-3xl mb-2">📥</div>
+        <h2 class="text-xl font-bold text-primary">Ingest Data</h2>
+        <p class="text-gray-600 mt-1">Add new ghazals (single or bulk) with automatic duplicate detection.</p>
+    </a>
+
+    <a href="/poets" class="card block">
+        <div class="text-3xl mb-2">🖋️</div>
+        <h2 class="text-xl font-bold text-primary">Poets</h2>
+        <p class="text-gray-600 mt-1">Browse ghazals by poet.</p>
+    </a>
+
+    <a href="/search" class="card block">
+        <div class="text-3xl mb-2">🔍</div>
+        <h2 class="text-xl font-bold text-primary">Advanced Search</h2>
+        <p class="text-gray-600 mt-1">Keyword, voice, and semantic search.</p>
+    </a>
+</div>
+{% endblock %}

@@ -1,9 +1,78 @@
 {% extends "base.html" %}
 {% block title %}Search | UCPC Poetry Archive{% endblock %}
+
 {% block extra_css %}
 <style>
-    .search-result { border-bottom: 1px solid #e2e8f0; padding: 1rem 0; }
-    .urdu { font-family: 'Jameel Noori Nastaleeq', serif; line-height: 2; }
+    .result-card {
+        background: #fff;
+        border-radius: 20px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .result-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    }
+    .match-badge {
+        background: #1e3c72;
+        color: #fff;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 700;
+        display: inline-block;
+        margin-bottom: 12px;
+    }
+    .match-badge.exact-matla { background: #16a34a; }
+    .match-badge.partial-matla { background: #d4af37; color: #1e293b; }
+    .match-badge.verse-match { background: #8b5cf6; }
+    .match-badge.title-match { background: #3b82f6; }
+    .match-badge.full-text { background: #64748b; }
+    .urdu {
+        font-family: 'Jameel Noori Nastaleeq', 'Noto Nastaliq Urdu', serif;
+        line-height: 2.2;
+    }
+    .matla {
+        font-size: 1.5rem;
+        margin-bottom: 8px;
+        font-weight: 600;
+    }
+    .matla a {
+        text-decoration: none;
+        color: #111827;
+    }
+    .matla a:hover {
+        color: #d4af37;
+    }
+    .poet-line {
+        color: #64748b;
+        margin-bottom: 14px;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+    .preview {
+        line-height: 2.2;
+        font-size: 1.1rem;
+        color: #1e293b;
+        margin-top: 10px;
+    }
+    .preview mark {
+        background-color: #fef9c3;
+        color: #854d0e;
+        padding: 0 2px;
+        border-radius: 4px;
+    }
+    .translation {
+        margin-top: 12px;
+        color: #475569;
+        border-top: 1px solid #e2e8f0;
+        padding-top: 10px;
+        font-size: 0.9rem;
+        font-style: italic;
+    }
     .suggestions-box {
         position: absolute;
         z-index: 1000;
@@ -14,9 +83,16 @@
         max-height: 300px;
         overflow-y: auto;
     }
-    .suggestion-item { padding: 0.5rem 1rem; cursor: pointer; }
-    .suggestion-item:hover { background: #f3f4f6; }
-    .relative { position: relative; }
+    .suggestion-item {
+        padding: 0.5rem 1rem;
+        cursor: pointer;
+    }
+    .suggestion-item:hover, .suggestion-item.active {
+        background: #f3f4f6;
+    }
+    .relative {
+        position: relative;
+    }
     .voice-btn {
         position: absolute;
         right: 12px;
@@ -29,11 +105,22 @@
         color: #666;
         z-index: 10;
     }
-    .voice-btn.listening { color: #ef4444; animation: pulse 1.5s infinite; }
+    .voice-btn.listening {
+        color: #ef4444;
+        animation: pulse 1.5s infinite;
+    }
     @keyframes pulse {
         0% { opacity: 0.5; transform: scale(1); }
         50% { opacity: 1; transform: scale(1.1); }
         100% { opacity: 0.5; transform: scale(1); }
+    }
+    .warning-box {
+        background: #fef9c3;
+        border-left: 4px solid #eab308;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+        border-radius: 0.5rem;
+        color: #854d0e;
     }
 </style>
 {% endblock %}
@@ -76,35 +163,62 @@
         </div>
     </form>
 
+    {% if generic_warning %}
+    <div class="warning-box">
+        <strong>⚠️ Note:</strong> {{ generic_warning }}
+    </div>
+    {% endif %}
+
     {% if keyword or poet_id or contributor_id %}
         <div class="mb-4 text-gray-600">
-            Found {{ total_results }} result(s)
+            Found <strong>{{ total_results }}</strong> result(s)
         </div>
 
         {% if results %}
-            {% for r in results %}
-            <div class="search-result">
-                <a href="{{ url_for('ghazals.view_ghazal', text_id=r.text_id) }}" class="block">
-                    <div class="urdu text-xl font-semibold">{{ r.title_urdu }}</div>
-                    <div class="text-sm text-gray-600">{{ r.poet_name_urdu }} ({{ r.poet_name }})</div>
-                    <div class="urdu mt-2 text-gray-800">{{ r.first_verse_urdu|safe }}</div>
-                    <div class="mt-1 text-gray-600">{{ r.first_verse_english|safe }}</div>
-                </a>
+            {% for g in results %}
+            <div class="result-card">
+                <div class="match-badge 
+                    {% if g.match_type == 'Exact Matla' %}exact-matla
+                    {% elif g.match_type == 'Partial Matla' %}partial-matla
+                    {% elif g.match_type == 'Verse Match' %}verse-match
+                    {% elif g.match_type == 'Title Match' %}title-match
+                    {% else %}full-text{% endif %}">
+                    {{ g.match_type }}
+                </div>
+                <h2 class="urdu matla">
+                    <a href="/ghazals/view/{{ g.id }}">{{ g.title_urdu }}</a>
+                </h2>
+                <div class="poet-line">
+                    {{ g.poet_name }}
+                    {% if g.poet_name_urdu %}({{ g.poet_name_urdu }}){% endif %}
+                </div>
+                <div class="urdu preview">
+                    {% if g.text_urdu_highlighted %}
+                        {{ g.text_urdu_highlighted|safe }}
+                    {% else %}
+                        {{ g.text_urdu[:350] }}{% if g.text_urdu|length > 350 %}...{% endif %}
+                    {% endif %}
+                </div>
+                {% if g.text_english %}
+                <div class="translation">
+                    {{ g.text_english[:200] }}{% if g.text_english|length > 200 %}...{% endif %}
+                </div>
+                {% endif %}
             </div>
             {% endfor %}
 
             <div class="mt-8 flex justify-between">
                 {% if offset > 0 %}
                 <a href="?keyword={{ keyword }}&poet_id={{ poet_id }}&contributor_id={{ contributor_id }}&offset={{ offset - limit }}" 
-                   class="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300">Previous</a>
+                   class="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300">← Previous</a>
                 {% endif %}
                 {% if offset + limit < total_results %}
                 <a href="?keyword={{ keyword }}&poet_id={{ poet_id }}&contributor_id={{ contributor_id }}&offset={{ offset + limit }}" 
-                   class="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300">Next</a>
+                   class="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300 ml-auto">Next →</a>
                 {% endif %}
             </div>
         {% else %}
-            <p class="text-gray-500">No results found.</p>
+            <p class="text-gray-500">No results found. Try a different keyword or remove filters.</p>
         {% endif %}
     {% endif %}
 </div>
@@ -120,7 +234,7 @@
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (SpeechRecognition) {
         recognition = new SpeechRecognition();
-        recognition.lang = 'ur-PK';           // Urdu (works for Roman Urdu too)
+        recognition.lang = 'ur-PK';
         recognition.interimResults = false;
         recognition.maxAlternatives = 1;
 
@@ -136,7 +250,6 @@
         };
         recognition.onresult = (event) => {
             const transcript = event.results[0][0].transcript.trim();
-            console.log("VOICE INPUT:", transcript);   // debug
             if (transcript) {
                 searchBox.value = transcript;
                 searchForm.submit();
@@ -173,7 +286,7 @@
         try {
             const res = await fetch(`/search/suggest?q=${encodeURIComponent(query)}`);
             const data = await res.json();
-            if (data.suggestions.length === 0) {
+            if (!data.suggestions || data.suggestions.length === 0) {
                 suggestionsBox.classList.add('hidden');
                 return;
             }
@@ -185,6 +298,7 @@
                 div.onclick = () => {
                     searchBox.value = s;
                     suggestionsBox.classList.add('hidden');
+                    searchForm.submit();
                 };
                 suggestionsBox.appendChild(div);
             });
