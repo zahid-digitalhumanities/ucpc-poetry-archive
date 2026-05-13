@@ -1,57 +1,41 @@
-# Bytecode
-__pycache__/
-*.pyc
-*.pyo
-
-# Environment variables
-.env
-.flaskenv
-
-# Database files
+# Database
 *.db
 *.sqlite
 *.sqlite3
+*.sql
+backup_*.sql
 
-# Private data directories (keep your corpus safe)
-training_data.csv
+# Models (large binary files)
+*.pkl
+*.pickle
+
+# Data files
 *.csv
-*.json
-*.jsonl
-data/
-clean_data/
-annotations/
-provenance/
-texts/
+sher_dataset.csv
+training_data.csv
 
-# Model temporary files (keep only the final .pkl)
-*.p
-*.pkl.gz
-*.joblib
-
-# Static generated files (temporary images)
-static/generated/
-*.png
-*.jpg
-*.jpeg
-*.gif
+# Cache
+__pycache__/
+*.pyc
+semantic/cache/
 
 # Logs
-*.log
 logs/
+*.log
+evaluation/
 
-# IDE / Editor files
+# Generated images
+static/generated/
+
+# Environment
+.env
+.venv/
+venv/
+
+# IDE
 .vscode/
 .idea/
 *.swp
-*.swo
-*~
 
-# OS junk
-Thumbs.db
-.DS_Store
-
-# Flask session
-flask_session/
-
-# Uploads (if any)
-uploads/
+# Local config
+config_local.py
