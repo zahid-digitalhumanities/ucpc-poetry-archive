@@ -1,78 +1,54 @@
 import sys
 import os
+import traceback
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from models.base import get_db_connection
 from modules.embeddings import update_ghazal_embedding
 
-
-def ensure_column_exists(conn):
-    """
-    Ensure embedding_generated column exists
-    """
-    cur = conn.cursor()
-    cur.execute("""
-        ALTER TABLE texts
-        ADD COLUMN IF NOT EXISTS embedding_generated BOOLEAN DEFAULT FALSE
-    """)
-    conn.commit()
-    cur.close()
-
-
 def backfill_embeddings():
     conn = get_db_connection()
-    ensure_column_exists(conn)
-
     cur = conn.cursor()
-
-    # ✅ Correct query
     cur.execute("""
-        SELECT id 
-        FROM texts 
-        WHERE (embedding_generated IS FALSE OR embedding_generated IS NULL)
-        AND text_urdu IS NOT NULL
+        SELECT t.id
+        FROM texts t
+        LEFT JOIN ghazal_embeddings g ON t.id = g.text_id
+        WHERE t.is_deleted = FALSE
+          AND g.text_id IS NULL
+        ORDER BY t.id
     """)
-
     rows = cur.fetchall()
     total = len(rows)
-
-    print(f"🚀 Found {total} ghazals without embeddings.")
-
+    print(f"\n==================================================")
+    print(f" FOUND {total} TEXTS WITHOUT EMBEDDINGS")
+    print("==================================================\n")
     success = 0
     failed = 0
-
-    for i, row in enumerate(rows):
-        text_id = row['id']   # ✅ FIXED
-
+    for idx, row in enumerate(rows, 1):
+        text_id = row['id']
         try:
             update_ghazal_embedding(text_id)
-
-            cur.execute("""
-                UPDATE texts 
-                SET embedding_generated = TRUE 
-                WHERE id = %s
-            """, (text_id,))
-
-            success += 1
-
-        except Exception as e:
-            failed += 1
-            print(f"❌ Error embedding {text_id}: {e}")
-
-        # ✅ Batch commit every 50
-        if (i + 1) % 50 == 0:
+            cur.execute("UPDATE texts SET embedding_generated = TRUE WHERE id = %s", (text_id,))
             conn.commit()
-            print(f"⚡ Progress: {i+1}/{total} | Success: {success} | Failed: {failed}")
-
-    conn.commit()
+            success += 1
+            print(f"✅ [{idx}/{total}] Embedded text {text_id}")
+        except Exception as e:
+            conn.rollback()
+            failed += 1
+            print(f"\n❌ Error on text {text_id}:")
+            print(str(e))
+            traceback.print_exc()
+            print("-" * 60)
     cur.close()
     conn.close()
-
-    print("\n✅ Embedding Backfill Complete")
-    print(f"✔ Success: {success}")
-    print(f"❌ Failed: {failed}")
-
+    print("\n==================================================")
+    print(" EMBEDDING BACKFILL COMPLETE")
+    print("==================================================")
+    print(f"✔ Success : {success}")
+    print(f"❌ Failed  : {failed}")
+    print(f"📚 Total   : {total}")
+    print("==================================================")
 
 if __name__ == "__main__":
     backfill_embeddings()

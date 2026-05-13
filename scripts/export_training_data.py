@@ -1,87 +1,106 @@
+# scripts/export_training_data.py
+"""
+Export clean training data for poet classifier
+"""
+
 import sys
 import os
-import csv
+import pandas as pd
+import json
+import psycopg2
+from psycopg2.extras import RealDictCursor
 
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from models.base import get_db_connection
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-# ================= CLEAN FUNCTION =================
-def clean_text(text):
-    if not text:
-        return ""
-    text = text.replace('\n', ' ')
-    text = text.replace('،', '').replace('۔', '')
-    text = ' '.join(text.split())
-    return text.strip()
+# Import your database config
+try:
+    from models.base import get_db_connection
+except ImportError:
+    # Fallback connection
+    def get_db_connection():
+        import psycopg2
+        return psycopg2.connect(
+            database="ucpc_v3_db",
+            user="postgres",
+            password="your_password",
+            host="localhost",
+            port="5432"
+        )
 
-# ================= FETCH DATA =================
-conn = get_db_connection()
-cur = conn.cursor()
-
-cur.execute("""
+def export_training_data(output_csv="training_data_export.csv"):
+    """Export clean training data to CSV"""
+    
+    print("📤 Exporting training data...")
+    
+    conn = get_db_connection()
+    
+    # Use cursor with dictionary support
+    cursor = conn.cursor(cursor_factory=RealDictCursor)
+    
+    query = """
     SELECT 
-        t.id as text_id,
+        t.id,
         t.poet_id,
-        v.misra1_urdu,
-        v.misra2_urdu,
-        v.couplet_index
+        p.name as poet_name,
+        p.name_urdu as poet_name_urdu,
+        t.text_urdu,
+        t.normalized_text,
+        t.verse_count,
+        t.integrity_status,
+        t.title_urdu,
+        COALESCE(t.normalized_text, t.text_urdu) as training_text
     FROM texts t
-    JOIN verses v ON t.id = v.text_id
-    WHERE t.poet_id IS NOT NULL
-    ORDER BY t.id, v.couplet_index
-""")
+    JOIN poets p ON t.poet_id = p.id
+    WHERE t.form = 'ghazal'
+      AND t.is_deleted = FALSE
+      AND t.integrity_status IN ('clean', 'merged')
+      AND t.text_urdu IS NOT NULL
+      AND LENGTH(t.text_urdu) > 100
+    ORDER BY p.name, t.id
+    """
+    
+    cursor.execute(query)
+    rows = cursor.fetchall()
+    
+    # Convert to DataFrame
+    df = pd.DataFrame(rows)
+    
+    cursor.close()
+    conn.close()
+    
+    if df.empty:
+        print("❌ No data found!")
+        return None
+    
+    print(f"  Exported {len(df)} ghazals")
+    print(f"  Poets: {df['poet_name'].nunique()}")
+    
+    # Show distribution
+    print("\n📊 Poet distribution:")
+    poet_counts = df['poet_name'].value_counts()
+    for poet, count in poet_counts.head(15).items():
+        bar = "█" * (count // 10) if count // 10 > 0 else "▌"
+        print(f"  {poet[:25]:25} {count:4} {bar}")
+    
+    # Save to CSV (use correct encoding for Windows)
+    df.to_csv(output_csv, index=False, encoding='utf-8-sig')
+    print(f"\n✅ Saved to: {output_csv}")
+    
+    # Also save metadata
+    metadata = {
+        'total_samples': int(len(df)),
+        'num_poets': int(df['poet_name'].nunique()),
+        'poets': {k: int(v) for k, v in poet_counts.to_dict().items()},
+        'date_exported': pd.Timestamp.now().isoformat()
+    }
+    
+    metadata_path = output_csv.replace('.csv', '_metadata.json')
+    with open(metadata_path, 'w', encoding='utf-8') as f:
+        json.dump(metadata, f, indent=2, ensure_ascii=False)
+    
+    print(f"📋 Metadata saved to: {metadata_path}")
+    
+    return df
 
-rows = cur.fetchall()
-cur.close()
-conn.close()
-
-# ================= BUILD FULL GHAZALS =================
-ghazals = {}
-
-for row in rows:
-    text_id = row['text_id']
-    poet_id = row['poet_id']
-
-    if text_id not in ghazals:
-        ghazals[text_id] = {
-            "poet_id": poet_id,
-            "lines": []
-        }
-
-    if row['misra1_urdu']:
-        ghazals[text_id]["lines"].append(row['misra1_urdu'])
-    if row['misra2_urdu']:
-        ghazals[text_id]["lines"].append(row['misra2_urdu'])
-
-# ================= WRITE CSV to scripts/ folder =================
-# Get the project root (two levels up from this script)
-project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-output_dir = os.path.join(project_root, 'scripts')
-os.makedirs(output_dir, exist_ok=True)
-output_path = os.path.join(output_dir, "training_data.csv")
-
-seen_texts = set()
-total = 0
-
-with open(output_path, 'w', encoding='utf-8', newline='') as f:
-    writer = csv.writer(f)
-    writer.writerow(['text_urdu', 'poet_id'])
-
-    for g in ghazals.values():
-        full_text = clean_text(" ".join(g["lines"]))
-
-        # ❌ skip weak ghazals
-        if len(full_text.split()) < 20:
-            continue
-
-        # ❌ remove duplicates
-        if full_text in seen_texts:
-            continue
-
-        seen_texts.add(full_text)
-
-        writer.writerow([full_text, g["poet_id"]])
-        total += 1
-
-print(f"✅ training_data.csv created at: {output_path}")
-print(f"📊 Total clean ghazals: {total}")
+if __name__ == "__main__":
+    export_training_data()
