@@ -19,7 +19,7 @@ from routes.insights_routes import insights_bp
 from routes.ingest_routes import ingest_bp
 from routes.ai_routes import ai_bp
 from routes.ask_ucpc_route import ask_bp
-from routes.ask_ucpc_index import ask_ucpc_bp as ask_index_bp  # Fixed: import with alias
+from routes.ask_ucpc_index import ask_ucpc_bp as ask_index_bp
 from routes.research_dashboard import research_dashboard_bp
 from routes.corpus_routes import corpus_bp          
 from routes.dh_advanced import dh_bp
@@ -62,7 +62,7 @@ def create_app():
     app.register_blueprint(ingest_bp)
     app.register_blueprint(ai_bp)
     app.register_blueprint(ask_bp)
-    app.register_blueprint(ask_index_bp)  # Now works because of alias
+    app.register_blueprint(ask_index_bp)
     app.register_blueprint(corpus_bp)
     app.register_blueprint(research_dashboard_bp)
     app.register_blueprint(dh_bp)
@@ -75,6 +75,15 @@ def create_app():
     print("   - Ask UCPC Index: /ask-index")
     print("   - AI Routes: /api/ai")
     print("   - Integrity Dashboard: /integrity")
+
+    # ========== HEALTH CHECK ENDPOINT (CRITICAL FOR RENDER) ==========
+    @app.route('/health')
+    def health_check():
+        return jsonify({
+            "status": "healthy",
+            "project": "UCPC Poetry Archive",
+            "version": "2.0"
+        })
 
     # ---------- AFTER REQUEST ----------
     @app.after_request
