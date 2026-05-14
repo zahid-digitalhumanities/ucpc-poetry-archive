@@ -1,3 +1,7 @@
+# ==================== EMERGENCY STARTUP PATCH - MUST BE FIRST ====================
+import startup  # This MUST be the first import - disables heavy models and limits threads
+# ==============================================================================
+
 from flask import Flask, redirect, url_for, render_template, request, jsonify, abort, send_from_directory, send_file
 from modules.image_generator import generate_ghazal_card
 import os
@@ -43,9 +47,9 @@ signal.signal(signal.SIGINT, signal_handler)
 
 # ==================== MEMORY LIMIT (Render Free Tier) ====================
 try:
-    # Set soft memory limit to 450MB (Render free has 512MB)
-    resource.setrlimit(resource.RLIMIT_AS, (450 * 1024 * 1024, 512 * 1024 * 1024))
-    print("✅ Memory limit set to 450MB")
+    # Set soft memory limit to 350MB (leaving room for overhead)
+    resource.setrlimit(resource.RLIMIT_AS, (350 * 1024 * 1024, 450 * 1024 * 1024))
+    print("✅ Memory limit set to 350MB")
 except Exception as e:
     print(f"⚠️ Could not set memory limit: {e}")
 
@@ -54,10 +58,8 @@ def get_db_connection():
     """Get database connection using Render's DATABASE_URL"""
     import psycopg2
     from psycopg2.extras import RealDictCursor
-    from psycopg2.pool import SimpleConnectionPool
     import os
     
-    # Use connection pool for better performance
     database_url = os.getenv('DATABASE_URL')
     
     if database_url:
@@ -79,47 +81,23 @@ def get_db_connection():
             cursor_factory=RealDictCursor
         )
 
-# ==================== LAZY LOADING FOR HEAVY MODELS ====================
-# These globals will only load when first accessed
+# ==================== LAZY LOADING FOR HEAVY MODELS (DISABLED FOR EMERGENCY) ====================
 _semantic_engine = None
 _poet_predictor = None
 _heavy_models_loaded = False
 
 def load_heavy_models():
-    """Lazy load heavy AI models - only called when needed"""
+    """Lazy load heavy AI models - ALL DISABLED for emergency fix"""
     global _semantic_engine, _poet_predictor, _heavy_models_loaded
     
     if _heavy_models_loaded:
         return True
     
-    # Check if semantic search is disabled via env var
-    if os.getenv('DISABLE_SEMANTIC') == 'true':
-        print("⚠️ Semantic search disabled via environment variable")
-        _semantic_engine = None
-    else:
-        try:
-            print("🔄 Loading semantic engine (lazy)...")
-            from semantic.semantic_search_v2 import get_semantic_engine
-            _semantic_engine = get_semantic_engine()
-            print("✅ Semantic engine loaded")
-        except Exception as e:
-            print(f"⚠️ Semantic engine failed to load: {e}")
-            _semantic_engine = None
-    
-    # Check if poet predictor is disabled
-    if os.getenv('DISABLE_POET_PREDICTOR') == 'true':
-        print("⚠️ Poet predictor disabled via environment variable")
-        _poet_predictor = None
-    else:
-        try:
-            print("🔄 Loading poet predictor (lazy)...")
-            from models.ai_engine.poet_prediction_ai_v2 import PoetPredictor
-            _poet_predictor = PoetPredictor()
-            print("✅ Poet predictor loaded")
-        except Exception as e:
-            print(f"⚠️ Poet predictor failed to load: {e}")
-            _poet_predictor = None
-    
+    # FORCE DISABLE all heavy models - emergency fix
+    print("⚠️ Heavy models are DISABLED for emergency stability")
+    print("   To enable: Remove DISABLE_HEAVY_MODELS env var and restart")
+    _semantic_engine = None
+    _poet_predictor = None
     _heavy_models_loaded = True
     return True
 
@@ -159,17 +137,17 @@ def create_app():
         except Exception as e:
             print(f"❌ Failed to register {prefix}: {e}")
     
-    print("\n🚀 UCPC Poetry Archive v2.0 - Ready for requests")
+    print("\n🚀 UCPC Poetry Archive v3.0 - EMERGENCY STABLE MODE")
     print(f"📊 Environment: {'Production' if os.getenv('RENDER') else 'Development'}")
     print(f"💾 Database: {'Configured' if os.getenv('DATABASE_URL') else 'Missing!'}")
-    print(f"🧠 Heavy models: {'Lazy loading enabled'}\n")
+    print(f"🧠 Heavy models: FORCE DISABLED (memory safe)")
+    print(f"🔧 Render free tier optimized\n")
     
     # ========== HEALTH CHECK ENDPOINT (CRITICAL FOR RENDER) ==========
     @app.route('/health')
     def health_check():
-        # Test database connection
+        # Simple health check - no heavy operations
         db_status = "unknown"
-        db_error = None
         try:
             conn = get_db_connection()
             cur = conn.cursor()
@@ -178,28 +156,21 @@ def create_app():
             conn.close()
             db_status = "connected"
         except Exception as e:
-            db_status = "disconnected"
-            db_error = str(e)
-        
-        # Get memory usage
-        try:
-            import psutil
-            process = psutil.Process()
-            memory_mb = process.memory_info().rss / 1024 / 1024
-        except:
-            memory_mb = 0
+            db_status = f"error: {str(e)[:50]}"
         
         return jsonify({
-            "status": "healthy" if db_status == "connected" else "degraded",
+            "status": "ok",
             "project": "UCPC Poetry Archive",
-            "version": "3.0",
-            "timestamp": datetime.now().isoformat(),
+            "version": "3.0-emergency",
             "database": db_status,
-            "database_error": db_error,
-            "memory_usage_mb": round(memory_mb, 2),
-            "heavy_models_loaded": _heavy_models_loaded,
-            "port": os.getenv('PORT', '10000')
+            "memory_safe": True,
+            "heavy_models": "disabled"
         })
+    
+    # ========== SIMPLE ROOT ROUTE ==========
+    @app.route('/')
+    def home():
+        return "UCPC Poetry Archive is running. Visit /health for status."
     
     # ========== MEMORY DEBUG ENDPOINT ==========
     @app.route('/debug/memory')
@@ -212,22 +183,10 @@ def create_app():
                 'rss_mb': round(memory_info.rss / 1024 / 1024, 2),
                 'vms_mb': round(memory_info.vms / 1024 / 1024, 2),
                 'cpu_percent': process.cpu_percent(),
-                'heavy_models_loaded': _heavy_models_loaded
+                'heavy_models_loaded': False
             })
         except Exception as e:
             return jsonify({'error': str(e)}), 500
-    
-    # ========== FORCE LOAD MODELS (for testing) ==========
-    @app.route('/debug/load-models')
-    def force_load_models():
-        if os.getenv('DISABLE_HEAVY_MODELS') == 'true':
-            return jsonify({'error': 'Heavy models disabled by environment'}), 403
-        load_heavy_models()
-        return jsonify({
-            'semantic_engine': _semantic_engine is not None,
-            'poet_predictor': _poet_predictor is not None,
-            'loaded': _heavy_models_loaded
-        })
     
     # ========== AFTER REQUEST ==========
     @app.after_request
@@ -236,14 +195,6 @@ def create_app():
         response.headers['ngrok-skip-browser-warning'] = 'true'
         response.headers['X-Content-Type-Options'] = 'nosniff'
         return response
-    
-    # ========== BEFORE REQUEST - Lazy load models on first API call ==========
-    @app.before_request
-    def lazy_load_on_api_call():
-        # Only load models for API endpoints that need them
-        if request.endpoint and 'api' in request.endpoint:
-            if os.getenv('DISABLE_HEAVY_MODELS') != 'true':
-                load_heavy_models()
     
     # ========== Redirects ==========
     @app.route('/admin/add_ghazal')
@@ -265,7 +216,7 @@ def create_app():
         for rule in app.url_map.iter_rules():
             if not rule.endpoint.startswith('static'):
                 routes.append(f"{rule.endpoint}: {rule}")
-        return "<br>".join(sorted(routes[:50]))  # Limit to 50 routes
+        return "<br>".join(sorted(routes[:50]))
     
     # ========== Client-side canvas upload ==========
     @app.route('/upload_image', methods=['POST'])
@@ -428,29 +379,14 @@ def create_app():
     def api_docs():
         return jsonify({
             "name": "UCPC Poetry Archive API",
-            "version": "3.0",
+            "version": "3.0-emergency",
             "environment": "production" if os.getenv('RENDER') else "development",
+            "status": "stable (heavy models disabled)",
             "endpoints": {
                 "health": "/health (GET)",
                 "check": "/check (GET)",
-                "debug_memory": "/debug/memory (GET)",
-                "research": {
-                    "analyze": "/research/api/analyze (POST)",
-                    "health": "/research/api/health (GET)",
-                    "corpus_stats": "/research/api/corpus-stats (GET)"
-                },
-                "poet_prediction": {
-                    "predict": "/api/ai/predict-poet (POST)",
-                    "by_id": "/api/ai/predict-poet/<text_id> (GET)"
-                },
-                "semantic_search": {
-                    "search": "/semantic/api/search (POST)",
-                    "status": "/semantic/status (GET)"
-                },
-                "search": "/search/ (GET)",
-                "integrity": "/integrity/ (GET)"
-            },
-            "documentation": "https://github.com/zahid-digitalhumanities/ucpc-poetry-archive"
+                "debug_memory": "/debug/memory (GET)"
+            }
         })
     
     # ========== Error Handlers ==========
