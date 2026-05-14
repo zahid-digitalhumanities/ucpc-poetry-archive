@@ -19,11 +19,13 @@ from routes.insights_routes import insights_bp
 from routes.ingest_routes import ingest_bp
 from routes.ai_routes import ai_bp
 from routes.ask_ucpc_route import ask_bp
-from routes.ask_ucpc_index import ask_index_bp
-
-# Models
-from models.stats_model import get_stats
-from models.ghazal_model import get_ghazal_with_verses
+from routes.ask_ucpc_index import ask_ucpc_bp as ask_index_bp  # Fixed: import with alias
+from routes.research_dashboard import research_dashboard_bp
+from routes.corpus_routes import corpus_bp          
+from routes.dh_advanced import dh_bp
+from routes.integrity_routes import integrity_bp
+from routes.semantic_routes import semantic_bp
+from routes.research_validation_routes import validation_bp
 
 # ==================== CONFIG ====================
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -33,11 +35,13 @@ os.makedirs(GENERATED_FOLDER, exist_ok=True)
 # ==================== DATABASE ====================
 def get_db_connection():
     import psycopg2
+    from psycopg2.extras import RealDictCursor
     return psycopg2.connect(
         host=os.getenv('DB_HOST', 'localhost'),
         database=os.getenv('DB_NAME', 'ucpc_v3_db'),
         user=os.getenv('DB_USER', 'postgres'),
-        password=os.getenv('DB_PASSWORD', '')
+        password=os.getenv('DB_PASSWORD', ''),
+        cursor_factory=RealDictCursor
     )
 
 # ==================== APP FACTORY ====================
@@ -58,9 +62,19 @@ def create_app():
     app.register_blueprint(ingest_bp)
     app.register_blueprint(ai_bp)
     app.register_blueprint(ask_bp)
-    app.register_blueprint(ask_index_bp)
-
+    app.register_blueprint(ask_index_bp)  # Now works because of alias
+    app.register_blueprint(corpus_bp)
+    app.register_blueprint(research_dashboard_bp)
+    app.register_blueprint(dh_bp)
+    app.register_blueprint(integrity_bp)
+    app.register_blueprint(semantic_bp)
+    app.register_blueprint(validation_bp)
+    
     print("✅ Blueprints registered")
+    print("   - Research Dashboard: /research")
+    print("   - Ask UCPC Index: /ask-index")
+    print("   - AI Routes: /api/ai")
+    print("   - Integrity Dashboard: /integrity")
 
     # ---------- AFTER REQUEST ----------
     @app.after_request
@@ -85,7 +99,10 @@ def create_app():
 
     @app.route('/routes')
     def show_routes():
-        return "<br>".join([str(rule) for rule in app.url_map.iter_rules()])
+        routes = []
+        for rule in app.url_map.iter_rules():
+            routes.append(f"{rule.endpoint}: {rule}")
+        return "<br>".join(sorted(routes))
 
     # ---------- Client-side canvas upload ----------
     @app.route('/upload_image', methods=['POST'])
@@ -111,6 +128,7 @@ def create_app():
             dedicator = request.args.get('dedicator', '')
             dedicatee = request.args.get('dedicatee', '')
 
+            from models.ghazal_model import get_ghazal_with_verses
             result = get_ghazal_with_verses(text_id)
             if not result:
                 return jsonify({'error': 'Ghazal not found'}), 404
@@ -149,6 +167,7 @@ def create_app():
     # ---------- Direct OG image (no file save) ----------
     @app.route('/og-image/<int:text_id>')
     def og_image(text_id):
+        from models.ghazal_model import get_ghazal_with_verses
         result = get_ghazal_with_verses(text_id)
         if not result:
             abort(404)
@@ -176,6 +195,7 @@ def create_app():
         dedicator = request.args.get('dedicator', '')
         dedicatee = request.args.get('dedicatee', '')
 
+        from models.ghazal_model import get_ghazal_with_verses
         result = get_ghazal_with_verses(text_id)
         if not result:
             return "Ghazal not found", 404
@@ -209,6 +229,7 @@ def create_app():
     @app.context_processor
     def inject_stats():
         try:
+            from models.stats_model import get_stats
             return dict(stats=get_stats())
         except Exception as e:
             print("⚠️ Stats error:", str(e))
@@ -225,13 +246,48 @@ def create_app():
         from models.base import get_db_connection
         conn = get_db_connection()
         cur = conn.cursor()
-        cur.execute("SELECT id FROM texts ORDER BY RANDOM() LIMIT 1")
+        cur.execute("SELECT id FROM texts WHERE form = 'ghazal' AND (is_deleted = FALSE OR is_deleted IS NULL) ORDER BY RANDOM() LIMIT 1")
         row = cur.fetchone()
         cur.close()
         conn.close()
         if row:
             return jsonify({'id': row['id']})
         return jsonify({'error': 'No ghazals found'}), 404
+
+    # ---------- Research Dashboard Redirect ----------
+    @app.route('/research-dashboard')
+    def research_dashboard_redirect():
+        return redirect(url_for('research_dashboard.dashboard'))
+
+    # ---------- API Documentation ----------
+    @app.route('/api/docs')
+    def api_docs():
+        return jsonify({
+            "name": "UCPC Poetry Archive API",
+            "version": "2.0",
+            "endpoints": {
+                "research": {
+                    "analyze": "/research/api/analyze (POST)",
+                    "health": "/research/api/health (GET)",
+                    "model_info": "/research/api/model-info (GET)",
+                    "corpus_stats": "/research/api/corpus-stats (GET)",
+                    "batch": "/research/api/batch (POST)"
+                },
+                "poet_prediction": {
+                    "predict": "/api/ai/predict-poet (POST)",
+                    "by_id": "/api/ai/predict-poet/<text_id> (GET)"
+                },
+                "search": {
+                    "search": "/search/ (GET)",
+                    "suggest": "/search/suggest (GET)"
+                },
+                "integrity": {
+                    "dashboard": "/integrity/ (GET)",
+                    "stats": "/integrity/api/stats (GET)"
+                }
+            },
+            "documentation": "https://github.com/ucpc/poetry-archive"
+        })
 
     # ---------- Error handlers ----------
     @app.errorhandler(404)
@@ -243,6 +299,7 @@ def create_app():
         return render_template('500.html'), 500
 
     return app
+
 
 app = create_app()
 
