@@ -1,13 +1,13 @@
-from flask import Flask, redirect, url_for, render_template, request, jsonify, abort, send_from_directory, send_file, make_response
+from flask import Flask, redirect, url_for, render_template, request, jsonify, abort, send_from_directory, send_file
 from modules.image_generator import generate_ghazal_card
 import os
 import base64
-import time
 import uuid
-import hashlib
 import io
-import re
-import urllib.parse
+import signal
+import sys
+import resource
+from datetime import datetime
 
 # Blueprints
 from routes.main_routes import main_bp
@@ -33,23 +33,43 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 GENERATED_FOLDER = os.path.join(BASE_DIR, 'static', 'generated')
 os.makedirs(GENERATED_FOLDER, exist_ok=True)
 
+# ==================== GRACEFUL SHUTDOWN ====================
+def signal_handler(sig, frame):
+    print(f"📡 Received signal {sig}, shutting down gracefully...")
+    sys.exit(0)
+
+signal.signal(signal.SIGTERM, signal_handler)
+signal.signal(signal.SIGINT, signal_handler)
+
+# ==================== MEMORY LIMIT (Render Free Tier) ====================
+try:
+    # Set soft memory limit to 450MB (Render free has 512MB)
+    resource.setrlimit(resource.RLIMIT_AS, (450 * 1024 * 1024, 512 * 1024 * 1024))
+    print("✅ Memory limit set to 450MB")
+except Exception as e:
+    print(f"⚠️ Could not set memory limit: {e}")
+
 # ==================== DATABASE (FIXED FOR RENDER) ====================
 def get_db_connection():
     """Get database connection using Render's DATABASE_URL"""
     import psycopg2
     from psycopg2.extras import RealDictCursor
+    from psycopg2.pool import SimpleConnectionPool
+    import os
     
-    # CRITICAL FIX: Use DATABASE_URL as primary source
+    # Use connection pool for better performance
     database_url = os.getenv('DATABASE_URL')
     
     if database_url:
-        # Render provides DATABASE_URL - use it directly
-        # Ensure SSL mode is required
+        # Ensure SSL mode is required for Render
         if 'sslmode' not in database_url:
-            database_url += '?sslmode=require'
+            if '?' in database_url:
+                database_url += '&sslmode=require'
+            else:
+                database_url += '?sslmode=require'
         return psycopg2.connect(database_url, cursor_factory=RealDictCursor)
     else:
-        # Fallback for local development only
+        # Fallback for local development
         return psycopg2.connect(
             host=os.getenv('DB_HOST', 'localhost'),
             database=os.getenv('DB_NAME', 'ucpc_v3_db'),
@@ -59,87 +79,195 @@ def get_db_connection():
             cursor_factory=RealDictCursor
         )
 
+# ==================== LAZY LOADING FOR HEAVY MODELS ====================
+# These globals will only load when first accessed
+_semantic_engine = None
+_poet_predictor = None
+_heavy_models_loaded = False
+
+def load_heavy_models():
+    """Lazy load heavy AI models - only called when needed"""
+    global _semantic_engine, _poet_predictor, _heavy_models_loaded
+    
+    if _heavy_models_loaded:
+        return True
+    
+    # Check if semantic search is disabled via env var
+    if os.getenv('DISABLE_SEMANTIC') == 'true':
+        print("⚠️ Semantic search disabled via environment variable")
+        _semantic_engine = None
+    else:
+        try:
+            print("🔄 Loading semantic engine (lazy)...")
+            from semantic.semantic_search_v2 import get_semantic_engine
+            _semantic_engine = get_semantic_engine()
+            print("✅ Semantic engine loaded")
+        except Exception as e:
+            print(f"⚠️ Semantic engine failed to load: {e}")
+            _semantic_engine = None
+    
+    # Check if poet predictor is disabled
+    if os.getenv('DISABLE_POET_PREDICTOR') == 'true':
+        print("⚠️ Poet predictor disabled via environment variable")
+        _poet_predictor = None
+    else:
+        try:
+            print("🔄 Loading poet predictor (lazy)...")
+            from models.ai_engine.poet_prediction_ai_v2 import PoetPredictor
+            _poet_predictor = PoetPredictor()
+            print("✅ Poet predictor loaded")
+        except Exception as e:
+            print(f"⚠️ Poet predictor failed to load: {e}")
+            _poet_predictor = None
+    
+    _heavy_models_loaded = True
+    return True
+
 # ==================== APP FACTORY ====================
 def create_app():
     app = Flask(__name__)
-    app.secret_key = os.getenv('SECRET_KEY', 'dev-secret-key')
-    app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024   # 50 MB
+    app.secret_key = os.getenv('SECRET_KEY', 'ucpc-production-secret-key-change-this')
+    app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024  # 50 MB
     app.config['GENERATED_FOLDER'] = GENERATED_FOLDER
-
-    # Register Blueprints
-    app.register_blueprint(main_bp)
-    app.register_blueprint(poets_bp)
-    app.register_blueprint(ghazals_bp)
-    app.register_blueprint(search_bp)
-    app.register_blueprint(listen_bp)
-    app.register_blueprint(similarity_bp)
-    app.register_blueprint(insights_bp)
-    app.register_blueprint(ingest_bp)
-    app.register_blueprint(ai_bp)
-    app.register_blueprint(ask_bp)
-    app.register_blueprint(ask_index_bp)
-    app.register_blueprint(corpus_bp)
-    app.register_blueprint(research_dashboard_bp)
-    app.register_blueprint(dh_bp)
-    app.register_blueprint(integrity_bp)
-    app.register_blueprint(semantic_bp)
-    app.register_blueprint(validation_bp)
+    app.config['JSON_AS_ASCII'] = False  # Support Urdu text
     
-    print("✅ Blueprints registered")
-    print("   - Research Dashboard: /research")
-    print("   - Ask UCPC Index: /ask-index")
-    print("   - AI Routes: /api/ai")
-    print("   - Integrity Dashboard: /integrity")
-
+    # Register Blueprints
+    blueprints = [
+        (main_bp, '/'),
+        (poets_bp, '/poets'),
+        (ghazals_bp, '/ghazals'),
+        (search_bp, '/search'),
+        (listen_bp, '/listen'),
+        (similarity_bp, '/similarity'),
+        (insights_bp, '/insights'),
+        (ingest_bp, '/ingest'),
+        (ai_bp, '/api/ai'),
+        (ask_bp, '/ask'),
+        (ask_index_bp, '/ask-index'),
+        (corpus_bp, '/corpus'),
+        (research_dashboard_bp, '/research'),
+        (dh_bp, '/dh'),
+        (integrity_bp, '/integrity'),
+        (semantic_bp, '/semantic'),
+        (validation_bp, '/research/validation')
+    ]
+    
+    for blueprint, prefix in blueprints:
+        try:
+            app.register_blueprint(blueprint)
+            print(f"✅ Registered: {prefix}")
+        except Exception as e:
+            print(f"❌ Failed to register {prefix}: {e}")
+    
+    print("\n🚀 UCPC Poetry Archive v2.0 - Ready for requests")
+    print(f"📊 Environment: {'Production' if os.getenv('RENDER') else 'Development'}")
+    print(f"💾 Database: {'Configured' if os.getenv('DATABASE_URL') else 'Missing!'}")
+    print(f"🧠 Heavy models: {'Lazy loading enabled'}\n")
+    
     # ========== HEALTH CHECK ENDPOINT (CRITICAL FOR RENDER) ==========
     @app.route('/health')
     def health_check():
         # Test database connection
         db_status = "unknown"
+        db_error = None
         try:
             conn = get_db_connection()
+            cur = conn.cursor()
+            cur.execute("SELECT 1")
+            cur.close()
             conn.close()
             db_status = "connected"
         except Exception as e:
-            db_status = f"error: {str(e)}"
+            db_status = "disconnected"
+            db_error = str(e)
+        
+        # Get memory usage
+        try:
+            import psutil
+            process = psutil.Process()
+            memory_mb = process.memory_info().rss / 1024 / 1024
+        except:
+            memory_mb = 0
         
         return jsonify({
-            "status": "healthy",
+            "status": "healthy" if db_status == "connected" else "degraded",
             "project": "UCPC Poetry Archive",
-            "version": "2.0",
+            "version": "3.0",
+            "timestamp": datetime.now().isoformat(),
             "database": db_status,
+            "database_error": db_error,
+            "memory_usage_mb": round(memory_mb, 2),
+            "heavy_models_loaded": _heavy_models_loaded,
             "port": os.getenv('PORT', '10000')
         })
-
-    # ---------- AFTER REQUEST ----------
+    
+    # ========== MEMORY DEBUG ENDPOINT ==========
+    @app.route('/debug/memory')
+    def debug_memory():
+        try:
+            import psutil
+            process = psutil.Process()
+            memory_info = process.memory_info()
+            return jsonify({
+                'rss_mb': round(memory_info.rss / 1024 / 1024, 2),
+                'vms_mb': round(memory_info.vms / 1024 / 1024, 2),
+                'cpu_percent': process.cpu_percent(),
+                'heavy_models_loaded': _heavy_models_loaded
+            })
+        except Exception as e:
+            return jsonify({'error': str(e)}), 500
+    
+    # ========== FORCE LOAD MODELS (for testing) ==========
+    @app.route('/debug/load-models')
+    def force_load_models():
+        if os.getenv('DISABLE_HEAVY_MODELS') == 'true':
+            return jsonify({'error': 'Heavy models disabled by environment'}), 403
+        load_heavy_models()
+        return jsonify({
+            'semantic_engine': _semantic_engine is not None,
+            'poet_predictor': _poet_predictor is not None,
+            'loaded': _heavy_models_loaded
+        })
+    
+    # ========== AFTER REQUEST ==========
     @app.after_request
     def add_security_headers(response):
         response.headers['Access-Control-Allow-Origin'] = '*'
         response.headers['ngrok-skip-browser-warning'] = 'true'
+        response.headers['X-Content-Type-Options'] = 'nosniff'
         return response
-
-    # ---------- Redirects ----------
+    
+    # ========== BEFORE REQUEST - Lazy load models on first API call ==========
+    @app.before_request
+    def lazy_load_on_api_call():
+        # Only load models for API endpoints that need them
+        if request.endpoint and 'api' in request.endpoint:
+            if os.getenv('DISABLE_HEAVY_MODELS') != 'true':
+                load_heavy_models()
+    
+    # ========== Redirects ==========
     @app.route('/admin/add_ghazal')
     def redirect_add_ghazal():
         return redirect(url_for('ingest.add'))
-
+    
     @app.route('/view/<int:text_id>')
     def redirect_view(text_id):
         return redirect(url_for('ghazals.view_ghazal', text_id=text_id))
-
-    # ---------- Debug ----------
+    
+    # ========== Debug Routes ==========
     @app.route('/check')
     def check():
-        return "OK WORKING"
-
+        return "✅ UCPC Poetry Archive is running!"
+    
     @app.route('/routes')
     def show_routes():
         routes = []
         for rule in app.url_map.iter_rules():
-            routes.append(f"{rule.endpoint}: {rule}")
-        return "<br>".join(sorted(routes))
-
-    # ---------- Client-side canvas upload ----------
+            if not rule.endpoint.startswith('static'):
+                routes.append(f"{rule.endpoint}: {rule}")
+        return "<br>".join(sorted(routes[:50]))  # Limit to 50 routes
+    
+    # ========== Client-side canvas upload ==========
     @app.route('/upload_image', methods=['POST'])
     def upload_image():
         data = request.json.get('image')
@@ -147,49 +275,48 @@ def create_app():
             return jsonify({'error': 'No image data'}), 400
         header, encoded = data.split(',', 1)
         binary = base64.b64decode(encoded)
-
+        
         filename = f"share_{uuid.uuid4().hex}.png"
         filepath = os.path.join(GENERATED_FOLDER, filename)
         with open(filepath, 'wb') as f:
             f.write(binary)
-
+        
         full_url = url_for('static', filename=f'generated/{filename}', _external=True)
         return jsonify({'url': full_url})
-
-    # ---------- Generate share image (with dedication) ----------
+    
+    # ========== Generate share image ==========
     @app.route('/generate_share/<int:text_id>')
     def generate_share(text_id):
         try:
             dedicator = request.args.get('dedicator', '')
             dedicatee = request.args.get('dedicatee', '')
-
+            
             from models.ghazal_model import get_ghazal_with_verses
             result = get_ghazal_with_verses(text_id)
             if not result:
                 return jsonify({'error': 'Ghazal not found'}), 404
-
+            
             if isinstance(result, tuple):
                 ghazal, verses = result
             else:
                 ghazal = result.get('ghazal')
                 verses = result.get('verses')
-
+            
             img = generate_ghazal_card(ghazal, verses, dedicator, dedicatee)
-
+            
             filename = f"share_{uuid.uuid4().hex}.png"
             filepath = os.path.join(GENERATED_FOLDER, filename)
             img.save(filepath)
-
+            
             name_without_ext = filename.replace('.png', '')
             share_url = url_for('share_page', filename=name_without_ext, _external=True)
             return jsonify({'share_url': share_url})
-
         except Exception as e:
             import traceback
             traceback.print_exc()
             return jsonify({'error': str(e)}), 500
-
-    # ---------- Share page (HTML with OG tags) ----------
+    
+    # ========== Share page ==========
     @app.route('/share_page/<filename>')
     def share_page(filename):
         if not filename.endswith('.png'):
@@ -198,8 +325,8 @@ def create_app():
             filename_png = filename
         image_url = url_for('static', filename=f'generated/{filename_png}', _external=True)
         return render_template('share.html', image_url=image_url)
-
-    # ---------- Direct OG image (no file save) ----------
+    
+    # ========== OG image ==========
     @app.route('/og-image/<int:text_id>')
     def og_image(text_id):
         from models.ghazal_model import get_ghazal_with_verses
@@ -218,127 +345,139 @@ def create_app():
         img.save(buf, format='PNG')
         buf.seek(0)
         return send_file(buf, mimetype='image/png')
-
-    # ---------- robots.txt ----------
+    
+    # ========== robots.txt ==========
     @app.route('/robots.txt')
     def robots():
         return send_from_directory('static', 'robots.txt')
-
-    # ---------- TEXT SHARE (with dedication) ----------
+    
+    # ========== Text share ==========
     @app.route('/share_text/<int:text_id>')
     def share_text(text_id):
         dedicator = request.args.get('dedicator', '')
         dedicatee = request.args.get('dedicatee', '')
-
+        
         from models.ghazal_model import get_ghazal_with_verses
         result = get_ghazal_with_verses(text_id)
         if not result:
             return "Ghazal not found", 404
-
+        
         if isinstance(result, tuple):
             ghazal, verses = result
         else:
             ghazal = result.get('ghazal')
             verses = result.get('verses')
-
+        
         text = ""
         poet = ghazal.get('poet_name', '').upper()
         text += f"{poet}\n"
         text += "-" * len(poet) + "\n\n"
-
+        
         if dedicator:
             text += f"From: {dedicator}\n"
         if dedicatee:
             text += f"To: {dedicatee}\n"
         text += "\n"
-
+        
         for v in verses:
             m1 = v.get('misra1_urdu', '')
             m2 = v.get('misra2_urdu', '')
             text += f"{m1}\n{m2}\n\n"
-
+        
         text += "📖 UCPC Poetry Archive"
         return text
-
-    # ---------- Global stats ----------
+    
+    # ========== Global stats ==========
     @app.context_processor
     def inject_stats():
         try:
             from models.stats_model import get_stats
             return dict(stats=get_stats())
         except Exception as e:
-            print("⚠️ Stats error:", str(e))
+            print(f"⚠️ Stats error: {e}")
             return dict(stats=None)
-
-    # ---------- Template filter for enumerate ----------
+    
+    # ========== Template filter ==========
     @app.template_filter('enumerate')
     def jinja_enumerate(iterable, start=1):
         return enumerate(iterable, start)
-
-    # ---------- Random Ghazal API (FIXED) ----------
+    
+    # ========== Random Ghazal API ==========
     @app.route('/api/random-ghazal')
     def random_ghazal():
-        conn = get_db_connection()
-        cur = conn.cursor()
-        cur.execute("SELECT id FROM texts WHERE form = 'ghazal' AND (is_deleted = FALSE OR is_deleted IS NULL) ORDER BY RANDOM() LIMIT 1")
-        row = cur.fetchone()
-        cur.close()
-        conn.close()
-        if row:
-            return jsonify({'id': row['id']})
-        return jsonify({'error': 'No ghazals found'}), 404
-
-    # ---------- Research Dashboard Redirect ----------
+        try:
+            conn = get_db_connection()
+            cur = conn.cursor()
+            cur.execute("SELECT id FROM texts WHERE form = 'ghazal' AND (is_deleted = FALSE OR is_deleted IS NULL) ORDER BY RANDOM() LIMIT 1")
+            row = cur.fetchone()
+            cur.close()
+            conn.close()
+            if row:
+                return jsonify({'id': row['id']})
+            return jsonify({'error': 'No ghazals found'}), 404
+        except Exception as e:
+            return jsonify({'error': str(e)}), 500
+    
+    # ========== Research Dashboard Redirect ==========
     @app.route('/research-dashboard')
     def research_dashboard_redirect():
         return redirect(url_for('research_dashboard.dashboard'))
-
-    # ---------- API Documentation ----------
+    
+    # ========== API Documentation ==========
     @app.route('/api/docs')
     def api_docs():
         return jsonify({
             "name": "UCPC Poetry Archive API",
-            "version": "2.0",
+            "version": "3.0",
+            "environment": "production" if os.getenv('RENDER') else "development",
             "endpoints": {
+                "health": "/health (GET)",
+                "check": "/check (GET)",
+                "debug_memory": "/debug/memory (GET)",
                 "research": {
                     "analyze": "/research/api/analyze (POST)",
                     "health": "/research/api/health (GET)",
-                    "model_info": "/research/api/model-info (GET)",
-                    "corpus_stats": "/research/api/corpus-stats (GET)",
-                    "batch": "/research/api/batch (POST)"
+                    "corpus_stats": "/research/api/corpus-stats (GET)"
                 },
                 "poet_prediction": {
                     "predict": "/api/ai/predict-poet (POST)",
                     "by_id": "/api/ai/predict-poet/<text_id> (GET)"
                 },
-                "search": {
-                    "search": "/search/ (GET)",
-                    "suggest": "/search/suggest (GET)"
+                "semantic_search": {
+                    "search": "/semantic/api/search (POST)",
+                    "status": "/semantic/status (GET)"
                 },
-                "integrity": {
-                    "dashboard": "/integrity/ (GET)",
-                    "stats": "/integrity/api/stats (GET)"
-                }
+                "search": "/search/ (GET)",
+                "integrity": "/integrity/ (GET)"
             },
-            "documentation": "https://github.com/ucpc/poetry-archive"
+            "documentation": "https://github.com/zahid-digitalhumanities/ucpc-poetry-archive"
         })
-
-    # ---------- Error handlers ----------
+    
+    # ========== Error Handlers ==========
     @app.errorhandler(404)
     def page_not_found(e):
         return render_template('404.html'), 404
-
+    
     @app.errorhandler(500)
     def internal_server_error(e):
-        return render_template('500.html'), 500
-
+        return jsonify({
+            "error": "Internal server error",
+            "message": str(e),
+            "timestamp": datetime.now().isoformat()
+        }), 500
+    
+    @app.errorhandler(413)
+    def too_large(e):
+        return jsonify({"error": "File too large", "max_size_mb": 50}), 413
+    
     return app
 
 
-# Create app instance for Gunicorn
+# ==================== CREATE APP INSTANCE ====================
 app = create_app()
 
-# Only run this when executing directly (local development)
+# ==================== RUN (Local Development Only) ====================
 if __name__ == '__main__':
     port = int(os.getenv('PORT', 10000))
-    app.run(host='0.0.0.0', port=port, debug=False)
+    print(f"🔥 Starting UCPC in development mode on port {port}")
+    app.run(host='0.0.0.0', port=port, debug=True, threaded=True)
