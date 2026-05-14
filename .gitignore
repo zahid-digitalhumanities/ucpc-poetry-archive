@@ -1,41 +1,41 @@
+# Sensitive configuration
+config.py
+.env
+*.env
+
 # Database
 *.db
 *.sqlite
-*.sqlite3
 *.sql
 backup_*.sql
 
 # Models (large binary files)
 *.pkl
 *.pickle
-
-# Data files
 *.csv
-sher_dataset.csv
-training_data.csv
 
 # Cache
 __pycache__/
 *.pyc
 semantic/cache/
-
-# Logs
 logs/
-*.log
 evaluation/
 
-# Generated images
-static/generated/
-
-# Environment
-.env
-.venv/
-venv/
+# Uploads
+uploads/
 
 # IDE
 .vscode/
 .idea/
 *.swp
 
-# Local config
-config_local.py
+# Tunnel executables
+*.exe
+ngrok.exe
+cloudflared.exe
+bore.exe
+
+# Environment
+.venv/
+venv/
+env/
