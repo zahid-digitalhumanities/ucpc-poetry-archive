@@ -10,7 +10,7 @@ import sys
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(BASE_DIR)
 
-from semantic.semantic_search_v2 import semantic_engine, search_semantic
+from semantic.semantic_search_v2 import get_semantic_engine, search_semantic
 from modules.intertextual_analysis import IntertextualAnalyzer
 
 semantic_bp = Blueprint("semantic", __name__, url_prefix="/semantic")
@@ -49,7 +49,8 @@ def matla_search_api():
         query = data.get("query", "").strip()
         if not query:
             return jsonify({"success": False, "error": "No matla query"}), 400
-        results = semantic_engine.search(query, top_n=20)
+        engine = get_semantic_engine()
+        results = engine.search(query, top_n=20)
         matla_results = []
         for r in results:
             matla = r.get("matla") or ""
@@ -98,7 +99,8 @@ def influence_search_api():
         threshold = float(data.get("threshold", 0.60))
         if not query:
             return jsonify({"success": False, "error": "No query"}), 400
-        results = semantic_engine.influence_search(query, threshold=threshold)
+        engine = get_semantic_engine()
+        results = engine.influence_search(query, threshold=threshold)
         return jsonify({
             "success": True,
             "query": query,
@@ -114,7 +116,8 @@ def influence_search_api():
 @semantic_bp.route("/api/similar/<int:text_id>")
 def similar_ghazals_api(text_id):
     try:
-        results = semantic_engine.find_similar_by_id(text_id, top_n=10)
+        engine = get_semantic_engine()
+        results = engine.find_similar_by_id(text_id, top_n=10)
         return jsonify({
             "success": True,
             "text_id": text_id,
@@ -129,7 +132,8 @@ def similar_ghazals_api(text_id):
 @semantic_bp.route("/api/stats")
 def semantic_stats():
     try:
-        total_docs = len(semantic_engine.documents)
+        engine = get_semantic_engine()
+        total_docs = len(engine.documents)
         return jsonify({
             "success": True,
             "engine": "UCPC Hybrid Semantic Engine",
