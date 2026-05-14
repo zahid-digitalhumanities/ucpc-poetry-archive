@@ -9,6 +9,7 @@ Features:
 - Matla-aware scoring
 - Intertextual reranking
 - Persistent index caching
+- Lazy loading (no heavy init on import)
 """
 
 import os
@@ -23,7 +24,6 @@ except ImportError:
     print("⚠️ rank_bm25 not installed. Run: pip install rank_bm25")
     BM25Okapi = None
 
-from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -37,10 +37,11 @@ from modules.intertextual_analysis import IntertextualAnalyzer
 _SENTENCE_MODEL = None
 
 def get_sentence_model():
-    """Singleton pattern for SentenceTransformer model."""
+    """Singleton pattern for SentenceTransformer model (lazy loaded)."""
     global _SENTENCE_MODEL
     if _SENTENCE_MODEL is None:
         print("🔄 Loading SentenceTransformer model (one‑time, 2-3 minutes)...")
+        from sentence_transformers import SentenceTransformer
         _SENTENCE_MODEL = SentenceTransformer(
             "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
         )
@@ -69,17 +70,27 @@ class UrduTextPreprocessor:
 class UCPCHybridSemanticEngine:
     def __init__(self):
         self.preprocessor = UrduTextPreprocessor()
-        self.intertextual = IntertextualAnalyzer()
+        self.intertextual = None  # Lazy load
         self.documents = []
         self.doc_vectors = None
         self.bm25 = None
+        self._initialized = False
+
+    def _get_intertextual(self):
+        """Lazy load IntertextualAnalyzer."""
+        if self.intertextual is None:
+            self.intertextual = IntertextualAnalyzer()
+        return self.intertextual
+
+    def _ensure_initialized(self):
+        """Load cache or build index only when needed."""
+        if self._initialized:
+            return
+        self._initialized = True
         
-        # Try to load cached index first
         if not self._load_cached_index():
             print("⚠️ No cache found. Building index from scratch...")
             self.build_index()
-        else:
-            print(f"✅ Loaded {len(self.documents)} ghazals from cache")
 
     def _load_cached_index(self):
         """Load pre-computed index from cache file."""
@@ -163,7 +174,7 @@ class UCPCHybridSemanticEngine:
     def build_embeddings(self):
         """Generate sentence embeddings using singleton model."""
         texts = [doc["text"] for doc in self.documents]
-        model = get_sentence_model()  # Singleton pattern
+        model = get_sentence_model()  # Singleton pattern (lazy)
         self.doc_vectors = model.encode(texts, show_progress_bar=True, convert_to_numpy=True)
         print("✅ Embeddings generated")
 
@@ -182,11 +193,13 @@ class UCPCHybridSemanticEngine:
         matla = self.normalize(matla)
         if query in matla:
             return 0.25
-        similarity = self.intertextual.sequence_similarity(query, matla)
+        similarity = self._get_intertextual().sequence_similarity(query, matla)
         return similarity * 0.15
 
     def search(self, query, top_n=10):
-        """Hybrid semantic search."""
+        """Hybrid semantic search (lazy initialization)."""
+        self._ensure_initialized()
+        
         if not self.documents:
             return []
         
@@ -212,7 +225,7 @@ class UCPCHybridSemanticEngine:
             hybrid_score = semantic_score * 0.60 + normalized_bm25 * 0.40
             hybrid_score += self.matla_boost(query, doc["matla"])
             
-            intertext = self.intertextual.analyze(query, doc["text"][:800])
+            intertext = self._get_intertextual().analyze(query, doc["text"][:800])
             hybrid_score += intertext["overall_intertextuality"] * 0.15
             
             results.append({
@@ -236,18 +249,28 @@ class UCPCHybridSemanticEngine:
         return [r for r in results if r["intertextuality"] >= threshold]
 
     def find_similar_by_id(self, text_id, top_n=10):
+        self._ensure_initialized()
         target = next((doc for doc in self.documents if doc["text_id"] == text_id), None)
         if not target:
             return []
         return self.search(target["text"], top_n=top_n)
 
 
-# ========== Singleton instance ==========
-semantic_engine = UCPCHybridSemanticEngine()
+# ========== LAZY SINGLETON INSTANCE ==========
+_semantic_engine = None
+
+def get_semantic_engine():
+    """Lazy-loaded singleton semantic engine (no heavy init on import)."""
+    global _semantic_engine
+    if _semantic_engine is None:
+        print("🔄 Initializing UCPC Semantic Engine (lazy load)...")
+        _semantic_engine = UCPCHybridSemanticEngine()
+    return _semantic_engine
 
 
 def search_semantic(query, top_n=10):
-    return semantic_engine.search(query, top_n=top_n)
+    """Convenience function for semantic search."""
+    return get_semantic_engine().search(query, top_n=top_n)
 
 
 if __name__ == "__main__":
