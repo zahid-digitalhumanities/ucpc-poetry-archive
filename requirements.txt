@@ -11,7 +11,7 @@ scipy>=1.10.0
 sentence-transformers>=2.2.0
 torch>=2.0.0
 rank-bm25>=0.2.0
-rapidfuzz>=3.0.0
+rapidfuzz==3.13.0
 arabic_reshaper>=2.1
 python-bidi>=0.4
 chardet>=5.2
