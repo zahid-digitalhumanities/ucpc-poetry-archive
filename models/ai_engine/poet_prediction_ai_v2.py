@@ -17,6 +17,8 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__fil
 sys.path.insert(0, BASE_DIR)
 
 from models.base import get_db_connection
+import models.vectorizers as vec
+from modules.explainability import explain_prediction
 
 # ========== RESEARCH LOGGING SETUP ==========
 LOG_DIR = os.path.join(BASE_DIR, 'logs', 'research')
@@ -25,24 +27,6 @@ os.makedirs(LOG_DIR, exist_ok=True)
 # Corpus and model versioning for reproducibility
 CORPUS_VERSION = "1.2"      # Update when corpus changes
 MODEL_VERSION = "v9"         # Update when model changes
-
-# ========== LAZY LOAD FOR HEAVY MODULES ==========
-_vec_module = None
-_explainability_module = None
-
-def get_vectorizers():
-    global _vec_module
-    if _vec_module is None:
-        import models.vectorizers as vec
-        _vec_module = vec
-    return _vec_module
-
-def get_explainability():
-    global _explainability_module
-    if _explainability_module is None:
-        from modules.explainability import explain_prediction
-        _explainability_module = explain_prediction
-    return _explainability_module
 
 
 def log_prediction(text: str, predictions: List[Dict], text_length: int, confidence: float = 0):
@@ -72,6 +56,13 @@ def log_prediction(text: str, predictions: List[Dict], text_length: int, confide
             f.write(json.dumps(log_entry, ensure_ascii=False) + '\n')
     except Exception as e:
         print(f"⚠️ Research logging error: {e}")
+
+
+# ========== CRITICAL HACK: Make vectorizers available to pickle ==========
+# This allows loading the existing v9 model without retraining
+sys.modules['__main__'].HybridVectorizer = vec.HybridVectorizer
+sys.modules['__main__'].AdvancedTextVectorizer = vec.AdvancedTextVectorizer
+# =========================================================================
 
 
 def load_model():
@@ -157,10 +148,11 @@ def predict_poet_from_text(text: str, top_n: int = 5) -> List[Dict[str, Any]]:
                 "explanation": ["Provide at least 100 characters for reliable attribution"],
                 "error": f"Text too short ({text_length} chars). Minimum 100 characters required."
             }]
+            # Log even failed predictions for research
             log_prediction(text, result, text_length, 0)
             return result
 
-        # Load model (lazy - only now)
+        # Load model
         model_pkg = load_model()
         model = model_pkg['model']
         vectorizer = model_pkg['vectorizer']
@@ -186,9 +178,6 @@ def predict_poet_from_text(text: str, top_n: int = 5) -> List[Dict[str, Any]]:
         results = []
         top_confidence = 0.0
         
-        # Get explainability function (lazy)
-        explain_prediction = get_explainability()
-        
         for idx in top_indices:
             confidence = float(aggregated_probs[idx])
             poet_id = int(label_encoder.inverse_transform([idx])[0])
@@ -197,7 +186,9 @@ def predict_poet_from_text(text: str, top_n: int = 5) -> List[Dict[str, Any]]:
             if confidence > top_confidence:
                 top_confidence = confidence
             
-            # Honest confidence calibration
+            # =====================================================
+            # HONEST CONFIDENCE CALIBRATION (Academic standard)
+            # =====================================================
             if confidence >= 0.75:
                 conf_level = "high"
             elif confidence >= 0.50:
@@ -207,16 +198,22 @@ def predict_poet_from_text(text: str, top_n: int = 5) -> List[Dict[str, Any]]:
             else:
                 conf_level = "uncertain"
             
+            # Keep original poet name - don't replace with "Uncertain Attribution"
+            # Instead, add a confidence indicator in the name for very low confidence
             display_name = poet_name
             if confidence < 0.35:
                 display_name = f"{poet_name} (Low Confidence)"
             
             confidence_percent = round(confidence * 100, 2)
+            
+            # =====================================================
+            # EXPLAINABILITY LAYER (Research-grade)
+            # =====================================================
             explanation = explain_prediction(poet_name)
             
             results.append({
                 "poet_id": poet_id,
-                "poet_name": display_name,
+                "poet_name": display_name,  # Use display name with indicator if needed
                 "poet_name_urdu": "",
                 "confidence": confidence_percent,
                 "confidence_percent": confidence_percent,
@@ -227,7 +224,11 @@ def predict_poet_from_text(text: str, top_n: int = 5) -> List[Dict[str, Any]]:
                 "explanation": explanation
             })
         
+        # =====================================================
+        # RESEARCH LOGGING (Reproducibility)
+        # =====================================================
         log_prediction(text, results, text_length, top_confidence)
+        
         return results
     
     except Exception as e:
@@ -246,6 +247,7 @@ def predict_poet_from_text(text: str, top_n: int = 5) -> List[Dict[str, Any]]:
             "explanation": [f"Prediction system error: {str(e)}"],
             "error": str(e)
         }]
+        # Log error for research tracking
         log_prediction(text, error_result, len(text), 0)
         return error_result
 
@@ -283,4 +285,5 @@ if __name__ == "__main__":
         if r.get('explanation'):
             print(f"   Evidence: {', '.join(r['explanation'][:3])}")
     
+    # Show log location
     print(f"\n📊 Research logs saved to: {LOG_DIR}")
