@@ -7,6 +7,7 @@ import uuid
 import hashlib
 import io
 import re
+import urllib.parse
 
 # Blueprints
 from routes.main_routes import main_bp
@@ -32,17 +33,31 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 GENERATED_FOLDER = os.path.join(BASE_DIR, 'static', 'generated')
 os.makedirs(GENERATED_FOLDER, exist_ok=True)
 
-# ==================== DATABASE ====================
+# ==================== DATABASE (FIXED FOR RENDER) ====================
 def get_db_connection():
+    """Get database connection using Render's DATABASE_URL"""
     import psycopg2
     from psycopg2.extras import RealDictCursor
-    return psycopg2.connect(
-        host=os.getenv('DB_HOST', 'localhost'),
-        database=os.getenv('DB_NAME', 'ucpc_v3_db'),
-        user=os.getenv('DB_USER', 'postgres'),
-        password=os.getenv('DB_PASSWORD', ''),
-        cursor_factory=RealDictCursor
-    )
+    
+    # CRITICAL FIX: Use DATABASE_URL as primary source
+    database_url = os.getenv('DATABASE_URL')
+    
+    if database_url:
+        # Render provides DATABASE_URL - use it directly
+        # Ensure SSL mode is required
+        if 'sslmode' not in database_url:
+            database_url += '?sslmode=require'
+        return psycopg2.connect(database_url, cursor_factory=RealDictCursor)
+    else:
+        # Fallback for local development only
+        return psycopg2.connect(
+            host=os.getenv('DB_HOST', 'localhost'),
+            database=os.getenv('DB_NAME', 'ucpc_v3_db'),
+            user=os.getenv('DB_USER', 'postgres'),
+            password=os.getenv('DB_PASSWORD', ''),
+            port=os.getenv('DB_PORT', '5432'),
+            cursor_factory=RealDictCursor
+        )
 
 # ==================== APP FACTORY ====================
 def create_app():
@@ -79,10 +94,21 @@ def create_app():
     # ========== HEALTH CHECK ENDPOINT (CRITICAL FOR RENDER) ==========
     @app.route('/health')
     def health_check():
+        # Test database connection
+        db_status = "unknown"
+        try:
+            conn = get_db_connection()
+            conn.close()
+            db_status = "connected"
+        except Exception as e:
+            db_status = f"error: {str(e)}"
+        
         return jsonify({
             "status": "healthy",
             "project": "UCPC Poetry Archive",
-            "version": "2.0"
+            "version": "2.0",
+            "database": db_status,
+            "port": os.getenv('PORT', '10000')
         })
 
     # ---------- AFTER REQUEST ----------
@@ -249,10 +275,9 @@ def create_app():
     def jinja_enumerate(iterable, start=1):
         return enumerate(iterable, start)
 
-    # ---------- Random Ghazal API ----------
+    # ---------- Random Ghazal API (FIXED) ----------
     @app.route('/api/random-ghazal')
     def random_ghazal():
-        from models.base import get_db_connection
         conn = get_db_connection()
         cur = conn.cursor()
         cur.execute("SELECT id FROM texts WHERE form = 'ghazal' AND (is_deleted = FALSE OR is_deleted IS NULL) ORDER BY RANDOM() LIMIT 1")
@@ -310,8 +335,10 @@ def create_app():
     return app
 
 
+# Create app instance for Gunicorn
 app = create_app()
 
+# Only run this when executing directly (local development)
 if __name__ == '__main__':
     port = int(os.getenv('PORT', 10000))
     app.run(host='0.0.0.0', port=port, debug=False)
