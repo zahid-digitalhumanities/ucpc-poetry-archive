@@ -1,14 +1,12 @@
 # routes/__init__.py
-# Lightweight version – only essential routes for public poetry archive
+# Lightweight version – only routes that actually exist
 
-# Core routes (always needed)
 from .main_routes import main_bp
 from .poets_routes import poets_bp
 from .ghazals_routes import ghazals_bp
 from .search_routes import search_bp
-from .bulk_routes import bulk_bp
 
-# Optional: Add these only if they exist and are lightweight
+# Only import these if the files exist
 try:
     from .ingest_routes import ingest_bp
 except ImportError:
@@ -29,29 +27,4 @@ try:
 except ImportError:
     listen_bp = None
 
-# ============================================
-# IMPORTANT: DO NOT import these heavy routes
-# They cause memory issues on Render free tier
-# ============================================
-
-# from .ai_routes import ai_bp
-# from .ask_ucpc_route import ask_bp
-# from .ask_ucpc_index import ask_ucpc_bp
-# from .semantic_routes import semantic_bp
-# from .research_dashboard import research_dashboard_bp
-# from .dh_advanced import dh_bp
-# from .research_validation_routes import validation_bp
-# from .similarity_route import similarity_bp
-# from .insights_routes import insights_bp
-
-__all__ = [
-    'main_bp',
-    'poets_bp',
-    'ghazals_bp',
-    'search_bp',
-    'bulk_bp',
-    'ingest_bp',
-    'corpus_bp',
-    'integrity_bp',
-    'listen_bp'
-]
+# DO NOT import bulk_routes – file doesn't exist
