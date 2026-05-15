@@ -313,12 +313,12 @@
     <div class="nav-share-row">
         <div class="nav-buttons">
             {% if prev_id %}
-            <a href="/ghazals/view/{{ prev_id }}" class="nav-btn">
+            <a href="{{ url_for('ghazals.view_ghazal', text_id=prev_id) }}" class="nav-btn">
                 <i class="fas fa-arrow-left"></i> Previous
             </a>
             {% endif %}
             {% if next_id %}
-            <a href="/ghazals/view/{{ next_id }}" class="nav-btn">
+            <a href="{{ url_for('ghazals.view_ghazal', text_id=next_id) }}" class="nav-btn">
                 Next <i class="fas fa-arrow-right"></i>
             </a>
             {% endif %}
