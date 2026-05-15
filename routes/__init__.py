@@ -22,4 +22,9 @@ try:
 except ImportError:
     integrity_bp = None
 
+try:
+    from .listen_routes import listen_bp
+except ImportError:
+    listen_bp = None
+
 __all__ = ['main_bp', 'poets_bp', 'ghazals_bp', 'search_bp']
