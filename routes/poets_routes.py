@@ -1,115 +1,89 @@
-from flask import Blueprint, render_template, flash, redirect, url_for, request, jsonify
-from models.poets_model import fetch_poet_by_id, get_texts_with_first_verses_paginated
-from models.ghazal_model import get_stats
+from flask import Blueprint, render_template, request
 from models.base import get_db_connection
-import re
 
-poets_bp = Blueprint('poets', __name__)
+poets_bp = Blueprint('poets', __name__, url_prefix='/poets')
 
-def slugify(text):
-    """Generate a slug from text (lowercase, spaces to hyphens, remove special chars)."""
-    text = text.lower().strip()
-    text = re.sub(r'[^a-z0-9\s-]', '', text)
-    text = re.sub(r'[\s-]+', '-', text)
-    return text
-
-@poets_bp.route('/poets')
+@poets_bp.route('/')
 def poets_list():
-    from models.poets_model import fetch_all_poets
-    poets = fetch_all_poets()
-    stats = get_stats()
-    return render_template('poets.html', poets=poets, stats=stats)
+    page = request.args.get('page', 1, type=int)
+    per_page = 30
+    offset = (page - 1) * per_page
+    
+    conn = get_db_connection()
+    cur = conn.cursor()
+    
+    # Get total count
+    cur.execute("SELECT COUNT(*) FROM poets ORDER BY name")
+    total = cur.fetchone()['count']
+    
+    # Get poets with pagination
+    cur.execute("""
+        SELECT id, name, name_urdu, 
+               birth_year, death_year,
+               (SELECT COUNT(*) FROM texts WHERE poet_id = poets.id AND form = 'ghazal') as ghazal_count
+        FROM poets 
+        ORDER BY name
+        LIMIT %s OFFSET %s
+    """, (per_page, offset))
+    
+    poets = cur.fetchall()
+    cur.close()
+    conn.close()
+    
+    total_pages = (total + per_page - 1) // per_page
+    
+    return render_template('poets.html', 
+                         poets=poets, 
+                         page=page, 
+                         total_pages=total_pages,
+                         total=total)
 
-@poets_bp.route('/poet/<int:poet_id>')
+@poets_bp.route('/<int:poet_id>')
 def poet_detail(poet_id):
     page = request.args.get('page', 1, type=int)
-    per_page = 12
-
-    poet = fetch_poet_by_id(poet_id)
+    per_page = 20
+    offset = (page - 1) * per_page
+    
+    conn = get_db_connection()
+    cur = conn.cursor()
+    
+    # Get poet info
+    cur.execute("""
+        SELECT id, name, name_urdu, bio, birth_year, death_year
+        FROM poets WHERE id = %s
+    """, (poet_id,))
+    poet = cur.fetchone()
+    
     if not poet:
-        flash('Poet not found', 'error')
-        return redirect(url_for('main.index'))
-
-    texts, total = get_texts_with_first_verses_paginated(poet_id, page, per_page)
-
+        cur.close()
+        conn.close()
+        return "Poet not found", 404
+    
+    # Get poet's ghazals
+    cur.execute("""
+        SELECT id, title_urdu, verse_count
+        FROM texts 
+        WHERE poet_id = %s AND form = 'ghazal' AND (is_deleted = FALSE OR is_deleted IS NULL)
+        ORDER BY id DESC
+        LIMIT %s OFFSET %s
+    """, (poet_id, per_page, offset))
+    texts = cur.fetchall()
+    
+    # Get total count for pagination
+    cur.execute("""
+        SELECT COUNT(*) FROM texts 
+        WHERE poet_id = %s AND form = 'ghazal' AND (is_deleted = FALSE OR is_deleted IS NULL)
+    """, (poet_id,))
+    total = cur.fetchone()['count']
+    
+    cur.close()
+    conn.close()
+    
     total_pages = (total + per_page - 1) // per_page
-    prev_page = page - 1 if page > 1 else None
-    next_page = page + 1 if page < total_pages else None
-
+    
     return render_template('poet_detail.html',
-                           poet=poet,
-                           texts=texts,
-                           page=page,
-                           total_pages=total_pages,
-                           prev_page=prev_page,
-                           next_page=next_page,
-                           total=total)
-
-# ==================== ADD NEW POET (AJAX) ====================
-@poets_bp.route('/add_poet', methods=['POST'])
-def add_poet():
-    data = request.get_json()
-    if not data:
-        return jsonify({'error': 'Invalid data'}), 400
-
-    name = data.get('name')
-    name_urdu = data.get('name_urdu')
-    bio_english = data.get('bio_english', '')
-    birth_year = data.get('birth_year')
-    death_year = data.get('death_year')
-
-    if not name:
-        return jsonify({'error': 'Poet name (English) is required'}), 400
-
-    # Generate slug from English name
-    slug = slugify(name)
-
-    conn = get_db_connection()
-    cur = conn.cursor()
-    try:
-        cur.execute("""
-            INSERT INTO poets (name, name_urdu, slug, bio_english, birth_year, death_year)
-            VALUES (%s, %s, %s, %s, %s, %s)
-            RETURNING id
-        """, (name, name_urdu, slug, bio_english, birth_year, death_year))
-        new_id = cur.fetchone()['id']
-        conn.commit()
-        return jsonify({'id': new_id, 'name': name, 'name_urdu': name_urdu})
-    except Exception as e:
-        conn.rollback()
-        return jsonify({'error': str(e)}), 500
-    finally:
-        cur.close()
-        conn.close()
-
-# ==================== ADD NEW BOOK (AJAX) ====================
-@poets_bp.route('/add_book', methods=['POST'])
-def add_book():
-    data = request.get_json()
-    if not data:
-        return jsonify({'error': 'Invalid data'}), 400
-
-    poet_id = data.get('poet_id')
-    name = data.get('name')
-    name_urdu = data.get('name_urdu')
-
-    if not poet_id or not name:
-        return jsonify({'error': 'Poet ID and book name are required'}), 400
-
-    conn = get_db_connection()
-    cur = conn.cursor()
-    try:
-        cur.execute("""
-            INSERT INTO books (poet_id, name, name_urdu)
-            VALUES (%s, %s, %s)
-            RETURNING id
-        """, (poet_id, name, name_urdu))
-        new_id = cur.fetchone()['id']
-        conn.commit()
-        return jsonify({'id': new_id, 'name': name, 'name_urdu': name_urdu})
-    except Exception as e:
-        conn.rollback()
-        return jsonify({'error': str(e)}), 500
-    finally:
-        cur.close()
-        conn.close()
+                         poet=poet,
+                         texts=texts,
+                         page=page,
+                         total_pages=total_pages,
+                         total=total)
