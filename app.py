@@ -21,32 +21,31 @@ import sys
 import resource
 from datetime import datetime
 
-# Blueprints
+# ============================================
+# CORE BLUEPRINTS (Keep Only Essential Ones)
+# ============================================
 from routes.main_routes import main_bp
 from routes.poets_routes import poets_bp
 from routes.ghazals_routes import ghazals_bp
 from routes.search_routes import search_bp
 from routes.listen_routes import listen_bp
-from routes.similarity_route import similarity_bp
-from routes.insights_routes import insights_bp
 from routes.ingest_routes import ingest_bp
-from routes.ai_routes import ai_bp
-from routes.ask_ucpc_route import ask_bp
-from routes.ask_ucpc_index import ask_ucpc_bp as ask_index_bp
-from routes.research_dashboard import research_dashboard_bp
 from routes.corpus_routes import corpus_bp          
-from routes.dh_advanced import dh_bp
 from routes.integrity_routes import integrity_bp
-from routes.research_validation_routes import validation_bp
 
-# ========== SEMANTIC ROUTES (LIGHTWEIGHT SAFE) ==========
-try:
-    from routes.semantic_routes import semantic_bp
-    SEMANTIC_AVAILABLE = True
-except Exception as e:
-    SEMANTIC_AVAILABLE = False
-    semantic_bp = None
-    print(f"⚠️ Semantic routes not available: {e}")
+# ============================================
+# HEAVY BLUEPRINTS - DISABLED FOR PUBLIC LAUNCH
+# (Will be re-enabled after upgrading Render plan)
+# ============================================
+# from routes.similarity_route import similarity_bp
+# from routes.insights_routes import insights_bp
+# from routes.ai_routes import ai_bp
+# from routes.ask_ucpc_route import ask_bp
+# from routes.ask_ucpc_index import ask_ucpc_bp as ask_index_bp
+# from routes.research_dashboard import research_dashboard_bp
+# from routes.dh_advanced import dh_bp
+# from routes.semantic_routes import semantic_bp
+# from routes.research_validation_routes import validation_bp
 
 # ==================== CONFIG ====================
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -97,6 +96,22 @@ def get_db_connection():
             cursor_factory=RealDictCursor
         )
 
+# ==================== LAZY LOADING FOR HEAVY MODELS (ALL DISABLED) ====================
+_heavy_models_loaded = False
+
+def load_heavy_models():
+    """All heavy models are DISABLED for public launch"""
+    global _heavy_models_loaded
+    
+    if _heavy_models_loaded:
+        return True
+    
+    # FORCE DISABLE all heavy models
+    print("⚠️ Heavy models are DISABLED for public launch")
+    print("   Lightweight mode: poetry reading, sharing, dedications only")
+    _heavy_models_loaded = True
+    return True
+
 # ==================== APP FACTORY ====================
 def create_app():
     app = Flask(__name__)
@@ -105,24 +120,16 @@ def create_app():
     app.config['GENERATED_FOLDER'] = GENERATED_FOLDER
     app.config['JSON_AS_ASCII'] = False  # Support Urdu text
     
-    # Register Core Blueprints
+    # Register Core Blueprints (Essential Only)
     blueprints = [
         (main_bp, '/'),
         (poets_bp, '/poets'),
         (ghazals_bp, '/ghazals'),
         (search_bp, '/search'),
         (listen_bp, '/listen'),
-        (similarity_bp, '/similarity'),
-        (insights_bp, '/insights'),
         (ingest_bp, '/ingest'),
-        (ai_bp, '/api/ai'),
-        (ask_bp, '/ask'),
-        (ask_index_bp, '/ask-index'),
         (corpus_bp, '/corpus'),
-        (research_dashboard_bp, '/research'),
-        (dh_bp, '/dh'),
-        (integrity_bp, '/integrity'),
-        (validation_bp, '/research/validation')
+        (integrity_bp, '/integrity')
     ]
     
     for blueprint, prefix in blueprints:
@@ -132,23 +139,11 @@ def create_app():
         except Exception as e:
             print(f"❌ Failed to register {prefix}: {e}")
     
-    # ========== SEMANTIC ROUTES (Lightweight) ==========
-    if SEMANTIC_AVAILABLE and semantic_bp:
-        try:
-            app.register_blueprint(semantic_bp)
-            print("✅ Registered: /semantic (lightweight TF-IDF)")
-        except Exception as e:
-            print(f"⚠️ Semantic routes registration failed: {e}")
-    else:
-        print("⚠️ Semantic routes disabled (lightweight mode)")
-    
-    print("\n🚀 UCPC Poetry Archive v3.0 - LIGHTWEIGHT PRODUCTION MODE")
+    print("\n🚀 UCPC Poetry Archive v3.0 - PUBLIC LAUNCH MODE")
     print(f"📊 Environment: {'Production' if os.getenv('RENDER') else 'Development'}")
     print(f"💾 Database: {'Configured' if os.getenv('DATABASE_URL') else 'Missing!'}")
-    print(f"🧠 Lightweight Mode: {LIGHTWEIGHT_MODE}")
-    print(f"🔧 Heavy models: DISABLED (torch, sentence-transformers removed)")
-    print(f"📚 Poet prediction: {'Enabled' if ENABLE_POET_PREDICTION else 'Disabled'}")
-    print(f"🔍 Semantic search: TF-IDF based (fast, memory-safe)\n")
+    print(f"📚 Features: Poetry Reading, Sharing, Dedications, Search")
+    print(f"🔧 AI Features: DISABLED (memory safe for free tier)\n")
     
     # ========== HEALTH CHECK ENDPOINT (CRITICAL FOR RENDER) ==========
     @app.route('/health')
@@ -167,19 +162,16 @@ def create_app():
         return jsonify({
             "status": "ok",
             "project": "UCPC Poetry Archive",
-            "version": "3.0-lightweight",
+            "version": "3.0-public",
             "mode": "lightweight",
             "database": db_status,
-            "memory_safe": True,
-            "poet_prediction": ENABLE_POET_PREDICTION,
-            "transformers": ENABLE_TRANSFORMERS,
-            "semantic_method": "TF-IDF"
+            "features": ["reading", "sharing", "dedications", "search"]
         })
     
     # ========== SIMPLE ROOT ROUTE ==========
     @app.route('/')
     def home():
-        return "UCPC Poetry Archive is running. Visit /health for status."
+        return "UCPC Poetry Archive is running. Visit /poets or /search"
     
     # ========== MEMORY DEBUG ENDPOINT ==========
     @app.route('/debug/memory')
@@ -193,7 +185,7 @@ def create_app():
                 'vms_mb': round(memory_info.vms / 1024 / 1024, 2),
                 'cpu_percent': process.cpu_percent(),
                 'lightweight_mode': LIGHTWEIGHT_MODE,
-                'poet_prediction': ENABLE_POET_PREDICTION
+                'features': 'reading, sharing, dedications'
             })
         except Exception as e:
             return jsonify({'error': str(e)}), 500
@@ -379,30 +371,22 @@ def create_app():
         except Exception as e:
             return jsonify({'error': str(e)}), 500
     
-    # ========== Research Dashboard Redirect ==========
-    @app.route('/research-dashboard')
-    def research_dashboard_redirect():
-        return redirect(url_for('research_dashboard.dashboard'))
-    
     # ========== API Documentation ==========
     @app.route('/api/docs')
     def api_docs():
         return jsonify({
             "name": "UCPC Poetry Archive API",
-            "version": "3.0-lightweight",
+            "version": "3.0-public",
             "environment": "production" if os.getenv('RENDER') else "development",
             "mode": "lightweight",
             "status": "stable",
-            "features": {
-                "poet_prediction": ENABLE_POET_PREDICTION,
-                "semantic_search": "TF-IDF based",
-                "heavy_models": "disabled"
-            },
+            "features": ["reading", "sharing", "dedications", "search"],
             "endpoints": {
                 "health": "/health (GET)",
                 "check": "/check (GET)",
-                "debug_memory": "/debug/memory (GET)",
-                "semantic_search": "/semantic/api/search (POST)"
+                "poets": "/poets (GET)",
+                "ghazals": "/ghazals/view/<id> (GET)",
+                "search": "/search (GET)"
             }
         })
     
