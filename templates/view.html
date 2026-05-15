@@ -6,7 +6,6 @@
 <meta property="og:image" content="{{ url_for('og_image', text_id=ghazal.id, _external=true) }}">
 <meta property="og:type" content="article">
 <meta property="og:url" content="{{ request.url }}">
-<meta property="og:site_name" content="UCPC Poetry Archive">
 <meta name="twitter:card" content="summary_large_image">
 {% endblock %}
 
@@ -16,119 +15,100 @@
 
 {% block extra_css %}
 <style>
-
 .view-container {
     max-width: 1200px;
     margin: 0 auto;
     padding: 2rem 1rem;
 }
 
-/* =========================================================
-   MAIN GHAZAL CARD – ULTRA ELEGANT WITH THICK GRADIENT BORDER
-========================================================= */
-
 .ghazal-card {
     background: #ffffff;
-    border-radius: 36px;
+    border-radius: 24px;
     padding: 2rem;
     max-width: 950px;
     margin: auto;
-    position: relative;
-    /* Thick colourful gradient border (4px) */
-    border: 4px solid transparent;
-    background-clip: padding-box;
-    background-image: linear-gradient(white, white), 
-                      linear-gradient(135deg, 
-                        #e6b800,  /* gold */
-                        #d4af37,  /* classic gold */
-                        #b8860b,  /* dark goldenrod */
-                        #ffd700,  /* bright gold */
-                        #daa520,  /* goldenrod */
-                        #cd7f32   /* bronze */
-                      );
-    background-origin: border-box;
-    background-clip: padding-box, border-box;
-    /* Outer glow */
-    box-shadow: 0 20px 35px -12px rgba(0,0,0,0.3), 
-                0 0 0 1px rgba(212,175,55,0.2) inset;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.ghazal-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 28px 40px -14px rgba(0,0,0,0.35), 
-                0 0 0 2px rgba(212,175,55,0.3) inset;
-}
-
-/* Inner decorative shine (pseudo-element) */
-.ghazal-card::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 6px;
-    background: linear-gradient(90deg, 
-        #e6b800, #d4af37, #b8860b, #ffd700, #daa520);
-    border-radius: 36px 36px 0 0;
-    opacity: 0.8;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.05);
 }
 
 .poet-header {
     text-align: center;
-    border-bottom: 2px solid rgba(212,175,55,0.5);
+    border-bottom: 2px solid #d4af37;
     padding-bottom: 1rem;
     margin-bottom: 1.5rem;
-    position: relative;
 }
 
 .poet-name-en {
-    font-size: 2.3rem;
+    font-size: 2rem;
     font-weight: 800;
-    background: linear-gradient(135deg, #1e3c72, #2a5298, #0f2b3d);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-    letter-spacing: 3px;
+    color: #1e3c72;
     text-transform: uppercase;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.05);
 }
 
 .poet-metadata {
     margin-top: 0.5rem;
     color: #64748b;
-    font-size: 0.95rem;
-    font-weight: 500;
+    font-size: 0.9rem;
 }
 
-/* Features row – elegant badges */
+/* =========================================================
+   DEDICATION SECTION - NEW FOR PUBLIC SHARING
+========================================================= */
+.dedication-box {
+    margin-top: 1.5rem;
+    background: linear-gradient(135deg, #fff8e8, #fffef8);
+    border: 1px solid rgba(212,175,55,0.35);
+    padding: 1.2rem;
+    border-radius: 24px;
+    text-align: center;
+}
+
+.dedication-title {
+    font-weight: 800;
+    color: #b8860b;
+    margin-bottom: 1rem;
+    font-size: 1rem;
+}
+
+.dedication-grid {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.dedication-grid input {
+    padding: 0.8rem 1rem;
+    border-radius: 999px;
+    border: 1px solid #d4af37;
+    min-width: 220px;
+    outline: none;
+    font-size: 0.95rem;
+    background: white;
+}
+
+.dedication-grid input:focus {
+    box-shadow: 0 0 0 4px rgba(212,175,55,0.15);
+    border-color: #b8860b;
+}
+
+/* Features Row */
 .features-row {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 1.2rem;
-    background: linear-gradient(120deg, #fff9e8, #fff5e0);
-    border-radius: 60px;
-    padding: 0.9rem 1.5rem;
-    margin-bottom: 2rem;
-    border: 1px solid rgba(212,175,55,0.4);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+    gap: 1rem;
+    background: #f8fafc;
+    border-radius: 40px;
+    padding: 0.7rem 1.2rem;
+    margin: 1.5rem 0 2rem 0;
+    border: 1px solid #e2e8f0;
 }
 
 .feature-item {
     color: #1e293b;
-    font-size: 1rem;
+    font-size: 0.9rem;
     font-weight: 600;
-    background: white;
-    padding: 0.3rem 1rem;
-    border-radius: 40px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-    transition: all 0.2s;
-}
-
-.feature-item:hover {
-    transform: scale(1.02);
-    background: #fffdf7;
 }
 
 .feature-label {
@@ -139,17 +119,15 @@
 
 .feature-value {
     color: #1e3c72;
-    font-weight: 600;
 }
 
-/* Urdu couplets – refined with subtle calligraphy feel */
+/* Urdu couplets */
 .urdu-couplet {
     text-align: center;
     direction: rtl;
-    margin-bottom: 2rem;
-    padding-bottom: 1.2rem;
-    border-bottom: 1px dashed rgba(212,175,55,0.5);
-    position: relative;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px dashed #e2e8f0;
 }
 
 .urdu-couplet:last-child {
@@ -157,251 +135,27 @@
 }
 
 .urdu-couplet div {
-    font-family: 'Jameel Noori Nastaleeq',
-                 'Noto Nastaliq Urdu',
-                 serif;
-    font-size: 2.1rem;
-    line-height: 2.6;
-    color: #1e293b;
-    font-weight: 700;
-    text-shadow: 0 1px 1px rgba(0,0,0,0.05);
-    letter-spacing: 0.5px;
-}
-
-/* =========================================================
-   SIMILAR GHAZALS TABLE – LARGER & BOLDER
-========================================================= */
-
-.table-responsive {
-    overflow-x: auto;
-    margin-top: 1rem;
-}
-
-.semantic-table {
-    width: 100%;
-    border-collapse: separate;
-    border-spacing: 0;
-    background: white;
-    border: 2px solid #d4af37;
-    border-radius: 28px;
-    overflow: hidden;
-    box-shadow: 0 12px 28px rgba(0,0,0,0.1);
-}
-
-.semantic-table th {
-    background: linear-gradient(135deg, #1e3c72, #0f2b3d);
-    color: #ffd966;
-    padding: 18px 12px;
-    text-align: center;
-    font-weight: 800;
-    font-size: 1.1rem;
-    letter-spacing: 1px;
-}
-
-.semantic-table td {
-    padding: 20px 14px;
-    border-bottom: 1px solid #eef2f6;
-    vertical-align: middle;
-}
-
-.semantic-table tr:last-child td {
-    border-bottom: none;
-}
-
-.semantic-table tr:hover td {
-    background-color: rgba(212,175,55,0.08);
-}
-
-.couplet-cell {
-    direction: rtl;
-    text-align: center;
-    padding: 22px 16px;
-    min-width: 420px;
-}
-
-.misra-line {
-    font-family: 'Jameel Noori Nastaleeq',
-                 'Noto Nastaliq Urdu',
-                 serif;
+    font-family: 'Jameel Noori Nastaleeq', 'Noto Nastaliq Urdu', serif;
     font-size: 1.8rem;
-    font-weight: 700;
     line-height: 2.4;
     color: #1e293b;
-    margin-bottom: 8px;
-    word-break: break-word;
-}
-
-.misra-line:last-child {
-    margin-bottom: 0;
-}
-
-.poet-cell {
-    text-align: center;
-    font-size: 1.2rem;
     font-weight: 700;
-    color: #2c3e2f;
-    white-space: nowrap;
 }
 
-.score-cell {
-    text-align: center;
-    font-weight: 800;
-    color: #16a34a;
-    font-size: 1.3rem;
-    white-space: nowrap;
-}
-
-.link-cell a {
-    text-decoration: none;
-    color: #d4af37;
-    font-weight: 800;
-    font-size: 1rem;
-    padding: 0.5rem 1rem;
-    border-radius: 30px;
-    transition: 0.2s;
-    border: 1px solid #d4af37;
-}
-
-.link-cell a:hover {
-    background: #d4af37;
-    color: #1e3c72;
-    border-color: #d4af37;
-}
-
-/* =========================================================
-   ASK BOX – keep clean
-========================================================= */
-
-.ask-box {
-    background: white;
-    border-radius: 28px;
-    border: 1px solid #e2e8f0;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.04);
-    padding: 1.5rem;
-    max-width: 950px;
-    margin: 2rem auto;
-}
-
-.ask-box h3 {
-    color: #1e3c72;
-    margin-bottom: 1rem;
-}
-
-.ask-input-group {
-    display: flex;
-    gap: 0.7rem;
-}
-
-.ask-input {
-    flex: 1;
-    border-radius: 999px;
-    border: 1px solid #cbd5e1;
-    padding: 0.9rem 1.2rem;
-    font-size: 0.95rem;
-}
-
-.ask-input:focus {
-    outline: none;
-    border-color: #d4af37;
-    box-shadow: 0 0 0 4px rgba(212,175,55,0.18);
-}
-
-.ask-btn {
-    background: #d4af37;
-    color: #1e3c72;
-    border: none;
-    border-radius: 999px;
-    padding: 0 1.5rem;
-    font-weight: 700;
-    cursor: pointer;
-}
-
-.ask-btn:hover {
-    background: #b8960c;
-}
-
-.quick-buttons {
-    margin-top: 1rem;
-    display: flex;
-    gap: 0.5rem;
-    flex-wrap: wrap;
-}
-
-.quick-btn {
-    border: 1px solid #e2e8f0;
-    background: #f8fafc;
-    border-radius: 999px;
-    padding: 0.45rem 1rem;
-    cursor: pointer;
-    font-size: 0.8rem;
-}
-
-.quick-btn:hover {
-    background: #d4af37;
-    color: #1e3c72;
-}
-
-.answer-box {
-    margin-top: 1rem;
-    padding: 1rem;
-    background: #f8fafc;
-    border-left: 4px solid #d4af37;
-    border-radius: 14px;
-    display: none;
-}
-
-/* =========================================================
-   MOBILE
-========================================================= */
-
-@media (max-width: 768px) {
-    .ghazal-card {
-        padding: 1.5rem;
-        border-width: 3px;
-    }
-    .urdu-couplet div {
-        font-size: 1.6rem;
-        line-height: 2.2;
-    }
-    .couplet-cell {
-        min-width: 280px;
-    }
-    .misra-line {
-        font-size: 1.3rem;
-    }
-    .poet-cell {
-        font-size: 1rem;
-    }
-    .score-cell {
-        font-size: 1.1rem;
-    }
-    .ask-input-group {
-        flex-direction: column;
-    }
-    .nav-share-row {
-        flex-direction: column;
-    }
-    .features-row {
-        gap: 0.8rem;
-        padding: 0.7rem 1rem;
-    }
-    .feature-item {
-        font-size: 0.85rem;
-    }
-}
-
+/* Navigation & Share Row */
 .nav-share-row {
     max-width: 950px;
     margin: 1.5rem auto;
     display: flex;
     justify-content: space-between;
-    gap: 1rem;
     flex-wrap: wrap;
+    gap: 1rem;
 }
 
 .nav-buttons {
     display: flex;
     gap: 0.7rem;
+    flex-wrap: wrap;
 }
 
 .nav-btn {
@@ -409,18 +163,83 @@
     color: white;
     border: none;
     border-radius: 999px;
-    padding: 0.65rem 1.3rem;
+    padding: 0.6rem 1.2rem;
     text-decoration: none;
     font-weight: 700;
-    transition: 0.2s ease;
     cursor: pointer;
+    transition: 0.2s ease;
+    font-size: 0.9rem;
 }
 
 .nav-btn:hover {
     background: #d4af37;
     color: #1e3c72;
+    transform: translateY(-2px);
 }
 
+/* Share buttons */
+.share-buttons {
+    display: flex;
+    gap: 0.7rem;
+    flex-wrap: wrap;
+}
+
+.btn-share {
+    background: #25d366;
+    color: white;
+    border: none;
+    border-radius: 999px;
+    padding: 0.6rem 1.2rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.2s ease;
+    font-size: 0.9rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn-share i {
+    font-size: 1rem;
+}
+
+.btn-share:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.05);
+}
+
+.btn-facebook {
+    background: #1877f2;
+}
+
+.btn-linkedin {
+    background: #0077b5;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .ghazal-card {
+        padding: 1rem;
+    }
+    .urdu-couplet div {
+        font-size: 1.3rem;
+        line-height: 2;
+    }
+    .dedication-grid input {
+        width: 100%;
+        min-width: auto;
+    }
+    .nav-share-row {
+        flex-direction: column;
+        align-items: center;
+    }
+    .nav-buttons, .share-buttons {
+        justify-content: center;
+    }
+    .poet-name-en {
+        font-size: 1.5rem;
+    }
+}
 </style>
 {% endblock %}
 
@@ -438,12 +257,21 @@
                 {% if ghazal.verse_count %}
                 {{ ghazal.verse_count }} verses
                 {% endif %}
-                {% if ghazal.source %}
-                • {{ ghazal.source }}
-                {% endif %}
             </div>
         </div>
 
+        <!-- ========== DEDICATION SECTION ========== -->
+        <div class="dedication-box">
+            <div class="dedication-title">
+                💝 Dedicate this Ghazal
+            </div>
+            <div class="dedication-grid">
+                <input type="text" id="fromName" placeholder="From (Your Name)">
+                <input type="text" id="toName" placeholder="To (Dedication Name)">
+            </div>
+        </div>
+
+        <!-- Features Row -->
         <div class="features-row">
             {% if ghazal.radif %}
             <div class="feature-item">
@@ -465,143 +293,116 @@
             {% endif %}
         </div>
 
-        {% for verse in verses %}
+        <!-- Ghazal Verses -->
+        {% for verse in verses[:30] %}
         <div class="urdu-couplet">
             <div>{{ verse.misra1_urdu }}</div>
             <div>{{ verse.misra2_urdu }}</div>
         </div>
         {% endfor %}
 
+        {% if verses|length > 30 %}
+        <div style="text-align: center; margin-top: 1rem; color: #64748b; font-size: 0.85rem;">
+            (Showing first 30 of {{ verses|length }} couplets)
+        </div>
+        {% endif %}
+
     </div>
 
-    <!-- NAVIGATION -->
+    <!-- ========== NAVIGATION & SHARE ROW ========== -->
     <div class="nav-share-row">
         <div class="nav-buttons">
             {% if prev_id %}
-            <a href="/ghazals/view/{{ prev_id }}" class="nav-btn">← Previous</a>
+            <a href="/ghazals/view/{{ prev_id }}" class="nav-btn">
+                <i class="fas fa-arrow-left"></i> Previous
+            </a>
             {% endif %}
             {% if next_id %}
-            <a href="/ghazals/view/{{ next_id }}" class="nav-btn">Next →</a>
+            <a href="/ghazals/view/{{ next_id }}" class="nav-btn">
+                Next <i class="fas fa-arrow-right"></i>
+            </a>
             {% endif %}
         </div>
-    </div>
 
-    <!-- ASK BOX -->
-    <div class="ask-box">
-        <h3>💬 Ask UCPC – AI Poetry Assistant</h3>
-        <div class="ask-input-group">
-            <input type="text" id="questionInput" class="ask-input" placeholder="Ask about poet, theme, similar ghazals...">
-            <button onclick="askUCPC()" class="ask-btn">Ask</button>
+        <div class="share-buttons">
+            <button class="btn-share" onclick="shareWhatsApp()">
+                <i class="fab fa-whatsapp"></i> WhatsApp
+            </button>
+            <button class="btn-share btn-facebook" onclick="shareFacebook()">
+                <i class="fab fa-facebook-f"></i> Facebook
+            </button>
+            <button class="btn-share btn-linkedin" onclick="shareLinkedIn()">
+                <i class="fab fa-linkedin-in"></i> LinkedIn
+            </button>
         </div>
-        <div class="quick-buttons">
-            <button class="quick-btn" onclick="setQuestion('Who is the poet?')">Poet</button>
-            <button class="quick-btn" onclick="setQuestion('Theme?')">Theme</button>
-            <button class="quick-btn" onclick="setQuestion('Similar ghazals')">Similar</button>
-        </div>
-        <div id="answerBox" class="answer-box"></div>
     </div>
 
 </div>
 
 <script>
-function setQuestion(q) {
-    document.getElementById('questionInput').value = q;
-}
+// =========================================================
+// DEDICATION & SHARING FUNCTIONS
+// =========================================================
 
-async function askUCPC() {
-    const question = document.getElementById("questionInput").value.trim();
-    const answerDiv = document.getElementById("answerBox");
-    if (!question) return;
+function getDedicationText() {
+    const fromName = document.getElementById("fromName")?.value.trim() || "";
+    const toName = document.getElementById("toName")?.value.trim() || "";
+    let dedication = "";
 
-    answerDiv.style.display = "block";
-    answerDiv.innerHTML = "Thinking...";
-
-    try {
-        const response = await fetch("/ask/", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                question: question,
-                text_id: {{ ghazal.id }}
-            })
-        });
-        const data = await response.json();
-        let html = "";
-
-        if (data.type === "similar") {
-            html = `
-                <strong>🔗 Similar Ghazals</strong>
-                <div class="table-responsive">
-                <table class="semantic-table">
-                    <thead>
-                        <tr><th>First Couplet (Urdu)</th><th>Poet</th><th>Similarity</th><th>View</th></tr>
-                    </thead>
-                    <tbody>
-            `;
-
-            data.data.forEach(s => {
-                let couplet = s.first_couplet || s.first_verse_urdu || s.title || '';
-                couplet = couplet.replace(/<br\s*\/?>/gi, '\n');
-                const lines = couplet.split('\n');
-                const misra1 = lines[0] || '';
-                const misra2 = lines[1] || '';
-                const poet = s.poet_name || s.poet || '';
-                const similarityPercent = ((s.similarity || s.score || 0) * 100).toFixed(1);
-
-                html += `
-                    <tr>
-                        <td class="couplet-cell">
-                            <div class="misra-line">${escapeHtml(misra1)}</div>
-                            ${misra2 ? `<div class="misra-line">${escapeHtml(misra2)}</div>` : ''}
-                        </td>
-                        <td class="poet-cell">${escapeHtml(poet)}</td>
-                        <td class="score-cell">${similarityPercent}%</td>
-                        <td class="link-cell"><a href="/ghazals/view/${s.text_id}" target="_blank">View →</a></td>
-                    </tr>
-                `;
-            });
-
-            html += `</tbody>${'<tr>'}</div>`;
-        } else {
-            // Improved fallback for poet/theme responses
-            if (data.type === "poet_prediction" && data.data && data.data.length) {
-                const top = data.data[0];
-                const confidencePercent = (top.confidence * 100).toFixed(1);
-                html = `
-                    <div style="font-family: inherit;">
-                        <strong>🖋️ Likely Poet</strong><br>
-                        ${escapeHtml(top.poet_name)} (${escapeHtml(top.poet_name_urdu || '')})<br>
-                        <span style="color: #16a34a; font-weight: bold;">Confidence: ${confidencePercent}%</span>
-                        ${top.explanation ? `<div style="margin-top: 0.5rem; font-size: 0.85rem; color: #64748b;">${top.explanation.join(' • ')}</div>` : ''}
-                    </div>
-                `;
-            } else if (data.type === "theme" && data.data) {
-                html = `
-                    <div>
-                        <strong>🎭 Theme:</strong> ${escapeHtml(data.data.primary_theme || 'Unknown')}
-                        ${data.data.keywords ? `<br><strong>Keywords:</strong> ${escapeHtml(data.data.keywords.join(', '))}` : ''}
-                    </div>
-                `;
-            } else {
-                html = `<pre style="white-space: pre-wrap;">${JSON.stringify(data, null, 2)}</pre>`;
-            }
+    if (fromName || toName) {
+        dedication += "💝 Dedicated Ghazal\n\n";
+        if (fromName) {
+            dedication += "From: " + fromName + "\n";
         }
-
-        answerDiv.innerHTML = html;
-    } catch (err) {
-        console.error(err);
-        answerDiv.innerHTML = "❌ Error processing request.";
+        if (toName) {
+            dedication += "To: " + toName + "\n";
+        }
+        dedication += "\n";
     }
+
+    return dedication;
 }
 
-function escapeHtml(str) {
-    if (!str) return '';
-    return str.replace(/[&<>]/g, function(m) {
-        if (m === '&') return '&amp;';
-        if (m === '<') return '&lt;';
-        if (m === '>') return '&gt;';
-        return m;
+function getGhazalText() {
+    const couplets = document.querySelectorAll('.urdu-couplet');
+    let text = "";
+    couplets.forEach(couplet => {
+        const lines = couplet.querySelectorAll('div');
+        if (lines.length >= 2) {
+            text += lines[0].innerText + "\n" + lines[1].innerText + "\n\n";
+        }
     });
+    return text.trim();
+}
+
+function shareWhatsApp() {
+    const dedication = getDedicationText();
+    const poetName = "{{ ghazal.poet_name }}";
+    const url = window.location.href;
+    
+    let shareText = dedication + poetName + "\n\n" + url;
+    
+    window.open(
+        "https://wa.me/?text=" + encodeURIComponent(shareText),
+        "_blank"
+    );
+}
+
+function shareFacebook() {
+    const url = window.location.href;
+    window.open(
+        "https://www.facebook.com/sharer/sharer.php?u=" + encodeURIComponent(url),
+        "_blank"
+    );
+}
+
+function shareLinkedIn() {
+    const url = window.location.href;
+    window.open(
+        "https://www.linkedin.com/sharing/share-offsite/?url=" + encodeURIComponent(url),
+        "_blank"
+    );
 }
 </script>
+
 {% endblock %}
