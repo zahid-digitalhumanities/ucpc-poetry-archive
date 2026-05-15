@@ -18,9 +18,8 @@ def poets_list():
     
     # Get poets with pagination
     cur.execute("""
-        SELECT id, name, name_urdu, 
-               birth_year, death_year,
-               (SELECT COUNT(*) FROM texts WHERE poet_id = poets.id AND form = 'ghazal') as ghazal_count
+        SELECT id, name, name_urdu, birth_year, death_year,
+               (SELECT COUNT(*) FROM texts WHERE poet_id = poets.id AND form = 'ghazal' AND (is_deleted = FALSE OR is_deleted IS NULL)) as ghazal_count
         FROM poets 
         ORDER BY name
         LIMIT %s OFFSET %s
@@ -59,12 +58,14 @@ def poet_detail(poet_id):
         conn.close()
         return "Poet not found", 404
     
-    # Get poet's ghazals
+    # Get poet's ghazals with first verse
     cur.execute("""
-        SELECT id, title_urdu, verse_count
-        FROM texts 
-        WHERE poet_id = %s AND form = 'ghazal' AND (is_deleted = FALSE OR is_deleted IS NULL)
-        ORDER BY id DESC
+        SELECT t.id, t.title_urdu, t.verse_count,
+               (SELECT misra1_urdu FROM verses WHERE text_id = t.id AND couplet_index = 1 LIMIT 1) as misra1,
+               (SELECT misra2_urdu FROM verses WHERE text_id = t.id AND couplet_index = 1 LIMIT 1) as misra2
+        FROM texts t
+        WHERE t.poet_id = %s AND t.form = 'ghazal' AND (t.is_deleted = FALSE OR t.is_deleted IS NULL)
+        ORDER BY t.id DESC
         LIMIT %s OFFSET %s
     """, (poet_id, per_page, offset))
     texts = cur.fetchall()
@@ -72,12 +73,20 @@ def poet_detail(poet_id):
     # Get total count for pagination
     cur.execute("""
         SELECT COUNT(*) FROM texts 
-        WHERE poet_id = %s AND form = 'ghazal' AND (is_deleted = FALSE OR is_deleted IS NULL)
+        WHERE poet_id = %s AND form = 'ghazal' AND (t.is_deleted = FALSE OR t.is_deleted IS NULL)
     """, (poet_id,))
     total = cur.fetchone()['count']
     
     cur.close()
     conn.close()
+    
+    # Add first_verse object to each text for template compatibility
+    for text in texts:
+        if text['misra1']:
+            text['first_verse'] = {
+                'misra1_urdu': text['misra1'],
+                'misra2_urdu': text['misra2'] or ''
+            }
     
     total_pages = (total + per_page - 1) // per_page
     
