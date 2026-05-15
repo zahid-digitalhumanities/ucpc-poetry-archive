@@ -8,7 +8,7 @@ def view_ghazal(text_id):
     conn = get_db_connection()
     cur = conn.cursor()
     
-    # Get ghazal details
+    # Get ghazal details – removed radif, qaafiya, theme
     cur.execute("""
         SELECT t.id, t.title_urdu, t.verse_count,
                p.name as poet_name, p.name_urdu as poet_name_urdu, p.id as poet_id
