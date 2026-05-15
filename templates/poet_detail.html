@@ -88,8 +88,8 @@
     }
     .first-couplet {
         font-family: 'Jameel Noori Nastaleeq', serif;
-        font-size: 1.4rem;
-        line-height: 2.2rem;
+        font-size: 1.3rem;
+        line-height: 2rem;
         font-weight: 600;
         color: #1e3c72;
         direction: rtl;
@@ -135,14 +135,6 @@
         background: #0f2b4a;
         transform: translateY(-2px);
     }
-    .btn-share {
-        background: #25d366;
-        color: white;
-    }
-    .btn-share:hover {
-        background: #1da155;
-        transform: translateY(-2px);
-    }
     .section-title {
         text-align: center;
         margin-bottom: 35px;
@@ -155,15 +147,6 @@
         background: linear-gradient(120deg, #fff, #faf7f0);
         padding: 0 20px;
     }
-    .section-title span {
-        background: var(--gold);
-        color: white;
-        padding: 4px 12px;
-        border-radius: 40px;
-        font-size: 0.9rem;
-        margin-left: 8px;
-    }
-    /* Pagination styles */
     .pagination-wrapper {
         display: flex;
         justify-content: center;
@@ -210,15 +193,8 @@
             grid-template-columns: 1fr;
         }
         .first-couplet {
-            font-size: 1.2rem;
-            line-height: 1.9rem;
-        }
-        .pagination-wrapper {
-            gap: 10px;
-        }
-        .btn-pagination, .page-info {
-            padding: 6px 14px;
-            font-size: 0.85rem;
+            font-size: 1.1rem;
+            line-height: 1.8rem;
         }
     }
 </style>
@@ -236,7 +212,6 @@
         </div>
         <div class="poet-stats">
             <div><i class="fas fa-book"></i> {{ total }} Poems</div>
-            <div><i class="fas fa-pen-fancy"></i> {{ texts|sum(attribute='verse_count') }} Verses</div>
         </div>
     </div>
 
@@ -252,17 +227,14 @@
                     {{ item.first_verse.misra1_urdu }}<br>
                     {{ item.first_verse.misra2_urdu }}
                 {% else %}
-                    No couplet available
+                    {{ item.title_urdu or "Ghazal" }}
                 {% endif %}
             </div>
             <div class="poem-meta">
-                <span><i class="fas fa-pen-fancy"></i> {{ item.verse_count }} verses</span>
+                <span><i class="fas fa-pen-fancy"></i> {{ item.verse_count or 0 }} verses</span>
             </div>
             <div class="action-buttons">
                 <a href="/ghazals/view/{{ item.id }}" class="btn-view">View Full</a>
-                <a target="_blank"
-                   href="https://wa.me/?text={{ (poet.name ~ '\n\n' ~ (item.first_verse.misra1_urdu if item.first_verse else '') ~ '\n' ~ (item.first_verse.misra2_urdu if item.first_verse else '') ~ '\n\nRead more: ' ~ request.url_root ~ 'ghazals/view/' ~ item.id) | urlencode }}"
-                   class="btn-share">Share on WhatsApp</a>
             </div>
         </div>
         {% endfor %}
@@ -271,14 +243,14 @@
     <!-- Pagination -->
     {% if total_pages > 1 %}
     <div class="pagination-wrapper">
-        {% if prev_page %}
-        <a href="{{ url_for('poets.poet_detail', poet_id=poet.id, page=prev_page) }}" class="btn-pagination">
+        {% if page > 1 %}
+        <a href="{{ url_for('poets.poet_detail', poet_id=poet.id, page=page-1) }}" class="btn-pagination">
             <i class="fas fa-chevron-left"></i> Previous
         </a>
         {% endif %}
-        <span class="page-info">Page {{ page }} of {{ total_pages }} ({{ total }} poems)</span>
-        {% if next_page %}
-        <a href="{{ url_for('poets.poet_detail', poet_id=poet.id, page=next_page) }}" class="btn-pagination">
+        <span class="page-info">Page {{ page }} of {{ total_pages }}</span>
+        {% if page < total_pages %}
+        <a href="{{ url_for('poets.poet_detail', poet_id=poet.id, page=page+1) }}" class="btn-pagination">
             Next <i class="fas fa-chevron-right"></i>
         </a>
         {% endif %}
