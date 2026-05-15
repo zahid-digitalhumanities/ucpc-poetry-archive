@@ -10,7 +10,7 @@ def view_ghazal(text_id):
     
     # Get ghazal details
     cur.execute("""
-        SELECT t.id, t.title_urdu, t.verse_count, t.radif, t.qaafiya, t.theme,
+        SELECT t.id, t.title_urdu, t.verse_count,
                p.name as poet_name, p.name_urdu as poet_name_urdu, p.id as poet_id
         FROM texts t
         JOIN poets p ON t.poet_id = p.id
