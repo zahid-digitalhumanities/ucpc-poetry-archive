@@ -1,4 +1,4 @@
-# routes/ai_routes_v2.py
+# routes/ai_routes.py
 """
 Enhanced AI routes for poet prediction and similarity search
 """
@@ -141,9 +141,15 @@ def batch_predict():
     if not texts:
         return jsonify({"error": "No texts provided"}), 400
     
-    from models.ai_engine.poet_prediction_ai_v2 import predict_batch
-    
-    results = predict_batch(texts, top_n=3)
+    # Note: predict_batch may not exist in lightweight version
+    # Fallback to individual predictions
+    results = []
+    for text in texts:
+        pred = predict_poet_from_text(text, top_n=3)
+        results.append({
+            "text_preview": text[:100],
+            "predictions": pred
+        })
     
     return jsonify({
         "success": True,
@@ -160,16 +166,15 @@ def model_info():
     """Get information about the current poet prediction model"""
     
     try:
-        from models.ai_engine.poet_prediction_ai_v2 import load_model
-        model = load_model()
+        from models.ai_engine.poet_prediction_ai_v2 import load_models
+        load_models()
         
+        # Return basic info (without loading full model if not needed)
         return jsonify({
-            "model_version": "v8",
-            "accuracy": model.get('accuracy', 'N/A'),
-            "num_poets": model.get('num_poets', 0),
-            "training_date": model.get('training_date', 'Unknown'),
-            "total_samples": model.get('total_samples', 0),
-            "features": model.get('config', {})
+            "model_version": "v9-lightweight",
+            "model_type": "TF-IDF + Logistic Regression",
+            "status": "active",
+            "note": "Lightweight version for Render free tier"
         })
     except Exception as e:
         return jsonify({
