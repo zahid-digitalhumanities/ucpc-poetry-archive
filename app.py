@@ -1,5 +1,13 @@
 # ==================== EMERGENCY STARTUP PATCH - MUST BE FIRST ====================
-import startup  # This MUST be the first import - disables heavy models and limits threads
+# This MUST be the first import - disables heavy models and limits threads
+import lightweight_mode
+from config_runtime import (
+    LIGHTWEIGHT_MODE,
+    ENABLE_POET_PREDICTION,
+    ENABLE_TRANSFORMERS,
+    ENABLE_SENTENCE_BERT,
+    ENABLE_HEAVY_EMBEDDINGS
+)
 # ==============================================================================
 
 from flask import Flask, redirect, url_for, render_template, request, jsonify, abort, send_from_directory, send_file
@@ -29,8 +37,16 @@ from routes.research_dashboard import research_dashboard_bp
 from routes.corpus_routes import corpus_bp          
 from routes.dh_advanced import dh_bp
 from routes.integrity_routes import integrity_bp
-from routes.semantic_routes import semantic_bp
 from routes.research_validation_routes import validation_bp
+
+# ========== SEMANTIC ROUTES (LIGHTWEIGHT SAFE) ==========
+try:
+    from routes.semantic_routes import semantic_bp
+    SEMANTIC_AVAILABLE = True
+except Exception as e:
+    SEMANTIC_AVAILABLE = False
+    semantic_bp = None
+    print(f"⚠️ Semantic routes not available: {e}")
 
 # ==================== CONFIG ====================
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -81,26 +97,6 @@ def get_db_connection():
             cursor_factory=RealDictCursor
         )
 
-# ==================== LAZY LOADING FOR HEAVY MODELS (DISABLED FOR EMERGENCY) ====================
-_semantic_engine = None
-_poet_predictor = None
-_heavy_models_loaded = False
-
-def load_heavy_models():
-    """Lazy load heavy AI models - ALL DISABLED for emergency fix"""
-    global _semantic_engine, _poet_predictor, _heavy_models_loaded
-    
-    if _heavy_models_loaded:
-        return True
-    
-    # FORCE DISABLE all heavy models - emergency fix
-    print("⚠️ Heavy models are DISABLED for emergency stability")
-    print("   To enable: Remove DISABLE_HEAVY_MODELS env var and restart")
-    _semantic_engine = None
-    _poet_predictor = None
-    _heavy_models_loaded = True
-    return True
-
 # ==================== APP FACTORY ====================
 def create_app():
     app = Flask(__name__)
@@ -109,7 +105,7 @@ def create_app():
     app.config['GENERATED_FOLDER'] = GENERATED_FOLDER
     app.config['JSON_AS_ASCII'] = False  # Support Urdu text
     
-    # Register Blueprints
+    # Register Core Blueprints
     blueprints = [
         (main_bp, '/'),
         (poets_bp, '/poets'),
@@ -126,7 +122,6 @@ def create_app():
         (research_dashboard_bp, '/research'),
         (dh_bp, '/dh'),
         (integrity_bp, '/integrity'),
-        (semantic_bp, '/semantic'),
         (validation_bp, '/research/validation')
     ]
     
@@ -137,16 +132,27 @@ def create_app():
         except Exception as e:
             print(f"❌ Failed to register {prefix}: {e}")
     
-    print("\n🚀 UCPC Poetry Archive v3.0 - EMERGENCY STABLE MODE")
+    # ========== SEMANTIC ROUTES (Lightweight) ==========
+    if SEMANTIC_AVAILABLE and semantic_bp:
+        try:
+            app.register_blueprint(semantic_bp)
+            print("✅ Registered: /semantic (lightweight TF-IDF)")
+        except Exception as e:
+            print(f"⚠️ Semantic routes registration failed: {e}")
+    else:
+        print("⚠️ Semantic routes disabled (lightweight mode)")
+    
+    print("\n🚀 UCPC Poetry Archive v3.0 - LIGHTWEIGHT PRODUCTION MODE")
     print(f"📊 Environment: {'Production' if os.getenv('RENDER') else 'Development'}")
     print(f"💾 Database: {'Configured' if os.getenv('DATABASE_URL') else 'Missing!'}")
-    print(f"🧠 Heavy models: FORCE DISABLED (memory safe)")
-    print(f"🔧 Render free tier optimized\n")
+    print(f"🧠 Lightweight Mode: {LIGHTWEIGHT_MODE}")
+    print(f"🔧 Heavy models: DISABLED (torch, sentence-transformers removed)")
+    print(f"📚 Poet prediction: {'Enabled' if ENABLE_POET_PREDICTION else 'Disabled'}")
+    print(f"🔍 Semantic search: TF-IDF based (fast, memory-safe)\n")
     
     # ========== HEALTH CHECK ENDPOINT (CRITICAL FOR RENDER) ==========
     @app.route('/health')
     def health_check():
-        # Simple health check - no heavy operations
         db_status = "unknown"
         try:
             conn = get_db_connection()
@@ -161,10 +167,13 @@ def create_app():
         return jsonify({
             "status": "ok",
             "project": "UCPC Poetry Archive",
-            "version": "3.0-emergency",
+            "version": "3.0-lightweight",
+            "mode": "lightweight",
             "database": db_status,
             "memory_safe": True,
-            "heavy_models": "disabled"
+            "poet_prediction": ENABLE_POET_PREDICTION,
+            "transformers": ENABLE_TRANSFORMERS,
+            "semantic_method": "TF-IDF"
         })
     
     # ========== SIMPLE ROOT ROUTE ==========
@@ -183,7 +192,8 @@ def create_app():
                 'rss_mb': round(memory_info.rss / 1024 / 1024, 2),
                 'vms_mb': round(memory_info.vms / 1024 / 1024, 2),
                 'cpu_percent': process.cpu_percent(),
-                'heavy_models_loaded': False
+                'lightweight_mode': LIGHTWEIGHT_MODE,
+                'poet_prediction': ENABLE_POET_PREDICTION
             })
         except Exception as e:
             return jsonify({'error': str(e)}), 500
@@ -379,13 +389,20 @@ def create_app():
     def api_docs():
         return jsonify({
             "name": "UCPC Poetry Archive API",
-            "version": "3.0-emergency",
+            "version": "3.0-lightweight",
             "environment": "production" if os.getenv('RENDER') else "development",
-            "status": "stable (heavy models disabled)",
+            "mode": "lightweight",
+            "status": "stable",
+            "features": {
+                "poet_prediction": ENABLE_POET_PREDICTION,
+                "semantic_search": "TF-IDF based",
+                "heavy_models": "disabled"
+            },
             "endpoints": {
                 "health": "/health (GET)",
                 "check": "/check (GET)",
-                "debug_memory": "/debug/memory (GET)"
+                "debug_memory": "/debug/memory (GET)",
+                "semantic_search": "/semantic/api/search (POST)"
             }
         })
     
@@ -415,5 +432,5 @@ app = create_app()
 # ==================== RUN (Local Development Only) ====================
 if __name__ == '__main__':
     port = int(os.getenv('PORT', 10000))
-    print(f"🔥 Starting UCPC in development mode on port {port}")
-    app.run(host='0.0.0.0', port=port, debug=True, threaded=True)
+    print(f"🔥 Starting UCPC in lightweight mode on port {port}")
+    app.run(host='0.0.0.0', port=port, debug=False, threaded=True)
