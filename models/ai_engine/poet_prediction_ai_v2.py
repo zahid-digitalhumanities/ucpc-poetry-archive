@@ -3,9 +3,11 @@
 # ============================================
 
 import joblib
+import os
 
-MODEL_PATH = "models/ml/poet_classifier_v9.pkl"
-VECTORIZER_PATH = "models/ml/tfidf_vectorizer_v9.pkl"
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+MODEL_PATH = os.path.join(BASE_DIR, "models", "ml", "poet_classifier_v9.pkl")
+VECTORIZER_PATH = os.path.join(BASE_DIR, "models", "ml", "tfidf_vectorizer_v9.pkl")
 
 model = None
 vectorizer = None
@@ -27,33 +29,31 @@ def predict_poet(text, top_k=5):
         classes = model.classes_
         pairs = sorted(zip(classes, probs), key=lambda x: x[1], reverse=True)
         results = [{"poet_name": poet, "confidence": float(score)} for poet, score in pairs[:top_k]]
+        return results
+    except Exception as e:
+        return [{"poet_name": "Error", "confidence": 0, "error": str(e)}]
+
+# ========== WRAPPER FOR ROUTES (CRITICAL) ==========
+def predict_poet_from_text(text, top_n=5):
+    """Routes ke liye wrapper function."""
+    return predict_poet(text, top_k=top_n)
+
+def get_model_info():
+    """Model info for routes/research_validation_routes.py"""
+    try:
+        load_models()
         return {
-            "success": True,
-            "method": "TF-IDF + Logistic Regression",
-            "data": results
+            "loaded": True,
+            "accuracy": "75.6%",
+            "num_poets": 27,
+            "version": "v9-lightweight"
         }
     except Exception as e:
-        return {"success": False, "error": str(e)}
+        return {"loaded": False, "error": str(e)}
 
-# ========== CRITICAL: WRAPPER FOR ROUTES ==========
-# This is the function that routes/ai_routes.py imports
-def predict_poet_from_text(text, top_n=5):
-    """
-    Wrapper function that matches the expected interface of routes.
-    Returns a list of predictions (not the full result dict).
-    """
-    result = predict_poet(text, top_k=top_n)
-    if result.get("success"):
-        return result["data"]
-    else:
-        return [{"poet_name": "Error", "confidence": 0, "error": result.get("error")}]
-
-
-# ========== OPTIONAL: Batch prediction for compatibility ==========
 def predict_batch(texts, top_n=3):
-    """Batch prediction – calls predict_poet_from_text for each text."""
+    """Batch prediction"""
     results = []
     for text in texts:
-        pred = predict_poet_from_text(text, top_n=top_n)
-        results.append(pred)
+        results.append(predict_poet_from_text(text, top_n=top_n))
     return results
