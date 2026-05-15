@@ -223,7 +223,7 @@
         {% for item in texts %}
         <div class="poem-card">
             <div class="first-couplet">
-                {% if item.first_verse %}
+                {% if item.first_verse and item.first_verse.misra1_urdu %}
                     {{ item.first_verse.misra1_urdu }}<br>
                     {{ item.first_verse.misra2_urdu }}
                 {% else %}
@@ -234,7 +234,7 @@
                 <span><i class="fas fa-pen-fancy"></i> {{ item.verse_count or 0 }} verses</span>
             </div>
             <div class="action-buttons">
-                <a href="/ghazals/view/{{ item.id }}" class="btn-view">View Full</a>
+                <a href="{{ url_for('ghazals.view_ghazal', text_id=item.id) }}" class="btn-view">View Full</a>
             </div>
         </div>
         {% endfor %}
