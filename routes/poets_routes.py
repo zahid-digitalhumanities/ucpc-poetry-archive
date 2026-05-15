@@ -3,11 +3,6 @@ from models.base import get_db_connection
 
 poets_bp = Blueprint('poets', __name__, url_prefix='/poets')
 
-
-# =========================================================
-# POETS LIST
-# =========================================================
-
 @poets_bp.route('/')
 def poets_list():
     page = request.args.get('page', 1, type=int)
@@ -17,12 +12,10 @@ def poets_list():
     conn = get_db_connection()
     cur = conn.cursor()
     
-    # Get total count
     cur.execute("SELECT COUNT(*) as total FROM poets")
     total_row = cur.fetchone()
     total = total_row['total'] if total_row else 0
     
-    # Get poets with pagination
     cur.execute("""
         SELECT id, name, name_urdu, birth_year, death_year,
                (SELECT COUNT(*) FROM texts WHERE poet_id = poets.id AND form = 'ghazal' AND (is_deleted = FALSE OR is_deleted IS NULL)) as ghazal_count
@@ -37,16 +30,7 @@ def poets_list():
     
     total_pages = (total + per_page - 1) // per_page if total > 0 else 1
     
-    return render_template('poets.html', 
-                         poets=poets, 
-                         page=page, 
-                         total_pages=total_pages,
-                         total=total)
-
-
-# =========================================================
-# POET DETAIL - MAIN ROUTE
-# =========================================================
+    return render_template('poets.html', poets=poets, page=page, total_pages=total_pages, total=total)
 
 @poets_bp.route('/<int:poet_id>')
 def poet_detail(poet_id):
@@ -57,7 +41,6 @@ def poet_detail(poet_id):
     conn = get_db_connection()
     cur = conn.cursor()
     
-    # Get poet info
     cur.execute("""
         SELECT id, name, name_urdu, bio, birth_year, death_year
         FROM poets WHERE id = %s
@@ -69,7 +52,6 @@ def poet_detail(poet_id):
         conn.close()
         return "Poet not found", 404
     
-    # Get poet's ghazals with first verse
     cur.execute("""
         SELECT t.id, t.title_urdu, t.verse_count,
                (SELECT misra1_urdu FROM verses WHERE text_id = t.id AND couplet_index = 1 LIMIT 1) as misra1,
@@ -81,7 +63,6 @@ def poet_detail(poet_id):
     """, (poet_id, per_page, offset))
     texts = cur.fetchall()
     
-    # Get total count for pagination
     cur.execute("""
         SELECT COUNT(*) as total FROM texts 
         WHERE poet_id = %s AND form = 'ghazal' AND (t.is_deleted = FALSE OR t.is_deleted IS NULL)
@@ -92,7 +73,6 @@ def poet_detail(poet_id):
     cur.close()
     conn.close()
     
-    # Add first_verse object to each text for template compatibility
     for text in texts:
         if text['misra1']:
             text['first_verse'] = {
@@ -102,29 +82,12 @@ def poet_detail(poet_id):
     
     total_pages = (total + per_page - 1) // per_page if total > 0 else 1
     
-    return render_template('poet_detail.html',
-                         poet=poet,
-                         texts=texts,
-                         page=page,
-                         total_pages=total_pages,
-                         total=total)
-
-
-# =========================================================
-# ALTERNATE ROUTE FOR /poet/17 (REDIRECT TO /poets/17)
-# =========================================================
+    return render_template('poet_detail.html', poet=poet, texts=texts, page=page, total_pages=total_pages, total=total)
 
 @poets_bp.route('/poet/<int:poet_id>')
 def poet_detail_alt(poet_id):
-    """Redirect /poet/17 to /poets/17"""
     return redirect(url_for('poets.poet_detail', poet_id=poet_id), 301)
-
-
-# =========================================================
-# ALTERNATE ROUTE FOR /poet/ (REDIRECT TO /poets/)
-# =========================================================
 
 @poets_bp.route('/poet/')
 def poets_list_alt():
-    """Redirect /poet/ to /poets/"""
     return redirect(url_for('poets.poets_list'), 301)
