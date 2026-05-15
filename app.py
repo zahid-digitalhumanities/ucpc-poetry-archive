@@ -8,15 +8,18 @@ from models.stats_model import get_stats
 app = Flask(__name__)
 app.secret_key = 'your-secret-key-here'
 
+# Register blueprints
 app.register_blueprint(main_bp)
 app.register_blueprint(poets_bp)
 app.register_blueprint(ghazals_bp)
 app.register_blueprint(search_bp)
 
+# Health check for Render
 @app.route('/health')
 def health():
-    return {"status": "ok", "service": "UCPC Poetry Archive"}
+    return {"status": "ok", "service": "UCPC Poetry Archive"}, 200
 
+# Redirects
 @app.route('/admin/add_ghazal')
 def redirect_add_ghazal():
     return redirect(url_for('ghazals.add_ghazal'))
@@ -25,10 +28,12 @@ def redirect_add_ghazal():
 def redirect_view(text_id):
     return redirect(url_for('ghazals.view_ghazal', text_id=text_id))
 
+# Global stats
 @app.context_processor
 def inject_stats():
     return dict(stats=get_stats())
 
+# Error handlers
 @app.errorhandler(404)
 def page_not_found(e):
     return render_template('404.html'), 404
