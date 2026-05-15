@@ -3,6 +3,7 @@ from routes.main_routes import main_bp
 from routes.poets_routes import poets_bp
 from routes.ghazals_routes import ghazals_bp
 from routes.search_routes import search_bp
+from routes.poet_redirect import poet_redirect_bp
 from models.stats_model import get_stats
 
 app = Flask(__name__)
@@ -13,6 +14,7 @@ app.register_blueprint(main_bp)
 app.register_blueprint(poets_bp)
 app.register_blueprint(ghazals_bp)
 app.register_blueprint(search_bp)
+app.register_blueprint(poet_redirect_bp)
 
 # Health check for Render
 @app.route('/health')
