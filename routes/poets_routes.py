@@ -3,6 +3,7 @@ from models.base import get_db_connection
 
 poets_bp = Blueprint('poets', __name__, url_prefix='/poets')
 
+
 @poets_bp.route('/')
 def poets_list():
     page = request.args.get('page', 1, type=int)
@@ -12,7 +13,7 @@ def poets_list():
     conn = get_db_connection()
     cur = conn.cursor()
     
-    # Get total count – FIXED: added 'as total' alias
+    # Get total count
     cur.execute("SELECT COUNT(*) as total FROM poets")
     total_row = cur.fetchone()
     total = total_row['total'] if total_row else 0
@@ -39,8 +40,19 @@ def poets_list():
                          total=total)
 
 
+# =========================================================
+# POET DETAIL - SUPPORTS BOTH /poets/28 AND /poet/28
+# =========================================================
+
+@poets_bp.route('/poet/<int:poet_id>')
+def poet_detail_alt(poet_id):
+    """Alternate URL: /poet/28"""
+    return poet_detail(poet_id)
+
+
 @poets_bp.route('/<int:poet_id>')
 def poet_detail(poet_id):
+    """Main URL: /poets/28"""
     page = request.args.get('page', 1, type=int)
     per_page = 20
     offset = (page - 1) * per_page
@@ -72,7 +84,7 @@ def poet_detail(poet_id):
     """, (poet_id, per_page, offset))
     texts = cur.fetchall()
     
-    # Get total count for pagination – FIXED: added 'as total' alias
+    # Get total count for pagination
     cur.execute("""
         SELECT COUNT(*) as total FROM texts 
         WHERE poet_id = %s AND form = 'ghazal' AND (t.is_deleted = FALSE OR t.is_deleted IS NULL)
