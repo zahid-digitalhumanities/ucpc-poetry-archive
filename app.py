@@ -19,6 +19,11 @@ app.register_blueprint(search_bp)
 def health():
     return {"status": "ok", "service": "UCPC Poetry Archive"}, 200
 
+# Root route
+@app.route('/')
+def home():
+    return render_template('index.html')
+
 # Redirects
 @app.route('/admin/add_ghazal')
 def redirect_add_ghazal():
