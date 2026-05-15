@@ -12,9 +12,10 @@ def poets_list():
     conn = get_db_connection()
     cur = conn.cursor()
     
-    # Get total count
-    cur.execute("SELECT COUNT(*) FROM poets ORDER BY name")
-    total = cur.fetchone()['count']
+    # Get total count – FIXED: added 'as total' alias
+    cur.execute("SELECT COUNT(*) as total FROM poets")
+    total_row = cur.fetchone()
+    total = total_row['total'] if total_row else 0
     
     # Get poets with pagination
     cur.execute("""
@@ -29,13 +30,14 @@ def poets_list():
     cur.close()
     conn.close()
     
-    total_pages = (total + per_page - 1) // per_page
+    total_pages = (total + per_page - 1) // per_page if total > 0 else 1
     
     return render_template('poets.html', 
                          poets=poets, 
                          page=page, 
                          total_pages=total_pages,
                          total=total)
+
 
 @poets_bp.route('/<int:poet_id>')
 def poet_detail(poet_id):
@@ -70,12 +72,13 @@ def poet_detail(poet_id):
     """, (poet_id, per_page, offset))
     texts = cur.fetchall()
     
-    # Get total count for pagination
+    # Get total count for pagination – FIXED: added 'as total' alias
     cur.execute("""
-        SELECT COUNT(*) FROM texts 
+        SELECT COUNT(*) as total FROM texts 
         WHERE poet_id = %s AND form = 'ghazal' AND (t.is_deleted = FALSE OR t.is_deleted IS NULL)
     """, (poet_id,))
-    total = cur.fetchone()['count']
+    total_row = cur.fetchone()
+    total = total_row['total'] if total_row else 0
     
     cur.close()
     conn.close()
@@ -88,7 +91,7 @@ def poet_detail(poet_id):
                 'misra2_urdu': text['misra2'] or ''
             }
     
-    total_pages = (total + per_page - 1) // per_page
+    total_pages = (total + per_page - 1) // per_page if total > 0 else 1
     
     return render_template('poet_detail.html',
                          poet=poet,
