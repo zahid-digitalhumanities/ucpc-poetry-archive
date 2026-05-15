@@ -1,8 +1,12 @@
-from flask import Blueprint, render_template, request
+from flask import Blueprint, render_template, request, redirect, url_for
 from models.base import get_db_connection
 
 poets_bp = Blueprint('poets', __name__, url_prefix='/poets')
 
+
+# =========================================================
+# POETS LIST
+# =========================================================
 
 @poets_bp.route('/')
 def poets_list():
@@ -41,18 +45,11 @@ def poets_list():
 
 
 # =========================================================
-# POET DETAIL - SUPPORTS BOTH /poets/28 AND /poet/28
+# POET DETAIL - MAIN ROUTE
 # =========================================================
-
-@poets_bp.route('/poet/<int:poet_id>')
-def poet_detail_alt(poet_id):
-    """Alternate URL: /poet/28"""
-    return poet_detail(poet_id)
-
 
 @poets_bp.route('/<int:poet_id>')
 def poet_detail(poet_id):
-    """Main URL: /poets/28"""
     page = request.args.get('page', 1, type=int)
     per_page = 20
     offset = (page - 1) * per_page
@@ -111,3 +108,23 @@ def poet_detail(poet_id):
                          page=page,
                          total_pages=total_pages,
                          total=total)
+
+
+# =========================================================
+# ALTERNATE ROUTE FOR /poet/17 (REDIRECT TO /poets/17)
+# =========================================================
+
+@poets_bp.route('/poet/<int:poet_id>')
+def poet_detail_alt(poet_id):
+    """Redirect /poet/17 to /poets/17"""
+    return redirect(url_for('poets.poet_detail', poet_id=poet_id), 301)
+
+
+# =========================================================
+# ALTERNATE ROUTE FOR /poet/ (REDIRECT TO /poets/)
+# =========================================================
+
+@poets_bp.route('/poet/')
+def poets_list_alt():
+    """Redirect /poet/ to /poets/"""
+    return redirect(url_for('poets.poets_list'), 301)
