@@ -1,5 +1,6 @@
-﻿{% extends "base.html" %}
+{% extends "base.html" %}
 {% block title %}{{ poet.name_urdu }} - UCPC Poetry Archive{% endblock %}
+
 {% block extra_css %}
 <style>
     .poet-detail-container {
@@ -85,20 +86,15 @@
         box-shadow: 0 10px 25px rgba(0,0,0,0.06);
         border-color: var(--gold);
     }
-    .poem-english-text {
-        font-size: 0.95rem;
-        opacity: 0.7;
-        color: #1e3c72;
-        margin-bottom: 10px;
-    }
-    .poem-urdu-text {
+    .first-couplet {
         font-family: 'Jameel Noori Nastaleeq', serif;
-        font-size: 1.5rem;
-        line-height: 2.4rem;
+        font-size: 1.4rem;
+        line-height: 2.2rem;
         font-weight: 600;
         color: #1e3c72;
         direction: rtl;
-        text-align: right;
+        text-align: center;
+        margin-bottom: 15px;
     }
     .poem-meta {
         display: flex;
@@ -114,6 +110,38 @@
     .poem-meta i {
         color: var(--gold);
         margin-right: 4px;
+    }
+    .action-buttons {
+        display: flex;
+        gap: 12px;
+        margin-top: 15px;
+    }
+    .btn-view, .btn-share {
+        padding: 6px 16px;
+        border-radius: 40px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-decoration: none;
+        transition: 0.2s;
+        display: inline-block;
+        text-align: center;
+    }
+    .btn-view {
+        background: #1e3c72;
+        color: white;
+        border: none;
+    }
+    .btn-view:hover {
+        background: #0f2b4a;
+        transform: translateY(-2px);
+    }
+    .btn-share {
+        background: #25d366;
+        color: white;
+    }
+    .btn-share:hover {
+        background: #1da155;
+        transform: translateY(-2px);
     }
     .section-title {
         text-align: center;
@@ -135,6 +163,37 @@
         font-size: 0.9rem;
         margin-left: 8px;
     }
+    /* Pagination styles */
+    .pagination-wrapper {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        margin-top: 40px;
+        flex-wrap: wrap;
+    }
+    .btn-pagination {
+        background: #1e3c72;
+        color: white;
+        padding: 8px 20px;
+        border-radius: 40px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .btn-pagination:hover {
+        background: #0f2b4a;
+        transform: translateY(-2px);
+    }
+    .page-info {
+        background: rgba(212,175,55,0.15);
+        padding: 8px 18px;
+        border-radius: 40px;
+        color: #1e3c72;
+        font-weight: 500;
+    }
     @media (max-width: 768px) {
         .poet-header {
             flex-direction: column;
@@ -150,8 +209,16 @@
         .poems-grid {
             grid-template-columns: 1fr;
         }
-        .poem-urdu-text {
-            font-size: 1.3rem;
+        .first-couplet {
+            font-size: 1.2rem;
+            line-height: 1.9rem;
+        }
+        .pagination-wrapper {
+            gap: 10px;
+        }
+        .btn-pagination, .page-info {
+            padding: 6px 14px;
+            font-size: 0.85rem;
         }
     }
 </style>
@@ -162,31 +229,60 @@
     <div class="poet-header">
         <div class="poet-name">
             <span class="poet-name-en">{{ poet.name }}</span>
-            <span class="poet-name-urdu">({{ poet.name_urdu }})</span>
+            <span class="poet-name-urdu">{{ poet.name_urdu }}</span>
             {% if poet.birth_year or poet.death_year %}
             <span class="poet-years"><i class="fas fa-calendar-alt"></i> {{ poet.birth_year or '?' }} – {{ poet.death_year or 'Present' }}</span>
             {% endif %}
         </div>
         <div class="poet-stats">
-            <div><i class="fas fa-book"></i> {{ texts|length }} Poems</div>
+            <div><i class="fas fa-book"></i> {{ total }} Poems</div>
             <div><i class="fas fa-pen-fancy"></i> {{ texts|sum(attribute='verse_count') }} Verses</div>
         </div>
     </div>
 
     <div class="section-title">
-        <h2>All Poems <span>{{ texts|length }}</span></h2>
+        <h2>All Poems <span>{{ total }}</span></h2>
     </div>
 
     <div class="poems-grid">
         {% for item in texts %}
-        <a href="/view/{{ item.id }}" class="poem-card">
-            <div class="poem-english-text">{{ item.title_english or 'Untitled' }}</div>
-            <div class="poem-urdu-text">{{ item.title_urdu or 'عنوان' }}</div>
+        <div class="poem-card">
+            <div class="first-couplet">
+                {% if item.first_verse %}
+                    {{ item.first_verse.misra1_urdu }}<br>
+                    {{ item.first_verse.misra2_urdu }}
+                {% else %}
+                    No couplet available
+                {% endif %}
+            </div>
             <div class="poem-meta">
                 <span><i class="fas fa-pen-fancy"></i> {{ item.verse_count }} verses</span>
             </div>
-        </a>
+            <div class="action-buttons">
+                <a href="/ghazals/view/{{ item.id }}" class="btn-view">View Full</a>
+                <a target="_blank"
+                   href="https://wa.me/?text={{ (poet.name ~ '\n\n' ~ (item.first_verse.misra1_urdu if item.first_verse else '') ~ '\n' ~ (item.first_verse.misra2_urdu if item.first_verse else '') ~ '\n\nRead more: ' ~ request.url_root ~ 'ghazals/view/' ~ item.id) | urlencode }}"
+                   class="btn-share">Share on WhatsApp</a>
+            </div>
+        </div>
         {% endfor %}
     </div>
+
+    <!-- Pagination -->
+    {% if total_pages > 1 %}
+    <div class="pagination-wrapper">
+        {% if prev_page %}
+        <a href="{{ url_for('poets.poet_detail', poet_id=poet.id, page=prev_page) }}" class="btn-pagination">
+            <i class="fas fa-chevron-left"></i> Previous
+        </a>
+        {% endif %}
+        <span class="page-info">Page {{ page }} of {{ total_pages }} ({{ total }} poems)</span>
+        {% if next_page %}
+        <a href="{{ url_for('poets.poet_detail', poet_id=poet.id, page=next_page) }}" class="btn-pagination">
+            Next <i class="fas fa-chevron-right"></i>
+        </a>
+        {% endif %}
+    </div>
+    {% endif %}
 </div>
 {% endblock %}

@@ -1,0 +1,260 @@
+{% extends "base.html" %}
+{% block title %}Similar Ghazals - {{ ghazal.title_urdu or ghazal.title_english }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .similar-container {
+        max-width: 900px;
+        margin: 0 auto;
+    }
+    .ghazal-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+    .ghazal-title {
+        font-family: 'Jameel Noori Nastaleeq', serif;
+        font-size: 1.8rem;
+        color: #D4AF37;
+        direction: rtl;
+        line-height: 1.4;
+    }
+    .ghazal-poet {
+        font-size: 1rem;
+        color: #b68b40;
+        margin-top: 0.5rem;
+        letter-spacing: 1px;
+    }
+    .similar-card {
+        background: linear-gradient(135deg, #ffffff, #fef9e6);
+        border-radius: 1.5rem;
+        padding: 1.25rem;
+        margin-bottom: 1rem;
+        border: 1px solid rgba(212,175,55,0.2);
+        transition: all 0.2s ease;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+    }
+    .similar-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+        border-color: rgba(212,175,55,0.5);
+    }
+    .similar-title {
+        font-family: 'Jameel Noori Nastaleeq', serif;
+        font-size: 1.2rem;
+        color: #1e3c72;
+        direction: rtl;
+        margin-bottom: 0.25rem;
+    }
+    .similar-poet {
+        font-size: 0.8rem;
+        color: #b68b40;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    .similarity-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin: 0.75rem 0;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+    .similarity-bar-wrapper {
+        flex: 1;
+        min-width: 150px;
+    }
+    .similarity-bar-bg {
+        background: rgba(0,0,0,0.1);
+        border-radius: 1rem;
+        height: 8px;
+        overflow: hidden;
+    }
+    .similarity-bar-fill {
+        background: #D4AF37;
+        height: 100%;
+        width: 0%;
+        border-radius: 1rem;
+        transition: width 0.5s ease;
+    }
+    .similarity-score {
+        font-weight: bold;
+        color: #D4AF37;
+        background: rgba(212,175,55,0.1);
+        padding: 0.2rem 0.6rem;
+        border-radius: 2rem;
+        font-size: 0.8rem;
+        white-space: nowrap;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        line-height: 1.2;
+    }
+    .similarity-score span {
+        font-size: 0.65rem;
+        color: #666;
+        font-weight: normal;
+    }
+    .explanation-badges {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-top: 0.5rem;
+        justify-content: flex-end;
+        align-items: center;
+    }
+    .exp-badge {
+        background: rgba(0,0,0,0.05);
+        border-radius: 2rem;
+        padding: 0.25rem 0.75rem;
+        font-size: 0.72rem;
+        color: #4a5568;
+        border: 1px solid rgba(0,0,0,0.05);
+        transition: all 0.2s;
+    }
+    .exp-badge strong {
+        color: #D4AF37;
+        margin-right: 0.25rem;
+    }
+    .why-btn {
+        background: none;
+        border: 1px solid #D4AF37;
+        color: #D4AF37;
+        border-radius: 2rem;
+        padding: 0.2rem 0.7rem;
+        font-size: 0.7rem;
+        cursor: pointer;
+        transition: all 0.2s;
+        margin-left: 0.25rem;
+    }
+    .why-btn:hover {
+        background: #D4AF37;
+        color: #1e3c72;
+    }
+    .explanation-detail {
+        margin-top: 0.5rem;
+        font-size: 0.75rem;
+        color: #4a5568;
+        background: #f9f7f0;
+        padding: 0.5rem;
+        border-radius: 1rem;
+        border-left: 3px solid #D4AF37;
+        line-height: 1.4;
+    }
+    .explanation-detail ul {
+        padding-left: 1rem;
+        margin: 0;
+    }
+    .explanation-detail li {
+        margin-bottom: 0.2rem;
+    }
+    .hidden {
+        display: none;
+    }
+    @media (max-width: 640px) {
+        .similarity-row {
+            flex-direction: column;
+            align-items: stretch;
+        }
+        .similarity-score {
+            align-self: flex-start;
+        }
+        .explanation-badges {
+            justify-content: flex-start;
+        }
+        .ghazal-title {
+            font-size: 1.3rem;
+        }
+        .similar-title {
+            font-size: 1rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="similar-container">
+    <div class="ghazal-header">
+        <div class="ghazal-title">{{ ghazal.title_urdu or ghazal.title_english }}</div>
+        <div class="ghazal-poet">— {{ ghazal.poet_name }} —</div>
+        <p class="text-sm text-gray-500 mt-2">🔍 Ghazals ranked by hybrid similarity (semantic + radif + qaafiya + theme)</p>
+    </div>
+
+    {% if similar %}
+        {% for item in similar %}
+        <div class="similar-card" id="card-{{ loop.index0 }}">
+            <div class="similar-title">{{ item.title_urdu or item.title_english }}</div>
+            <div class="similar-poet">{{ item.poet_name }}</div>
+            
+            <div class="similarity-row">
+                <div class="similarity-bar-wrapper">
+                    <div class="similarity-bar-bg">
+                        <div class="similarity-bar-fill" style="width: {{ item.similarity * 100 }}%;"></div>
+                    </div>
+                </div>
+                <div class="similarity-score">
+                    {{ (item.similarity * 100) | round(1) }}%
+                    <span>Hybrid Score</span>
+                </div>
+            </div>
+            
+            {% if item.explanation %}
+            <div class="explanation-badges">
+                <span class="exp-badge" title="Embedding similarity (semantic meaning)">
+                    <strong>🧠 Semantic</strong>
+                    {{ (item.explanation.embedding_score * 100) | round(1) }}%
+                </span>
+                <span class="exp-badge" title="Exact radif match">
+                    <strong>📜 Radif</strong>
+                    {% if item.explanation.breakdown.radif > 0 %}
+                        ✅ Match
+                    {% else %}
+                        ❌ No
+                    {% endif %}
+                </span>
+                <span class="exp-badge" title="Qaafiya overlap strength">
+                    <strong>🎵 Qaafiya</strong>
+                    {{ (item.explanation.breakdown.qaafiya * 100) | round(1) }}%
+                </span>
+                <span class="exp-badge" title="Theme similarity">
+                    <strong>🏷️ Theme</strong>
+                    {% if item.explanation.breakdown.theme > 0 %}
+                        ✅ Same
+                    {% else %}
+                        ❌ Different
+                    {% endif %}
+                </span>
+                {% if item.explanation.breakdown.meter is defined %}
+                <span class="exp-badge" title="Meter similarity">
+                    <strong>📐 Meter</strong>
+                    {{ item.explanation.breakdown.meter }}
+                </span>
+                {% endif %}
+                <button class="why-btn" onclick="toggleExplanation({{ loop.index0 }})">📖 Why?</button>
+            </div>
+            <div id="explanation-detail-{{ loop.index0 }}" class="explanation-detail hidden">
+                <strong>Why similar?</strong>
+                <ul>
+                {% for line in item.explanation.explanation_text %}
+                    <li>{{ line }}</li>
+                {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded">
+            <p class="text-yellow-800">No similar ghazals found. Please ensure embeddings and poetic features are generated.</p>
+        </div>
+    {% endif %}
+</div>
+
+<script>
+function toggleExplanation(idx) {
+    const detailDiv = document.getElementById('explanation-detail-' + idx);
+    if (detailDiv) {
+        detailDiv.classList.toggle('hidden');
+    }
+}
+</script>
+{% endblock %}

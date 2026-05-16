@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+{% block title %}Poet Prediction - UCPC Poetry{% endblock %}
+
+{% block extra_css %}
+<style>
+    .prediction-container {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+    .ghazal-title {
+        text-align: center;
+        font-family: 'Jameel Noori Nastaleeq', serif;
+        font-size: 1.8rem;
+        color: #D4AF37;
+        margin-bottom: 2rem;
+        direction: rtl;
+    }
+    .prediction-card {
+        background: linear-gradient(135deg, #0F2B3D, #1E3C72);
+        border-radius: 1.5rem;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        border: 1px solid rgba(212,175,55,0.3);
+        transition: transform 0.2s;
+    }
+    .prediction-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    }
+    .poet-name {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        flex-wrap: wrap;
+        margin-bottom: 0.75rem;
+    }
+    .poet-name-urdu {
+        font-family: 'Jameel Noori Nastaleeq', serif;
+        font-size: 1.5rem;
+        color: #F5E7B2;
+        direction: rtl;
+    }
+    .poet-name-en {
+        font-size: 0.9rem;
+        color: #D4AF37;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    .similarity-bar-container {
+        background: rgba(255,255,255,0.1);
+        border-radius: 1rem;
+        height: 8px;
+        overflow: hidden;
+        margin: 0.75rem 0;
+    }
+    .similarity-bar {
+        background: #D4AF37;
+        height: 100%;
+        width: 0%;
+        border-radius: 1rem;
+        transition: width 0.5s ease;
+    }
+    .similarity-value {
+        text-align: right;
+        font-size: 0.8rem;
+        color: #D4AF37;
+        margin-top: 0.25rem;
+    }
+    .components {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-top: 0.5rem;
+        justify-content: flex-end;
+    }
+    .component-badge {
+        background: rgba(255,255,255,0.1);
+        border-radius: 1rem;
+        padding: 0.2rem 0.6rem;
+        font-size: 0.7rem;
+        color: #ddd;
+    }
+    .component-badge strong {
+        color: #D4AF37;
+        margin-right: 0.25rem;
+    }
+    @media (max-width: 768px) {
+        .ghazal-title { font-size: 1.3rem; }
+        .poet-name-urdu { font-size: 1.2rem; }
+        .prediction-card { padding: 1rem; }
+        .components { justify-content: flex-start; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="prediction-container">
+    <div class="ghazal-title">
+        {{ ghazal.title_urdu or ghazal.title_english }}
+    </div>
+    <h3 class="text-center text-gold mb-4">🎭 Predicted Poets (Hybrid Model)</h3>
+    {% if predictions %}
+        {% for p in predictions %}
+        <div class="prediction-card">
+            <div class="poet-name">
+                <span class="poet-name-urdu">{{ p.name_urdu }}</span>
+                <span class="poet-name-en">{{ p.name }}</span>
+            </div>
+            <div class="similarity-bar-container">
+                <div class="similarity-bar" style="width: {{ p.similarity * 100 }}%;"></div>
+            </div>
+            <div class="similarity-value">
+                Hybrid similarity: {{ "%.1f"|format(p.similarity * 100) }}%
+            </div>
+            <!-- Component breakdown -->
+            <div class="components">
+                <span class="component-badge"><strong>🧠 Embedding:</strong> {{ (p.components.embedding * 100) | round(0) }}%</span>
+                <span class="component-badge"><strong>📜 Radif:</strong> {{ '✓' if p.components.radif_match else '✗' }}</span>
+                <span class="component-badge"><strong>🎵 Qaafiya:</strong> {{ (p.components.qaafiya * 100) | round(0) }}%</span>
+                <span class="component-badge"><strong>📖 Vocab:</strong> {{ (p.components.vocab * 100) | round(0) }}%</span>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="text-center text-gray-400">
+            No predictions available. Please ensure embeddings and poet fingerprints are built.
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

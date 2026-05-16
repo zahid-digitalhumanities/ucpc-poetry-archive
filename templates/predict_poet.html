@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}Poet Prediction (Explainable) - {{ ghazal.title_urdu or ghazal.title_english }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .prediction-container { max-width: 900px; margin: 0 auto; }
+    .ghazal-header { text-align: center; margin-bottom: 2rem; }
+    .ghazal-title { font-family: 'Jameel Noori Nastaleeq', serif; font-size: 1.8rem; color: #D4AF37; direction: rtl; }
+    .ghazal-poet { font-size: 1rem; color: #b68b40; margin-top: 0.5rem; }
+    .prediction-card { background: linear-gradient(135deg, #ffffff, #fef9e6); border-radius: 1.5rem; padding: 1.25rem; margin-bottom: 1rem; border: 1px solid rgba(212,175,55,0.2); transition: 0.2s; }
+    .prediction-card:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0,0,0,0.08); }
+    .poet-name { font-size: 1.3rem; font-weight: bold; color: #1e3c72; }
+    .similarity-score { font-weight: bold; color: #D4AF37; background: rgba(212,175,55,0.1); padding: 0.2rem 0.6rem; border-radius: 2rem; display: inline-block; margin-top: 0.5rem; }
+    .explanation-detail { margin-top: 0.75rem; font-size: 0.75rem; color: #4a5568; background: #f9f7f0; padding: 0.75rem; border-radius: 1rem; border-left: 3px solid #D4AF37; }
+    .explanation-detail ul { padding-left: 1rem; margin: 0; }
+    .explanation-detail li { margin-bottom: 0.25rem; }
+    .example-ghazal { font-size: 0.7rem; color: #666; margin-top: 0.5rem; font-style: italic; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="prediction-container">
+    <div class="ghazal-header">
+        <div class="ghazal-title">{{ ghazal.title_urdu or ghazal.title_english }}</div>
+        <div class="ghazal-poet">Unknown Poet – Explainable Prediction</div>
+        <p class="text-sm text-gray-500 mt-2">🔍 Hybrid similarity (semantic + radif + qaafiya + theme)</p>
+    </div>
+
+    {% if predictions %}
+        {% for p in predictions %}
+        <div class="prediction-card">
+            <div class="poet-name">🎭 {{ p.poet_name }}</div>
+            <div class="similarity-score">{{ (p.score * 100) | round(1) }}% hybrid similarity</div>
+            <div class="explanation-detail">
+                <strong>Why this poet?</strong>
+                <ul>
+                {# Show all explanation lines from the best example #}
+                {% if p.examples and p.examples[0].explanation %}
+                    {% for line in p.examples[0].explanation %}
+                        <li>{{ line }}</li>
+                    {% endfor %}
+                {% else %}
+                    <li>No detailed explanation available</li>
+                {% endif %}
+                </ul>
+                <div class="text-xs text-gray-500 mt-1">Based on {{ p.examples|length }} similar ghazal(s)</div>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded">
+            <p class="text-yellow-800">No predictions available. Ensure embeddings and poetic features exist.</p>
+        </div>
+    {% endif %}
+    <div class="mt-4 text-center">
+        <a href="/ghazals/view/{{ ghazal.id }}" class="text-gold hover:underline">← Back to Ghazal</a>
+    </div>
+</div>
+{% endblock %}

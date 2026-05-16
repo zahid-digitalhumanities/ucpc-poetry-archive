@@ -13,6 +13,12 @@
     .duplicate-table th, .duplicate-table td { border: 1px solid #ffc107; padding: 10px; text-align: left; }
     .duplicate-table th { background: #ffe6a3; }
     .help-text { font-size: 0.85rem; color: #6c757d; margin-top: 5px; }
+    .add-btn { background: #e2e8f0; border: 1px solid #cbd5e1; border-radius: 20px; padding: 5px 12px; font-size: 0.8rem; cursor: pointer; margin-left: 8px; }
+    .add-btn:hover { background: #cbd5e1; }
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
+    .modal-content { background: white; padding: 25px; border-radius: 20px; width: 90%; max-width: 500px; }
+    .modal-content input, .modal-content textarea { width: 100%; margin-bottom: 10px; padding: 8px; border: 1px solid #ccc; border-radius: 8px; }
+    .modal-content button { margin-right: 10px; }
 </style>
 {% endblock %}
 
@@ -30,14 +36,14 @@
         <p>This ghazal is already present in our archive. Please see details below:</p>
         <table class="duplicate-table">
             <thead>
-                <tr><th>Poet</th><th>Urdu Title</th><th>English Title</th><th>Action</th> </tr>
+                <tr><th>Poet</th><th>Urdu Title</th><th>English Title</th><th>Action</th></tr>
             </thead>
             <tbody>
                 <tr><td>{{ existing_ghazal.poet_name_urdu }} ({{ existing_ghazal.poet_name }})</td>
                     <td class="urdu">{{ existing_ghazal.title_urdu }}</td>
                     <td>{{ existing_ghazal.title_english }}</td>
                     <td><a href="/view/{{ existing_ghazal.id }}" target="_blank" class="text-blue-600 underline">Read Ghazal</a></td>
-                 </tr>
+                </tr>
             </tbody>
         </table>
         <button onclick="history.back()" class="mt-3 px-4 py-2 bg-gray-600 text-white rounded-full">Go Back</button>
@@ -45,32 +51,37 @@
     {% endif %}
 
     <form method="POST" id="addGhazalForm">
-        <!-- Poet Dropdown -->
+        <!-- Poet Dropdown with Add button -->
         <div class="form-card">
             <div class="card-title"><i class="fas fa-user-circle"></i> Select Poet</div>
             <div class="form-group">
-                <label class="block font-semibold mb-2">Poet <span class="text-red-500">*</span></label>
-                <select name="poet_id" id="poet_id" class="w-full px-4 py-2 border rounded-lg" required>
-                    <option value="">-- Select Poet --</option>
-                    {% for poet in poets %}
-                    <option value="{{ poet.id }}" {% if selected_poet_id == poet.id %}selected{% endif %}>{{ poet.name_urdu }} ({{ poet.name }})</option>
-                    {% endfor %}
-                </select>
+                <div class="flex items-center gap-2">
+                    <select name="poet_id" id="poet_id" class="w-full px-4 py-2 border rounded-lg" required>
+                        <option value="">-- Select Poet --</option>
+                        {% for poet in poets %}
+                        <option value="{{ poet.id }}" {% if selected_poet_id == poet.id %}selected{% endif %}>{{ poet.name_urdu }} ({{ poet.name }})</option>
+                        {% endfor %}
+                    </select>
+                    <button type="button" id="addPoetBtn" class="add-btn"><i class="fas fa-plus"></i> New Poet</button>
+                </div>
             </div>
         </div>
 
-        <!-- Book Dropdown (dynamic) -->
+        <!-- Book Dropdown with Add button -->
         <div class="form-card">
             <div class="card-title"><i class="fas fa-book"></i> Select Book (Optional)</div>
             <div class="form-group">
-                <select name="book_id" id="book_id" class="w-full px-4 py-2 border rounded-lg">
-                    <option value="">-- Not associated with a book --</option>
-                    {% if books %}
-                        {% for book in books %}
-                        <option value="{{ book.id }}" {% if selected_book_id == book.id %}selected{% endif %}>{{ book.name_urdu or book.name }}</option>
-                        {% endfor %}
-                    {% endif %}
-                </select>
+                <div class="flex items-center gap-2">
+                    <select name="book_id" id="book_id" class="w-full px-4 py-2 border rounded-lg">
+                        <option value="">-- Not associated with a book --</option>
+                        {% if books %}
+                            {% for book in books %}
+                            <option value="{{ book.id }}" {% if selected_book_id == book.id %}selected{% endif %}>{{ book.name_urdu or book.name }}</option>
+                            {% endfor %}
+                        {% endif %}
+                    </select>
+                    <button type="button" id="addBookBtn" class="add-btn" style="display: none;"><i class="fas fa-plus"></i> New Book</button>
+                </div>
                 <p class="help-text">If this ghazal belongs to a specific book of the poet, you can select it here.</p>
             </div>
         </div>
@@ -107,7 +118,37 @@
     </form>
 </div>
 
+<!-- Add Poet Modal -->
+<div id="addPoetModal" class="modal">
+    <div class="modal-content">
+        <h3>Add New Poet</h3>
+        <input type="text" id="poet_name" placeholder="English Name *" required>
+        <input type="text" id="poet_name_urdu" placeholder="Urdu Name">
+        <textarea id="poet_bio_en" placeholder="Bio (English)" rows="2"></textarea>
+        <input type="number" id="poet_birth" placeholder="Birth Year">
+        <input type="number" id="poet_death" placeholder="Death Year">
+        <div style="margin-top: 15px;">
+            <button id="savePoetBtn" class="bg-gold px-4 py-2 rounded">Save Poet</button>
+            <button id="closePoetModal" class="bg-gray-300 px-4 py-2 rounded">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<!-- Add Book Modal -->
+<div id="addBookModal" class="modal">
+    <div class="modal-content">
+        <h3>Add New Book for <span id="bookPoetName"></span></h3>
+        <input type="text" id="book_name" placeholder="Book Name *" required>
+        <input type="text" id="book_name_urdu" placeholder="Book Name (Urdu)">
+        <div style="margin-top: 15px;">
+            <button id="saveBookBtn" class="bg-gold px-4 py-2 rounded">Save Book</button>
+            <button id="closeBookModal" class="bg-gray-300 px-4 py-2 rounded">Cancel</button>
+        </div>
+    </div>
+</div>
+
 <script>
+    // Font size controls
     const textarea = document.getElementById('ghazalText');
     let currentFontSize = 1.2;
     function updateFontSize() { textarea.style.fontSize = currentFontSize + 'rem'; textarea.style.lineHeight = (currentFontSize * 1.6) + 'rem'; }
@@ -116,25 +157,157 @@
 
     const poetSelect = document.getElementById('poet_id');
     const bookSelect = document.getElementById('book_id');
+    const addBookBtn = document.getElementById('addBookBtn');
 
-    poetSelect.addEventListener('change', function() {
-        const poetId = this.value;
+    // Load books when poet changes
+    function loadBooks(poetId, selectedBookId = null) {
         if (!poetId) {
             bookSelect.innerHTML = '<option value="">-- Not associated with a book --</option>';
+            addBookBtn.style.display = 'none';
             return;
         }
-        fetch(`/admin/books/${poetId}`)
+        fetch(`/ghazals/books/${poetId}`)
             .then(response => response.json())
             .then(data => {
                 let options = '<option value="">-- Not associated with a book --</option>';
-                data.books.forEach(book => {
-                    options += `<option value="${book.id}">${book.name_urdu || book.name}</option>`;
-                });
+                if (data.books && data.books.length) {
+                    data.books.forEach(book => {
+                        let selected = (selectedBookId && selectedBookId == book.id) ? 'selected' : '';
+                        options += `<option value="${book.id}" ${selected}>${book.name_urdu || book.name}</option>`;
+                    });
+                }
                 bookSelect.innerHTML = options;
+                addBookBtn.style.display = 'inline-block';
             })
             .catch(err => console.error('Error loading books:', err));
+    }
+
+    poetSelect.addEventListener('change', function() {
+        loadBooks(this.value, '');
     });
 
+    if (poetSelect.value) {
+        loadBooks(poetSelect.value, "{{ selected_book_id }}");
+    }
+
+    // ------------------------- Add Poet Modal -------------------------
+    const addPoetBtn = document.getElementById('addPoetBtn');
+    const addPoetModal = document.getElementById('addPoetModal');
+    const closePoetModal = document.getElementById('closePoetModal');
+    const savePoetBtn = document.getElementById('savePoetBtn');
+
+    addPoetBtn.onclick = () => {
+        addPoetModal.style.display = 'flex';
+    };
+    closePoetModal.onclick = () => {
+        addPoetModal.style.display = 'none';
+    };
+    window.onclick = (e) => {
+        if (e.target == addPoetModal) addPoetModal.style.display = 'none';
+        if (e.target == addBookModal) addBookModal.style.display = 'none';
+    };
+
+    savePoetBtn.onclick = async () => {
+        const name = document.getElementById('poet_name').value.trim();
+        if (!name) {
+            alert('English name is required');
+            return;
+        }
+        const data = {
+            name: name,
+            name_urdu: document.getElementById('poet_name_urdu').value.trim(),
+            bio_english: document.getElementById('poet_bio_en').value.trim(),
+            birth_year: document.getElementById('poet_birth').value || null,
+            death_year: document.getElementById('poet_death').value || null
+        };
+        try {
+            const res = await fetch('/add_poet', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data)
+            });
+            const result = await res.json();
+            if (result.id) {
+                const option = document.createElement('option');
+                option.value = result.id;
+                option.textContent = `${result.name_urdu || result.name} (${result.name})`;
+                poetSelect.appendChild(option);
+                poetSelect.value = result.id;
+                loadBooks(result.id, '');
+                // Clear modal fields
+                document.getElementById('poet_name').value = '';
+                document.getElementById('poet_name_urdu').value = '';
+                document.getElementById('poet_bio_en').value = '';
+                document.getElementById('poet_birth').value = '';
+                document.getElementById('poet_death').value = '';
+                addPoetModal.style.display = 'none';
+                alert('Poet added successfully!');
+            } else {
+                alert('Error: ' + (result.error || 'Unknown error'));
+            }
+        } catch (err) {
+            alert('Failed to add poet: ' + err.message);
+        }
+    };
+
+    // ------------------------- Add Book Modal -------------------------
+    const addBookModal = document.getElementById('addBookModal');
+    const closeBookModal = document.getElementById('closeBookModal');
+    const saveBookBtn = document.getElementById('saveBookBtn');
+    const bookPoetNameSpan = document.getElementById('bookPoetName');
+
+    addBookBtn.onclick = () => {
+        const poetId = poetSelect.value;
+        if (!poetId) {
+            alert('Please select a poet first');
+            return;
+        }
+        const selectedOption = poetSelect.options[poetSelect.selectedIndex];
+        bookPoetNameSpan.textContent = selectedOption ? selectedOption.textContent : '';
+        addBookModal.style.display = 'flex';
+    };
+    closeBookModal.onclick = () => {
+        addBookModal.style.display = 'none';
+    };
+
+    saveBookBtn.onclick = async () => {
+        const poetId = poetSelect.value;
+        const name = document.getElementById('book_name').value.trim();
+        if (!name) {
+            alert('Book name is required');
+            return;
+        }
+        const data = {
+            poet_id: poetId,
+            name: name,
+            name_urdu: document.getElementById('book_name_urdu').value.trim()
+        };
+        try {
+            const res = await fetch('/add_book', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data)
+            });
+            const result = await res.json();
+            if (result.id) {
+                const option = document.createElement('option');
+                option.value = result.id;
+                option.textContent = result.name_urdu || result.name;
+                bookSelect.appendChild(option);
+                bookSelect.value = result.id;
+                document.getElementById('book_name').value = '';
+                document.getElementById('book_name_urdu').value = '';
+                addBookModal.style.display = 'none';
+                alert('Book added successfully!');
+            } else {
+                alert('Error: ' + (result.error || 'Unknown error'));
+            }
+        } catch (err) {
+            alert('Failed to add book: ' + err.message);
+        }
+    };
+
+    // Form submission spinner
     document.getElementById('addGhazalForm').addEventListener('submit', function() {
         document.getElementById('submitBtn').innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
         document.getElementById('submitBtn').disabled = true;

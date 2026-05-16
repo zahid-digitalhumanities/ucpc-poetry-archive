@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+{% block title %}Word Frequency - Poet Analysis | UCPC Research{% endblock %}
+
+{% block extra_css %}
+<style>
+    .word-card {
+        background: linear-gradient(135deg, #0F2B3D, #1E3C72);
+        border-radius: 1rem;
+        transition: all 0.2s ease;
+        border: 1px solid rgba(212, 175, 55, 0.2);
+        padding: 1rem;
+        margin-bottom: 0.75rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    .word-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        border-color: rgba(212, 175, 55, 0.6);
+    }
+    .word-rank {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #D4AF37;
+        min-width: 3rem;
+        text-align: center;
+    }
+    .word-text {
+        font-family: 'Jameel Noori Nastaleeq', serif;
+        font-size: 1.2rem;
+        color: #F5E7B2;
+        direction: rtl;
+        flex: 2;
+        text-align: right;
+        padding: 0 1rem;
+    }
+    .word-count-bar {
+        background: rgba(255,255,255,0.1);
+        border-radius: 1rem;
+        height: 8px;
+        width: 150px;
+        overflow: hidden;
+    }
+    .word-count-fill {
+        background: #D4AF37;
+        height: 100%;
+        width: 0%;
+        border-radius: 1rem;
+        transition: width 0.5s ease;
+    }
+    .word-count-number {
+        font-size: 0.8rem;
+        color: #D4AF37;
+        font-weight: 600;
+        min-width: 3rem;
+        text-align: right;
+    }
+    .poet-select {
+        background: rgba(255,255,255,0.05);
+        border: 1px solid rgba(212,175,55,0.3);
+        border-radius: 2rem;
+        padding: 0.6rem 1.2rem;
+        color: white;
+        font-size: 0.9rem;
+        transition: 0.2s;
+    }
+    .poet-select:focus {
+        outline: none;
+        border-color: #D4AF37;
+        box-shadow: 0 0 0 2px rgba(212,175,55,0.2);
+    }
+    .btn-gold {
+        background: #D4AF37;
+        color: #1E3C72;
+        font-weight: bold;
+        padding: 0.6rem 1.5rem;
+        border-radius: 2rem;
+        transition: 0.2s;
+        border: none;
+    }
+    .btn-gold:hover {
+        background: #c49f2a;
+        transform: translateY(-2px);
+    }
+    .hero-poet-stats {
+        background: rgba(0,0,0,0.3);
+        border-radius: 2rem;
+        padding: 0.5rem 1rem;
+        display: inline-flex;
+        gap: 1rem;
+        backdrop-filter: blur(4px);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4 max-w-4xl mx-auto">
+    <div class="text-center mb-8">
+        <div class="inline-block p-4 bg-gradient-to-r from-gold/20 to-primary-dark/30 rounded-2xl backdrop-blur-sm">
+            <h1 class="text-3xl md:text-4xl font-bold text-gold mb-2">📖 Most Frequent Words</h1>
+            <p class="text-gray-300">Analyse lexical style of any poet in the UCPC corpus</p>
+        </div>
+    </div>
+
+    <!-- Poet selector form -->
+    <form method="post" class="mb-8 flex flex-col sm:flex-row gap-4 justify-center">
+        <select name="poet" class="poet-select bg-gray-800/50 text-white px-5 py-2 rounded-full" required>
+            <option value="">-- Select a Poet --</option>
+            {% for poet in poets %}
+            <option value="{{ poet.name }}" {% if poet.name == selected_poet %}selected{% endif %}>{{ poet.name_urdu }} ({{ poet.name }})</option>
+            {% endfor %}
+        </select>
+        <button type="submit" class="btn-gold cursor-pointer">
+            <i class="fas fa-chart-line mr-2"></i> Analyze
+        </button>
+    </form>
+
+    {% if top_words %}
+    <div class="text-center mb-6">
+        <div class="hero-poet-stats mx-auto w-fit">
+            <span class="text-gold font-bold">🎤 {{ poet_name_display }}</span>
+            <span class="text-gray-300">| Top 20 words</span>
+        </div>
+    </div>
+
+    <div class="space-y-2">
+        {% for word, count in top_words %}
+        <div class="word-card">
+            <div class="word-rank">#{{ loop.index }}</div>
+            <div class="word-text">{{ word }}</div>
+            <div class="flex items-center gap-3">
+                <div class="word-count-bar">
+                    <div class="word-count-fill" style="width: {{ (count / top_words[0][1] * 100) | round(0) }}%;"></div>
+                </div>
+                <div class="word-count-number">{{ count }}</div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="text-center text-gray-400 text-sm mt-8 pt-4 border-t border-gold/20">
+        Words are extracted from the full Urdu text of ghazals.<br>
+        The frequency bar shows relative frequency compared to the most common word for this poet.
+    </div>
+
+    {% elif selected_poet %}
+    <div class="text-center p-6 bg-red-900/30 rounded-xl border border-red-500/30">
+        <p class="text-red-300">⚠️ No ghazals found for the selected poet. Please check the name or add ghazals first.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

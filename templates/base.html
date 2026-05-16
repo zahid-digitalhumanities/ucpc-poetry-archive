@@ -1,11 +1,21 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <meta name="theme-color" content="#1E3C72">
-    <meta name="csrf-token" content="{{ csrf_token() if csrf_token else '' }}">
     <title>{% block title %}UCPC - Urdu Computational Philology Corpus{% endblock %}</title>
+
+    <!-- Open Graph / Social Media Meta Tags -->
+    <meta property="og:title" content="{% block og_title %}UCPC Poetry Archive{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}A research-grade digital archive of Urdu poetry with bilingual content, advanced search, voice input, and bulk upload.{% endblock %}">
+    <meta property="og:image" content="{% block og_image %}{{ url_for('static', filename='images/og-image.png', _external=True) }}{% endblock %}">
+    <meta property="og:url" content="{{ request.url }}">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ self.og_title() }}">
+    <meta name="twitter:description" content="{{ self.og_description() }}">
+    <meta name="twitter:image" content="{{ self.og_image() }}">
+
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts -->
@@ -30,6 +40,8 @@
             font-family: 'Inter', system-ui, -apple-system, sans-serif;
             background: var(--paper);
             min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
         .urdu-text, .urdu-font {
             font-family: 'Jameel Noori Nastaleeq', 'Noto Nastaliq Urdu', serif;
@@ -45,10 +57,14 @@
             border-radius: 32px;
             overflow: hidden;
             box-shadow: 0 30px 60px rgba(0,0,0,0.08);
+            display: flex;
+            flex-direction: column;
+            flex: 1;
         }
         .main-content {
             padding: 60px 80px;
             background: white;
+            flex: 1;
         }
         /* Reading Mode Override */
         body.reading-mode .navbar,
@@ -76,12 +92,96 @@
         ::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
         ::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+
+        /* Marquee styles */
+        .nav-marquee {
+            background: #1e293b;
+            border-bottom: 1px solid rgba(212,175,55,0.5);
+            border-top: 1px solid rgba(212,175,55,0.5);
+            overflow: hidden;
+            white-space: nowrap;
+            padding: 10px 0;
+            position: relative;
+            z-index: 10;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        .marquee-content {
+            display: inline-block;
+            animation: marquee 45s linear infinite;
+            font-size: 0.9rem;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+        }
+        .marquee-content a {
+            color: #F5E7B2;
+            text-decoration: none;
+            transition: all 0.2s;
+            margin: 0 4px;
+        }
+        .marquee-content a:hover {
+            color: #D4AF37;
+            text-decoration: underline;
+        }
+        .marquee-content span {
+            color: #e2e8f0;
+            padding-right: 2rem;
+        }
+        @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+        @media (max-width: 768px) {
+            .marquee-content { animation-duration: 60s; font-size: 0.8rem; }
+        }
+
+        .btn-gold {
+            background: linear-gradient(135deg, #D4AF37, #B8960C);
+            color: #1E3C72;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+        .btn-gold:hover {
+            background: linear-gradient(135deg, #E5C158, #C9A32D);
+            transform: scale(1.02);
+        }
+        .text-gold {
+            color: #D4AF37;
+        }
+        .bg-gold {
+            background-color: #D4AF37;
+        }
+        .from-primary-dark {
+            --tw-gradient-from: #0F2B3D;
+        }
+        .to-primary {
+            --tw-gradient-to: #1E3C72;
+        }
     </style>
     {% block extra_css %}{% endblock %}
 </head>
 <body>
     <div class="app-wrapper">
         {% include 'header.html' %}
+
+        <div class="nav-marquee">
+            <div class="marquee-content">
+                <span>
+                    <a href="/poets">📜 Poets: Click to view a complete list of poets. Select your favorite poet to read their Ghazals. Explore Poets →</a> &nbsp;|&nbsp;
+                    <a href="/ghazals/add">📖 Add: Click to submit your own Ghazal and share it with the community. Contribute →</a> &nbsp;|&nbsp;
+                    <a href="/search">🔍 Search: Search by voice or type any keyword to find specific poems. Search Now →</a> &nbsp;|&nbsp;
+                    <a href="/bulk">📤 Bulk: Use this option to upload or write multiple Ghazals at once. Bulk Upload →</a> &nbsp;|&nbsp;
+                    ✨ Special Thanks to Mr. Muhammad Riaz (OSI SPU), Punjab Police, Lahore, for his invaluable inspiration and guidance. ✨
+                </span>
+                <span>
+                    <a href="/poets">📜 Poets: Click to view a complete list of poets. Select your favorite poet to read their Ghazals. Explore Poets →</a> &nbsp;|&nbsp;
+                    <a href="/ghazals/add">📖 Add: Click to submit your own Ghazal and share it with the community. Contribute →</a> &nbsp;|&nbsp;
+                    <a href="/search">🔍 Search: Search by voice or type any keyword to find specific poems. Search Now →</a> &nbsp;|&nbsp;
+                    <a href="/bulk">📤 Bulk: Use this option to upload or write multiple Ghazals at once. Bulk Upload →</a> &nbsp;|&nbsp;
+                    ✨ Special Thanks to Dr. Muhammad Riaz (Establishment SPU Punjab Lahore, for his invaluable inspiration and guidance. ✨
+                </span>
+            </div>
+        </div>
+
         {% include 'navbar.html' %}
 
         <!-- Flash Messages -->
@@ -110,20 +210,118 @@
         {% include 'footer.html' %}
     </div>
 
-    <!-- Pass request endpoint to JavaScript for safety -->
-    <script>
-        window.requestEndpoint = {{ request.endpoint|tojson|default('null') }};
-        // Reading mode toggle functionality
-        function toggleReadingMode() {
-            document.body.classList.toggle('reading-mode');
-            localStorage.setItem('readingMode', document.body.classList.contains('reading-mode'));
-        }
-        // Load reading mode preference
-        if (localStorage.getItem('readingMode') === 'true') {
-            document.body.classList.add('reading-mode');
-        }
-    </script>
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+
+    <!-- ML Poet Prediction Script -->
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const predictBtn = document.getElementById('predictPoetBtn');
+        if (!predictBtn) return;
+
+        predictBtn.addEventListener('click', async function(e) {
+            e.preventDefault();
+            
+            const match = window.location.pathname.match(/\/ghazals\/view\/(\d+)/);
+            if (!match) {
+                alert("Please open a ghazal page first.");
+                return;
+            }
+            const ghazalId = match[1];
+            
+            const loadingHtml = `<div class="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+                <div class="bg-gradient-to-br from-primary-dark to-primary p-6 rounded-2xl max-w-md w-full text-center text-white">
+                    <i class="fas fa-spinner fa-pulse fa-2x text-gold"></i>
+                    <p class="mt-4">Analyzing ghazal style...</p>
+                </div>
+            </div>`;
+            document.body.insertAdjacentHTML('beforeend', loadingHtml);
+            const modalDiv = document.body.lastElementChild;
+            
+            try {
+                const res = await fetch(`/api/predict-poet/${ghazalId}`);
+                if (!res.ok) throw new Error('Prediction failed');
+                const data = await res.json();
+                
+                modalDiv.remove();
+                
+                if (!data.length) {
+                    alert("No prediction available for this ghazal.");
+                    return;
+                }
+                
+                let html = `<div class="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+                    <div class="bg-gradient-to-br from-primary-dark to-primary p-6 rounded-2xl max-w-md w-full shadow-2xl">
+                        <h3 class="text-xl font-bold text-gold mb-4 flex items-center gap-2">
+                            <i class="fas fa-robot"></i> ML Poet Prediction
+                        </h3>`;
+                data.forEach(p => {
+                    let barColor = '';
+                    if (p.probability >= 0.7) barColor = 'bg-green-500';
+                    else if (p.probability >= 0.4) barColor = 'bg-yellow-500';
+                    else barColor = 'bg-red-500';
+                    
+                    // Build features string safely
+                    let featuresHtml = '';
+                    if (p.features && p.features.length > 0) {
+                        featuresHtml = '<ul class="list-disc list-inside space-y-1">';
+                        p.features.forEach(f => {
+                            featuresHtml += `<li>${escapeHtml(f.name)}: ${(f.importance * 100).toFixed(1)}%</li>`;
+                        });
+                        featuresHtml += '</ul>';
+                    } else {
+                        featuresHtml = '<em class="text-gray-400">Feature importance data not available</em>';
+                    }
+                    
+                    html += `<div class="mb-4 border-b border-gray-700 pb-3 last:border-0">
+                        <div class="flex justify-between items-center">
+                            <div class="font-semibold text-white text-lg">${escapeHtml(p.name_urdu || p.name)}</div>
+                            <button onclick="toggleFeatures(this)" class="text-xs text-gold hover:text-white focus:outline-none">
+                                <i class="fas fa-question-circle"></i> Why?
+                            </button>
+                        </div>
+                        <div class="text-gold text-sm">Confidence: ${(p.probability*100).toFixed(1)}%</div>
+                        <div class="w-full bg-gray-700 rounded-full h-2 mt-1">
+                            <div class="${barColor} h-2 rounded-full transition-all duration-500" style="width: ${p.probability*100}%"></div>
+                        </div>
+                        <div class="features-explanation hidden mt-2 text-xs text-gray-300 bg-gray-800/50 p-2 rounded">
+                            <strong>Key features:</strong><br>
+                            ${featuresHtml}
+                        </div>
+                    </div>`;
+                });
+                html += `<button onclick="this.closest('.fixed').remove()" class="mt-4 w-full btn-gold px-4 py-2 rounded-full font-semibold">
+                            Close
+                        </button>
+                    </div>
+                </div>`;
+                document.body.insertAdjacentHTML('beforeend', html);
+            } catch (err) {
+                modalDiv.remove();
+                alert("Could not predict poet. Please try again later.");
+                console.error(err);
+            }
+        });
+        
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
+        }
+
+        window.toggleFeatures = function(btn) {
+            const parent = btn.closest('.mb-4');
+            const explanation = parent.querySelector('.features-explanation');
+            if (explanation) {
+                explanation.classList.toggle('hidden');
+            }
+        };
+    });
+    </script>
+
     {% block extra_js %}{% endblock %}
 </body>
 </html>
