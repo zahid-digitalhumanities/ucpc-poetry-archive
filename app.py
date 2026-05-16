@@ -1,7 +1,3 @@
-# ==================== EMERGENCY STARTUP - MUST BE FIRST ====================
-import startup  # MUST BE FIRST LINE - disables heavy models
-# ==========================================================================
-
 from flask import Flask, redirect, url_for, render_template, request, jsonify, abort, send_from_directory, send_file, make_response
 from modules.image_generator import generate_ghazal_card
 import os
