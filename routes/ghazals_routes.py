@@ -1,164 +1,131 @@
-﻿# routes/ghazals_routes.py
-import hashlib
-from flask import Blueprint, render_template, request, redirect, url_for, flash, session, jsonify
-from markupsafe import Markup
+from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, abort
 from models.ghazal_model import (
-    get_stats, get_all_poets, get_books_by_poet, check_duplicate_ghazal,
-    get_or_create_contributor, insert_ghazal, insert_verse,
-    get_ghazal_with_verses, get_navigation
+    get_all_poets, get_books_by_poet,
+    insert_ghazal, insert_verse,
+    check_duplicate_ghazal, get_poet_by_id,
+    get_ghazal_with_verses, get_navigation,
+    get_or_create_contributor
 )
-from modules.analysis import split_verses
-from modules.ai_tools import translate_urdu_to_english
+from models.poets_model import fetch_poet_by_id
+from models.bulk_model import analyze_ghazal   # NLP analysis
+from models.base import get_db_connection
+from modules.embeddings import update_ghazal_embedding   # 🔥 NEW: embedding generation
+import hashlib
+import re
 
 ghazals_bp = Blueprint('ghazals', __name__, url_prefix='/ghazals')
 
-def clean_translation(text: str) -> str:
-    if not text:
-        return ""
-    text = text.strip()
-    text = text.replace(" is of", "")
-    text = text.replace(" of is", "")
-    text = text.replace("  ", " ")
-    if len(text) > 1:
-        text = text[0].upper() + text[1:]
-    return text
-
 @ghazals_bp.route('/add', methods=['GET', 'POST'])
 def add_ghazal():
-    stats = get_stats()
-    poets = get_all_poets()
-    books = []
-    selected_poet_id = None
-    selected_book_id = None
-    form_data = {}
-
     if request.method == 'POST':
-        poet_id = request.form.get('poet_id')
-        book_id = request.form.get('book_id') or None
+        poet_id = request.form.get('poet_id', type=int)
+        book_id = request.form.get('book_id', type=int) or None
+        ghazal_text = request.form.get('ghazal_text', '').strip()
         contributor_name = request.form.get('contributor_name', '').strip()
         contributor_email = request.form.get('contributor_email', '').strip()
-        ghazal_text = request.form.get('ghazal_text', '').strip()
 
-        form_data = {
-            'ghazal_text': ghazal_text,
-            'contributor_name': contributor_name,
-            'contributor_email': contributor_email,
-        }
-        selected_poet_id = poet_id
-        selected_book_id = book_id
+        if not poet_id or not ghazal_text:
+            flash('Poet and Ghazal text are required.', 'error')
+            return redirect(url_for('ghazals.add_ghazal'))
 
-        if not poet_id:
-            flash('❌ Please select a poet.', 'error')
-            return render_template('add_ghazal.html', stats=stats, poets=poets,
-                                   books=books, selected_poet_id=selected_poet_id,
-                                   selected_book_id=selected_book_id, form_data=form_data)
-
-        if not ghazal_text:
-            flash('❌ Please enter ghazal text.', 'error')
-            return render_template('add_ghazal.html', stats=stats, poets=poets,
-                                   books=books, selected_poet_id=selected_poet_id,
-                                   selected_book_id=selected_book_id, form_data=form_data)
-
+        # Compute content hash for duplicate detection
         content_hash = hashlib.sha256(ghazal_text.encode('utf-8')).hexdigest()
+
+        # Check for duplicate
         is_dup, existing = check_duplicate_ghazal(content_hash)
         if is_dup:
-            flash('⚠️ This ghazal already exists!', 'warning')
-            return render_template('add_ghazal.html', stats=stats, poets=poets,
-                                   books=books, selected_poet_id=selected_poet_id,
-                                   selected_book_id=selected_book_id, form_data=form_data,
-                                   duplicate_found=True, existing_ghazal=existing)
+            poet = fetch_poet_by_id(existing['poet_id'])
+            existing['poet_name'] = poet['name'] if poet else 'Unknown'
+            existing['poet_name_urdu'] = poet['name_urdu'] if poet else ''
+            return render_template('add_ghazal.html',
+                                 poets=get_all_poets(),
+                                 duplicate_found=True,
+                                 existing_ghazal=existing,
+                                 form_data=request.form)
 
-        verses = split_verses(ghazal_text)
-        if not verses:
-            flash('❌ Could not parse verses. Please check format (each couplet on two lines).', 'error')
-            return render_template('add_ghazal.html', stats=stats, poets=poets,
-                                   books=books, selected_poet_id=selected_poet_id,
-                                   selected_book_id=selected_book_id, form_data=form_data)
+        # Normalize line endings
+        ghazal_text = ghazal_text.replace('\r\n', '\n')
+        # Split into couplets (separated by blank lines)
+        couplets = re.split(r'\n\s*\n', ghazal_text)
+        if len(couplets) == 1 and '\n' in ghazal_text:
+            lines = ghazal_text.split('\n')
+            couplets = []
+            for i in range(0, len(lines), 2):
+                if i+1 < len(lines):
+                    couplets.append(f"{lines[i]}\n{lines[i+1]}")
+                else:
+                    couplets.append(lines[i])
+        verse_count = len(couplets)
 
-        title_urdu = verses[0][0] if verses else ghazal_text[:100]
-        title_english_raw = translate_urdu_to_english(title_urdu)
-        title_english = clean_translation(title_english_raw)
+        # First line of first couplet becomes Urdu title
+        first_couplet = couplets[0].split('\n')
+        title_urdu = first_couplet[0][:100] if first_couplet else ''
+        title_english = ''  # optional, can be auto‑translated later
 
-        translated_verses = []
-        text_english_parts = []
-        for (m1, m2) in verses:
-            m1_en_raw = translate_urdu_to_english(m1)
-            m2_en_raw = translate_urdu_to_english(m2) if m2 else ''
-            m1_en = clean_translation(m1_en_raw)
-            m2_en = clean_translation(m2_en_raw) if m2 else ''
-            if len(m1_en.split()) <= 2:
-                m1_en = "[Translation unavailable]"
-            if m2 and len(m2_en.split()) <= 2:
-                m2_en = "[Translation unavailable]"
-            translated_verses.append((m1_en, m2_en))
-            text_english_parts.append(f"{m1_en}\n{m2_en}" if m2_en else m1_en)
-
-        text_english = '\n\n'.join(text_english_parts)
-
+        # Get or create contributor (if name provided)
         contributor_id = None
         if contributor_name:
             contributor_id = get_or_create_contributor(contributor_name, contributor_email)
 
-        try:
-            text_id = insert_ghazal(
-                poet_id=poet_id,
-                book_id=book_id,                     # ✅ book_id passed
-                contributor_id=contributor_id,
-                title_urdu=title_urdu,
-                title_english=title_english,
-                text_urdu=ghazal_text,
-                text_english=text_english,
-                content_hash=content_hash,
-                verse_count=len(verses)
-            )
+        # Insert ghazal into `texts` table
+        text_id = insert_ghazal(
+            poet_id=poet_id,
+            book_id=book_id,
+            contributor_id=contributor_id,
+            title_urdu=title_urdu,
+            title_english=title_english,
+            text_urdu=ghazal_text,
+            text_english='',
+            content_hash=content_hash,
+            verse_count=verse_count
+        )
 
-            for idx, ((m1, m2), (m1_en, m2_en)) in enumerate(zip(verses, translated_verses), 1):
-                insert_verse(text_id, idx, m1, m2, m1_en, m2_en)
+        # Insert each verse into `verses` table
+        for idx, couplet in enumerate(couplets, start=1):
+            lines = couplet.strip().split('\n')
+            misra1 = lines[0] if len(lines) > 0 else ''
+            misra2 = lines[1] if len(lines) > 1 else ''
+            insert_verse(text_id, idx, misra1, misra2, '', '')
 
-            flash(f'✨ Thank you {contributor_name or "contributor"}! Your ghazal has been added.', 'success')
-            flash(Markup(f'📖 <a href="{url_for("ghazals.view_ghazal", text_id=text_id)}" class="underline">Click here to view your ghazal</a>'), 'success')
-            return redirect(url_for('ghazals.view_ghazal', text_id=text_id))
+        # 🔥 NLP analysis (radif, qaafiya, meter, etc.)
+        conn = get_db_connection()
+        analyze_ghazal(conn, text_id)
+        conn.close()
 
-        except Exception as e:
-            flash(f'❌ Error saving ghazal: {str(e)}', 'error')
-            return render_template('add_ghazal.html', stats=stats, poets=poets,
-                                   books=books, selected_poet_id=selected_poet_id,
-                                   selected_book_id=selected_book_id, form_data=form_data)
+        # 🔥 Generate embedding for semantic similarity
+        update_ghazal_embedding(text_id)
 
-    # GET request
-    selected_poet_id = request.args.get('poet_id')
-    if selected_poet_id:
-        books = get_books_by_poet(selected_poet_id)
+        flash('Ghazal added successfully!', 'success')
+        return redirect(url_for('ghazals.view_ghazal', text_id=text_id))
 
-    return render_template('add_ghazal.html', stats=stats, poets=poets,
-                           books=books, selected_poet_id=selected_poet_id,
-                           selected_book_id=None, form_data=None)
+    # GET request – show empty form
+    poets = get_all_poets()
+    return render_template('add_ghazal.html', poets=poets, duplicate_found=False)
 
 @ghazals_bp.route('/books/<int:poet_id>')
 def get_books(poet_id):
+    """Return JSON list of books for a poet (used by AJAX)."""
     books = get_books_by_poet(poet_id)
     return jsonify({'books': books})
 
 @ghazals_bp.route('/view/<int:text_id>')
 def view_ghazal(text_id):
-    stats = get_stats()
-    ghazal, verses = get_ghazal_with_verses(text_id)
+    """Display a ghazal with all its couplets (Urdu only)."""
+    result = get_ghazal_with_verses(text_id)
+    if not result:
+        abort(404)
+    if isinstance(result, tuple):
+        ghazal, verses = result
+    else:
+        ghazal = result.get('ghazal')
+        verses = result.get('verses')
     if not ghazal:
-        flash('Ghazal not found', 'error')
-        return redirect(url_for('main.index'))
-    mode = session.get('view_mode', 'bilingual')
+        abort(404)
+
     prev_id, next_id, total = get_navigation(text_id, ghazal['poet_id'])
     return render_template('view.html',
-                           ghazal=ghazal,
-                           verses=verses,
-                           prev_id=prev_id,
-                           next_id=next_id,
-                           total_in_poet=total,
-                           stats=stats,
-                           mode=mode)
-
-@ghazals_bp.route('/set_mode/<mode>')
-def set_mode(mode):
-    if mode in ['bilingual', 'urdu', 'english']:
-        session['view_mode'] = mode
-    return redirect(request.referrer or url_for('main.index'))
+                         ghazal=ghazal,
+                         verses=verses,
+                         prev_id=prev_id,
+                         next_id=next_id,
+                         total=total)
