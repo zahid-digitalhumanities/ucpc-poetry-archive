@@ -1,3 +1,7 @@
+# ==================== EMERGENCY STARTUP - MUST BE FIRST ====================
+import startup  # MUST BE FIRST LINE - disables heavy models
+# ==========================================================================
+
 from flask import Flask, redirect, url_for, render_template, request, jsonify, abort, send_from_directory, send_file, make_response
 from modules.image_generator import generate_ghazal_card
 import os
@@ -7,59 +11,109 @@ import uuid
 import hashlib
 import io
 import re
+import sys
 
-# Blueprints
+# ==================== SAFE BLUEPRINT IMPORTS ====================
+# Only import blueprints that work on free tier
 from routes.main_routes import main_bp
 from routes.poets_routes import poets_bp
 from routes.ghazals_routes import ghazals_bp
 from routes.search_routes import search_bp
-from routes.bulk_routes import bulk_bp
-from routes.listen_routes import listen_bp
-from routes.similarity_route import similarity_bp
-from routes.fingerprint import fingerprint_bp
-from routes.insights_routes import insights_bp
-from routes.poet_prediction import poet_bp
 
-# Models
-from models.stats_model import get_stats
-from models.ghazal_model import get_ghazal_with_verses
+# DISABLED for free tier (heavy or problematic):
+# from routes.bulk_routes import bulk_bp           # DISABLED - may have heavy NLP
+# from routes.listen_routes import listen_bp       # DISABLED - audio processing
+from routes.similarity_route import similarity_bp   # KEEP - we fixed this
+# from routes.fingerprint import fingerprint_bp     # DISABLED - unknown
+# from routes.insights_routes import insights_bp   # DISABLED - may have ML
+# from routes.poet_prediction import poet_bp       # DISABLED - use lite predictor instead
 
 # ==================== CONFIG ====================
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 GENERATED_FOLDER = os.path.join(BASE_DIR, 'static', 'generated')
 os.makedirs(GENERATED_FOLDER, exist_ok=True)
 
-# ==================== DATABASE ====================
+# ==================== DATABASE (FIXED FOR RENDER) ====================
 def get_db_connection():
+    """Get database connection using Render's DATABASE_URL with SSL."""
     import psycopg2
-    return psycopg2.connect(
-        host=os.getenv('DB_HOST', 'localhost'),
-        database=os.getenv('DB_NAME', 'ucpc_v3_db'),
-        user=os.getenv('DB_USER', 'postgres'),
-        password=os.getenv('DB_PASSWORD', '')
-    )
+    from psycopg2.extras import RealDictCursor
+    
+    database_url = os.getenv('DATABASE_URL')
+    
+    if database_url:
+        # Ensure SSL mode is required for Render
+        if 'sslmode' not in database_url:
+            if '?' in database_url:
+                database_url += '&sslmode=require'
+            else:
+                database_url += '?sslmode=require'
+        return psycopg2.connect(database_url, cursor_factory=RealDictCursor)
+    else:
+        # Fallback for local development
+        return psycopg2.connect(
+            host=os.getenv('DB_HOST', 'localhost'),
+            database=os.getenv('DB_NAME', 'ucpc_v3_db'),
+            user=os.getenv('DB_USER', 'postgres'),
+            password=os.getenv('DB_PASSWORD', ''),
+            port=os.getenv('DB_PORT', '5432'),
+            cursor_factory=RealDictCursor
+        )
 
 # ==================== APP FACTORY ====================
 def create_app():
     app = Flask(__name__)
-    app.secret_key = os.getenv('SECRET_KEY', 'dev-secret-key')
+    app.secret_key = os.getenv('SECRET_KEY', 'ucpc-free-tier-secret-key')
     app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024   # 50 MB
     app.config['GENERATED_FOLDER'] = GENERATED_FOLDER
+    app.config['JSON_AS_ASCII'] = False  # Support Urdu text
 
-    # Register Blueprints
+    # Register Blueprints (only safe ones)
     app.register_blueprint(main_bp)
     app.register_blueprint(poets_bp)
     app.register_blueprint(ghazals_bp)
     app.register_blueprint(search_bp)
-    app.register_blueprint(bulk_bp)
-    app.register_blueprint(listen_bp)
-    app.register_blueprint(similarity_bp)
-    app.register_blueprint(fingerprint_bp)
-    app.register_blueprint(insights_bp)
-    app.register_blueprint(poet_bp)
+    # app.register_blueprint(bulk_bp)        # DISABLED
+    # app.register_blueprint(listen_bp)      # DISABLED
+    app.register_blueprint(similarity_bp)     # KEPT - fixed version
+    # app.register_blueprint(fingerprint_bp)  # DISABLED
+    # app.register_blueprint(insights_bp)    # DISABLED
+    # app.register_blueprint(poet_bp)        # DISABLED - use /ask-index instead
 
+    print("✅ Blueprints registered (free tier optimized)")
+    print("   - / (main)")
+    print("   - /poets")
+    print("   - /ghazals")
+    print("   - /search")
+    print("   - /similarity")
 
-    print("✅ Blueprints registered")
+    # ========== HEALTH CHECK ENDPOINT (CRITICAL FOR RENDER) ==========
+    @app.route('/health')
+    def health_check():
+        db_status = "unknown"
+        try:
+            conn = get_db_connection()
+            cur = conn.cursor()
+            cur.execute("SELECT 1")
+            cur.close()
+            conn.close()
+            db_status = "connected"
+        except Exception as e:
+            db_status = f"error: {str(e)[:50]}"
+        
+        return jsonify({
+            "status": "ok",
+            "project": "UCPC Poetry Archive",
+            "version": "3.0-free-tier",
+            "database": db_status,
+            "memory_safe": True,
+            "heavy_models": "disabled"
+        })
+
+    # ========== SIMPLE ROOT ROUTE ==========
+    @app.route('/')
+    def home():
+        return "UCPC Poetry Archive is running. Visit /health for status."
 
     # ---------- AFTER REQUEST (allow Facebook bot & skip ngrok warning) ----------
     @app.after_request
@@ -80,11 +134,15 @@ def create_app():
     # ---------- Debug ----------
     @app.route('/check')
     def check():
-        return "OK WORKING"
+        return "✅ UCPC Poetry Archive is running!"
 
     @app.route('/routes')
     def show_routes():
-        return "<br>".join([str(rule) for rule in app.url_map.iter_rules()])
+        routes = []
+        for rule in app.url_map.iter_rules():
+            if not rule.endpoint.startswith('static'):
+                routes.append(f"{rule.endpoint}: {rule}")
+        return "<br>".join(sorted(routes[:50]))
 
     # ---------- Client-side canvas upload ----------
     @app.route('/upload_image', methods=['POST'])
@@ -110,6 +168,7 @@ def create_app():
             dedicator = request.args.get('dedicator', '')
             dedicatee = request.args.get('dedicatee', '')
 
+            from models.ghazal_model import get_ghazal_with_verses
             result = get_ghazal_with_verses(text_id)
             if not result:
                 return jsonify({'error': 'Ghazal not found'}), 404
@@ -119,10 +178,6 @@ def create_app():
             else:
                 ghazal = result.get('ghazal')
                 verses = result.get('verses')
-
-            print(f"Verses count: {len(verses)}")
-            if verses:
-                print(f"First verse keys: {verses[0].keys()}")
 
             img = generate_ghazal_card(ghazal, verses, dedicator, dedicatee)
 
@@ -152,6 +207,7 @@ def create_app():
     # ---------- Direct OG image (no file save) ----------
     @app.route('/og-image/<int:text_id>')
     def og_image(text_id):
+        from models.ghazal_model import get_ghazal_with_verses
         result = get_ghazal_with_verses(text_id)
         if not result:
             abort(404)
@@ -179,6 +235,7 @@ def create_app():
         dedicator = request.args.get('dedicator', '')
         dedicatee = request.args.get('dedicatee', '')
 
+        from models.ghazal_model import get_ghazal_with_verses
         result = get_ghazal_with_verses(text_id)
         if not result:
             return "Ghazal not found", 404
@@ -208,13 +265,14 @@ def create_app():
         text += "📖 UCPC Poetry Archive"
         return text
 
-    # ---------- Global stats ----------
+    # ---------- Global stats (safe version) ----------
     @app.context_processor
     def inject_stats():
         try:
+            from models.stats_model import get_stats
             return dict(stats=get_stats())
         except Exception as e:
-            print("⚠️ Stats error:", str(e))
+            print(f"⚠️ Stats error: {e}")
             return dict(stats=None)
 
     # ---------- Template filter for enumerate ----------
@@ -222,26 +280,30 @@ def create_app():
     def jinja_enumerate(iterable, start=1):
         return enumerate(iterable, start)
 
-    # ---------- Poet Prediction API ----------
+    # ---------- Poet Prediction API (DISABLED - use /ask-index instead) ----------
     @app.route('/api/predict-poet/<int:text_id>')
     def api_predict_poet(text_id):
-        from modules.poet_classifier import predict_poet_by_id
-        results = predict_poet_by_id(text_id)
-        return jsonify(results)
+        return jsonify({
+            'success': False,
+            'error': 'Poet prediction API disabled on free tier',
+            'alternative': 'Use /ask-index/ endpoint'
+        }), 503
 
     # ---------- Random Ghazal API ----------
     @app.route('/api/random-ghazal')
     def random_ghazal():
-        from models.base import get_db_connection
-        conn = get_db_connection()
-        cur = conn.cursor()
-        cur.execute("SELECT id FROM texts ORDER BY RANDOM() LIMIT 1")
-        row = cur.fetchone()
-        cur.close()
-        conn.close()
-        if row:
-            return jsonify({'id': row['id']})
-        return jsonify({'error': 'No ghazals found'}), 404
+        try:
+            conn = get_db_connection()
+            cur = conn.cursor()
+            cur.execute("SELECT id FROM texts WHERE form = 'ghazal' AND (is_deleted = FALSE OR is_deleted IS NULL) ORDER BY RANDOM() LIMIT 1")
+            row = cur.fetchone()
+            cur.close()
+            conn.close()
+            if row:
+                return jsonify({'id': row['id']})
+            return jsonify({'error': 'No ghazals found'}), 404
+        except Exception as e:
+            return jsonify({'error': str(e)}), 500
 
     # ---------- Error handlers ----------
     @app.errorhandler(404)
@@ -250,12 +312,20 @@ def create_app():
 
     @app.errorhandler(500)
     def internal_server_error(e):
-        return render_template('500.html'), 500
+        return jsonify({
+            "error": "Internal server error",
+            "message": str(e),
+            "timestamp": time.strftime("%Y-%m-%d %H:%M:%S")
+        }), 500
 
     return app
 
+
+# ==================== CREATE APP INSTANCE ====================
 app = create_app()
 
+# ==================== RUN (Local Development Only) ====================
 if __name__ == '__main__':
     port = int(os.getenv('PORT', 10000))
-    app.run(host='0.0.0.0', port=port, debug=False)
+    print(f"🔥 Starting UCPC in development mode on port {port}")
+    app.run(host='0.0.0.0', port=port, debug=True, threaded=True)
