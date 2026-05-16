@@ -1,31 +1,376 @@
-﻿/* static/css/style.css */
+/* ==================== BASE STYLES ==================== */
+:root {
+    --primary-dark: #0F2B3D;
+    --primary: #1E3C72;
+    --gold: #D4AF37;
+    --gold-light: #F5E7B2;
+    --dark-bg: #0a1a2a;
+}
+
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
-.urdu-text {
+body {
+    background: var(--dark-bg);
+    font-family: 'Poppins', 'Segoe UI', sans-serif;
+    color: #fff;
+    line-height: 1.5;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* ==================== TYPOGRAPHY ==================== */
+.urdu-text, .urdu-couplet, .urdu-title, .poet-name-urdu {
     font-family: 'Jameel Noori Nastaleeq', 'Noto Nastaliq Urdu', serif;
     direction: rtl;
-    text-align: right;
 }
 
-.btn {
-    padding: 10px 24px;
-    border: none;
-    border-radius: 50px;
-    cursor: pointer;
-    font-weight: 600;
-    transition: all 0.3s;
+.text-gold {
+    color: var(--gold);
 }
 
-.btn-primary {
-    background: linear-gradient(135deg, #1e3c72, #2c5a8c);
+/* ==================== GHAZAL CARD (as requested) ==================== */
+.ghazal-card {
+    max-width: 650px;
+    margin: 20px auto;
+    padding: 20px;
+    background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+    border-radius: 1.5rem;
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    color: #fff;
+}
+
+.urdu-title {
+    text-align: center;
+    font-size: 28px;
+    margin-bottom: 20px;
+    font-family: 'Jameel Noori Nastaleeq', serif;
+    direction: rtl;
+    color: var(--gold);
+}
+
+.verse-item {
+    margin-bottom: 18px;
+}
+
+.urdu-couplet {
+    text-align: center;
+    direction: rtl;
+    font-size: 22px;
+    line-height: 1.8;
+    font-family: 'Jameel Noori Nastaleeq', serif;
+    color: #ffffff;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.8rem;
+    border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+}
+
+.misra {
+    display: block;
+}
+
+.english-couplet {
+    text-align: left;
+    font-size: 14px;
+    color: #ccc;
+    margin-top: 5px;
+}
+
+.share-box {
+    text-align: center;
+    margin-top: 20px;
+}
+
+/* ==================== HERO SECTION ==================== */
+.ghazal-hero {
+    background: transparent;
+    padding: 1.5rem 1rem 0.5rem;
+    text-align: center;
+}
+
+.poet-name-en {
+    font-size: 1.8rem;
+    letter-spacing: 3px;
+    color: var(--gold);
+    text-transform: uppercase;
+    font-weight: 700;
+    font-family: 'Georgia', serif;
+}
+
+.hero-metadata {
+    font-size: 0.8rem;
+    color: var(--gold);
+    margin-top: 0.25rem;
+    opacity: 0.8;
+}
+
+/* ==================== DEDICATION FORM ==================== */
+.dedication-form {
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 2rem;
+    padding: 0.8rem 1rem;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.8rem;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(212, 175, 55, 0.3);
+}
+
+.dedication-form input {
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--gold);
+    border-radius: 2rem;
+    font-size: 0.9rem;
+    width: 180px;
+    background: rgba(0, 0, 0, 0.5);
     color: white;
 }
 
-.btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(30,60,114,0.3);
+.dedication-form input::placeholder {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.dedication-form button {
+    background: var(--gold);
+    border: none;
+    padding: 0.5rem 1.2rem;
+    border-radius: 2rem;
+    font-weight: bold;
+    cursor: pointer;
+    color: #1e3c72;
+}
+
+.dedication-form button:hover {
+    background: #c49f2a;
+}
+
+.dedication-display {
+    text-align: center;
+    font-family: 'Georgia', serif;
+    font-size: 1rem;
+    color: var(--gold);
+    margin-top: 0.5rem;
+    padding: 0.5rem;
+    background: rgba(212, 175, 55, 0.15);
+    border-radius: 2rem;
+    font-style: italic;
+}
+
+/* ==================== WATERMARK ==================== */
+.watermark {
+    text-align: center;
+    font-size: 0.7rem;
+    color: rgba(212, 175, 55, 0.6);
+    margin-top: 1rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid rgba(212, 175, 55, 0.2);
+    font-family: 'Georgia', serif;
+}
+
+/* ==================== SOCIAL SHARE BUTTONS ==================== */
+.share-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 0.8rem;
+    margin-top: 1rem;
+    flex-wrap: wrap;
+}
+
+.share-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.4rem 1rem;
+    border-radius: 2rem;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.85rem;
+    transition: 0.2s;
+    color: white;
+}
+
+.share-btn i { font-size: 1rem; }
+.share-btn-facebook { background: #1877f2; }
+.share-btn-twitter { background: #000000; }
+.share-btn-linkedin { background: #0077b5; }
+.share-btn-whatsapp { background: #25d366; }
+.share-btn:hover { transform: translateY(-2px); filter: brightness(1.05); }
+
+/* ==================== NAVIGATION BUTTONS ==================== */
+.nav-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin: 2rem 0;
+    flex-wrap: wrap;
+}
+
+.nav-btn {
+    padding: 0.6rem 1.5rem;
+    border-radius: 2rem;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.nav-btn-prev, .nav-btn-next {
+    background: var(--gold);
+    color: #1e3c72;
+}
+
+.nav-btn-all {
+    background: rgba(255, 255, 255, 0.15);
+    color: var(--gold);
+    border: 1px solid var(--gold);
+}
+
+/* ==================== POETS GRID ==================== */
+.poet-card {
+    background: white;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    border: 1px solid rgba(212,175,55,0.2);
+    border-radius: 1rem;
+}
+
+.poet-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 20px 35px rgba(0,0,0,0.1);
+}
+
+.poet-image {
+    height: 220px;
+    background: #f3f4f6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.poet-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.poet-name {
+    font-weight: 700;
+    font-size: 1.25rem;
+    color: #1e3c72;
+    text-align: center;
+    padding: 0.75rem 1rem 0;
+}
+
+.poet-name-urdu {
+    font-family: 'Jameel Noori Nastaleeq', serif;
+    font-size: 1.1rem;
+    color: #8b5a2b;
+    text-align: center;
+    margin-top: -0.25rem;
+    margin-bottom: 0.5rem;
+}
+
+.poet-couplet {
+    font-family: 'Jameel Noori Nastaleeq', serif;
+    font-size: 0.95rem;
+    line-height: 1.8;
+    text-align: center;
+    direction: rtl;
+    padding: 0 1rem 1.25rem;
+    color: #4b5563;
+    border-top: 1px solid #f0e6d2;
+    margin-top: 0.5rem;
+    min-height: 80px;
+}
+
+/* ==================== RECENT GHAZALS ==================== */
+.ghazal-mini-card {
+    background: white;
+    border-radius: 1rem;
+    padding: 1rem;
+    margin-bottom: 0.5rem;
+    border: 1px solid #e5e7eb;
+    transition: 0.2s;
+}
+
+.ghazal-mini-card:hover {
+    background: #fef9e6;
+}
+
+/* ==================== FEATURE CARDS ==================== */
+.feature-card {
+    background: #f9fafb;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    text-align: center;
+    transition: 0.2s;
+}
+
+.feature-icon {
+    font-size: 2rem;
+    color: var(--gold);
+    margin-bottom: 0.75rem;
+}
+
+.feature-title {
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+
+.feature-desc {
+    font-size: 0.85rem;
+    color: #6b7280;
+    margin-bottom: 1rem;
+}
+
+.feature-btn {
+    background: #1e3c72;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 2rem;
+    text-decoration: none;
+    font-size: 0.8rem;
+}
+
+/* ==================== THANKS SECTION ==================== */
+.thanks-section {
+    background: #fef9e6;
+    border-radius: 1.5rem;
+    padding: 1.5rem;
+    margin-top: 2rem;
+}
+
+/* ==================== RESPONSIVE ==================== */
+@media (max-width: 768px) {
+    .urdu-couplet {
+        font-size: 1.2rem;
+        line-height: 1.9rem;
+    }
+    .poet-name-en {
+        font-size: 1.2rem;
+    }
+    .dedication-form input {
+        width: 140px;
+        font-size: 0.8rem;
+    }
+    .poet-image {
+        height: 180px;
+    }
+    .poet-name {
+        font-size: 1rem;
+    }
+    .poet-couplet {
+        font-size: 0.85rem;
+    }
 }
