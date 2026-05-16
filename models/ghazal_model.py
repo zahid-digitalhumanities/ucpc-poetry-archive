@@ -1,5 +1,5 @@
-﻿# models/ghazal_model.py
-import uuid                     # ✅ Added missing import
+# models/ghazal_model.py
+import uuid
 from models.base import get_db_connection
 
 def get_db():
@@ -119,7 +119,7 @@ def insert_ghazal(poet_id, book_id, contributor_id, title_urdu, title_english,
                   text_urdu, text_english, content_hash, verse_count):
     with get_db_connection() as conn:
         with conn.cursor() as cur:
-            public_id = str(uuid.uuid4())[:8]   # ✅ uuid imported
+            public_id = str(uuid.uuid4())[:8]
             cur.execute("""
                 INSERT INTO texts (public_id, poet_id, book_id, contributor_id,
                                    title_urdu, title_english, text_urdu, text_english,
@@ -148,3 +148,69 @@ def insert_verse(text_id, couplet_index, misra1_urdu, misra2_urdu, misra1_englis
                   misra1_english, misra2_english,
                   search_text, 1))
             conn.commit()
+
+# ✅ NEW FUNCTION: Get recent ghazals for homepage
+def get_recent_ghazals(limit=5):
+    """Fetch most recent ghazals for homepage display"""
+    with get_db_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute("""
+                SELECT t.id, t.title_english, t.title_urdu, t.created_at,
+                       p.name as poet_name, p.name_urdu as poet_name_urdu, p.id as poet_id
+                FROM texts t
+                JOIN poets p ON t.poet_id = p.id
+                WHERE t.form = 'ghazal'
+                ORDER BY t.created_at DESC, t.id DESC
+                LIMIT %s
+            """, (limit,))
+            results = cur.fetchall()
+            
+            # Convert to list of dicts with proper field names
+            recent = []
+            for row in results:
+                recent.append({
+                    'id': row['id'],
+                    'title_english': row['title_english'],
+                    'title_urdu': row['title_urdu'],
+                    'poet_name': row['poet_name'],
+                    'poet_name_urdu': row['poet_name_urdu'],
+                    'poet_id': row['poet_id'],
+                    'created_at': row['created_at']
+                })
+            return recent
+
+# ✅ NEW FUNCTION: Get featured poets for homepage
+def get_featured_poets(limit=8):
+    """Fetch poets with most ghazals for homepage"""
+    with get_db_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute("""
+                SELECT p.id, p.name, p.name_urdu, COUNT(t.id) as ghazal_count
+                FROM poets p
+                LEFT JOIN texts t ON t.poet_id = p.id AND t.form = 'ghazal'
+                GROUP BY p.id
+                HAVING COUNT(t.id) > 0
+                ORDER BY ghazal_count DESC, p.name
+                LIMIT %s
+            """, (limit,))
+            return cur.fetchall()
+
+# ✅ NEW FUNCTION: Search ghazals (basic)
+def search_ghazals(query, limit=20):
+    """Basic search for ghazals by title or poet name"""
+    with get_db_connection() as conn:
+        with conn.cursor() as cur:
+            search_term = f"%{query}%"
+            cur.execute("""
+                SELECT DISTINCT t.id, t.title_english, t.title_urdu, 
+                       p.name as poet_name, p.name_urdu as poet_name_urdu
+                FROM texts t
+                JOIN poets p ON t.poet_id = p.id
+                WHERE t.form = 'ghazal' 
+                AND (t.title_english ILIKE %s 
+                     OR t.title_urdu ILIKE %s
+                     OR p.name ILIKE %s
+                     OR p.name_urdu ILIKE %s)
+                LIMIT %s
+            """, (search_term, search_term, search_term, search_term, limit))
+            return cur.fetchall()
