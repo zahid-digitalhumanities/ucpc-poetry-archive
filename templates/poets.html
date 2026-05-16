@@ -1,0 +1,81 @@
+﻿{% extends "base.html" %}
+{% block title %}Poets – UCPC Poetry Archive{% endblock %}
+
+{% block extra_css %}
+<style>
+    .poets-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 30px;
+    }
+    .poet-card {
+        background: white;
+        border-radius: 28px;
+        padding: 30px 20px;
+        text-align: center;
+        transition: all 0.3s;
+        border: 1px solid rgba(212,175,55,0.2);
+        text-decoration: none;
+        display: block;
+    }
+    .poet-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 35px rgba(212,175,55,0.1);
+        border-color: var(--gold);
+    }
+    .poet-name-en {
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: #1e3c72;
+    }
+    .poet-name-urdu {
+        font-family: 'Jameel Noori Nastaleeq', serif;
+        font-size: 1.2rem;
+        color: var(--gold);
+        margin-top: 5px;
+        direction: rtl;
+    }
+    .poet-years {
+        font-size: 0.9rem;
+        color: #6c757d;
+        margin-top: 10px;
+    }
+    .poet-stats {
+        margin-top: 15px;
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        font-size: 0.8rem;
+        color: #495057;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto">
+    <div class="text-center mb-10">
+        <h1 class="text-3xl font-bold text-[#1e3c72]">Poets</h1>
+        <p class="text-gray-600 mt-2">Browse all poets in the corpus</p>
+    </div>
+
+    <div class="poets-grid">
+        {% for poet in poets %}
+        <a href="/poet/{{ poet.id }}" class="poet-card">
+            <div class="poet-name-en">{{ poet.name }}</div>
+            <div class="poet-name-urdu">{{ poet.name_urdu }}</div>
+            {% if poet.birth_year or poet.death_year %}
+            <div class="poet-years">
+                <i class="fas fa-calendar-alt"></i> {{ poet.birth_year or '?' }} – {{ poet.death_year or 'Present' }}
+            </div>
+            {% endif %}
+            <div class="poet-stats">
+                <span><i class="fas fa-book"></i> {{ poet.ghazal_count }} poems</span>
+                <span><i class="fas fa-pen-fancy"></i> {{ poet.verse_count }} verses</span>
+            </div>
+        </a>
+        {% else %}
+        <p class="text-center col-span-full">No poets found.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

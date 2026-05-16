@@ -1,0 +1,245 @@
+{% extends "base.html" %}
+{% block title %}Search | UCPC Poetry Archive{% endblock %}
+{% block extra_css %}
+<style>
+    .search-result { border-bottom: 1px solid #e2e8f0; padding: 1rem 0; }
+    .urdu { font-family: 'Jameel Noori Nastaleeq', serif; line-height: 2; }
+    .suggestions-box {
+        position: absolute;
+        z-index: 1000;
+        background: white;
+        border: 1px solid #ddd;
+        border-radius: 0.5rem;
+        width: 100%;
+        max-height: 300px;
+        overflow-y: auto;
+    }
+    .suggestion-item { padding: 0.5rem 1rem; cursor: pointer; }
+    .suggestion-item:hover { background: #f3f4f6; }
+    .relative { position: relative; }
+    .voice-btn {
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: #666;
+        z-index: 10;
+    }
+    .voice-btn.listening { color: #ef4444; animation: pulse 1.5s infinite; }
+    @keyframes pulse {
+        0% { opacity: 0.5; transform: scale(1); }
+        50% { opacity: 1; transform: scale(1.1); }
+        100% { opacity: 0.5; transform: scale(1); }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <h2 class="text-2xl font-bold mb-6 text-center">Search Ghazals / Nazms</h2>
+
+    <form method="GET" action="{{ url_for('search.search_page') }}" class="mb-8" id="searchForm">
+        <div class="relative">
+            <input type="text" id="searchBox" name="keyword" value="{{ keyword }}" 
+                   placeholder="اردو یا رومن اردو میں لکھیں / بول کر تلاش کریں" 
+                   autocomplete="off"
+                   class="w-full px-6 py-4 text-lg rounded-full border shadow-sm focus:border-gold focus:ring focus:ring-gold-light pr-12">
+            <button type="button" id="voiceBtn" class="voice-btn" title="Voice Search">
+                <i class="fas fa-microphone"></i>
+            </button>
+            <div id="suggestionsBox" class="suggestions-box hidden"></div>
+        </div>
+        <div class="flex flex-wrap gap-4 mt-4">
+            <select name="poet_id" class="px-4 py-2 border rounded-lg">
+                <option value="">All Poets</option>
+                {% for poet in poets %}
+                <option value="{{ poet.id }}" {% if poet_id == poet.id %}selected{% endif %}>
+                    {{ poet.name_urdu }} ({{ poet.name }})
+                </option>
+                {% endfor %}
+            </select>
+            <select name="contributor_id" class="px-4 py-2 border rounded-lg">
+                <option value="">All Contributors</option>
+                {% for c in contributors %}
+                <option value="{{ c.id }}" {% if contributor_id == c.id %}selected{% endif %}>
+                    {{ c.name }}
+                </option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="px-6 py-2 bg-gold text-primary-dark rounded-full hover:bg-gold-dark transition shadow-md">
+                <i class="fas fa-search"></i> Search
+            </button>
+        </div>
+    </form>
+
+    {% if keyword or poet_id or contributor_id %}
+        <div class="mb-4 text-gray-600">
+            Found {{ total_results }} result(s)
+        </div>
+
+        {% if results %}
+            {% for r in results %}
+            <div class="search-result">
+                <a href="{{ url_for('ghazals.view_ghazal', text_id=r.text_id) }}" class="block">
+                    <div class="urdu text-xl font-semibold">{{ r.title_urdu }}</div>
+                    <div class="text-sm text-gray-600">{{ r.poet_name_urdu }} ({{ r.poet_name }})</div>
+                    <div class="urdu mt-2 text-gray-800">{{ r.first_verse_urdu|safe }}</div>
+                    <div class="mt-1 text-gray-600">{{ r.first_verse_english|safe }}</div>
+                </a>
+            </div>
+            {% endfor %}
+
+            <div class="mt-8 flex justify-between">
+                {% if offset > 0 %}
+                <a href="?keyword={{ keyword }}&poet_id={{ poet_id }}&contributor_id={{ contributor_id }}&offset={{ offset - limit }}" 
+                   class="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300">Previous</a>
+                {% endif %}
+                {% if offset + limit < total_results %}
+                <a href="?keyword={{ keyword }}&poet_id={{ poet_id }}&contributor_id={{ contributor_id }}&offset={{ offset + limit }}" 
+                   class="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300">Next</a>
+                {% endif %}
+            </div>
+        {% else %}
+            <p class="text-gray-500">No results found.</p>
+        {% endif %}
+    {% endif %}
+</div>
+
+<script>
+    // Voice Search
+    const voiceBtn = document.getElementById('voiceBtn');
+    const searchBox = document.getElementById('searchBox');
+    const searchForm = document.getElementById('searchForm');
+    let recognition = null;
+    let listening = false;
+
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (SpeechRecognition) {
+        recognition = new SpeechRecognition();
+        recognition.lang = 'ur-PK';           // Urdu (works for Roman Urdu too)
+        recognition.interimResults = false;
+        recognition.maxAlternatives = 1;
+
+        recognition.onstart = () => {
+            listening = true;
+            voiceBtn.classList.add('listening');
+            voiceBtn.innerHTML = '<i class="fas fa-microphone-alt"></i>';
+        };
+        recognition.onend = () => {
+            listening = false;
+            voiceBtn.classList.remove('listening');
+            voiceBtn.innerHTML = '<i class="fas fa-microphone"></i>';
+        };
+        recognition.onresult = (event) => {
+            const transcript = event.results[0][0].transcript.trim();
+            console.log("VOICE INPUT:", transcript);   // debug
+            if (transcript) {
+                searchBox.value = transcript;
+                searchForm.submit();
+            }
+        };
+        recognition.onerror = (event) => {
+            console.error('Speech recognition error:', event.error);
+            alert('Voice recognition failed. Please try again or type your query.');
+            voiceBtn.classList.remove('listening');
+            voiceBtn.innerHTML = '<i class="fas fa-microphone"></i>';
+            listening = false;
+        };
+        voiceBtn.addEventListener('click', () => {
+            if (listening) recognition.stop();
+            else {
+                try { recognition.start(); }
+                catch (e) { alert('Please allow microphone access to use voice search.'); }
+            }
+        });
+    } else {
+        voiceBtn.style.display = 'none';
+    }
+
+    // Autocomplete Suggestions
+    const suggestionsBox = document.getElementById('suggestionsBox');
+    let currentFocus = -1;
+
+    async function fetchSuggestions() {
+        const query = searchBox.value.trim();
+        if (query.length < 2) {
+            suggestionsBox.classList.add('hidden');
+            return;
+        }
+        try {
+            const res = await fetch(`/search/suggest?q=${encodeURIComponent(query)}`);
+            const data = await res.json();
+            if (data.suggestions.length === 0) {
+                suggestionsBox.classList.add('hidden');
+                return;
+            }
+            suggestionsBox.innerHTML = '';
+            data.suggestions.forEach((s, idx) => {
+                const div = document.createElement('div');
+                div.className = 'suggestion-item';
+                div.innerText = s;
+                div.onclick = () => {
+                    searchBox.value = s;
+                    suggestionsBox.classList.add('hidden');
+                };
+                suggestionsBox.appendChild(div);
+            });
+            suggestionsBox.classList.remove('hidden');
+            currentFocus = -1;
+        } catch (err) {
+            console.error('Suggestion error:', err);
+            suggestionsBox.classList.add('hidden');
+        }
+    }
+
+    let debounceTimer;
+    searchBox.addEventListener('input', function() {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(fetchSuggestions, 200);
+    });
+
+    searchBox.addEventListener('keydown', function(e) {
+        const items = suggestionsBox.querySelectorAll('.suggestion-item');
+        if (items.length === 0) return;
+        if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            currentFocus++;
+            if (currentFocus >= items.length) currentFocus = 0;
+            setActiveItem(items);
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            currentFocus--;
+            if (currentFocus < 0) currentFocus = items.length - 1;
+            setActiveItem(items);
+        } else if (e.key === 'Enter') {
+            e.preventDefault();
+            if (currentFocus >= 0 && items[currentFocus]) {
+                searchBox.value = items[currentFocus].innerText;
+                suggestionsBox.classList.add('hidden');
+                searchForm.submit();
+            }
+        }
+    });
+
+    function setActiveItem(items) {
+        items.forEach((item, idx) => {
+            if (idx === currentFocus) {
+                item.classList.add('active');
+                item.scrollIntoView({ block: 'nearest' });
+            } else {
+                item.classList.remove('active');
+            }
+        });
+    }
+
+    document.addEventListener('click', function(e) {
+        if (!searchBox.contains(e.target) && !suggestionsBox.contains(e.target)) {
+            suggestionsBox.classList.add('hidden');
+        }
+    });
+</script>
+{% endblock %}

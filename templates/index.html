@@ -1,0 +1,119 @@
+﻿{% extends "base.html" %}
+{% block title %}UCPC – Urdu Computational Philology Corpus{% endblock %}
+
+{% block extra_css %}
+<style>
+    .hero-section {
+        background: linear-gradient(135deg, #1e3c72 0%, #2c5a8c 100%);
+        border-radius: 32px;
+        padding: 60px 30px;
+        margin-bottom: 50px;
+        text-align: center;
+        color: white;
+    }
+    .hero-title {
+        font-size: 3rem;
+        font-weight: 800;
+        margin-bottom: 1rem;
+    }
+    .hero-subtitle {
+        font-size: 1.5rem;
+        font-family: 'Jameel Noori Nastaleeq', serif;
+        direction: rtl;
+    }
+    .feature-card {
+        background: white;
+        border-radius: 28px;
+        padding: 30px 20px;
+        text-align: center;
+        transition: transform 0.3s, box-shadow 0.3s;
+        border: 1px solid rgba(212,175,55,0.2);
+    }
+    .feature-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 35px rgba(212,175,55,0.1);
+    }
+    .feature-icon {
+        font-size: 2.5rem;
+        color: var(--gold);
+        margin-bottom: 1rem;
+    }
+    .feature-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        margin-bottom: 0.75rem;
+        color: #1e3c72;
+    }
+    .recent-ghazals {
+        margin-top: 60px;
+    }
+    .ghazal-mini-card {
+        background: white;
+        border-radius: 20px;
+        padding: 20px;
+        margin-bottom: 20px;
+        border-left: 4px solid var(--gold);
+        transition: all 0.2s;
+    }
+    .ghazal-mini-card:hover {
+        background: #fefcf8;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto">
+    <div class="hero-section">
+        <div class="hero-title">UCPC Poetry Archive</div>
+        <div class="hero-subtitle mb-4">اردو شاعری کا تحقیقی ذخیرہ</div>
+        <div class="text-lg opacity-90 max-w-2xl mx-auto">
+            A digital corpus for computational philology, preserving classical and modern Urdu poetry with bilingual annotations.
+        </div>
+        <div class="mt-8 flex justify-center gap-4">
+            <a href="/search" class="bg-gold text-[#1e3c72] px-8 py-3 rounded-full font-bold hover:bg-gold-light transition">Explore Poetry</a>
+            <a href="/poets" class="bg-white/20 backdrop-blur-sm px-8 py-3 rounded-full font-bold hover:bg-white/30 transition">Browse Poets</a>
+        </div>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-8 mb-16">
+        <div class="feature-card">
+            <div class="feature-icon"><i class="fas fa-microscope"></i></div>
+            <div class="feature-title">Computational Analysis</div>
+            <div class="text-gray-600">Rhyme schemes, radif/qaafiya extraction, and stylistic metrics.</div>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon"><i class="fas fa-language"></i></div>
+            <div class="feature-title">Bilingual Display</div>
+            <div class="text-gray-600">Switch between Urdu and English views instantly.</div>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon"><i class="fas fa-chart-line"></i></div>
+            <div class="feature-title">Research Tools</div>
+            <div class="text-gray-600">Analytics, poet comparisons, and bulk data upload.</div>
+        </div>
+    </div>
+
+    <div class="recent-ghazals">
+        <h2 class="text-2xl font-bold text-[#1e3c72] mb-6 flex items-center gap-2">
+            <i class="fas fa-clock text-gold"></i> Recently Added
+        </h2>
+        <div class="space-y-4">
+            {% for ghazal in recent_ghazals %}
+            <a href="/view/{{ ghazal.id }}" class="ghazal-mini-card block">
+                <div class="flex justify-between items-center flex-wrap gap-2">
+                    <div>
+                        <div class="font-bold text-lg">{{ ghazal.title_english }}</div>
+                        <div class="urdu-text text-md">{{ ghazal.title_urdu }}</div>
+                    </div>
+                    <div class="text-sm text-gray-500">
+                        <i class="fas fa-user"></i> {{ ghazal.poet_name }}
+                    </div>
+                </div>
+            </a>
+            {% else %}
+            <p class="text-gray-500">No recent ghazals yet.</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

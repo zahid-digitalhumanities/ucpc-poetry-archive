@@ -1,0 +1,1130 @@
+base.py
+import os
+import psycopg2
+import psycopg2.extras
+
+def get_db_connection():
+    """Return a database connection using DATABASE_URL environment variable."""
+    database_url = os.getenv("DATABASE_URL")
+    if database_url:
+        return psycopg2.connect(database_url, sslmode='require', cursor_factory=psycopg2.extras.RealDictCursor)
+    else:
+        # Fallback to local config
+        from config import DB_CONFIG
+        if 'dsn' in DB_CONFIG:
+            return psycopg2.connect(DB_CONFIG['dsn'], cursor_factory=psycopg2.extras.RealDictCursor)
+        else:
+            return psycopg2.connect(
+                dbname=DB_CONFIG['dbname'],
+                user=DB_CONFIG['user'],
+                password=DB_CONFIG['password'],
+                host=DB_CONFIG['host'],
+                port=DB_CONFIG['port'],
+                cursor_factory=psycopg2.extras.RealDictCursor
+            )
+
+# Alias for backward compatibility with code that imports get_db
+get_db = get_db_connection
+
+__________
+
+search_model.py
+# models/search_model.py
+from models.base import get_db_connection
+from modules.roman_engine.matcher import process_query
+
+# ---------- Roman → Urdu dictionary ----------
+ROMAN_DICT = {
+    "mohabbat": "محبت",
+    "ishq": "عشق",
+    "pyar": "پیار",
+    "dard": "درد",
+    "zindagi": "زندگی",
+    "raat": "رات",
+    "tanhaai": "تنہائی",
+    "yaad": "یاد",
+    "dil": "دل",
+    "aankh": "آنکھ",
+    "lab": "لب",
+    "chehra": "چہرہ",
+    "husn": "حسن",
+    "khuda": "خدا",
+    "zaman": "زمان",
+    "safar": "سفر",
+    "manzil": "منزل",
+    "dunya": "دنیا",
+    "khushi": "خوشی",
+    "gham": "غم",
+    "aansu": "آنسو",
+    "rooh": "روح",
+    "jaan": "جان",
+    "yeh": "یہ",
+    "woh": "وہ",
+    "hai": "ہے",
+    "hain": "ہیں",
+    "tha": "تھا",
+    "thi": "تھی",
+    "the": "تھے",
+    "main": "میں",
+    "tu": "تو",
+    "ap": "آپ",
+    "us": "اس",
+    "is": "اس",
+    "ko": "کو",
+    "se": "سے",
+    "ka": "کا",
+    "ki": "کی",
+    "ke": "کے",
+    "par": "پر",
+    "mein": "میں",
+    "ne": "نے",
+    "ghalib": "غالب",
+    "iqbal": "اقبال",
+    "faiz": "فیض",
+    "mir": "میر",
+    "faraz": "فراز",
+    "parveen": "پروین",
+    "shakir": "شاکر",
+    "nasir": "ناصر",
+    "kazmi": "کاظمی",
+    "sahir": "ساحر",
+    "ludhianvi": "لدھیانوی",
+    # English words
+    "night": "رات",
+    "love": "محبت",
+    "lonely": "تنہائی",
+    "alone": "تنہا",
+    "sad": "غم",
+    "happy": "خوش",
+    "heart": "دل",
+    "life": "زندگی",
+    "death": "موت",
+    "sky": "آسمان",
+    "moon": "چاند",
+    "star": "ستارہ",
+    "flower": "پھول",
+    "garden": "گلشن",
+    "friend": "دوست",
+    "enemy": "دشمن",
+    "pain": "درد",
+    "sorrow": "غم",
+    "hope": "امید",
+    "waiting": "انتظار",
+}
+
+def normalize_roman(text):
+    text = text.lower().strip()
+    text = text.replace("aa", "a").replace("ee", "i").replace("oo", "u")
+    return text
+
+def roman_to_urdu(text):
+    words = text.split()
+    urdu_words = []
+    for w in words:
+        norm = normalize_roman(w)
+        if any('\u0600' <= c <= '\u06FF' for c in w):
+            urdu_words.append(w)
+        else:
+            urdu_words.append(ROMAN_DICT.get(norm, w))
+    return " ".join(urdu_words)
+
+def search_ghazals(filters):
+    keyword = filters.get('keyword', '').strip()
+    urdu_query = process_query(keyword) if keyword else ''
+    poet_id = filters.get('poet_id')
+    contributor_id = filters.get('contributor_id')
+    offset = filters.get('offset', 0)
+    limit = filters.get('limit', 20)
+
+    with get_db_connection() as conn:
+        with conn.cursor() as cur:
+            where_parts = []
+            params = []
+
+            if keyword:
+                like_kw = f"%{keyword}%"
+                conditions = []
+                conditions.append("""
+                    (t.title_urdu ILIKE %s OR t.title_english ILIKE %s OR
+                     EXISTS (SELECT 1 FROM verses v WHERE v.text_id = t.id AND
+                             (v.misra1_urdu ILIKE %s OR v.misra2_urdu ILIKE %s)))
+                """)
+                params.extend([like_kw, like_kw, like_kw, like_kw])
+                if urdu_query and urdu_query != keyword:
+                    like_ur = f"%{urdu_query}%"
+                    conditions.append("""
+                        (t.title_urdu ILIKE %s OR
+                         EXISTS (SELECT 1 FROM verses v WHERE v.text_id = t.id AND
+                                 (v.misra1_urdu ILIKE %s OR v.misra2_urdu ILIKE %s)))
+                    """)
+                    params.extend([like_ur, like_ur, like_ur])
+                where_parts.append("(" + " OR ".join(conditions) + ")")
+
+            if poet_id:
+                where_parts.append("t.poet_id = %s")
+                params.append(poet_id)
+
+            if contributor_id:
+                where_parts.append("t.contributor_id = %s")
+                params.append(contributor_id)
+
+            where_clause = " AND ".join(where_parts) if where_parts else "1=1"
+
+            # Count total
+            count_query = f"""
+                SELECT COUNT(DISTINCT t.id) as total
+                FROM texts t
+                WHERE t.form = 'ghazal' AND {where_clause}
+            """
+            cur.execute(count_query, params)
+            total = cur.fetchone()['total']
+
+            # Fetch first verse for display
+            query = f"""
+                SELECT DISTINCT
+                    t.id as text_id,
+                    t.title_urdu,
+                    t.title_english,
+                    p.name as poet_name,
+                    p.name_urdu as poet_name_urdu,
+                    v.misra1_urdu,
+                    v.misra2_urdu,
+                    v.misra1_english,
+                    v.misra2_english
+                FROM texts t
+                JOIN poets p ON p.id = t.poet_id
+                LEFT JOIN verses v ON v.text_id = t.id AND v.couplet_index = 1
+                WHERE t.form = 'ghazal' AND {where_clause}
+                ORDER BY t.id DESC
+                LIMIT %s OFFSET %s
+            """
+            final_params = params + [limit, offset]
+            cur.execute(query, final_params)
+            rows = cur.fetchall()
+
+            # Group results (already distinct by text_id)
+            grouped = {}
+            for row in rows:
+                tid = row['text_id']
+                if tid not in grouped:
+                    grouped[tid] = {
+                        'text_id': tid,
+                        'title_urdu': row['title_urdu'],
+                        'title_english': row['title_english'],
+                        'poet_name': row['poet_name'],
+                        'poet_name_urdu': row['poet_name_urdu'],
+                        'first_verse_urdu': f"{row['misra1_urdu']}\n{row['misra2_urdu']}" if row['misra2_urdu'] else row['misra1_urdu'],
+                        'first_verse_english': f"{row['misra1_english']}\n{row['misra2_english']}" if row['misra2_english'] else row['misra1_english'],
+                    }
+            return list(grouped.values()), total
+
+def get_suggestions(q):
+    urdu_q = process_query(q)
+    like_pattern = f"%{urdu_q}%"
+    with get_db_connection() as conn:
+        with conn.cursor() as cur:
+            try:
+                cur.execute("""
+                    SELECT DISTINCT suggestion FROM (
+                        SELECT title_urdu AS suggestion
+                        FROM texts
+                        WHERE title_urdu ILIKE %s
+                        UNION
+                        SELECT misra1_urdu
+                        FROM verses
+                        WHERE misra1_urdu ILIKE %s
+                        UNION
+                        SELECT misra1_urdu
+                        FROM verses
+                        WHERE similarity(misra1_urdu, %s) > 0.2
+                    ) s
+                    LIMIT 10
+                """, (like_pattern, like_pattern, urdu_q))
+            except Exception:
+                cur.execute("""
+                    SELECT title_urdu AS suggestion FROM texts WHERE title_urdu ILIKE %s
+                    UNION
+                    SELECT misra1_urdu FROM verses WHERE misra1_urdu ILIKE %s
+                    LIMIT 10
+                """, (like_pattern, like_pattern))
+            rows = cur.fetchall()
+            return [r['suggestion'] for r in rows]
+
+_____________________  
+
+ghazal_model.py
+# models/ghazal_model.py
+from models.base import get_db_connection
+
+def get_db():
+    """Legacy function – uses new connection. For backward compatibility."""
+    return get_db_connection()
+
+def get_stats():
+    with get_db_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute("SELECT COUNT(*) FROM poets")
+            poets = cur.fetchone()['count']
+            cur.execute("SELECT COUNT(*) FROM texts WHERE form = 'ghazal'")
+            texts = cur.fetchone()['count']
+            cur.execute("SELECT COUNT(*) FROM verses")
+            verses = cur.fetchone()['count']
+    return {'total_poets': poets, 'total_ghazals': texts, 'texts': texts, 'total_verses': verses, 'verses': verses}
+
+def get_all_poets():
+    with get_db_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute("""
+                SELECT p.id, p.name, p.name_urdu, p.birth_year, p.death_year,
+                       COUNT(t.id) AS ghazal_count
+                FROM poets p
+                LEFT JOIN texts t ON t.poet_id = p.id AND t.form = 'ghazal'
+                GROUP BY p.id
+                ORDER BY p.name
+            """)
+            return cur.fetchall()
+
+def get_poet_by_id(poet_id):
+    with get_db_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute("SELECT id, name, name_urdu, bio_english, bio_urdu, birth_year, death_year FROM poets WHERE id = %s", (poet_id,))
+            return cur.fetchone()
+
+def fetch_texts_by_poet(poet_id):
+    with get_db_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute("SELECT id, public_id, title_urdu, title_english, verse_count FROM texts WHERE poet_id = %s AND form = 'ghazal' ORDER BY id", (poet_id,))
+            return cur.fetchall()
+
+def get_ghazal_with_verses(text_id):
+    with get_db_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute("""
+                SELECT t.*, p.name AS poet_name, p.name_urdu AS poet_name_urdu
+                FROM texts t
+                JOIN poets p ON t.poet_id = p.id
+                WHERE t.id = %s
+            """, (text_id,))
+            ghazal = cur.fetchone()
+            if ghazal:
+                cur.execute("SELECT * FROM verses WHERE text_id = %s ORDER BY couplet_index", (text_id,))
+                verses = cur.fetchall()
+            else:
+                verses = []
+            return ghazal, verses
+
+def get_navigation(current_id, poet_id):
+    with get_db_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute("SELECT id FROM texts WHERE poet_id = %s AND form = 'ghazal' ORDER BY id", (poet_id,))
+            ids = [row['id'] for row in cur.fetchall()]
+            if not ids:
+                return None, None, 0
+            try:
+                index = ids.index(current_id)
+            except ValueError:
+                return None, None, len(ids)
+            prev_id = ids[index-1] if index > 0 else None
+            next_id = ids[index+1] if index < len(ids)-1 else None
+            return prev_id, next_id, len(ids)
+
+def get_all_contributors():
+    with get_db_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute("SELECT id, name FROM contributors ORDER BY name")
+            return cur.fetchall()
+
+def get_books_by_poet(poet_id):
+    with get_db_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute("SELECT id, name, name_urdu FROM books WHERE poet_id = %s ORDER BY name", (poet_id,))
+            return cur.fetchall()
+
+def check_duplicate_ghazal(content_hash):
+    with get_db_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute("""
+                SELECT t.id, t.title_urdu, t.title_english,
+                       p.name as poet_name, p.name_urdu as poet_name_urdu, p.id as poet_id
+                FROM texts t
+                JOIN poets p ON t.poet_id = p.id
+                WHERE t.content_hash = %s AND t.form IN ('ghazal', 'nazm')
+            """, (content_hash,))
+            existing = cur.fetchone()
+            return (True, existing) if existing else (False, None)
+
+def get_or_create_contributor(name, email):
+    if not name:
+        return None
+    with get_db_connection() as conn:
+        with conn.cursor() as cur:
+            if email:
+                cur.execute("SELECT id FROM contributors WHERE name = %s AND email = %s", (name, email))
+            else:
+                cur.execute("SELECT id FROM contributors WHERE name = %s", (name,))
+            row = cur.fetchone()
+            if row:
+                return row['id']
+            cur.execute("INSERT INTO contributors (name, email) VALUES (%s, %s) RETURNING id", (name, email))
+            conn.commit()
+            return cur.fetchone()['id']
+
+def insert_ghazal(poet_id, book_id, contributor_id, title_urdu, title_english,
+                  text_urdu, text_english, content_hash, verse_count):
+    with get_db_connection() as conn:
+        with conn.cursor() as cur:
+            public_id = str(uuid.uuid4())[:8]
+            cur.execute("""
+                INSERT INTO texts (public_id, poet_id, book_id, contributor_id,
+                                   title_urdu, title_english, text_urdu, text_english,
+                                   content_hash, verse_count, form, language)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                RETURNING id
+            """, (public_id, poet_id, book_id, contributor_id,
+                  title_urdu, title_english, text_urdu, text_english,
+                  content_hash, verse_count, 'ghazal', 'ur'))
+            text_id = cur.fetchone()['id']
+            conn.commit()
+            return text_id
+
+def insert_verse(text_id, couplet_index, misra1_urdu, misra2_urdu, misra1_english, misra2_english):
+    with get_db_connection() as conn:
+        with conn.cursor() as cur:
+            search_text = f"{misra1_urdu} {misra2_urdu}" if misra2_urdu else misra1_urdu
+            cur.execute("""
+                INSERT INTO verses (text_id, couplet_index,
+                                    misra1_urdu, misra2_urdu,
+                                    misra1_english, misra2_english,
+                                    search_text, verse_count)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+            """, (text_id, couplet_index,
+                  misra1_urdu, misra2_urdu,
+                  misra1_english, misra2_english,
+                  search_text, 1))
+            conn.commit()
+
+___________________
+bulk_model.py
+
+# bulk_model.py
+import uuid
+import hashlib
+import re
+from models.ghazal_model import get_db
+from modules.ai_tools import translate_urdu_to_english
+
+def normalize_ghazal(text):
+    text = text.strip()
+    text = re.sub(r'\s+', ' ', text)
+    text = text.replace('،', '').replace('.', '').replace('!', '')
+    return text.lower()
+
+def is_duplicate(conn, ghazal_text):
+    normalized = normalize_ghazal(ghazal_text)
+    content_hash = hashlib.sha256(normalized.encode('utf-8')).hexdigest()
+    cur = conn.cursor()
+    cur.execute("SELECT id, title_urdu, poet_id FROM texts WHERE content_hash = %s", (content_hash,))
+    result = cur.fetchone()
+    cur.close()
+    if result:
+        return True, result['id'], result['title_urdu'], result['poet_id']
+    return False, None, None, None
+
+def split_misra_pairs(lines):
+    pairs = []
+    for i in range(0, len(lines)-1, 2):
+        pairs.append((lines[i], lines[i+1]))
+    return pairs
+
+def get_or_create_contributor(conn, name, email=None):
+    if not name:
+        return None
+    cur = conn.cursor()
+    if email:
+        cur.execute("SELECT id FROM contributors WHERE name = %s AND email = %s", (name, email))
+    else:
+        cur.execute("SELECT id FROM contributors WHERE name = %s", (name,))
+    row = cur.fetchone()
+    if row:
+        return row['id']
+    cur.execute("INSERT INTO contributors (name, email) VALUES (%s, %s) RETURNING id", (name, email))
+    conn.commit()
+    return cur.fetchone()['id']
+
+def insert_ghazal_bulk(conn, poet_id, book_id, contributor_id, ghazal_text, title_urdu=None):
+    cur = conn.cursor()
+    try:
+        lines = [l.strip() for l in ghazal_text.split('\n') if l.strip()]
+        if len(lines) < 2:
+            return None, "Not enough lines"
+        pairs = split_misra_pairs(lines)
+        if not pairs:
+            return None, "Could not split into misra pairs"
+        if title_urdu is None:
+            title_urdu = pairs[0][0]
+        title_en_raw = translate_urdu_to_english(title_urdu)
+        title_en = title_en_raw.strip() if title_en_raw else "[Translation unavailable]"
+        normalized = normalize_ghazal(ghazal_text)
+        content_hash = hashlib.sha256(normalized.encode('utf-8')).hexdigest()
+        public_id = str(uuid.uuid4())[:8]
+        cur.execute("""
+            INSERT INTO texts (public_id, poet_id, book_id, contributor_id,
+                               title_urdu, title_english,
+                               text_urdu, text_english,
+                               verse_count, content_hash, form, language)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            RETURNING id
+        """, (public_id, poet_id, book_id, contributor_id,
+              title_urdu, title_en,
+              ghazal_text, "",
+              len(pairs), content_hash, 'ghazal', 'ur'))
+        text_id = cur.fetchone()['id']
+        for i, (m1, m2) in enumerate(pairs, 1):
+            m1_en = translate_urdu_to_english(m1) or "[Translation unavailable]"
+            m2_en = translate_urdu_to_english(m2) if m2 else ""
+            if m2_en:
+                m2_en = m2_en.strip() or "[Translation unavailable]"
+            cur.execute("""
+                INSERT INTO verses (
+                    text_id, couplet_index,
+                    misra1_urdu, misra2_urdu,
+                    misra1_english, misra2_english,
+                    search_text, verse_count
+                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+            """, (text_id, i, m1, m2, m1_en, m2_en, f"{m1} {m2}" if m2 else m1, len(pairs)))
+        conn.commit()
+        return text_id, None
+    except Exception as e:
+        conn.rollback()
+        return None, str(e)
+    finally:
+        cur.close()
+
+def get_books_by_poet(poet_id):
+    """Return list of books for a given poet."""
+    conn = get_db()
+    try:
+        cur = conn.cursor()
+        cur.execute("SELECT id, name, name_urdu FROM books WHERE poet_id = %s ORDER BY name", (poet_id,))
+        return cur.fetchall()
+    except Exception as e:
+        print(f"Error fetching books: {e}")
+        return []
+    finally:
+        conn.close()
+
+___________________
+poetes_model.py
+from models.base import get_db
+
+def fetch_all_poets():
+    conn = get_db()
+    try:
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT p.id, p.name, p.name_urdu, p.birth_year, p.death_year,
+                   COUNT(t.id) AS poem_count
+            FROM poets p
+            LEFT JOIN texts t ON t.poet_id = p.id AND t.form IN ('ghazal', 'nazm')
+            GROUP BY p.id
+            ORDER BY p.name
+        """)
+        return cur.fetchall()
+    finally:
+        cur.close()
+        conn.close()
+
+def fetch_poet_by_id(poet_id):
+    conn = get_db()
+    try:
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT id, name, name_urdu, bio_english, bio_urdu,
+                   birth_year, death_year
+            FROM poets WHERE id = %s
+        """, (poet_id,))
+        return cur.fetchone()
+    finally:
+        cur.close()
+        conn.close()
+______________________
+contributors_model.py
+from models.base import get_db
+
+def get_all_contributors():
+    conn = get_db()
+    try:
+        cur = conn.cursor()
+        cur.execute("SELECT id, name FROM contributors ORDER BY name")
+        return cur.fetchall()
+    finally:
+        cur.close()
+        conn.close()
+
+______________________________
+
+routes files
+
+search_routes.py
+
+# routes/search_routes.py
+from flask import Blueprint, render_template, request, jsonify
+from models.search_model import search_ghazals, get_suggestions
+from models.ghazal_model import get_stats, get_all_poets, get_all_contributors
+
+search_bp = Blueprint('search', __name__, url_prefix='/search')
+
+@search_bp.route('/')
+def search_page():
+    keyword = request.args.get('keyword', '').strip()
+    poet_id = request.args.get('poet_id', type=int)
+    contributor_id = request.args.get('contributor_id', type=int)
+    offset = request.args.get('offset', 0, type=int)
+    limit = 20
+
+    filters = {
+        'keyword': keyword,
+        'poet_id': poet_id,
+        'contributor_id': contributor_id,
+        'offset': offset,
+        'limit': limit
+    }
+
+    results, total = search_ghazals(filters) if (keyword or poet_id or contributor_id) else ([], 0)
+
+    data = {
+        'stats': get_stats(),
+        'poets': get_all_poets(),
+        'contributors': get_all_contributors(),
+        'results': results,
+        'total_results': total,
+        'offset': offset,
+        'limit': limit,
+        'keyword': keyword,
+        'poet_id': poet_id,
+        'contributor_id': contributor_id
+    }
+    return render_template('search.html', **data)
+
+@search_bp.route('/suggest')
+def suggest():
+    q = request.args.get('q', '')
+    if len(q) < 2:
+        return jsonify({'suggestions': []})
+    suggestions = get_suggestions(q)
+    return jsonify({'suggestions': suggestions})
+
+_______________________________________
+
+ghazals_routes.py
+
+
+# routes/ghazals_routes.py
+import hashlib
+from flask import Blueprint, render_template, request, redirect, url_for, flash, session, jsonify
+from markupsafe import Markup
+from models.ghazal_model import (
+    get_stats, get_all_poets, get_books_by_poet, check_duplicate_ghazal,
+    get_or_create_contributor, insert_ghazal, insert_verse,
+    get_ghazal_with_verses, get_navigation
+)
+from modules.analysis import split_verses
+from modules.ai_tools import translate_urdu_to_english
+
+ghazals_bp = Blueprint('ghazals', __name__, url_prefix='/ghazals')
+
+def clean_translation(text: str) -> str:
+    if not text:
+        return ""
+    text = text.strip()
+    text = text.replace(" is of", "")
+    text = text.replace(" of is", "")
+    text = text.replace("  ", " ")
+    if len(text) > 1:
+        text = text[0].upper() + text[1:]
+    return text
+
+@ghazals_bp.route('/add', methods=['GET', 'POST'])
+def add_ghazal():
+    stats = get_stats()
+    poets = get_all_poets()
+    books = []
+    selected_poet_id = None
+    selected_book_id = None
+    form_data = {}
+
+    if request.method == 'POST':
+        poet_id = request.form.get('poet_id')
+        book_id = request.form.get('book_id') or None
+        contributor_name = request.form.get('contributor_name', '').strip()
+        contributor_email = request.form.get('contributor_email', '').strip()
+        ghazal_text = request.form.get('ghazal_text', '').strip()
+
+        form_data = {
+            'ghazal_text': ghazal_text,
+            'contributor_name': contributor_name,
+            'contributor_email': contributor_email,
+        }
+        selected_poet_id = poet_id
+        selected_book_id = book_id
+
+        if not poet_id:
+            flash('❌ Please select a poet.', 'error')
+            return render_template('add_ghazal.html', stats=stats, poets=poets,
+                                   books=books, selected_poet_id=selected_poet_id,
+                                   selected_book_id=selected_book_id, form_data=form_data)
+
+        if not ghazal_text:
+            flash('❌ Please enter ghazal text.', 'error')
+            return render_template('add_ghazal.html', stats=stats, poets=poets,
+                                   books=books, selected_poet_id=selected_poet_id,
+                                   selected_book_id=selected_book_id, form_data=form_data)
+
+        content_hash = hashlib.sha256(ghazal_text.encode('utf-8')).hexdigest()
+        is_dup, existing = check_duplicate_ghazal(content_hash)
+        if is_dup:
+            flash('⚠️ This ghazal already exists!', 'warning')
+            return render_template('add_ghazal.html', stats=stats, poets=poets,
+                                   books=books, selected_poet_id=selected_poet_id,
+                                   selected_book_id=selected_book_id, form_data=form_data,
+                                   duplicate_found=True, existing_ghazal=existing)
+
+        verses = split_verses(ghazal_text)
+        if not verses:
+            flash('❌ Could not parse verses. Please check format (each couplet on two lines).', 'error')
+            return render_template('add_ghazal.html', stats=stats, poets=poets,
+                                   books=books, selected_poet_id=selected_poet_id,
+                                   selected_book_id=selected_book_id, form_data=form_data)
+
+        title_urdu = verses[0][0] if verses else ghazal_text[:100]
+        title_english_raw = translate_urdu_to_english(title_urdu)
+        title_english = clean_translation(title_english_raw)
+
+        translated_verses = []
+        text_english_parts = []
+        for (m1, m2) in verses:
+            m1_en_raw = translate_urdu_to_english(m1)
+            m2_en_raw = translate_urdu_to_english(m2) if m2 else ''
+            m1_en = clean_translation(m1_en_raw)
+            m2_en = clean_translation(m2_en_raw) if m2 else ''
+            if len(m1_en.split()) <= 2:
+                m1_en = "[Translation unavailable]"
+            if m2 and len(m2_en.split()) <= 2:
+                m2_en = "[Translation unavailable]"
+            translated_verses.append((m1_en, m2_en))
+            text_english_parts.append(f"{m1_en}\n{m2_en}" if m2_en else m1_en)
+
+        text_english = '\n\n'.join(text_english_parts)
+
+        contributor_id = None
+        if contributor_name:
+            contributor_id = get_or_create_contributor(contributor_name, contributor_email)
+
+        try:
+            text_id = insert_ghazal(
+                poet_id=poet_id,
+                book_id=book_id,                     # ✅ book_id passed
+                contributor_id=contributor_id,
+                title_urdu=title_urdu,
+                title_english=title_english,
+                text_urdu=ghazal_text,
+                text_english=text_english,
+                content_hash=content_hash,
+                verse_count=len(verses)
+            )
+
+            for idx, ((m1, m2), (m1_en, m2_en)) in enumerate(zip(verses, translated_verses), 1):
+                insert_verse(text_id, idx, m1, m2, m1_en, m2_en)
+
+            flash(f'✨ Thank you {contributor_name or "contributor"}! Your ghazal has been added.', 'success')
+            flash(Markup(f'📖 <a href="{url_for("ghazals.view_ghazal", text_id=text_id)}" class="underline">Click here to view your ghazal</a>'), 'success')
+            return redirect(url_for('ghazals.view_ghazal', text_id=text_id))
+
+        except Exception as e:
+            flash(f'❌ Error saving ghazal: {str(e)}', 'error')
+            return render_template('add_ghazal.html', stats=stats, poets=poets,
+                                   books=books, selected_poet_id=selected_poet_id,
+                                   selected_book_id=selected_book_id, form_data=form_data)
+
+    # GET request
+    selected_poet_id = request.args.get('poet_id')
+    if selected_poet_id:
+        books = get_books_by_poet(selected_poet_id)
+
+    return render_template('add_ghazal.html', stats=stats, poets=poets,
+                           books=books, selected_poet_id=selected_poet_id,
+                           selected_book_id=None, form_data=None)
+
+@ghazals_bp.route('/books/<int:poet_id>')
+def get_books(poet_id):
+    books = get_books_by_poet(poet_id)
+    return jsonify({'books': books})
+
+@ghazals_bp.route('/view/<int:text_id>')
+def view_ghazal(text_id):
+    stats = get_stats()
+    ghazal, verses = get_ghazal_with_verses(text_id)
+    if not ghazal:
+        flash('Ghazal not found', 'error')
+        return redirect(url_for('main.index'))
+    mode = session.get('view_mode', 'bilingual')
+    prev_id, next_id, total = get_navigation(text_id, ghazal['poet_id'])
+    return render_template('view.html',
+                           ghazal=ghazal,
+                           verses=verses,
+                           prev_id=prev_id,
+                           next_id=next_id,
+                           total_in_poet=total,
+                           stats=stats,
+                           mode=mode)
+
+@ghazals_bp.route('/set_mode/<mode>')
+def set_mode(mode):
+    if mode in ['bilingual', 'urdu', 'english']:
+        session['view_mode'] = mode
+    return redirect(request.referrer or url_for('main.index'))
+
+
+_____________________________________
+
+poets_routes.py
+
+from flask import Blueprint, render_template, flash, redirect, url_for
+from models.poets_model import fetch_poet_by_id, fetch_all_poets
+from models.ghazals_model import fetch_texts_by_poet
+from models.stats_model import get_stats
+
+poets_bp = Blueprint('poets', __name__)
+
+@poets_bp.route('/poets')
+def poets_list():
+    stats = get_stats()
+    poets = fetch_all_poets()
+    return render_template('poets.html', poets=poets, stats=stats)
+
+@poets_bp.route('/poet/<int:poet_id>')
+def poet_detail(poet_id):
+    poet = fetch_poet_by_id(poet_id)
+    if not poet:
+        flash('Poet not found', 'error')
+        return redirect(url_for('main.index'))
+    texts = fetch_texts_by_poet(poet_id)
+    return render_template('poet_detail.html', poet=poet, texts=texts)
+
+_________________________________________
+
+bulk_routes.py
+
+
+from flask import Blueprint, render_template, request, redirect, url_for, flash, session, jsonify
+from werkzeug.utils import secure_filename
+import os
+import json
+import tempfile
+import re
+import uuid
+import hashlib
+from models.ghazal_model import get_stats, get_all_poets, get_db
+from models.bulk_model import (
+    is_duplicate, get_or_create_contributor,
+    insert_ghazal_bulk, get_books_by_poet
+)
+
+bulk_bp = Blueprint('bulk', __name__, url_prefix='/bulk')
+
+def cleanup_temp_file(filepath):
+    if filepath and os.path.exists(filepath):
+        try:
+            os.unlink(filepath)
+        except:
+            pass
+
+def parse_blocks(text):
+    text = text.replace('\r\n', '\n')
+    if '###GHZ###' in text:
+        return [b.strip() for b in text.split('###GHZ###') if b.strip()]
+    else:
+        return [b.strip() for b in re.split(r'\n\s*\n+', text) if b.strip()]
+
+@bulk_bp.route('/')
+def bulk_upload():
+    stats = get_stats()
+    poets = get_all_poets()
+    preview_data = session.get('preview_data', [])
+    duplicates_found = session.get('duplicates_found', [])
+    insert_results = session.get('insert_results', [])
+
+    if not preview_data:
+        temp_file = session.get('temp_preview_file')
+        if temp_file:
+            cleanup_temp_file(temp_file)
+            session.pop('temp_preview_file', None)
+
+    return render_template(
+        'bulk.html',
+        poets=poets,
+        preview_data=preview_data,
+        duplicates_found=duplicates_found,
+        stats=stats,
+        insert_results=insert_results
+    )
+
+@bulk_bp.route('/preview', methods=['POST'])
+def bulk_preview():
+    try:
+        poet_id = request.form.get('poet_id')
+        book_id = request.form.get('book_id') or None
+        contributor = request.form.get('contributor', '').strip()
+        contributor_email = request.form.get('contributor_email', '').strip()
+
+        if not poet_id:
+            flash('❌ Please select a poet', 'error')
+            return redirect(url_for('bulk.bulk_upload'))
+
+        session['bulk_poet_id'] = poet_id
+        session['bulk_book_id'] = book_id
+        session['bulk_contributor'] = contributor
+        session['bulk_contributor_email'] = contributor_email
+
+        old_temp = session.get('temp_preview_file')
+        if old_temp:
+            cleanup_temp_file(old_temp)
+            session.pop('temp_preview_file', None)
+
+        raw_blocks = []
+        pasted_text = request.form.get('pasted_text', '')
+        if pasted_text:
+            raw_blocks.extend(parse_blocks(pasted_text))
+        elif 'files' in request.files:
+            files = request.files.getlist('files')
+            for file in files:
+                if file and file.filename:
+                    filename = secure_filename(file.filename).lower()
+                    file_bytes = file.read()
+                    try:
+                        text = file_bytes.decode('utf-8')
+                    except:
+                        try:
+                            text = file_bytes.decode('utf-8-sig')
+                        except:
+                            text = ''
+                    if text:
+                        raw_blocks.extend(parse_blocks(text))
+
+        if not raw_blocks:
+            flash('❌ No valid ghazals found. Check file format (separate with blank lines or ###GHZ###)', 'error')
+            return redirect(url_for('bulk.bulk_upload'))
+
+        conn = get_db()
+        valid_blocks = []
+        malformed_count = 0
+        for block in raw_blocks:
+            lines = [l.strip() for l in block.split('\n') if l.strip()]
+            if len(lines) < 2:
+                malformed_count += 1
+                continue
+            valid_blocks.append(block)
+
+        if malformed_count > 0:
+            flash(f'⚠️ {malformed_count} ghazal(s) had fewer than 2 lines and were skipped.', 'warning')
+
+        if not valid_blocks:
+            flash('❌ No valid ghazals with at least 2 lines found.', 'error')
+            return redirect(url_for('bulk.bulk_upload'))
+
+        preview_list = []
+        duplicates_list = []
+        new_ghazals = []
+
+        for block in valid_blocks:
+            lines = [l.strip() for l in block.split('\n') if l.strip()]
+            title_urdu = lines[0]
+            verses = len(lines) // 2
+            is_dup, existing_id, dup_title, dup_poet_id = is_duplicate(conn, block)
+            if is_dup:
+                cur = conn.cursor()
+                cur.execute("SELECT name_urdu FROM poets WHERE id = %s", (dup_poet_id,))
+                poet_name = cur.fetchone()['name_urdu'] if cur.rowcount else "Unknown"
+                cur.close()
+                duplicates_list.append({
+                    'title': dup_title,
+                    'existing_id': existing_id,
+                    'poet_name': poet_name
+                })
+                preview_list.append({
+                    'title_urdu': title_urdu,
+                    'verses': verses,
+                    'is_duplicate': True,
+                    'existing_id': existing_id
+                })
+            else:
+                preview_list.append({
+                    'title_urdu': title_urdu,
+                    'verses': verses,
+                    'is_duplicate': False,
+                    'existing_id': None
+                })
+                new_ghazals.append((block, title_urdu, verses))
+
+        conn.close()
+
+        session['preview_data'] = preview_list
+        session['duplicates_found'] = duplicates_list
+        session['valid_ghazals_count'] = len(new_ghazals)
+
+        if new_ghazals:
+            temp_file = tempfile.NamedTemporaryFile(mode='w', encoding='utf-8', delete=False, suffix='.json')
+            temp_file_path = temp_file.name
+            data = [{'text': block, 'title': title, 'verses': verses} for block, title, verses in new_ghazals]
+            with open(temp_file_path, 'w', encoding='utf-8') as f:
+                json.dump(data, f, ensure_ascii=False, indent=2)
+            session['temp_preview_file'] = temp_file_path
+        else:
+            session['temp_preview_file'] = None
+
+        if duplicates_list:
+            flash(f'⚠️ {len(duplicates_list)} duplicate ghazal(s) detected. They will be skipped during insertion.', 'warning')
+        if new_ghazals:
+            flash(f'✅ Found {len(new_ghazals)} new ghazals ready for upload', 'success')
+        else:
+            flash('ℹ️ No new ghazals to insert. All are duplicates.', 'info')
+
+        return redirect(url_for('bulk.bulk_upload'))
+
+    except Exception as e:
+        flash(f'❌ Error: {str(e)}', 'error')
+        return redirect(url_for('bulk.bulk_upload'))
+
+@bulk_bp.route('/insert', methods=['POST'])
+def bulk_insert():
+    try:
+        poet_id = session.get('bulk_poet_id')
+        book_id = session.get('bulk_book_id')
+        contributor_name = session.get('bulk_contributor')
+        contributor_email = session.get('bulk_contributor_email')
+        temp_file_path = session.get('temp_preview_file')
+
+        if not temp_file_path or not poet_id:
+            flash('❌ No valid ghazals to insert or session expired. Please preview again.', 'error')
+            return redirect(url_for('bulk.bulk_upload'))
+
+        if not os.path.exists(temp_file_path):
+            flash('❌ Temporary file missing. Please preview again.', 'error')
+            return redirect(url_for('bulk.bulk_upload'))
+
+        with open(temp_file_path, 'r', encoding='utf-8') as f:
+            new_ghazals = json.load(f)
+
+        if not new_ghazals:
+            flash('❌ No valid ghazals to insert', 'error')
+            return redirect(url_for('bulk.bulk_upload'))
+
+        conn = get_db()
+        contributor_id = None
+        if contributor_name:
+            contributor_id = get_or_create_contributor(conn, contributor_name, contributor_email)
+
+        results = []
+        for ghazal_data in new_ghazals:
+            ghazal_text = ghazal_data['text']
+            is_dup, existing_id, dup_title, dup_poet_id = is_duplicate(conn, ghazal_text)
+            if is_dup:
+                results.append({
+                    'status': 'duplicate',
+                    'title_urdu': ghazal_data['title'],
+                    'title_english': '',
+                    'verse_count': ghazal_data['verses'],
+                    'text_id': None,
+                    'existing_id': existing_id
+                })
+                continue
+
+            text_id, error = insert_ghazal_bulk(
+                conn,
+                poet_id=int(poet_id),
+                book_id=int(book_id) if book_id else None,
+                contributor_id=contributor_id,
+                ghazal_text=ghazal_text,
+                title_urdu=ghazal_data['title']
+            )
+            if text_id:
+                cur = conn.cursor()
+                cur.execute("SELECT title_urdu, title_english, verse_count FROM texts WHERE id = %s", (text_id,))
+                row = cur.fetchone()
+                cur.close()
+                results.append({
+                    'status': 'inserted',
+                    'title_urdu': row['title_urdu'],
+                    'title_english': row['title_english'],
+                    'verse_count': row['verse_count'],
+                    'text_id': text_id,
+                    'existing_id': None
+                })
+            else:
+                results.append({
+                    'status': 'error',
+                    'title_urdu': ghazal_data['title'],
+                    'title_english': '',
+                    'verse_count': ghazal_data['verses'],
+                    'text_id': None,
+                    'existing_id': None,
+                    'error': error
+                })
+
+        conn.commit()
+        conn.close()
+
+        cleanup_temp_file(temp_file_path)
+
+        session['insert_results'] = results
+        session.pop('preview_data', None)
+        session.pop('duplicates_found', None)
+        session.pop('valid_ghazals_count', None)
+        session.pop('temp_preview_file', None)
+        session.pop('bulk_poet_id', None)
+        session.pop('bulk_book_id', None)
+        session.pop('bulk_contributor', None)
+        session.pop('bulk_contributor_email', None)
+
+        flash(f'✅ Inserted {sum(1 for r in results if r["status"] == "inserted")} new ghazals. {sum(1 for r in results if r["status"] == "duplicate")} duplicates skipped.', 'success')
+        return redirect(url_for('bulk.bulk_upload'))
+
+    except Exception as e:
+        flash(f'❌ Insert failed: {str(e)}', 'error')
+        return redirect(url_for('bulk.bulk_upload'))
+
+@bulk_bp.route('/clear', methods=['POST'])
+def bulk_clear():
+    temp_file = session.pop('temp_preview_file', None)
+    if temp_file:
+        cleanup_temp_file(temp_file)
+    session.pop('preview_data', None)
+    session.pop('duplicates_found', None)
+    session.pop('valid_ghazals_count', None)
+    session.pop('bulk_poet_id', None)
+    session.pop('bulk_book_id', None)
+    session.pop('bulk_contributor', None)
+    session.pop('bulk_contributor_email', None)
+    session.pop('insert_results', None)
+    flash('Preview cleared. You can start a new bulk upload.', 'info')
+    return redirect(url_for('bulk.bulk_upload'))
+
+@bulk_bp.route('/books/<int:poet_id>')
+def get_books(poet_id):
+    books = get_books_by_poet(poet_id)
+    return jsonify({'books': books})
+__________________________________
+
+main_routs.py
+
+from flask import Blueprint, render_template
+from models.poets_model import fetch_all_poets
+from models.stats_model import get_stats
+
+main_bp = Blueprint('main', __name__)
+
+@main_bp.route('/')
+def index():
+    stats = get_stats()
+    poets = fetch_all_poets()
+    return render_template('index.html', poets=poets, stats=stats)
