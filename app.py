@@ -1,5 +1,4 @@
-﻿from flask import Flask, redirect, url_for, render_template
-from flask import Flask, redirect, url_for
+from flask import Flask, redirect, url_for, render_template, request
 from routes.main_routes import main_bp
 from routes.poets_routes import poets_bp
 from routes.ghazals_routes import ghazals_bp
@@ -16,6 +15,11 @@ app.register_blueprint(ghazals_bp)
 app.register_blueprint(search_bp)
 app.register_blueprint(bulk_bp)
 
+# Health check endpoint for Render
+@app.route('/health')
+def health_check():
+    return {'status': 'healthy', 'message': 'Server is running'}, 200
+
 @app.route('/admin/add_ghazal')
 def redirect_add_ghazal():
     return redirect(url_for('ghazals.add_ghazal'))
@@ -28,13 +32,14 @@ def redirect_view(text_id):
 def inject_stats():
     return dict(stats=get_stats())
 
+# Error handlers with request context
 @app.errorhandler(404)
 def page_not_found(e):
-    return render_template('404.html'), 404
+    return render_template('404.html', request=request), 404
 
 @app.errorhandler(500)
 def internal_server_error(e):
-    return render_template('500.html'), 500
+    return render_template('500.html', request=request), 500
 
 if __name__ == '__main__':
     app.run(debug=True)
