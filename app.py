@@ -1,121 +1,261 @@
-from flask import Flask, redirect, url_for, render_template, request, jsonify
+from flask import Flask, redirect, url_for, render_template, request, jsonify, abort, send_from_directory, send_file, make_response
+from modules.image_generator import generate_ghazal_card
+import os
+import base64
+import time
+import uuid
+import hashlib
+import io
+import re
+
+# Blueprints
 from routes.main_routes import main_bp
 from routes.poets_routes import poets_bp
 from routes.ghazals_routes import ghazals_bp
 from routes.search_routes import search_bp
 from routes.bulk_routes import bulk_bp
+from routes.listen_routes import listen_bp
+from routes.similarity_route import similarity_bp
+from routes.fingerprint import fingerprint_bp
+from routes.insights_routes import insights_bp
+from routes.poet_prediction import poet_bp
+
+# Models
 from models.stats_model import get_stats
-import os
-import logging
+from models.ghazal_model import get_ghazal_with_verses
 
-# Configure logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+# ==================== CONFIG ====================
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+GENERATED_FOLDER = os.path.join(BASE_DIR, 'static', 'generated')
+os.makedirs(GENERATED_FOLDER, exist_ok=True)
 
-app = Flask(__name__)
+# ==================== DATABASE ====================
+def get_db_connection():
+    import psycopg2
+    return psycopg2.connect(
+        host=os.getenv('DB_HOST', 'localhost'),
+        database=os.getenv('DB_NAME', 'ucpc_v3_db'),
+        user=os.getenv('DB_USER', 'postgres'),
+        password=os.getenv('DB_PASSWORD', '')
+    )
 
-# Use environment variable for secret key in production
-app.secret_key = os.environ.get('SECRET_KEY', 'your-secret-key-here-change-this-in-production')
+# ==================== APP FACTORY ====================
+def create_app():
+    app = Flask(__name__)
+    app.secret_key = os.getenv('SECRET_KEY', 'dev-secret-key')
+    app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024   # 50 MB
+    app.config['GENERATED_FOLDER'] = GENERATED_FOLDER
 
-# Configuration
-app.config.update(
-    SESSION_COOKIE_SECURE=os.environ.get('SESSION_COOKIE_SECURE', 'False').lower() == 'true',
-    SESSION_COOKIE_HTTPONLY=True,
-    SESSION_COOKIE_SAMESITE='Lax',
-)
+    # Register Blueprints
+    app.register_blueprint(main_bp)
+    app.register_blueprint(poets_bp)
+    app.register_blueprint(ghazals_bp)
+    app.register_blueprint(search_bp)
+    app.register_blueprint(bulk_bp)
+    app.register_blueprint(listen_bp)
+    app.register_blueprint(similarity_bp)
+    app.register_blueprint(fingerprint_bp)
+    app.register_blueprint(insights_bp)
+    app.register_blueprint(poet_bp)
 
-# Register blueprints
-app.register_blueprint(main_bp)
-app.register_blueprint(poets_bp)
-app.register_blueprint(ghazals_bp)
-app.register_blueprint(search_bp)
-app.register_blueprint(bulk_bp)
 
-# Health check endpoint for Render
-@app.route('/health')
-def health_check():
-    return jsonify({
-        'status': 'healthy',
-        'message': 'Server is running',
-        'endpoint': request.endpoint
-    }), 200
+    print("✅ Blueprints registered")
 
-# Readiness probe for Render
-@app.route('/ready')
-def readiness_check():
-    try:
-        # Check database connection or other critical services here
-        stats = get_stats()
-        return jsonify({
-            'status': 'ready',
-            'stats': stats
-        }), 200
-    except Exception as e:
-        logger.error(f"Readiness check failed: {e}")
-        return jsonify({'status': 'not ready', 'error': str(e)}), 503
+    # ---------- AFTER REQUEST (allow Facebook bot & skip ngrok warning) ----------
+    @app.after_request
+    def add_security_headers(response):
+        response.headers['Access-Control-Allow-Origin'] = '*'
+        response.headers['ngrok-skip-browser-warning'] = 'true'
+        return response
 
-@app.route('/admin/add_ghazal')
-def redirect_add_ghazal():
-    return redirect(url_for('ghazals.add_ghazal'))
+    # ---------- Redirects ----------
+    @app.route('/admin/add_ghazal')
+    def redirect_add_ghazal():
+        return redirect(url_for('ghazals.add_ghazal'))
 
-@app.route('/view/<int:text_id>')
-def redirect_view(text_id):
-    return redirect(url_for('ghazals.view_ghazal', text_id=text_id))
+    @app.route('/view/<int:text_id>')
+    def redirect_view(text_id):
+        return redirect(url_for('ghazals.view_ghazal', text_id=text_id))
 
-@app.context_processor
-def inject_stats():
-    return dict(stats=get_stats())
+    # ---------- Debug ----------
+    @app.route('/check')
+    def check():
+        return "OK WORKING"
 
-@app.context_processor
-def inject_year():
-    return dict(current_year=os.environ.get('CURRENT_YEAR', '2026'))
+    @app.route('/routes')
+    def show_routes():
+        return "<br>".join([str(rule) for rule in app.url_map.iter_rules()])
 
-# Error handlers with request context
-@app.errorhandler(404)
-def page_not_found(e):
-    logger.warning(f"404 error: {request.url} - endpoint: {request.endpoint}")
-    return render_template('404.html', request=request), 404
+    # ---------- Client-side canvas upload ----------
+    @app.route('/upload_image', methods=['POST'])
+    def upload_image():
+        data = request.json.get('image')
+        if not data:
+            return jsonify({'error': 'No image data'}), 400
+        header, encoded = data.split(',', 1)
+        binary = base64.b64decode(encoded)
 
-@app.errorhandler(500)
-def internal_server_error(e):
-    logger.error(f"500 error: {request.url} - {str(e)}")
-    return render_template('500.html', request=request), 500
+        filename = f"share_{uuid.uuid4().hex}.png"
+        filepath = os.path.join(GENERATED_FOLDER, filename)
+        with open(filepath, 'wb') as f:
+            f.write(binary)
 
-@app.errorhandler(403)
-def forbidden(e):
-    return render_template('403.html', request=request), 403
+        full_url = url_for('static', filename=f'generated/{filename}', _external=True)
+        return jsonify({'url': full_url})
 
-@app.errorhandler(405)
-def method_not_allowed(e):
-    return render_template('405.html', request=request), 405
+    # ---------- Generate share image (with dedication) ----------
+    @app.route('/generate_share/<int:text_id>')
+    def generate_share(text_id):
+        try:
+            dedicator = request.args.get('dedicator', '')
+            dedicatee = request.args.get('dedicatee', '')
 
-# Handle large payloads and timeouts
-@app.errorhandler(413)
-def request_entity_too_large(e):
-    return jsonify({'error': 'File too large. Maximum size is 16MB.'}), 413
+            result = get_ghazal_with_verses(text_id)
+            if not result:
+                return jsonify({'error': 'Ghazal not found'}), 404
 
-@app.errorhandler(504)
-def gateway_timeout(e):
-    return jsonify({'error': 'Request timeout. Please try again.'}), 504
+            if isinstance(result, tuple):
+                ghazal, verses = result
+            else:
+                ghazal = result.get('ghazal')
+                verses = result.get('verses')
 
-# Before request handler for security
-@app.before_request
-def before_request():
-    # Log all requests in production
-    if not app.debug:
-        logger.info(f"{request.method} {request.path} - {request.remote_addr}")
+            print(f"Verses count: {len(verses)}")
+            if verses:
+                print(f"First verse keys: {verses[0].keys()}")
 
-# After request handler for headers
-@app.after_request
-def after_request(response):
-    # Add security headers
-    response.headers['X-Content-Type-Options'] = 'nosniff'
-    response.headers['X-Frame-Options'] = 'DENY'
-    response.headers['X-XSS-Protection'] = '1; mode=block'
-    response.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
-    return response
+            img = generate_ghazal_card(ghazal, verses, dedicator, dedicatee)
+
+            filename = f"share_{uuid.uuid4().hex}.png"
+            filepath = os.path.join(GENERATED_FOLDER, filename)
+            img.save(filepath)
+
+            name_without_ext = filename.replace('.png', '')
+            share_url = url_for('share_page', filename=name_without_ext, _external=True)
+            return jsonify({'share_url': share_url})
+
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+            return jsonify({'error': str(e)}), 500
+
+    # ---------- Share page (HTML with OG tags) – no .png in URL ----------
+    @app.route('/share_page/<filename>')
+    def share_page(filename):
+        if not filename.endswith('.png'):
+            filename_png = filename + '.png'
+        else:
+            filename_png = filename
+        image_url = url_for('static', filename=f'generated/{filename_png}', _external=True)
+        return render_template('share.html', image_url=image_url)
+
+    # ---------- Direct OG image (no file save) ----------
+    @app.route('/og-image/<int:text_id>')
+    def og_image(text_id):
+        result = get_ghazal_with_verses(text_id)
+        if not result:
+            abort(404)
+        if isinstance(result, tuple):
+            ghazal, verses = result
+        else:
+            ghazal = result.get('ghazal')
+            verses = result.get('verses')
+        if not ghazal:
+            abort(404)
+        img = generate_ghazal_card(ghazal, verses, '', '')
+        buf = io.BytesIO()
+        img.save(buf, format='PNG')
+        buf.seek(0)
+        return send_file(buf, mimetype='image/png')
+
+    # ---------- robots.txt ----------
+    @app.route('/robots.txt')
+    def robots():
+        return send_from_directory('static', 'robots.txt')
+
+    # ---------- TEXT SHARE (with dedication) ----------
+    @app.route('/share_text/<int:text_id>')
+    def share_text(text_id):
+        dedicator = request.args.get('dedicator', '')
+        dedicatee = request.args.get('dedicatee', '')
+
+        result = get_ghazal_with_verses(text_id)
+        if not result:
+            return "Ghazal not found", 404
+
+        if isinstance(result, tuple):
+            ghazal, verses = result
+        else:
+            ghazal = result.get('ghazal')
+            verses = result.get('verses')
+
+        text = ""
+        poet = ghazal.get('poet_name', '').upper()
+        text += f"{poet}\n"
+        text += "-" * len(poet) + "\n\n"
+
+        if dedicator:
+            text += f"From: {dedicator}\n"
+        if dedicatee:
+            text += f"To: {dedicatee}\n"
+        text += "\n"
+
+        for v in verses:
+            m1 = v.get('misra1_urdu', '')
+            m2 = v.get('misra2_urdu', '')
+            text += f"{m1}\n{m2}\n\n"
+
+        text += "📖 UCPC Poetry Archive"
+        return text
+
+    # ---------- Global stats ----------
+    @app.context_processor
+    def inject_stats():
+        try:
+            return dict(stats=get_stats())
+        except Exception as e:
+            print("⚠️ Stats error:", str(e))
+            return dict(stats=None)
+
+    # ---------- Template filter for enumerate ----------
+    @app.template_filter('enumerate')
+    def jinja_enumerate(iterable, start=1):
+        return enumerate(iterable, start)
+
+    # ---------- Poet Prediction API ----------
+    @app.route('/api/predict-poet/<int:text_id>')
+    def api_predict_poet(text_id):
+        from modules.poet_classifier import predict_poet_by_id
+        results = predict_poet_by_id(text_id)
+        return jsonify(results)
+
+    # ---------- Random Ghazal API ----------
+    @app.route('/api/random-ghazal')
+    def random_ghazal():
+        from models.base import get_db_connection
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute("SELECT id FROM texts ORDER BY RANDOM() LIMIT 1")
+        row = cur.fetchone()
+        cur.close()
+        conn.close()
+        if row:
+            return jsonify({'id': row['id']})
+        return jsonify({'error': 'No ghazals found'}), 404
+
+    # ---------- Error handlers ----------
+    @app.errorhandler(404)
+    def page_not_found(e):
+        return render_template('404.html'), 404
+
+    @app.errorhandler(500)
+    def internal_server_error(e):
+        return render_template('500.html'), 500
+
+    return app
+
+app = create_app()
 
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5000))
-    debug = os.environ.get('FLASK_DEBUG', 'False').lower() == 'true'
-    app.run(host='0.0.0.0', port=port, debug=debug)
+    port = int(os.getenv('PORT', 10000))
+    app.run(host='0.0.0.0', port=port, debug=False)
