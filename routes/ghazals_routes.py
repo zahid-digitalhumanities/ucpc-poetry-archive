@@ -9,7 +9,7 @@ from models.ghazal_model import (
 from models.poets_model import fetch_poet_by_id
 from models.bulk_model import analyze_ghazal   # NLP analysis
 from models.base import get_db_connection
-from modules.embeddings import update_ghazal_embedding   # 🔥 NEW: embedding generation
+# from modules.embeddings import update_ghazal_embedding   # 🔥 DISABLED for free tier
 import hashlib
 import re
 
@@ -92,8 +92,8 @@ def add_ghazal():
         analyze_ghazal(conn, text_id)
         conn.close()
 
-        # 🔥 Generate embedding for semantic similarity
-        update_ghazal_embedding(text_id)
+        # 🔥 Generate embedding for semantic similarity - DISABLED for free tier
+        # update_ghazal_embedding(text_id)  # COMMENTED OUT
 
         flash('Ghazal added successfully!', 'success')
         return redirect(url_for('ghazals.view_ghazal', text_id=text_id))
