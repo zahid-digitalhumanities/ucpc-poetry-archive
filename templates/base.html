@@ -1,8 +1,10 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#1E3C72">
+    <meta name="csrf-token" content="{{ csrf_token() if csrf_token else '' }}">
     <title>{% block title %}UCPC - Urdu Computational Philology Corpus{% endblock %}</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -108,6 +110,19 @@
         {% include 'footer.html' %}
     </div>
 
+    <!-- Pass request endpoint to JavaScript for safety -->
+    <script>
+        window.requestEndpoint = {{ request.endpoint|tojson|default('null') }};
+        // Reading mode toggle functionality
+        function toggleReadingMode() {
+            document.body.classList.toggle('reading-mode');
+            localStorage.setItem('readingMode', document.body.classList.contains('reading-mode'));
+        }
+        // Load reading mode preference
+        if (localStorage.getItem('readingMode') === 'true') {
+            document.body.classList.add('reading-mode');
+        }
+    </script>
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     {% block extra_js %}{% endblock %}
 </body>
