@@ -3,25 +3,18 @@
 {% block title %}{{ ghazal.poet_name }} - UCPC Poetry Archive{% endblock %}
 
 {% block extra_head %}
-<!-- Open Graph for social media (required for preview) -->
 <meta property="og:title" content="{{ ghazal.poet_name }} - Urdu Ghazal" />
-<meta property="og:description" content="Dedicate this beautiful ghazal to someone special." />
+<meta property="og:description" content="Dedicate this beautiful ghazal to someone special. Read full ghazal at UCPC Poetry Archive." />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="{{ request.url }}" />
 <meta property="og:image" content="{{ url_for('static', filename='og-image.png', _external=true) }}" />
-<meta property="og:image:width" content="1200" />
-<meta property="og:image:height" content="630" />
 <meta property="og:site_name" content="UCPC Poetry Archive" />
 <meta name="twitter:card" content="summary_large_image" />
 {% endblock %}
 
 {% block extra_css %}
 <style>
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
         background: #0a0a0a;
         font-family: 'Segoe UI', 'Inter', system-ui, sans-serif;
@@ -32,13 +25,8 @@
         padding: 20px;
     }
 
-    .page-container {
-        max-width: 800px;
-        width: 100%;
-        margin: 0 auto;
-    }
+    .page-container { max-width: 800px; width: 100%; margin: 0 auto; }
 
-    /* Input area – UI only */
     .dedication-input-area {
         background: #111;
         border-radius: 60px;
@@ -59,16 +47,15 @@
         outline: none;
     }
 
-    /* ========== POSTER – OPTIMIZED SIZE & SPACING ========== */
+    /* POSTER - optimized for Facebook (4 verses only) */
     .poetry-poster {
         background: linear-gradient(180deg, #0a0a0a 0%, #111111 100%);
         border: 2px solid #E0B94F;
         border-radius: 32px;
-        padding: 1.8rem;
+        padding: 1.5rem;
         position: relative;
         overflow: hidden;
         box-shadow: 0 20px 35px rgba(0,0,0,0.5);
-        /* Fixed width for consistent capture */
         width: 100%;
         max-width: 800px;
         margin: 0 auto;
@@ -85,7 +72,7 @@
         color: #E0B94F;
         font-size: 0.8rem;
         letter-spacing: 3px;
-        margin-bottom: 1.2rem;
+        margin-bottom: 1rem;
         font-weight: 700;
         text-transform: uppercase;
     }
@@ -93,45 +80,51 @@
         text-align: center;
         color: #F6D878;
         font-size: 1rem;
-        margin-bottom: 1.5rem;
+        margin-bottom: 0.3rem;
         font-style: italic;
         line-height: 1.4;
         font-weight: 500;
-        padding: 0.3rem;
     }
-    .poster-verses {
-        margin: 0.5rem 0;
+    .poster-site {
+        text-align: center;
+        color: rgba(224,185,79,0.5);
+        font-size: 0.65rem;
+        letter-spacing: 1px;
+        margin-bottom: 1.2rem;
+        font-family: monospace;
     }
-    /* REDUCED SPACING BETWEEN VERSES */
+    .poster-verses { margin: 0.5rem 0; }
     .poster-verse {
         direction: rtl;
         text-align: center;
         color: #F8F1DA;
-        font-size: 1.3rem;
-        line-height: 1.8;
+        font-size: 1.4rem;
+        line-height: 1.9;
         margin-bottom: 1rem;
         font-family: 'Noto Nastaliq Urdu', 'Jameel Noori Nastaleeq', serif;
     }
     .poster-poet {
         text-align: center;
         color: rgba(224,185,79,0.85);
-        margin-top: 1.2rem;
+        margin-top: 0.8rem;
         font-size: 0.85rem;
         letter-spacing: 1px;
     }
-    .poster-watermark {
+    .poster-cta {
         text-align: center;
+        color: rgba(224,185,79,0.6);
+        font-size: 0.65rem;
         margin-top: 1rem;
-        font-size: 0.6rem;
-        color: rgba(224,185,79,0.35);
-        letter-spacing: 1px;
+        padding-top: 0.8rem;
+        border-top: 1px dashed rgba(224,185,79,0.3);
+        line-height: 1.4;
+    }
+    .poster-cta a {
+        color: #E0B94F;
+        text-decoration: none;
     }
 
-    /* Share button */
-    .share-action {
-        text-align: center;
-        margin-top: 1.5rem;
-    }
+    .share-action { text-align: center; margin-top: 1.5rem; }
     .share-btn-poster {
         background: #E0B94F;
         color: #0a0a0a;
@@ -141,30 +134,17 @@
         font-weight: bold;
         font-size: 1rem;
         cursor: pointer;
-        box-shadow: 0 4px 12px rgba(224,185,79,0.3);
-        transition: 0.2s;
     }
-    .share-btn-poster:hover {
-        background: #F6D878;
-        transform: scale(1.01);
-    }
-    .back-link {
-        text-align: center;
-        margin-top: 1rem;
-    }
-    .back-link a {
-        color: #888;
-        text-decoration: none;
-        font-size: 0.8rem;
-    }
+    .back-link { text-align: center; margin-top: 1rem; }
+    .back-link a { color: #888; text-decoration: none; font-size: 0.8rem; }
 
-    /* Mobile */
     @media (max-width: 600px) {
         .poetry-poster { padding: 1rem; }
-        .poster-verse { font-size: 1rem; line-height: 1.6; margin-bottom: 0.8rem; }
-        .poster-brand { font-size: 0.7rem; }
-        .poster-dedication { font-size: 0.85rem; margin-bottom: 1rem; }
-        .dedication-input-area input { width: 150px; font-size: 0.8rem; }
+        .poster-verse { font-size: 1.1rem; line-height: 1.7; margin-bottom: 0.8rem; }
+        .poster-brand { font-size: 0.65rem; }
+        .poster-dedication { font-size: 0.85rem; }
+        .poster-site { font-size: 0.55rem; }
+        .poster-cta { font-size: 0.55rem; }
     }
 
     .toast-message {
@@ -180,34 +160,40 @@
         z-index: 1000;
         display: none;
         font-size: 0.8rem;
-        white-space: nowrap;
     }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="page-container">
-    <!-- Input area (UI only) -->
     <div class="dedication-input-area">
         <input type="text" id="fromName" placeholder="Your Name">
         <input type="text" id="toName" placeholder="Special Someone">
         <div style="font-size:0.7rem; color:#aaa; margin-top:0.3rem;">💕 Enter names to personalise the poster</div>
     </div>
 
-    <!-- THE POSTER – only this is captured -->
     <div id="poetry-poster" class="poetry-poster">
         <div class="poster-brand">✨ UCPC POETRY ARCHIVE ✨</div>
         <div class="poster-dedication" id="posterDedication">✨ Dedicated Urdu Poetry ✨</div>
+        <div class="poster-site" id="posterSite">www.ucpcpoetry.com</div>
+        
+        <!-- ONLY FIRST 4 VERSES (2 couplets) for the poster -->
         <div class="poster-verses">
-            {% for verse in verses %}
+            {% for verse in poster_verses %}
             <div class="poster-verse" dir="rtl">
                 {{ verse.misra1_urdu }}<br>
                 {{ verse.misra2_urdu }}
             </div>
             {% endfor %}
         </div>
+        
         <div class="poster-poet">— {{ ghazal.poet_name }} —</div>
-        <div class="poster-watermark">www.ucpcpoetry.com</div>
+        
+        <!-- CALL TO ACTION - drives traffic to website -->
+        <div class="poster-cta">
+            ✨ Continue reading full ghazal ✨<br>
+            <a href="{{ request.url }}">www.ucpcpoetry.com</a>
+        </div>
     </div>
 
     <div class="share-action">
@@ -251,7 +237,6 @@
     toInput.addEventListener('input', updatePosterDedication);
     updatePosterDedication();
 
-    // Optimized image capture with compression
     document.getElementById('sharePosterBtn').addEventListener('click', async function() {
         const poster = document.getElementById('poetry-poster');
         const toast = document.getElementById('toast');
@@ -260,22 +245,14 @@
         toast.innerText = '🎨 Creating poster...';
 
         try {
-            // Capture at 2x scale (good quality, smaller file)
             const canvas = await html2canvas(poster, {
                 scale: 2,
                 backgroundColor: '#0a0a0a',
                 logging: false,
-                useCORS: true,
-                windowWidth: poster.scrollWidth,
-                windowHeight: poster.scrollHeight
+                useCORS: true
             });
-
-            // Compress to JPEG at 85% quality (reduces file size dramatically)
             const imageData = canvas.toDataURL('image/jpeg', 0.85);
-
-            // Convert to blob for file size check
             const blob = await (await fetch(imageData)).blob();
-            console.log(`Image size: ${(blob.size / 1024).toFixed(1)} KB`);
 
             if (navigator.share) {
                 const file = new File([blob], 'ucpc_poster.jpg', { type: 'image/jpeg' });
@@ -286,12 +263,11 @@
                 });
                 toast.innerText = '✅ Shared!';
             } else {
-                // Desktop fallback: download
                 const link = document.createElement('a');
                 link.download = `ucpc_poster_${Date.now()}.jpg`;
                 link.href = imageData;
                 link.click();
-                toast.innerText = '✅ Poster saved! Share it on social media.';
+                toast.innerText = '✅ Poster saved!';
             }
         } catch (err) {
             console.error(err);
