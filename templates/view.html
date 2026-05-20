@@ -75,49 +75,39 @@
         font-size: 0.8rem;
     }
 
-    /* ========== HIDDEN SOCIAL POSTER ========== */
+    /* ========== COMPACT SOCIAL POSTER (FIXED SPACING) ========== */
     #social-poster {
         width: 1080px;
-        height: 1920px;
         background: linear-gradient(180deg, #050505 0%, #111111 100%);
         position: fixed;
         left: -99999px;
         top: 0;
-        padding: 100px 70px;
-        display: flex;
-        flex-direction: column;
+        padding: 60px 70px 50px 70px;
         font-family: 'Noto Nastaliq Urdu', 'Jameel Noori Nastaleeq', serif;
     }
 
     .poster-watermark {
         text-align: center;
         color: #D4AF37;
-        font-size: 34px;
-        letter-spacing: 6px;
-        margin-bottom: 40px;
+        font-size: 32px;
+        letter-spacing: 5px;
+        margin-bottom: 30px;
         font-weight: bold;
     }
 
     .poster-poet {
         text-align: center;
-        font-size: 48px;
+        font-size: 46px;
         color: #E8C766;
-        margin-bottom: 60px;
+        margin-bottom: 50px;
         font-weight: 600;
-    }
-
-    .poster-verses {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        gap: 60px;
     }
 
     .poster-sher {
         text-align: center;
-        font-size: 54px;
-        line-height: 2.4;
+        font-size: 50px;
+        line-height: 2.2;
+        margin-bottom: 45px;
         color: #F8F1DA;
     }
 
@@ -127,10 +117,11 @@
 
     .poster-dedication {
         text-align: center;
-        font-size: 44px;
+        font-size: 40px;
         color: #E8C766;
-        margin: 50px 0 30px 0;
-        line-height: 1.6;
+        margin-top: 45px;
+        margin-bottom: 25px;
+        line-height: 1.5;
     }
 
     .poster-dedication.hidden {
@@ -139,10 +130,11 @@
 
     .poster-footer {
         text-align: center;
-        font-size: 28px;
-        color: rgba(224,185,79,0.45);
-        letter-spacing: 3px;
-        margin-top: 20px;
+        font-size: 26px;
+        color: rgba(224,185,79,0.5);
+        letter-spacing: 2px;
+        margin-top: 35px;
+        padding-bottom: 10px;
     }
 
     .toast-message {
@@ -183,7 +175,7 @@
     </div>
 </div>
 
-<!-- ========== HIDDEN SOCIAL POSTER ========== -->
+<!-- ========== COMPACT SOCIAL POSTER ========== -->
 <div id="social-poster">
     <div class="poster-watermark">✨ UCPC POETRY ARCHIVE ✨</div>
     <div class="poster-poet">{{ ghazal.poet_name }}</div>
@@ -252,7 +244,7 @@
                 logging: false,
                 useCORS: true,
                 windowWidth: 1080,
-                windowHeight: 1920
+                windowHeight: poster.scrollHeight
             });
             
             const imageData = canvas.toDataURL('image/jpeg', 0.9);
