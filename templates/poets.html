@@ -4,6 +4,12 @@
 
 {% block extra_css %}
 <style>
+    .page-title {
+        text-align: center;
+        color: #D4AF37;
+        font-size: 2rem;
+        margin-bottom: 2rem;
+    }
     .poets-grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -14,8 +20,8 @@
         border-radius: 16px;
         padding: 1.5rem;
         text-align: center;
-        transition: 0.2s;
         border: 1px solid #2a2a2a;
+        transition: 0.2s;
     }
     .poet-card:hover {
         border-color: #D4AF37;
@@ -30,16 +36,25 @@
         font-weight: bold;
     }
     .poet-name-urdu {
-        font-family: 'Noto Nastaliq Urdu', serif;
+        font-family: 'Noto Nastaliq Urdu', 'Times New Roman', serif;
         font-size: 1.2rem;
         color: #ccc;
+        margin-top: 0.5rem;
+    }
+    .ghazal-count {
+        display: inline-block;
+        background: #2a2a2a;
+        color: #D4AF37;
+        font-size: 0.7rem;
+        padding: 0.2rem 0.6rem;
+        border-radius: 20px;
         margin-top: 0.5rem;
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<h1 style="text-align: center; color: #D4AF37; margin-bottom: 2rem;">🖋️ Classical Poets</h1>
+<h1 class="page-title">🖋️ Classical Poets</h1>
 
 <div class="poets-grid">
     {% for poet in poets %}
@@ -47,6 +62,7 @@
         <a href="/poets/{{ poet.id }}">
             <div class="poet-name-en">{{ poet.name }}</div>
             <div class="poet-name-urdu">{{ poet.name_urdu }}</div>
+            <div class="ghazal-count">{{ poet.ghazal_count }} Ghazals</div>
         </a>
     </div>
     {% endfor %}
