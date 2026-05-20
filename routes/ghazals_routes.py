@@ -1,7 +1,6 @@
 from flask import Blueprint, render_template, abort
 from models.db import get_db
 
-# Create the blueprint - THIS MUST BE NAMED 'ghazals_bp'
 ghazals_bp = Blueprint('ghazals', __name__)
 
 
@@ -10,7 +9,7 @@ def view_ghazal(text_id):
     conn = get_db()
     cur = conn.cursor()
 
-    # Get ghazal info
+    # Get ghazal with poet name
     cur.execute("""
         SELECT 
             t.id,
@@ -30,18 +29,20 @@ def view_ghazal(text_id):
         conn.close()
         abort(404)
 
-    # Get verses for poster (first 3 couplets)
+    # Get all verses
     cur.execute("""
         SELECT misra1_urdu, misra2_urdu, couplet_index
         FROM verses
         WHERE text_id = %s
         ORDER BY couplet_index ASC
-        LIMIT 3
     """, (text_id,))
     
-    poster_verses = cur.fetchall()
+    all_verses = cur.fetchall()
     cur.close()
     conn.close()
+
+    # SIRF 2 COUPLET (4 misray) - YEHI AAP CHAHTE THAY
+    poster_verses = all_verses[:2]  # 2 couplet = first 2 entries
 
     return render_template('view.html', 
                           ghazal=ghazal, 
