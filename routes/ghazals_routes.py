@@ -1,7 +1,8 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, abort
 from models.db import get_db
 
 ghazals_bp = Blueprint("ghazals", __name__)
+
 
 @ghazals_bp.route("/view/<int:text_id>")
 def view_ghazal(text_id):
@@ -11,7 +12,17 @@ def view_ghazal(text_id):
     cur.execute("SELECT * FROM texts WHERE id = %s", (text_id,))
     ghazal = cur.fetchone()
 
-    cur.execute("SELECT * FROM verses WHERE text_id = %s ORDER BY verse_number ASC", (text_id,))
+    if ghazal is None:
+        cur.close()
+        conn.close()
+        abort(404)
+
+    cur.execute("""
+        SELECT * FROM verses 
+        WHERE text_id = %s 
+        ORDER BY verse_number ASC
+    """, (text_id,))
+    
     verses = cur.fetchall()
 
     cur.close()
