@@ -1,3 +1,4 @@
+import os  # ← ADD THIS LINE
 from dotenv import load_dotenv
 
 load_dotenv()
