@@ -6,12 +6,11 @@ ghazals_bp = Blueprint('ghazals', __name__)
 
 @ghazals_bp.route('/view/<int:text_id>')
 def view_ghazal(text_id):
-    """Display a single ghazal with all its verses"""
+    """Display a single ghazal with all verses (for web)"""
     conn = get_db()
     cur = conn.cursor()
 
-    # Get ghazal info from texts table
-    # Note: poet_name doesn't exist, so we join with poets table
+    # Get ghazal info
     cur.execute("""
         SELECT 
             t.id,
@@ -34,8 +33,7 @@ def view_ghazal(text_id):
         conn.close()
         abort(404)
 
-    # Get all verses for this ghazal from verses table
-    # Note: Using couplet_index instead of verse_number
+    # Get ALL verses for web view
     cur.execute("""
         SELECT 
             id,
@@ -52,9 +50,15 @@ def view_ghazal(text_id):
         ORDER BY couplet_index ASC
     """, (text_id,))
     
-    verses = cur.fetchall()
+    all_verses = cur.fetchall()
 
     cur.close()
     conn.close()
 
-    return render_template('view.html', ghazal=ghazal, verses=verses)
+    # For Facebook poster: only first 4 verses (2 couplets)
+    poster_verses = all_verses[:4]  # First 4 misras = first 2 couplets
+
+    return render_template('view.html', 
+                          ghazal=ghazal, 
+                          verses=all_verses,      # All verses for web
+                          poster_verses=poster_verses)  # Only 4 for image
