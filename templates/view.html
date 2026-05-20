@@ -4,10 +4,9 @@
 
 {% block extra_head %}
 <meta property="og:title" content="{{ ghazal.poet_name }} - Urdu Ghazal" />
-<meta property="og:description" content="Read and share beautiful Urdu poetry from classical and modern poets." />
+<meta property="og:description" content="Beautiful Urdu poetry from classical and modern poets." />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="{{ request.url }}" />
-<meta property="og:image" content="{{ url_for('static', filename='og-image.png', _external=true) }}" />
 <meta property="og:site_name" content="UCPC Poetry Archive" />
 <meta name="twitter:card" content="summary_large_image" />
 {% endblock %}
@@ -46,9 +45,6 @@
         margin: 0.3rem;
         outline: none;
     }
-    .dedication-input-area input:focus {
-        border-color: #F6D878;
-    }
 
     .share-action {
         text-align: center;
@@ -78,9 +74,6 @@
         text-decoration: none;
         font-size: 0.8rem;
     }
-    .back-link a:hover {
-        color: #E0B94F;
-    }
 
     /* ========== HIDDEN SOCIAL POSTER ========== */
     #social-poster {
@@ -90,7 +83,7 @@
         position: fixed;
         left: -99999px;
         top: 0;
-        padding: 80px 60px;
+        padding: 100px 70px;
         display: flex;
         flex-direction: column;
         font-family: 'Noto Nastaliq Urdu', 'Jameel Noori Nastaleeq', serif;
@@ -99,17 +92,17 @@
     .poster-watermark {
         text-align: center;
         color: #D4AF37;
-        font-size: 36px;
-        letter-spacing: 4px;
-        margin-bottom: 30px;
+        font-size: 34px;
+        letter-spacing: 6px;
+        margin-bottom: 40px;
         font-weight: bold;
     }
 
     .poster-poet {
         text-align: center;
-        font-size: 46px;
+        font-size: 48px;
         color: #E8C766;
-        margin-bottom: 50px;
+        margin-bottom: 60px;
         font-weight: 600;
     }
 
@@ -118,13 +111,13 @@
         display: flex;
         flex-direction: column;
         justify-content: center;
+        gap: 60px;
     }
 
     .poster-sher {
         text-align: center;
-        font-size: 52px;
-        line-height: 2.2;
-        margin-bottom: 50px;
+        font-size: 54px;
+        line-height: 2.4;
         color: #F8F1DA;
     }
 
@@ -134,22 +127,22 @@
 
     .poster-dedication {
         text-align: center;
-        font-size: 42px;
+        font-size: 44px;
         color: #E8C766;
-        margin: 40px 0 20px 0;
-        line-height: 1.5;
+        margin: 50px 0 30px 0;
+        line-height: 1.6;
     }
 
-    /* Hide dedication by default */
     .poster-dedication.hidden {
         display: none;
     }
 
     .poster-footer {
         text-align: center;
-        font-size: 26px;
-        color: rgba(224,185,79,0.5);
-        letter-spacing: 2px;
+        font-size: 28px;
+        color: rgba(224,185,79,0.45);
+        letter-spacing: 3px;
+        margin-top: 20px;
     }
 
     .toast-message {
@@ -165,7 +158,6 @@
         z-index: 1000;
         display: none;
         font-size: 0.8rem;
-        white-space: nowrap;
     }
 
     @media (max-width: 600px) {
@@ -180,7 +172,7 @@
     <div class="dedication-input-area">
         <input type="text" id="fromName" placeholder="Your Name (optional)">
         <input type="text" id="toName" placeholder="Special Someone (optional)">
-        <div style="font-size:0.7rem; color:#aaa; margin-top:0.3rem;">💕 Enter names to personalise your poetry poster (optional)</div>
+        <div style="font-size:0.7rem; color:#aaa; margin-top:0.3rem;">💕 Enter names to personalise (optional)</div>
     </div>
 
     <div class="share-action">
@@ -246,13 +238,12 @@
     toInput.addEventListener('input', updatePosterDedication);
     updatePosterDedication();
 
-    // Capture ONLY the hidden poster
     document.getElementById('sharePosterBtn').addEventListener('click', async function() {
         const poster = document.getElementById('social-poster');
         const toast = document.getElementById('toast');
 
         toast.style.display = 'block';
-        toast.innerText = '🎨 Generating luxury poster...';
+        toast.innerText = '🎨 Generating poster...';
 
         try {
             const canvas = await html2canvas(poster, {
@@ -266,11 +257,9 @@
             
             const imageData = canvas.toDataURL('image/jpeg', 0.9);
             const blob = await (await fetch(imageData)).blob();
-            
-            console.log(`Poster size: ${(blob.size / 1024).toFixed(1)} KB`);
 
             if (navigator.share) {
-                const file = new File([blob], 'ucpc_poetry_poster.jpg', { type: 'image/jpeg' });
+                const file = new File([blob], 'ucpc_poster.jpg', { type: 'image/jpeg' });
                 await navigator.share({
                     title: 'Urdu Poetry Poster',
                     text: posterDedication.classList.contains('hidden') ? 'Beautiful Urdu Ghazal' : posterDedication.innerText,
@@ -282,10 +271,10 @@
                 link.download = `ucpc_poster_${Date.now()}.jpg`;
                 link.href = imageData;
                 link.click();
-                toast.innerText = '✅ Poster downloaded! Share on Facebook/Instagram.';
+                toast.innerText = '✅ Poster saved!';
             }
         } catch (err) {
-            console.error('Poster error:', err);
+            console.error(err);
             toast.innerText = '❌ Failed to create poster.';
         } finally {
             setTimeout(() => { toast.style.display = 'none'; }, 3000);
