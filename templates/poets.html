@@ -1,121 +1,54 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Poets - UCPC Poetry Archive</title>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+{% extends "base.html" %}
 
-        body {
-            background: #0a0a0a;
-            color: #e0e0e0;
-            font-family: 'Segoe UI', Arial, sans-serif;
-            padding: 40px 20px;
-        }
+{% block title %}Poets - UCPC{% endblock %}
 
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-        }
+{% block extra_css %}
+<style>
+    .poets-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 1.5rem;
+    }
+    .poet-card {
+        background: #1a1a1a;
+        border-radius: 16px;
+        padding: 1.5rem;
+        text-align: center;
+        transition: 0.2s;
+        border: 1px solid #2a2a2a;
+    }
+    .poet-card:hover {
+        border-color: #D4AF37;
+        transform: translateY(-3px);
+    }
+    .poet-card a {
+        text-decoration: none;
+    }
+    .poet-name-en {
+        color: #D4AF37;
+        font-size: 1.3rem;
+        font-weight: bold;
+    }
+    .poet-name-urdu {
+        font-family: 'Noto Nastaliq Urdu', serif;
+        font-size: 1.2rem;
+        color: #ccc;
+        margin-top: 0.5rem;
+    }
+</style>
+{% endblock %}
 
-        h1 {
-            color: #D4AF37;
-            font-size: 36px;
-            text-align: center;
-            margin-bottom: 10px;
-        }
+{% block content %}
+<h1 style="text-align: center; color: #D4AF37; margin-bottom: 2rem;">🖋️ Classical Poets</h1>
 
-        .subtitle {
-            text-align: center;
-            color: #888;
-            margin-bottom: 40px;
-            font-size: 14px;
-        }
-
-        .poets-grid {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .poet-card {
-            background: #1a1a1a;
-            border-radius: 12px;
-            transition: 0.2s;
-            border: 1px solid #2a2a2a;
-        }
-
-        .poet-card:hover {
-            background: #222;
-            border-color: #D4AF37;
-            transform: translateX(5px);
-        }
-
-        .poet-card a {
-            display: block;
-            padding: 18px 24px;
-            text-decoration: none;
-            color: #e0e0e0;
-            font-size: 20px;
-        }
-
-        .poet-name {
-            color: #D4AF37;
-            font-weight: bold;
-        }
-
-        .poet-name-urdu {
-            font-family: 'Noto Nastaliq Urdu', 'Times New Roman', serif;
-            font-size: 18px;
-            color: #aaa;
-            margin-top: 5px;
-        }
-
-        .back-home {
-            text-align: center;
-            margin-top: 40px;
-        }
-
-        .back-home a {
-            color: #888;
-            text-decoration: none;
-            font-size: 14px;
-        }
-
-        .back-home a:hover {
-            color: #D4AF37;
-        }
-
-        @media (max-width: 600px) {
-            .poet-card a { padding: 14px 18px; font-size: 16px; }
-            h1 { font-size: 28px; }
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>🖋️ Classical Poets</h1>
-        <div class="subtitle">Explore the masters of Urdu Ghazal</div>
-
-        <div class="poets-grid">
-            {% for poet in poets %}
-            <div class="poet-card">
-                <a href="/poets/{{ poet.id }}">
-                    <div class="poet-name">{{ poet.name }}</div>
-                    <div class="poet-name-urdu">{{ poet.name_urdu }}</div>
-                </a>
-            </div>
-            {% endfor %}
-        </div>
-
-        <div class="back-home">
-            <a href="/">← Back to Home</a>
-        </div>
+<div class="poets-grid">
+    {% for poet in poets %}
+    <div class="poet-card">
+        <a href="/poets/{{ poet.id }}">
+            <div class="poet-name-en">{{ poet.name }}</div>
+            <div class="poet-name-urdu">{{ poet.name_urdu }}</div>
+        </a>
     </div>
-</body>
-</html>
+    {% endfor %}
+</div>
+{% endblock %}
