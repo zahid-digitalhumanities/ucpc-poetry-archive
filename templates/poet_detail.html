@@ -1,36 +1,209 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>{{ poet.name }}</title>
+    <title>{{ poet.name }} - UCPC Poetry Archive</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0a0a0a;
+            color: #e0e0e0;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        /* Poet Header */
+        .poet-header {
+            text-align: center;
+            border-bottom: 2px solid #D4AF37;
+            padding-bottom: 30px;
+            margin-bottom: 40px;
+        }
+
+        .poet-name {
+            color: #D4AF37;
+            font-size: 48px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .poet-name-urdu {
+            font-family: 'Noto Nastaliq Urdu', 'Times New Roman', serif;
+            font-size: 32px;
+            color: #ccc;
+            margin-bottom: 20px;
+        }
+
+        .poet-years {
+            color: #888;
+            font-size: 16px;
+        }
+
+        /* Ghazal List */
+        .ghazal-list {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .ghazal-card {
+            background: #1a1a1a;
+            border-radius: 16px;
+            border: 1px solid #2a2a2a;
+            transition: 0.3s;
+            overflow: hidden;
+        }
+
+        .ghazal-card:hover {
+            border-color: #D4AF37;
+            transform: translateY(-3px);
+        }
+
+        .first-couplet {
+            padding: 30px;
+            text-align: center;
+            direction: rtl;
+            font-family: 'Noto Nastaliq Urdu', 'Times New Roman', serif;
+            font-size: 26px;
+            line-height: 2;
+            color: #f0e6d0;
+            background: #111;
+        }
+
+        .ghazal-footer {
+            padding: 15px 30px;
+            background: #151515;
+            border-top: 1px solid #2a2a2a;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .verse-count {
+            color: #888;
+            font-size: 14px;
+        }
+
+        .read-link {
+            background: #D4AF37;
+            color: #0a0a0a;
+            padding: 8px 25px;
+            text-decoration: none;
+            border-radius: 40px;
+            font-weight: bold;
+            font-size: 14px;
+            transition: 0.2s;
+            display: inline-block;
+        }
+
+        .read-link:hover {
+            background: #ffd966;
+            transform: scale(1.02);
+        }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            background: #1a1a1a;
+            border-radius: 16px;
+        }
+
+        .empty-state p {
+            color: #888;
+            margin-bottom: 20px;
+        }
+
+        /* Navigation */
+        .back-nav {
+            margin-top: 50px;
+            text-align: center;
+        }
+
+        .back-nav a {
+            color: #888;
+            text-decoration: none;
+            font-size: 14px;
+            transition: 0.2s;
+        }
+
+        .back-nav a:hover {
+            color: #D4AF37;
+        }
+
+        .back-nav span {
+            color: #D4AF37;
+            margin: 0 10px;
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .poet-name { font-size: 32px; }
+            .poet-name-urdu { font-size: 24px; }
+            .first-couplet { font-size: 20px; padding: 20px; }
+            .ghazal-footer { flex-direction: column; text-align: center; }
+        }
+    </style>
 </head>
-
 <body>
+    <div class="container">
+        <!-- Poet Header -->
+        <div class="poet-header">
+            <div class="poet-name">{{ poet.name }}</div>
+            <div class="poet-name-urdu">{{ poet.name_urdu }}</div>
+            {% if poet.birth_year or poet.death_year %}
+            <div class="poet-years">
+                {% if poet.birth_year %}{{ poet.birth_year }}{% endif %}
+                {% if poet.death_year %} — {{ poet.death_year }}{% endif %}
+            </div>
+            {% endif %}
+        </div>
 
-<h1>{{ poet.name }}</h1>
+        <!-- Ghazal List -->
+        {% if texts %}
+        <div class="ghazal-list">
+            {% for item in texts %}
+            <div class="ghazal-card">
+                <div class="first-couplet" dir="rtl">
+                    {{ item.first_couplet }}
+                </div>
+                <div class="ghazal-footer">
+                    <div class="verse-count">
+                        📖 {% if item.verse_count %}{{ item.verse_count }}{% else %}?{% endif %} verses
+                    </div>
+                    <a href="/ghazals/view/{{ item.id }}" class="read-link">
+                        Read Full Ghazal →
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <p>✨ No ghazals found for this poet yet.</p>
+            <p style="font-size: 14px;">Check back soon for updates!</p>
+        </div>
+        {% endif %}
 
-<h2>{{ poet.name_urdu }}</h2>
-
-<hr>
-
-{% for item in texts %}
-
-<div style="margin-bottom:40px;">
-
-    <div dir="rtl">
-
-        {{ item.first_couplet }}
-
+        <!-- Navigation -->
+        <div class="back-nav">
+            <a href="/poets">← All Poets</a>
+            <span>•</span>
+            <a href="/">Home</a>
+        </div>
     </div>
-
-    <br>
-
-    <a href="/ghazals/view/{{ item.id }}">
-        Read Full Ghazal
-    </a>
-
-</div>
-
-{% endfor %}
-
 </body>
 </html>
