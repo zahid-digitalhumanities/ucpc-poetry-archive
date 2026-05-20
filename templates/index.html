@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>UCPC Poetry Archive</title>
+</head>
+
+<body>
+
+    <h1>UCPC Poetry Archive</h1>
+
+    <a href="/poets">
+        Explore Poets
+    </a>
+
+</body>
+</html>
+10. templates/poets.html
+HTML
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Poets - UCPC</title>
+</head>
+
+<body>
+
+<h1>All Poets</h1>
+
+{% for poet in poets %}
+
+    <div style="margin-bottom:20px;">
+
+        <a href="/poets/{{ poet.id }}">
+
+            {{ poet.name }}
+
+            -
+
+            {{ poet.name_urdu }}
+
+        </a>
+
+    </div>
+
+{% endfor %}
+
+</body>
+</html>

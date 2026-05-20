@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ poet.name }}</title>
+</head>
+
+<body>
+
+<h1>{{ poet.name }}</h1>
+
+<h2>{{ poet.name_urdu }}</h2>
+
+<hr>
+
+{% for item in texts %}
+
+<div style="margin-bottom:40px;">
+
+    <div dir="rtl">
+
+        {{ item.first_couplet }}
+
+    </div>
+
+    <br>
+
+    <a href="/ghazals/view/{{ item.id }}">
+        Read Full Ghazal
+    </a>
+
+</div>
+
+{% endfor %}
+
+</body>
+</html>

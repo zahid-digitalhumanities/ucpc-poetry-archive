@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<title>{{ ghazal.poet_name }}</title>
+
+</head>
+
+<body>
+
+<h1>{{ ghazal.poet_name }}</h1>
+
+<!-- DEDICATION -->
+
+<form>
+
+    <input
+        type="text"
+        id="fromName"
+        placeholder="From"
+    >
+
+    <input
+        type="text"
+        id="toName"
+        placeholder="To"
+    >
+
+</form>
+
+<hr>
+
+<!-- GHAZAL -->
+
+{% for verse in verses %}
+
+<div
+    dir="rtl"
+    style="
+        text-align:center;
+        margin-bottom:30px;
+        font-size:28px;
+    "
+>
+
+{{ verse.misra1_urdu }}
+
+<br>
+
+{{ verse.misra2_urdu }}
+
+</div>
+
+{% endfor %}
+
+<hr>
+
+<!-- SHARE -->
+
+<button onclick="shareWhatsApp()">
+    WhatsApp
+</button>
+
+<button onclick="shareFacebook()">
+    Facebook
+</button>
+
+<button onclick="shareLinkedIn()">
+    LinkedIn
+</button>
+
+<script>
+
+function buildText(){
+
+    const fromName =
+        document.getElementById("fromName").value;
+
+    const toName =
+        document.getElementById("toName").value;
+
+    return `
+From: ${fromName}
+
+To: ${toName}
+
+Read this Ghazal:
+
+${window.location.href}
+    `;
+}
+
+function shareWhatsApp(){
+
+    const text = encodeURIComponent(
+        buildText()
+    );
+
+    window.open(
+        `https://wa.me/?text=${text}`,
+        "_blank"
+    );
+}
+
+function shareFacebook(){
+
+    const url =
+        encodeURIComponent(
+            window.location.href
+        );
+
+    window.open(
+        `https://www.facebook.com/sharer/sharer.php?u=${url}`,
+        "_blank"
+    );
+}
+
+function shareLinkedIn(){
+
+    const url =
+        encodeURIComponent(
+            window.location.href
+        );
+
+    window.open(
+        `https://www.linkedin.com/sharing/share-offsite/?url=${url}`,
+        "_blank"
+    );
+}
+
+</script>
+
+</body>
+</html>
