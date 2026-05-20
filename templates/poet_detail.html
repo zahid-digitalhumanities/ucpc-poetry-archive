@@ -1,98 +1,155 @@
 {% extends "base.html" %}
-
-{% block title %}{{ poet.name }} - UCPC{% endblock %}
+{% block title %}{{ poet.name_urdu }} - UCPC Poetry Archive{% endblock %}
 
 {% block extra_css %}
 <style>
+    .poet-detail-container {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
     .poet-header {
-        text-align: center;
-        border-bottom: 2px solid #D4AF37;
-        padding-bottom: 1.5rem;
-        margin-bottom: 2rem;
+        background: linear-gradient(135deg, #fefcf8, #faf7f0);
+        border-radius: 60px;
+        padding: 25px 35px;
+        margin-bottom: 45px;
+        border: 1px solid rgba(212,175,55,0.3);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+    .poet-name {
+        display: flex;
+        align-items: baseline;
+        gap: 15px;
+        flex-wrap: wrap;
     }
     .poet-name-en {
-        color: #D4AF37;
-        font-size: 2.5rem;
-        font-weight: bold;
+        font-size: 2rem;
+        font-weight: 800;
+        color: #1e3c72;
     }
     .poet-name-urdu {
-        font-family: 'Noto Nastaliq Urdu', 'Times New Roman', serif;
+        font-family: 'Jameel Noori Nastaleeq', serif;
         font-size: 1.5rem;
-        color: #ccc;
-        margin-top: 0.5rem;
+        font-weight: 700;
+        color: #D4AF37;
+        direction: rtl;
     }
-    .ghazal-list {
+    .poet-years {
+        background: rgba(212,175,55,0.12);
+        padding: 6px 18px;
+        border-radius: 40px;
+        font-size: 0.9rem;
+    }
+    .poet-stats {
         display: flex;
-        flex-direction: column;
-        gap: 1rem;
+        gap: 20px;
+        background: white;
+        padding: 8px 20px;
+        border-radius: 50px;
     }
-    .ghazal-card {
-        background: #1a1a1a;
-        border-radius: 16px;
-        padding: 1.5rem;
-        border: 1px solid #2a2a2a;
-        transition: 0.2s;
+    .poems-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+        gap: 30px;
+        margin-top: 30px;
     }
-    .ghazal-card:hover {
+    .poem-card {
+        background: #fff;
+        border-radius: 22px;
+        padding: 22px;
+        border: 1px solid rgba(0,0,0,0.05);
+        transition: 0.25s;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.04);
+    }
+    .poem-card:hover {
+        transform: translateY(-3px);
         border-color: #D4AF37;
     }
     .first-couplet {
-        font-family: 'Noto Nastaliq Urdu', 'Times New Roman', serif;
-        font-size: 1.2rem;
-        text-align: center;
+        font-family: 'Jameel Noori Nastaleeq', serif;
+        font-size: 1.4rem;
+        line-height: 2.2rem;
+        font-weight: 600;
+        color: #1e3c72;
         direction: rtl;
-        line-height: 2;
-        color: #f0e6d0;
-    }
-    .read-link {
-        display: inline-block;
-        margin-top: 1rem;
-        background: #D4AF37;
-        color: #0a0a0a;
-        padding: 0.5rem 1.2rem;
-        border-radius: 50px;
-        text-decoration: none;
-        font-weight: bold;
-        font-size: 0.85rem;
-    }
-    .back-link {
         text-align: center;
-        margin-top: 2rem;
+        margin-bottom: 15px;
     }
-    .back-link a {
-        color: #888;
+    .poem-meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 12px;
+        margin-top: 12px;
+        border-top: 1px solid rgba(212,175,55,0.15);
+    }
+    .btn-view, .btn-share {
+        padding: 6px 16px;
+        border-radius: 40px;
+        font-size: 0.8rem;
+        font-weight: 600;
         text-decoration: none;
+        display: inline-block;
     }
-    .back-link a:hover {
-        color: #D4AF37;
+    .btn-view {
+        background: #1e3c72;
+        color: white;
+    }
+    .btn-view:hover {
+        background: #0f2b4a;
+    }
+    .btn-share {
+        background: #25d366;
+        color: white;
+    }
+    .btn-share:hover {
+        background: #1da155;
+    }
+    @media (max-width: 768px) {
+        .poet-header { flex-direction: column; text-align: center; }
+        .poems-grid { grid-template-columns: 1fr; }
+        .first-couplet { font-size: 1.2rem; }
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="poet-header">
-    <div class="poet-name-en">{{ poet.name }}</div>
-    <div class="poet-name-urdu" dir="rtl">{{ poet.name_urdu }}</div>
-</div>
-
-{% if texts and texts|length > 0 %}
-<div class="ghazal-list">
-    {% for item in texts %}
-    <div class="ghazal-card">
-        <div class="first-couplet" dir="rtl">
-            {{ item.first_couplet | safe }}
+<div class="poet-detail-container">
+    <div class="poet-header">
+        <div class="poet-name">
+            <span class="poet-name-en">{{ poet.name }}</span>
+            <span class="poet-name-urdu">{{ poet.name_urdu }}</span>
+            {% if poet.birth_year or poet.death_year %}
+            <span class="poet-years">{{ poet.birth_year or '?' }} – {{ poet.death_year or 'Present' }}</span>
+            {% endif %}
         </div>
-        <a href="/ghazals/view/{{ item.id }}" class="read-link">Read Full Ghazal →</a>
+        <div class="poet-stats">
+            <div>📖 {{ total }} Poems</div>
+        </div>
     </div>
-    {% endfor %}
-</div>
-{% else %}
-<div style="text-align: center; padding: 2rem; color: #888;">
-    No ghazals found for this poet.
-</div>
-{% endif %}
 
-<div class="back-link">
-    <a href="/poets">← Back to All Poets</a>
+    <div class="poems-grid">
+        {% for item in texts %}
+        <div class="poem-card">
+            <div class="first-couplet">
+                {% if item.first_verse %}
+                    {{ item.first_verse.misra1_urdu }}<br>
+                    {{ item.first_verse.misra2_urdu }}
+                {% else %}
+                    {{ item.first_couplet | safe }}
+                {% endif %}
+            </div>
+            <div class="poem-meta">
+                <span>✍️ {{ item.verse_count or 0 }} verses</span>
+                <div>
+                    <a href="/ghazals/view/{{ item.id }}" class="btn-view">Read</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
 </div>
 {% endblock %}
