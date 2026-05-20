@@ -2,142 +2,27 @@
 
 {% block title %}{{ ghazal.poet_name }} - UCPC Poetry Archive{% endblock %}
 
+{% block extra_head %}
+<!-- Open Graph / Facebook / WhatsApp / LinkedIn -->
+<meta property="og:title" content="{{ ghazal.poet_name }} - Urdu Ghazal" />
+<meta property="og:description" content="Beautiful Urdu poetry from {{ ghazal.poet_name }}. Read and share classical ghazals." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="{{ request.url }}" />
+<meta property="og:image" content="https://ucpc-poetry-archive.onrender.com/static/og-image.png" />
+<meta property="og:site_name" content="UCPC Poetry Archive" />
+<meta property="og:locale" content="ur_PK" />
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="{{ ghazal.poet_name }} - Urdu Ghazal" />
+<meta name="twitter:description" content="Beautiful Urdu poetry" />
+<meta name="twitter:image" content="https://ucpc-poetry-archive.onrender.com/static/og-image.png" />
+{% endblock %}
+
 {% block extra_css %}
-<style>
-    .ghazal-container {
-        background: #1a1a1a;
-        border-radius: 24px;
-        padding: 2rem;
-        border: 2px solid #D4AF37;
-        max-width: 900px;
-        margin: 0 auto;
-    }
-    .poet-name {
-        text-align: center;
-        color: #D4AF37;
-        font-size: 2rem;
-        font-weight: bold;
-        margin-bottom: 0.5rem;
-    }
-    .poet-name-urdu {
-        text-align: center;
-        font-family: 'Noto Nastaliq Urdu', serif;
-        font-size: 1.3rem;
-        color: #ccc;
-        margin-bottom: 2rem;
-    }
-    .title {
-        text-align: center;
-        color: #888;
-        font-size: 0.9rem;
-        margin-bottom: 2rem;
-    }
-    .verse {
-        text-align: center;
-        direction: rtl;
-        font-family: 'Noto Nastaliq Urdu', serif;
-        font-size: 1.4rem;
-        line-height: 2.2;
-        margin-bottom: 1.8rem;
-        color: #f0e6d0;
-    }
-    .matla {
-        color: #D4AF37;
-        border-bottom: 1px solid #333;
-        padding-bottom: 1rem;
-        margin-bottom: 2rem;
-    }
-    .maqta {
-        margin-top: 2rem;
-        padding-top: 1rem;
-        border-top: 1px solid #333;
-    }
-    .share-section {
-        text-align: center;
-        margin-top: 2rem;
-        padding-top: 1.5rem;
-        border-top: 1px solid #333;
-    }
-    .share-btn {
-        background: #D4AF37;
-        color: #0a0a0a;
-        border: none;
-        padding: 0.6rem 1.2rem;
-        border-radius: 50px;
-        font-weight: bold;
-        margin: 0.3rem;
-        cursor: pointer;
-    }
-    .back-link {
-        text-align: center;
-        margin-top: 1.5rem;
-    }
-    .back-link a {
-        color: #888;
-        text-decoration: none;
-    }
-    .back-link a:hover {
-        color: #D4AF37;
-    }
-    @media (max-width: 600px) {
-        .ghazal-container { padding: 1rem; }
-        .verse { font-size: 1.1rem; }
-        .poet-name { font-size: 1.5rem; }
-    }
-</style>
+<!-- your existing CSS -->
 {% endblock %}
 
 {% block content %}
-<div class="ghazal-container">
-    <div class="poet-name">{{ ghazal.poet_name or 'Unknown Poet' }}</div>
-    {% if ghazal.poet_name_urdu %}
-    <div class="poet-name-urdu">{{ ghazal.poet_name_urdu }}</div>
-    {% endif %}
-    {% if ghazal.title_urdu %}
-    <div class="title" dir="rtl">{{ ghazal.title_urdu }}</div>
-    {% elif ghazal.title_en %}
-    <div class="title">{{ ghazal.title_en }}</div>
-    {% endif %}
-
-    <!-- Verses -->
-    {% for verse in verses %}
-    <div class="verse {% if verse.is_matla %}matla{% endif %} {% if verse.is_maqta %}maqta{% endif %}" dir="rtl">
-        {{ verse.misra1_urdu }}<br>
-        {{ verse.misra2_urdu }}
-    </div>
-    {% endfor %}
-
-    <!-- Share Section -->
-    <div class="share-section">
-        <button class="share-btn" onclick="shareWhatsApp()">📱 WhatsApp</button>
-        <button class="share-btn" onclick="shareFacebook()">📘 Facebook</button>
-        <button class="share-btn" onclick="copyLink()">🔗 Copy Link</button>
-    </div>
-</div>
-
-<div class="back-link">
-    <a href="/poets/{{ ghazal.poet_id }}">← Back to Poet</a>
-    <span style="color: #444;"> • </span>
-    <a href="/poets">All Poets</a>
-</div>
-
-<script>
-    function shareWhatsApp() {
-        const url = window.location.href;
-        const title = "{{ ghazal.title_urdu or ghazal.title_en or 'Urdu Ghazal' }}";
-        const poet = "{{ ghazal.poet_name }}";
-        const text = encodeURIComponent(`✨ ${poet} - ${title} ✨\n\nRead this beautiful ghazal:\n${url}`);
-        window.open(`https://wa.me/?text=${text}`, "_blank");
-    }
-
-    function shareFacebook() {
-        const url = encodeURIComponent(window.location.href);
-        window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, "_blank");
-    }
-
-    function copyLink() {
-        navigator.clipboard.writeText(window.location.href);
-        alert("✅ Link copied!");
-    }
-</script>
+<!-- your existing content -->
 {% endblock %}
