@@ -3,26 +3,318 @@
 {% block title %}{{ ghazal.poet_name }} - UCPC Poetry Archive{% endblock %}
 
 {% block extra_head %}
-<!-- Open Graph / Facebook / WhatsApp / LinkedIn -->
+<!-- Open Graph (for link preview fallback) -->
 <meta property="og:title" content="{{ ghazal.poet_name }} - Urdu Ghazal" />
-<meta property="og:description" content="Beautiful Urdu poetry from {{ ghazal.poet_name }}. Read and share classical ghazals." />
+<meta property="og:description" content="A beautiful ghazal by {{ ghazal.poet_name }} – read and share." />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="{{ request.url }}" />
 <meta property="og:image" content="https://ucpc-poetry-archive.onrender.com/static/og-image.png" />
 <meta property="og:site_name" content="UCPC Poetry Archive" />
-<meta property="og:locale" content="ur_PK" />
-
-<!-- Twitter Card -->
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content="{{ ghazal.poet_name }} - Urdu Ghazal" />
-<meta name="twitter:description" content="Beautiful Urdu poetry" />
-<meta name="twitter:image" content="https://ucpc-poetry-archive.onrender.com/static/og-image.png" />
 {% endblock %}
 
 {% block extra_css %}
-<!-- your existing CSS -->
+<style>
+    /* Base reset */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        background: #0a0a0a;
+        font-family: 'Segoe UI', 'Inter', system-ui, sans-serif;
+    }
+
+    .ghazal-card {
+        max-width: 900px;
+        margin: 2rem auto;
+        background: linear-gradient(145deg, #111111 0%, #1a1a1a 100%);
+        border-radius: 48px;
+        border: 2px solid #D4AF37;
+        box-shadow: 0 25px 40px -12px rgba(0,0,0,0.5), 0 0 0 2px rgba(212,175,55,0.2) inset;
+        padding: 2rem;
+        transition: transform 0.2s ease;
+    }
+
+    /* Poet header – side by side */
+    .poet-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        flex-wrap: wrap;
+        gap: 1rem;
+        border-bottom: 2px solid #D4AF37;
+        padding-bottom: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    .poet-name-en {
+        font-size: 2rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, #D4AF37, #FFD966);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        letter-spacing: 1px;
+    }
+    .poet-name-urdu {
+        font-family: 'Noto Nastaliq Urdu', 'Jameel Noori Nastaleeq', serif;
+        font-size: 1.8rem;
+        color: #F5E7B2;
+        direction: rtl;
+    }
+
+    /* Dedication card */
+    .dedication-card {
+        background: rgba(212,175,55,0.08);
+        border-radius: 32px;
+        padding: 1.2rem;
+        margin-bottom: 2rem;
+        text-align: center;
+        border: 1px solid rgba(212,175,55,0.4);
+    }
+    .dedication-title {
+        color: #D4AF37;
+        font-size: 1.2rem;
+        font-weight: bold;
+        margin-bottom: 1rem;
+    }
+    .dedication-inputs {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+    .dedication-inputs input {
+        background: #2a2a2a;
+        border: 1px solid #D4AF37;
+        color: #fff;
+        padding: 0.6rem 1rem;
+        border-radius: 50px;
+        font-size: 0.9rem;
+        width: 180px;
+    }
+    .dedication-inputs input::placeholder {
+        color: #aaa;
+    }
+
+    /* Verses */
+    .verse {
+        text-align: center;
+        direction: rtl;
+        font-family: 'Noto Nastaliq Urdu', 'Jameel Noori Nastaleeq', serif;
+        font-size: 1.4rem;
+        line-height: 2.2;
+        margin-bottom: 1.8rem;
+        color: #F5E7D0;
+        padding: 0.2rem;
+    }
+    .matla {
+        border-bottom: 1px dashed #D4AF37;
+        padding-bottom: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    .maqta {
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px dashed #D4AF37;
+    }
+
+    /* Share buttons area */
+    .share-section {
+        text-align: center;
+        margin-top: 2rem;
+        padding-top: 1rem;
+        border-top: 1px solid #2a2a2a;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 0.8rem;
+    }
+    .share-btn, .share-image-btn {
+        background: #D4AF37;
+        color: #0a0a0a;
+        border: none;
+        padding: 0.6rem 1.2rem;
+        border-radius: 50px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: 0.2s;
+        font-size: 0.9rem;
+    }
+    .share-btn:hover, .share-image-btn:hover {
+        background: #FFD966;
+        transform: scale(1.02);
+    }
+    .share-image-btn {
+        background: #25D366;
+        color: white;
+    }
+    .share-image-btn:hover {
+        background: #1da155;
+    }
+
+    /* Responsive */
+    @media (max-width: 650px) {
+        .ghazal-card { padding: 1.2rem; margin: 1rem; }
+        .poet-name-en { font-size: 1.4rem; }
+        .poet-name-urdu { font-size: 1.3rem; }
+        .verse { font-size: 1.1rem; line-height: 1.8; }
+        .dedication-inputs input { width: 140px; }
+    }
+
+    /* Loading toast */
+    .toast-message {
+        position: fixed;
+        bottom: 30px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #D4AF37;
+        color: #0a0a0a;
+        padding: 0.6rem 1.2rem;
+        border-radius: 40px;
+        font-weight: bold;
+        z-index: 1000;
+        display: none;
+        white-space: nowrap;
+    }
+</style>
 {% endblock %}
 
 {% block content %}
-<!-- your existing content -->
+<div class="ghazal-card" id="ghazal-card">
+    <!-- Poet header: side by side -->
+    <div class="poet-header">
+        <div class="poet-name-en">{{ ghazal.poet_name }}</div>
+        <div class="poet-name-urdu">{{ ghazal.poet_name_urdu or ghazal.poet_name }}</div>
+    </div>
+
+    <!-- Dedication section -->
+    <div class="dedication-card">
+        <div class="dedication-title">🌸 Dedicate this Ghazal</div>
+        <div class="dedication-inputs">
+            <input type="text" id="fromName" placeholder="From (Your Name)">
+            <input type="text" id="toName" placeholder="To (Someone Special)">
+        </div>
+        <div style="font-size: 0.7rem; color: #aaa; margin-top: 0.5rem;">💕 Your message will appear on the shared image</div>
+    </div>
+
+    <!-- All verses -->
+    {% for verse in verses %}
+    <div class="verse {% if verse.is_matla %}matla{% endif %} {% if verse.is_maqta %}maqta{% endif %}" dir="rtl">
+        {{ verse.misra1_urdu }}<br>
+        {{ verse.misra2_urdu }}
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Share controls -->
+<div class="share-section">
+    <button class="share-btn" onclick="shareWhatsAppLink()">📱 WhatsApp (Link)</button>
+    <button class="share-btn" onclick="shareFacebookLink()">📘 Facebook (Link)</button>
+    <button class="share-btn" onclick="copyLink()">🔗 Copy Link</button>
+    <button class="share-image-btn" id="shareImageBtn">🖼️ Share as Image</button>
+</div>
+
+<div class="back-link" style="text-align: center; margin-top: 1rem;">
+    <a href="/poets/{{ ghazal.poet_id }}" style="color: #888;">← Back to Poet</a>
+    <span style="color: #444;"> • </span>
+    <a href="/poets" style="color: #888;">All Poets</a>
+</div>
+
+<div id="toast" class="toast-message">✅ Image ready! Sharing...</div>
+
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script>
+    // Helper to get dedication text
+    function getDedicationText() {
+        const from = document.getElementById('fromName').value.trim();
+        const to = document.getElementById('toName').value.trim();
+        if (from && to) return `From: ${from}  •  To: ${to}`;
+        if (from) return `From: ${from}`;
+        if (to) return `To: ${to}`;
+        return '';
+    }
+
+    // Standard link shares
+    function shareWhatsAppLink() {
+        const url = window.location.href;
+        const text = encodeURIComponent(`✨ ${document.querySelector('.poet-name-en').innerText} - Urdu Ghazal ✨\n\n${getDedicationText()}\n\nRead here: ${url}`);
+        window.open(`https://wa.me/?text=${text}`, '_blank');
+    }
+    function shareFacebookLink() {
+        const url = encodeURIComponent(window.location.href);
+        window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank');
+    }
+    function copyLink() {
+        navigator.clipboard.writeText(window.location.href);
+        alert('✅ Link copied!');
+    }
+
+    // Share as Image (capture card and share via Web Share API or download)
+    document.getElementById('shareImageBtn').addEventListener('click', async function() {
+        const card = document.getElementById('ghazal-card');
+        const toast = document.getElementById('toast');
+        
+        // Temporarily add dedication text inside card for image capture (if any)
+        const dedicationText = getDedicationText();
+        let dedicationElem = null;
+        if (dedicationText) {
+            dedicationElem = document.createElement('div');
+            dedicationElem.style.textAlign = 'center';
+            dedicationElem.style.color = '#D4AF37';
+            dedicationElem.style.fontSize = '1rem';
+            dedicationElem.style.margin = '0.5rem 0 1rem 0';
+            dedicationElem.style.fontWeight = 'bold';
+            dedicationElem.innerText = dedicationText;
+            // Insert after poet header but before verses
+            const header = card.querySelector('.poet-header');
+            header.insertAdjacentElement('afterend', dedicationElem);
+        }
+
+        // Show loading
+        toast.style.display = 'block';
+        toast.innerText = '📸 Generating image...';
+        
+        try {
+            // Capture the card as PNG
+            const canvas = await html2canvas(card, {
+                scale: 2,             // high resolution
+                backgroundColor: '#0a0a0a',
+                logging: false,
+                useCORS: true
+            });
+            const imageData = canvas.toDataURL('image/png');
+            
+            // Try Web Share API (mobile) – shares image directly to WhatsApp, etc.
+            if (navigator.share) {
+                const blob = await (await fetch(imageData)).blob();
+                const file = new File([blob], 'ghazal.png', { type: 'image/png' });
+                await navigator.share({
+                    title: `${document.querySelector('.poet-name-en').innerText} - Ghazal`,
+                    text: dedicationText || 'Beautiful Urdu Ghazal',
+                    files: [file]
+                });
+                toast.innerText = '✅ Shared!';
+            } else {
+                // Desktop fallback: download the image
+                const link = document.createElement('a');
+                link.download = `ghazal_${Date.now()}.png`;
+                link.href = imageData;
+                link.click();
+                toast.innerText = '✅ Image downloaded! You can now share it.';
+            }
+        } catch (err) {
+            console.error('Capture error:', err);
+            toast.innerText = '❌ Failed to generate image.';
+        } finally {
+            // Remove temporary dedication element
+            if (dedicationElem) dedicationElem.remove();
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 2000);
+        }
+    });
+</script>
 {% endblock %}
