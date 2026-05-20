@@ -1,11 +1,12 @@
 from flask import Blueprint, render_template, abort
 from models.db import get_db
 
-poets_bp = Blueprint("poets", __name__)
+poets_bp = Blueprint('poets', __name__)
 
 
-@poets_bp.route("/")
-def poets():
+@poets_bp.route('/')
+def poets_list():
+    """Display all poets with ghazal count"""
     conn = get_db()
     cur = conn.cursor()
 
@@ -25,16 +26,18 @@ def poets():
     cur.close()
     conn.close()
 
-    return render_template("poets.html", poets=poets)
+    return render_template('poets.html', poets=poets)
 
 
-@poets_bp.route("/<int:poet_id>")
+@poets_bp.route('/<int:poet_id>')
 def poet_detail(poet_id):
+    """Display a single poet and their ghazals"""
     conn = get_db()
     cur = conn.cursor()
 
+    # Get poet info from poets table
     cur.execute("""
-        SELECT id, name, name_urdu
+        SELECT id, name, name_urdu, birth_year, death_year
         FROM poets 
         WHERE id = %s
     """, (poet_id,))
@@ -46,8 +49,14 @@ def poet_detail(poet_id):
         conn.close()
         abort(404)
 
+    # Get all ghazals for this poet - using correct columns
+    # Note: Using title_urdu for display, first_line as first couplet
     cur.execute("""
-        SELECT id, poet_name, first_couplet, verse_count
+        SELECT 
+            id, 
+            title_urdu, 
+            first_line as first_couplet,
+            verse_count
         FROM texts
         WHERE poet_id = %s
         ORDER BY id DESC
@@ -55,7 +64,23 @@ def poet_detail(poet_id):
     
     texts = cur.fetchall()
 
+    # Get first verse for each ghazal from verses table
+    for text in texts:
+        cur.execute("""
+            SELECT misra1_urdu, misra2_urdu
+            FROM verses
+            WHERE text_id = %s
+            ORDER BY couplet_index ASC
+            LIMIT 1
+        """, (text['id'],))
+        
+        first_verse = cur.fetchone()
+        text['first_verse'] = first_verse
+
     cur.close()
     conn.close()
 
-    return render_template("poet_detail.html", poet=poet, texts=texts)
+    return render_template('poet_detail.html', 
+                          poet=poet, 
+                          texts=texts,
+                          total=len(texts))
