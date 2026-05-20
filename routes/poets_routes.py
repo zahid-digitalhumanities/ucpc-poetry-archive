@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, abort
 from models.db import get_db
 
 poets_bp = Blueprint("poets", __name__)
@@ -6,11 +6,9 @@ poets_bp = Blueprint("poets", __name__)
 
 @poets_bp.route("/")
 def poets():
-    """Display all poets with ghazal count"""
     conn = get_db()
     cur = conn.cursor()
 
-    # Get poets with their ghazal count
     cur.execute("""
         SELECT 
             p.id, 
@@ -32,32 +30,24 @@ def poets():
 
 @poets_bp.route("/<int:poet_id>")
 def poet_detail(poet_id):
-    """Display poet details and their ghazals"""
     conn = get_db()
     cur = conn.cursor()
 
-    # Get poet information
     cur.execute("""
-        SELECT id, name, name_urdu, birth_year, death_year, bio
+        SELECT id, name, name_urdu
         FROM poets 
         WHERE id = %s
     """, (poet_id,))
     
     poet = cur.fetchone()
 
-    if not poet:
+    if poet is None:
         cur.close()
         conn.close()
-        return "Poet not found", 404
+        abort(404)
 
-    # Get all ghazals for this poet
     cur.execute("""
-        SELECT 
-            id, 
-            poet_name, 
-            title, 
-            first_couplet, 
-            verse_count
+        SELECT id, poet_name, first_couplet, verse_count
         FROM texts
         WHERE poet_id = %s
         ORDER BY id DESC
