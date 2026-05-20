@@ -1,0 +1,50 @@
+<nav class="navbar" style="background: #0a0a0a; border-bottom: 2px solid #D4AF37; position: sticky; top: 0; z-index: 100; padding: 0.8rem 2rem;">
+    <div style="max-width: 1200px; margin: 0 auto; display: flex; justify-content: center; gap: 1.5rem; flex-wrap: wrap;">
+        
+        <a href="/" class="nav-link {% if request and request.endpoint == 'main.index' %}active{% endif %}" style="color: #e0e0e0; text-decoration: none; padding: 0.5rem 1.2rem; border-radius: 40px; transition: 0.2s;">
+            <i class="fas fa-home"></i> Home
+        </a>
+        
+        <a href="/poets" class="nav-link {% if request and request.endpoint and 'poets' in request.endpoint %}active{% endif %}" style="color: #e0e0e0; text-decoration: none; padding: 0.5rem 1.2rem; border-radius: 40px; transition: 0.2s;">
+            <i class="fas fa-feather-alt"></i> Poets
+        </a>
+        
+        <a href="#" id="randomGhazalBtn" class="nav-link" style="color: #e0e0e0; text-decoration: none; padding: 0.5rem 1.2rem; border-radius: 40px; transition: 0.2s; cursor: pointer;">
+            <i class="fas fa-dice"></i> Random Ghazal
+        </a>
+        
+    </div>
+</nav>
+
+<style>
+    .nav-link:hover, .nav-link.active {
+        background: #D4AF37;
+        color: #0a0a0a !important;
+    }
+    .nav-link:hover i, .nav-link.active i {
+        color: #0a0a0a;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const randomBtn = document.getElementById('randomGhazalBtn');
+        if (randomBtn) {
+            randomBtn.addEventListener('click', async function(e) {
+                e.preventDefault();
+                try {
+                    const response = await fetch('/api/random-ghazal');
+                    if (!response.ok) throw new Error('Failed');
+                    const data = await response.json();
+                    if (data.id) {
+                        window.location.href = `/ghazals/view/${data.id}`;
+                    } else {
+                        alert('No ghazals found.');
+                    }
+                } catch (err) {
+                    alert('Could not load random ghazal.');
+                }
+            });
+        }
+    });
+</script>
