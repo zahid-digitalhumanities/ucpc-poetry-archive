@@ -1,22 +1,51 @@
+from flask import Blueprint, render_template, abort
+from models.db import get_db
+
+ghazals_bp = Blueprint('ghazals', __name__)
+
+
 @ghazals_bp.route('/view/<int:text_id>')
 def view_ghazal(text_id):
-    # ... existing code ...
-    
-    # Get ALL verses
+    conn = get_db()
+    cur = conn.cursor()
+
+    # Get ghazal with poet name
     cur.execute("""
-        SELECT misra1_urdu, misra2_urdu, couplet_index
+        SELECT 
+            t.id,
+            t.title_urdu,
+            t.verse_count,
+            t.poet_id,
+            p.name as poet_name,
+            p.name_urdu as poet_name_urdu
+        FROM texts t
+        LEFT JOIN poets p ON t.poet_id = p.id
+        WHERE t.id = %s
+    """, (text_id,))
+    
+    ghazal = cur.fetchone()
+
+    if ghazal is None:
+        cur.close()
+        conn.close()
+        abort(404)
+
+    # Get all verses
+    cur.execute("""
+        SELECT misra1_urdu, misra2_urdu, couplet_index, is_matla, is_maqta
         FROM verses
         WHERE text_id = %s
         ORDER BY couplet_index ASC
     """, (text_id,))
     
     all_verses = cur.fetchall()
-    
-    # FOR POSTER: ONLY FIRST 2 COUPLETS (4 misras)
-    poster_verses = all_verses[:2]  # 2 couplets = 4 lines
-    
-    # FOR WEB: all verses
+    cur.close()
+    conn.close()
+
+    # For social media poster: only first 2 couplets
+    poster_verses = all_verses[:2]
+
     return render_template('view.html', 
-                          ghazal=ghazal,
-                          all_verses=all_verses,  # full for web
-                          verses=poster_verses)   # only 2 for image
+                          ghazal=ghazal, 
+                          verses=all_verses,
+                          poster_verses=poster_verses)
