@@ -1,324 +1,109 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>{{ ghazal.poet_name }} - UCPC Poetry Archive</title>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+{% extends "base.html" %}
 
-        body {
-            background: #0a0a0a;
-            color: #e0e0e0;
-            font-family: 'Segoe UI', Arial, sans-serif;
-            padding: 20px;
-            min-height: 100vh;
-        }
+{% block title %}{{ ghazal.poet_name }} - UCPC{% endblock %}
 
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-        }
+{% block extra_css %}
+<style>
+    .ghazal-container {
+        background: #1a1a1a;
+        border-radius: 24px;
+        padding: 2rem;
+        border: 2px solid #D4AF37;
+    }
+    .poet-name {
+        text-align: center;
+        color: #D4AF37;
+        font-size: 2rem;
+        font-weight: bold;
+        margin-bottom: 2rem;
+    }
+    .verse {
+        text-align: center;
+        direction: rtl;
+        font-family: 'Noto Nastaliq Urdu', serif;
+        font-size: 1.5rem;
+        line-height: 2.2;
+        margin-bottom: 2rem;
+        color: #f0e6d0;
+    }
+    .share-section {
+        text-align: center;
+        margin-top: 2rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid #333;
+    }
+    .share-btn {
+        background: #D4AF37;
+        color: #0a0a0a;
+        border: none;
+        padding: 0.6rem 1.2rem;
+        border-radius: 50px;
+        font-weight: bold;
+        margin: 0.3rem;
+        cursor: pointer;
+    }
+    .dedication-input {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        margin-bottom: 1.5rem;
+        flex-wrap: wrap;
+    }
+    .dedication-input input {
+        background: #2a2a2a;
+        border: 1px solid #444;
+        color: #e0e0e0;
+        padding: 0.6rem 1rem;
+        border-radius: 50px;
+    }
+</style>
+{% endblock %}
 
-        /* Header */
-        .poet-header {
-            text-align: center;
-            padding: 30px 20px 20px;
-            border-bottom: 2px solid #D4AF37;
-            margin-bottom: 30px;
-        }
+{% block content %}
+<div class="ghazal-container">
+    <div class="poet-name">{{ ghazal.poet_name }}</div>
 
-        .poet-name {
-            color: #D4AF37;
-            font-size: 36px;
-            font-weight: bold;
-        }
-
-        .ghazal-title {
-            color: #888;
-            font-size: 14px;
-            margin-top: 10px;
-        }
-
-        /* Dedication Card */
-        .dedication-card {
-            background: linear-gradient(135deg, #1a1a1a 0%, #111 100%);
-            border: 1px solid #D4AF37;
-            border-radius: 20px;
-            padding: 25px;
-            margin-bottom: 30px;
-            text-align: center;
-        }
-
-        .dedication-title {
-            color: #D4AF37;
-            font-size: 20px;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        .dedication-inputs {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-
-        .dedication-inputs input {
-            background: #2a2a2a;
-            border: 1px solid #444;
-            color: #e0e0e0;
-            padding: 12px 20px;
-            border-radius: 50px;
-            font-size: 16px;
-            width: 200px;
-            transition: 0.2s;
-        }
-
-        .dedication-inputs input:focus {
-            outline: none;
-            border-color: #D4AF37;
-        }
-
-        .dedication-inputs input::placeholder {
-            color: #666;
-        }
-
-        /* Ghazal Verses */
-        .ghazal-container {
-            background: #111;
-            border-radius: 24px;
-            padding: 30px 20px;
-            margin-bottom: 30px;
-        }
-
-        .verse {
-            text-align: center;
-            direction: rtl;
-            font-family: 'Noto Nastaliq Urdu', 'Times New Roman', serif;
-            font-size: 26px;
-            line-height: 2;
-            margin-bottom: 35px;
-            color: #f0e6d0;
-            padding: 0 10px;
-        }
-
-        .verse:last-child {
-            margin-bottom: 0;
-        }
-
-        /* Share Section */
-        .share-section {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .share-title {
-            color: #D4AF37;
-            font-size: 18px;
-            margin-bottom: 15px;
-        }
-
-        .share-buttons {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-
-        .share-btn {
-            background: #1a1a1a;
-            border: 1px solid #333;
-            color: #e0e0e0;
-            padding: 12px 28px;
-            border-radius: 50px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.2s;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .share-btn:hover {
-            transform: translateY(-2px);
-        }
-
-        .share-whatsapp:hover {
-            background: #25D366;
-            border-color: #25D366;
-            color: white;
-        }
-
-        .share-facebook:hover {
-            background: #1877F2;
-            border-color: #1877F2;
-            color: white;
-        }
-
-        .share-copy:hover {
-            background: #D4AF37;
-            border-color: #D4AF37;
-            color: #0a0a0a;
-        }
-
-        /* Navigation */
-        .back-nav {
-            text-align: center;
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid #222;
-        }
-
-        .back-nav a {
-            color: #888;
-            text-decoration: none;
-            font-size: 14px;
-            transition: 0.2s;
-            margin: 0 10px;
-        }
-
-        .back-nav a:hover {
-            color: #D4AF37;
-        }
-
-        /* Toast Message */
-        .toast {
-            position: fixed;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%) translateY(100px);
-            background: #D4AF37;
-            color: #0a0a0a;
-            padding: 12px 24px;
-            border-radius: 50px;
-            font-weight: bold;
-            transition: 0.3s;
-            z-index: 1000;
-            opacity: 0;
-        }
-
-        .toast.show {
-            transform: translateX(-50%) translateY(0);
-            opacity: 1;
-        }
-
-        /* Responsive */
-        @media (max-width: 600px) {
-            .poet-name { font-size: 28px; }
-            .verse { font-size: 20px; }
-            .dedication-inputs input { width: 100%; }
-            .share-btn { padding: 10px 20px; font-size: 14px; }
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <!-- Header -->
-        <div class="poet-header">
-            <div class="poet-name">{{ ghazal.poet_name }}</div>
-            {% if ghazal.title %}
-            <div class="ghazal-title">{{ ghazal.title }}</div>
-            {% endif %}
-        </div>
-
-        <!-- Dedication Section -->
-        <div class="dedication-card">
-            <div class="dedication-title">
-                🌸 Dedicate This Ghazal
-            </div>
-            <div class="dedication-inputs">
-                <input type="text" id="fromName" placeholder="From (Your Name)">
-                <input type="text" id="toName" placeholder="To (Someone Special)">
-            </div>
-            <p style="font-size: 12px; color: #666; margin-top: 15px;">
-                💕 Your dedication will appear when you share
-            </p>
-        </div>
-
-        <!-- Ghazal Verses -->
-        <div class="ghazal-container">
-            {% for verse in verses %}
-            <div class="verse" dir="rtl">
-                {{ verse.misra1_urdu }}<br>
-                {{ verse.misra2_urdu }}
-            </div>
-            {% endfor %}
-        </div>
-
-        <!-- Share Section -->
-        <div class="share-section">
-            <div class="share-title">📤 Share this Ghazal</div>
-            <div class="share-buttons">
-                <button class="share-btn share-whatsapp" onclick="shareWhatsApp()">
-                    📱 WhatsApp
-                </button>
-                <button class="share-btn share-facebook" onclick="shareFacebook()">
-                    📘 Facebook
-                </button>
-                <button class="share-btn share-copy" onclick="copyLink()">
-                    🔗 Copy Link
-                </button>
-            </div>
-        </div>
-
-        <!-- Navigation -->
-        <div class="back-nav">
-            <a href="/poets/{{ ghazal.poet_id }}">← Back to Poet</a>
-            <span>•</span>
-            <a href="/poets">All Poets</a>
-            <span>•</span>
-            <a href="/">Home</a>
-        </div>
+    <!-- Dedication -->
+    <div class="dedication-input">
+        <input type="text" id="fromName" placeholder="From (Your Name)">
+        <input type="text" id="toName" placeholder="To (Someone Special)">
     </div>
 
-    <!-- Toast Message -->
-    <div id="toast" class="toast">✅ Link copied!</div>
+    <!-- Verses -->
+    {% for verse in verses %}
+    <div class="verse" dir="rtl">
+        {{ verse.misra1_urdu }}<br>
+        {{ verse.misra2_urdu }}
+    </div>
+    {% endfor %}
 
-    <script>
-        function buildMessage() {
-            const fromName = document.getElementById("fromName").value.trim();
-            const toName = document.getElementById("toName").value.trim();
-            const url = window.location.href;
-            
-            if (fromName && toName) {
-                return `✨ Ghazal Dedication ✨\n\nFrom: ${fromName}\nTo: ${toName}\n\n“${document.querySelector('.verse')?.innerText.replace(/\n/g, ' ').substring(0, 100)}…”\n\nRead full ghazal:\n${url}`;
-            } else if (fromName) {
-                return `✨ Ghazal Dedication from ${fromName} ✨\n\nRead here:\n${url}`;
-            } else if (toName) {
-                return `✨ Ghazal dedicated to ${toName} ✨\n\nRead here:\n${url}`;
-            } else {
-                return `✨ Beautiful Urdu Ghazal ✨\n\nRead here:\n${url}`;
-            }
-        }
+    <!-- Share -->
+    <div class="share-section">
+        <button class="share-btn" onclick="shareWhatsApp()">📱 WhatsApp</button>
+        <button class="share-btn" onclick="shareFacebook()">📘 Facebook</button>
+        <button class="share-btn" onclick="copyLink()">🔗 Copy Link</button>
+    </div>
+</div>
 
-        function shareWhatsApp() {
-            const text = encodeURIComponent(buildMessage());
-            window.open(`https://wa.me/?text=${text}`, "_blank");
-        }
-
-        function shareFacebook() {
-            const url = encodeURIComponent(window.location.href);
-            window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, "_blank");
-        }
-
-        function copyLink() {
-            navigator.clipboard.writeText(window.location.href).then(() => {
-                const toast = document.getElementById('toast');
-                toast.classList.add('show');
-                setTimeout(() => {
-                    toast.classList.remove('show');
-                }, 2000);
-            });
-        }
-    </script>
-</body>
-</html>
+<script>
+    function buildMessage() {
+        const from = document.getElementById("fromName").value.trim();
+        const to = document.getElementById("toName").value.trim();
+        const url = window.location.href;
+        if (from && to) return `✨ Ghazal Dedication ✨\n\nFrom: ${from}\nTo: ${to}\n\nRead here:\n${url}`;
+        if (from) return `✨ Ghazal from ${from} ✨\n\nRead here:\n${url}`;
+        if (to) return `✨ Ghazal dedicated to ${to} ✨\n\nRead here:\n${url}`;
+        return `✨ Beautiful Urdu Ghazal ✨\n\nRead here:\n${url}`;
+    }
+    function shareWhatsApp() {
+        window.open(`https://wa.me/?text=${encodeURIComponent(buildMessage())}`, "_blank");
+    }
+    function shareFacebook() {
+        window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`, "_blank");
+    }
+    function copyLink() {
+        navigator.clipboard.writeText(window.location.href);
+        alert("✅ Link copied!");
+    }
+</script>
+{% endblock %}
