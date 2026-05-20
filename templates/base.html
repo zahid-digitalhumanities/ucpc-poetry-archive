@@ -2,15 +2,12 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#0a0a0a">
     <title>{% block title %}UCPC Poetry Archive{% endblock %}</title>
 
-    <!-- Open Graph -->
-    <meta property="og:title" content="{% block og_title %}UCPC Poetry Archive{% endblock %}">
-    <meta property="og:description" content="{% block og_description %}Classical Urdu Ghazals • Read • Share • Dedicate{% endblock %}">
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="{{ request.url }}">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
         * {
@@ -22,50 +19,12 @@
         body {
             background: #0a0a0a;
             color: #e0e0e0;
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            font-family: 'Segoe UI', system-ui, sans-serif;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
         }
 
-        /* Navigation */
-        .navbar {
-            background: #0a0a0a;
-            border-bottom: 2px solid #D4AF37;
-            padding: 1rem 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 1rem;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        .logo {
-            font-size: 1.2rem;
-            font-weight: bold;
-            color: #D4AF37;
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 1.5rem;
-            flex-wrap: wrap;
-        }
-
-        .nav-links a {
-            color: #e0e0e0;
-            text-decoration: none;
-            transition: 0.2s;
-        }
-
-        .nav-links a:hover {
-            color: #D4AF37;
-        }
-
-        /* Main Content */
         .main-content {
             flex: 1;
             max-width: 1200px;
@@ -74,21 +33,16 @@
             width: 100%;
         }
 
-        /* Footer */
         footer {
             text-align: center;
             padding: 1.5rem;
             color: #555;
             border-top: 1px solid #222;
             font-size: 0.8rem;
+            background: #0a0a0a;
         }
 
-        /* Responsive */
         @media (max-width: 768px) {
-            .navbar {
-                flex-direction: column;
-                text-align: center;
-            }
             .main-content {
                 padding: 1rem;
             }
@@ -97,20 +51,15 @@
     {% block extra_css %}{% endblock %}
 </head>
 <body>
-    <nav class="navbar">
-        <div class="logo">📜 UCPC Poetry Archive</div>
-        <div class="nav-links">
-            <a href="/">Home</a>
-            <a href="/poets">Poets</a>
-        </div>
-    </nav>
+    {% include "navbar.html" %}
 
     <main class="main-content">
         {% block content %}{% endblock %}
     </main>
 
     <footer>
-        UCPC – Urdu Classical Poetry Archive | Read • Share • Dedicate
+        <div>📜 UCPC – Urdu Classical Poetry Archive</div>
+        <div style="font-size: 0.7rem; margin-top: 0.5rem;">Read • Share • Dedicate</div>
     </footer>
 
     {% block extra_js %}{% endblock %}
