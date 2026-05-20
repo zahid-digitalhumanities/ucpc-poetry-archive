@@ -86,7 +86,9 @@
         margin-top: 12px;
         border-top: 1px solid rgba(212,175,55,0.15);
     }
-    .btn-view, .btn-share {
+    .btn-view {
+        background: #1e3c72;
+        color: white;
         padding: 6px 16px;
         border-radius: 40px;
         font-size: 0.8rem;
@@ -94,19 +96,8 @@
         text-decoration: none;
         display: inline-block;
     }
-    .btn-view {
-        background: #1e3c72;
-        color: white;
-    }
     .btn-view:hover {
         background: #0f2b4a;
-    }
-    .btn-share {
-        background: #25d366;
-        color: white;
-    }
-    .btn-share:hover {
-        background: #1da155;
     }
     @media (max-width: 768px) {
         .poet-header { flex-direction: column; text-align: center; }
@@ -127,7 +118,7 @@
             {% endif %}
         </div>
         <div class="poet-stats">
-            <div>📖 {{ total }} Poems</div>
+            <div>📖 {{ total }} Ghazals</div>
         </div>
     </div>
 
@@ -139,14 +130,12 @@
                     {{ item.first_verse.misra1_urdu }}<br>
                     {{ item.first_verse.misra2_urdu }}
                 {% else %}
-                    {{ item.first_couplet | safe }}
+                    {{ item.first_couplet or item.title_urdu or 'No couplet available' }}
                 {% endif %}
             </div>
             <div class="poem-meta">
                 <span>✍️ {{ item.verse_count or 0 }} verses</span>
-                <div>
-                    <a href="/ghazals/view/{{ item.id }}" class="btn-view">Read</a>
-                </div>
+                <a href="/ghazals/view/{{ item.id }}" class="btn-view">Read Full →</a>
             </div>
         </div>
         {% endfor %}
