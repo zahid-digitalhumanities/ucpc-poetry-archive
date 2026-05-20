@@ -3,12 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#0a0a0a">
     <title>{% block title %}UCPC Poetry Archive{% endblock %}</title>
-
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
     <style>
         * {
             margin: 0;
@@ -19,47 +14,78 @@
         body {
             background: #0a0a0a;
             color: #e0e0e0;
-            font-family: 'Segoe UI', system-ui, sans-serif;
+            font-family: 'Segoe UI', Arial, sans-serif;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
         }
 
+        /* Navigation */
+        .navbar {
+            background: #0a0a0a;
+            border-bottom: 2px solid #D4AF37;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .navbar a {
+            color: #e0e0e0;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 30px;
+            transition: 0.2s;
+        }
+
+        .navbar a:hover {
+            background: #D4AF37;
+            color: #0a0a0a;
+        }
+
+        /* Main Content */
         .main-content {
             flex: 1;
-            max-width: 1200px;
+            max-width: 1000px;
             margin: 0 auto;
             padding: 2rem;
             width: 100%;
         }
 
+        /* Footer */
         footer {
             text-align: center;
             padding: 1.5rem;
             color: #555;
             border-top: 1px solid #222;
             font-size: 0.8rem;
-            background: #0a0a0a;
         }
 
-        @media (max-width: 768px) {
-            .main-content {
-                padding: 1rem;
-            }
+        @media (max-width: 600px) {
+            .navbar { gap: 1rem; }
+            .navbar a { font-size: 0.9rem; }
+            .main-content { padding: 1rem; }
         }
     </style>
     {% block extra_css %}{% endblock %}
 </head>
 <body>
-    {% include "navbar.html" %}
+    <nav class="navbar">
+        <a href="/">🏠 Home</a>
+        <a href="/poets">📜 Poets</a>
+    </nav>
 
     <main class="main-content">
         {% block content %}{% endblock %}
     </main>
 
     <footer>
-        <div>📜 UCPC – Urdu Classical Poetry Archive</div>
-        <div style="font-size: 0.7rem; margin-top: 0.5rem;">Read • Share • Dedicate</div>
+        UCPC – Urdu Classical Poetry Archive | Read • Share • Dedicate
     </footer>
 
     {% block extra_js %}{% endblock %}
