@@ -47,12 +47,12 @@
         outline: none;
     }
 
-    /* POSTER - optimized for Facebook (4 verses only) */
+    /* POSTER - optimized for Facebook */
     .poetry-poster {
         background: linear-gradient(180deg, #0a0a0a 0%, #111111 100%);
         border: 2px solid #E0B94F;
         border-radius: 32px;
-        padding: 1.5rem;
+        padding: 1.8rem;
         position: relative;
         overflow: hidden;
         box-shadow: 0 20px 35px rgba(0,0,0,0.5);
@@ -70,8 +70,8 @@
     .poster-brand {
         text-align: center;
         color: #E0B94F;
-        font-size: 0.8rem;
-        letter-spacing: 3px;
+        font-size: 0.85rem;
+        letter-spacing: 4px;
         margin-bottom: 1rem;
         font-weight: 700;
         text-transform: uppercase;
@@ -79,49 +79,48 @@
     .poster-dedication {
         text-align: center;
         color: #F6D878;
-        font-size: 1rem;
-        margin-bottom: 0.3rem;
+        font-size: 1.1rem;
+        margin-bottom: 0.5rem;
         font-style: italic;
         line-height: 1.4;
         font-weight: 500;
     }
-    .poster-site {
+    /* PROMINENT SITE ADDRESS */
+    .poster-website {
         text-align: center;
-        color: rgba(224,185,79,0.5);
-        font-size: 0.65rem;
-        letter-spacing: 1px;
-        margin-bottom: 1.2rem;
-        font-family: monospace;
+        color: #E0B94F;
+        font-size: 0.8rem;
+        letter-spacing: 2px;
+        margin: 0.5rem 0 1.2rem 0;
+        font-weight: bold;
+        background: rgba(224,185,79,0.1);
+        padding: 0.4rem;
+        border-radius: 40px;
     }
-    .poster-verses { margin: 0.5rem 0; }
+    .poster-verses { margin: 0.8rem 0; }
     .poster-verse {
         direction: rtl;
         text-align: center;
         color: #F8F1DA;
-        font-size: 1.4rem;
-        line-height: 1.9;
-        margin-bottom: 1rem;
+        font-size: 1.5rem;
+        line-height: 2;
+        margin-bottom: 1.2rem;
         font-family: 'Noto Nastaliq Urdu', 'Jameel Noori Nastaleeq', serif;
     }
     .poster-poet {
         text-align: center;
         color: rgba(224,185,79,0.85);
-        margin-top: 0.8rem;
-        font-size: 0.85rem;
-        letter-spacing: 1px;
+        margin-top: 1rem;
+        font-size: 0.9rem;
+        letter-spacing: 2px;
     }
     .poster-cta {
         text-align: center;
-        color: rgba(224,185,79,0.6);
+        color: rgba(224,185,79,0.5);
         font-size: 0.65rem;
         margin-top: 1rem;
         padding-top: 0.8rem;
         border-top: 1px dashed rgba(224,185,79,0.3);
-        line-height: 1.4;
-    }
-    .poster-cta a {
-        color: #E0B94F;
-        text-decoration: none;
     }
 
     .share-action { text-align: center; margin-top: 1.5rem; }
@@ -139,12 +138,11 @@
     .back-link a { color: #888; text-decoration: none; font-size: 0.8rem; }
 
     @media (max-width: 600px) {
-        .poetry-poster { padding: 1rem; }
-        .poster-verse { font-size: 1.1rem; line-height: 1.7; margin-bottom: 0.8rem; }
-        .poster-brand { font-size: 0.65rem; }
-        .poster-dedication { font-size: 0.85rem; }
-        .poster-site { font-size: 0.55rem; }
-        .poster-cta { font-size: 0.55rem; }
+        .poetry-poster { padding: 1.2rem; }
+        .poster-verse { font-size: 1.2rem; line-height: 1.7; margin-bottom: 0.9rem; }
+        .poster-brand { font-size: 0.7rem; }
+        .poster-dedication { font-size: 0.9rem; }
+        .poster-website { font-size: 0.65rem; }
     }
 
     .toast-message {
@@ -175,11 +173,11 @@
     <div id="poetry-poster" class="poetry-poster">
         <div class="poster-brand">✨ UCPC POETRY ARCHIVE ✨</div>
         <div class="poster-dedication" id="posterDedication">✨ Dedicated Urdu Poetry ✨</div>
-        <div class="poster-site" id="posterSite">www.ucpcpoetry.com</div>
+        <div class="poster-website">✨ www.ucpcpoetry.com ✨</div>
         
-        <!-- ONLY FIRST 4 VERSES (2 couplets) for the poster -->
+        <!-- ONLY 2 COUPLETS (4 lines) -->
         <div class="poster-verses">
-            {% for verse in poster_verses %}
+            {% for verse in verses %}
             <div class="poster-verse" dir="rtl">
                 {{ verse.misra1_urdu }}<br>
                 {{ verse.misra2_urdu }}
@@ -189,10 +187,8 @@
         
         <div class="poster-poet">— {{ ghazal.poet_name }} —</div>
         
-        <!-- CALL TO ACTION - drives traffic to website -->
         <div class="poster-cta">
-            ✨ Continue reading full ghazal ✨<br>
-            <a href="{{ request.url }}">www.ucpcpoetry.com</a>
+            🔗 Read full ghazal: {{ request.url }}
         </div>
     </div>
 
