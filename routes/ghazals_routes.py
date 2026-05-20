@@ -1,274 +1,48 @@
-{% extends "base.html" %}
+from flask import Blueprint, render_template, abort
+from models.db import get_db
 
-{% block title %}{{ ghazal.poet_name }} - UCPC Poetry Archive{% endblock %}
+# Create the blueprint - THIS MUST BE NAMED 'ghazals_bp'
+ghazals_bp = Blueprint('ghazals', __name__)
 
-{% block extra_head %}
-<meta property="og:title" content="{{ ghazal.poet_name }} - Urdu Ghazal" />
-<meta property="og:description" content="Dedicate this beautiful ghazal to someone special. Read full ghazal at UCPC Poetry Archive." />
-<meta property="og:type" content="article" />
-<meta property="og:url" content="{{ request.url }}" />
-<meta property="og:image" content="{{ url_for('static', filename='og-image.png', _external=true) }}" />
-<meta property="og:site_name" content="UCPC Poetry Archive" />
-<meta name="twitter:card" content="summary_large_image" />
-{% endblock %}
 
-{% block extra_css %}
-<style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-        background: #0a0a0a;
-        font-family: 'Segoe UI', 'Inter', system-ui, sans-serif;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        min-height: 100vh;
-        padding: 20px;
-    }
+@ghazals_bp.route('/view/<int:text_id>')
+def view_ghazal(text_id):
+    conn = get_db()
+    cur = conn.cursor()
 
-    .page-container { max-width: 800px; width: 100%; margin: 0 auto; }
+    # Get ghazal info
+    cur.execute("""
+        SELECT 
+            t.id,
+            t.verse_count,
+            t.poet_id,
+            p.name as poet_name,
+            p.name_urdu as poet_name_urdu
+        FROM texts t
+        LEFT JOIN poets p ON t.poet_id = p.id
+        WHERE t.id = %s
+    """, (text_id,))
+    
+    ghazal = cur.fetchone()
 
-    .dedication-input-area {
-        background: #111;
-        border-radius: 60px;
-        padding: 1rem;
-        margin-bottom: 2rem;
-        text-align: center;
-        border: 1px solid rgba(224,185,79,0.4);
-    }
-    .dedication-input-area input {
-        background: #1f1f1f;
-        border: 1px solid #E0B94F;
-        color: #fff;
-        padding: 0.6rem 1rem;
-        border-radius: 60px;
-        font-size: 0.9rem;
-        width: 200px;
-        margin: 0.3rem;
-        outline: none;
-    }
+    if ghazal is None:
+        cur.close()
+        conn.close()
+        abort(404)
 
-    .poetry-poster {
-        background: linear-gradient(180deg, #0a0a0a 0%, #111111 100%);
-        border: 2px solid #E0B94F;
-        border-radius: 32px;
-        padding: 1.8rem;
-        position: relative;
-        overflow: hidden;
-        box-shadow: 0 20px 35px rgba(0,0,0,0.5);
-        width: 100%;
-        max-width: 800px;
-        margin: 0 auto;
-    }
-    .poetry-poster::before {
-        content: '';
-        position: absolute;
-        inset: 0;
-        background: radial-gradient(circle at top, rgba(224,185,79,0.1), transparent 70%);
-        pointer-events: none;
-    }
-    .poster-brand {
-        text-align: center;
-        color: #E0B94F;
-        font-size: 0.8rem;
-        letter-spacing: 2px;  /* FIXED: reduced from 4px */
-        margin-bottom: 1rem;
-        font-weight: 700;
-        text-transform: uppercase;
-    }
-    /* DYNAMIC DEDICATION - only one instance */
-    .poster-dedication {
-        text-align: center;
-        color: #F6D878;
-        font-size: 1.1rem;
-        margin-bottom: 0.5rem;
-        font-style: italic;
-        line-height: 1.4;
-        font-weight: 500;
-    }
-    .poster-website {
-        text-align: center;
-        color: #E0B94F;
-        font-size: 0.75rem;
-        letter-spacing: 1px;
-        margin: 0.3rem 0 1rem 0;
-        font-weight: bold;
-    }
-    .poster-verses { margin: 1rem 0; }
-    .poster-verse {
-        direction: rtl;
-        text-align: center;
-        color: #F8F1DA;
-        font-size: 1.5rem;
-        line-height: 2;
-        margin-bottom: 1.2rem;
-        font-family: 'Noto Nastaliq Urdu', 'Jameel Noori Nastaleeq', serif;
-    }
-    .poster-poet {
-        text-align: center;
-        color: rgba(224,185,79,0.85);
-        margin-top: 1rem;
-        font-size: 0.9rem;
-        letter-spacing: 2px;
-    }
-    .poster-cta {
-        text-align: center;
-        color: rgba(224,185,79,0.6);
-        font-size: 0.7rem;
-        margin-top: 1rem;
-        padding-top: 0.8rem;
-        border-top: 1px dashed rgba(224,185,79,0.3);
-    }
+    # Get verses for poster (first 3 couplets)
+    cur.execute("""
+        SELECT misra1_urdu, misra2_urdu, couplet_index
+        FROM verses
+        WHERE text_id = %s
+        ORDER BY couplet_index ASC
+        LIMIT 3
+    """, (text_id,))
+    
+    poster_verses = cur.fetchall()
+    cur.close()
+    conn.close()
 
-    .share-action { text-align: center; margin-top: 1.5rem; }
-    .share-btn-poster {
-        background: #E0B94F;
-        color: #0a0a0a;
-        border: none;
-        padding: 0.8rem 1.8rem;
-        border-radius: 60px;
-        font-weight: bold;
-        font-size: 1rem;
-        cursor: pointer;
-    }
-    .back-link { text-align: center; margin-top: 1rem; }
-    .back-link a { color: #888; text-decoration: none; font-size: 0.8rem; }
-
-    @media (max-width: 600px) {
-        .poetry-poster { padding: 1.2rem; }
-        .poster-verse { font-size: 1.2rem; line-height: 1.7; margin-bottom: 0.9rem; }
-        .poster-brand { font-size: 0.65rem; }
-        .poster-dedication { font-size: 0.9rem; }
-    }
-
-    .toast-message {
-        position: fixed;
-        bottom: 30px;
-        left: 50%;
-        transform: translateX(-50%);
-        background: #E0B94F;
-        color: #0a0a0a;
-        padding: 0.6rem 1.2rem;
-        border-radius: 60px;
-        font-weight: bold;
-        z-index: 1000;
-        display: none;
-        font-size: 0.8rem;
-    }
-</style>
-{% endblock %}
-
-{% block content %}
-<div class="page-container">
-    <div class="dedication-input-area">
-        <input type="text" id="fromName" placeholder="Your Name">
-        <input type="text" id="toName" placeholder="Special Someone">
-        <div style="font-size:0.7rem; color:#aaa; margin-top:0.3rem;">💕 Enter names to personalise the poster</div>
-    </div>
-
-    <div id="poetry-poster" class="poetry-poster">
-        <div class="poster-brand">✨ UCPC POETRY ARCHIVE ✨</div>
-        
-        <!-- ONLY ONE DEDICATION - dynamically updated -->
-        <div class="poster-dedication" id="posterDedication">✨ Dedicated Urdu Poetry ✨</div>
-        
-        <div class="poster-website">✨ www.ucpcpoetry.com ✨</div>
-        
-        <div class="poster-verses">
-            {% for verse in poster_verses %}
-            <div class="poster-verse" dir="rtl">
-                {{ verse.misra1_urdu }}<br>
-                {{ verse.misra2_urdu }}
-            </div>
-            {% endfor %}
-        </div>
-        
-        <div class="poster-poet">— {{ ghazal.poet_name }} —</div>
-        
-        <!-- CLEAR CALL TO ACTION -->
-        <div class="poster-cta">
-            🔗 Read full ghazal: {{ request.url }}
-        </div>
-    </div>
-
-    <div class="share-action">
-        <button class="share-btn-poster" id="sharePosterBtn">📱 Share on Social Media</button>
-    </div>
-    <div class="back-link">
-        <a href="/poets/{{ ghazal.poet_id }}">← Back to Poet</a> • <a href="/poets">All Poets</a>
-    </div>
-</div>
-
-<div id="toast" class="toast-message"></div>
-
-<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-<script>
-    const fromInput = document.getElementById('fromName');
-    const toInput = document.getElementById('toName');
-    const posterDedication = document.getElementById('posterDedication');
-
-    function escapeHtml(str) {
-        if (!str) return '';
-        return str.replace(/[&<>]/g, function(m) {
-            return m === '&' ? '&amp;' : (m === '<' ? '&lt;' : '&gt;');
-        });
-    }
-
-    function updatePosterDedication() {
-        const from = fromInput.value.trim();
-        const to = toInput.value.trim();
-        if (from && to) {
-            posterDedication.innerHTML = `💖 From ${escapeHtml(from)}   ❤️   To ${escapeHtml(to)}`;
-        } else if (to) {
-            posterDedication.innerHTML = `💖 Dedicated to ${escapeHtml(to)}`;
-        } else if (from) {
-            posterDedication.innerHTML = `💖 Shared by ${escapeHtml(from)}`;
-        } else {
-            posterDedication.innerHTML = `✨ Dedicated Urdu Poetry ✨`;
-        }
-    }
-
-    fromInput.addEventListener('input', updatePosterDedication);
-    toInput.addEventListener('input', updatePosterDedication);
-    updatePosterDedication();
-
-    document.getElementById('sharePosterBtn').addEventListener('click', async function() {
-        const poster = document.getElementById('poetry-poster');
-        const toast = document.getElementById('toast');
-
-        toast.style.display = 'block';
-        toast.innerText = '🎨 Creating poster...';
-
-        try {
-            const canvas = await html2canvas(poster, {
-                scale: 2,
-                backgroundColor: '#0a0a0a',
-                logging: false,
-                useCORS: true
-            });
-            const imageData = canvas.toDataURL('image/jpeg', 0.85);
-            const blob = await (await fetch(imageData)).blob();
-
-            if (navigator.share) {
-                const file = new File([blob], 'ucpc_poster.jpg', { type: 'image/jpeg' });
-                await navigator.share({
-                    title: 'Urdu Poetry Poster',
-                    text: posterDedication.innerText,
-                    files: [file]
-                });
-                toast.innerText = '✅ Shared!';
-            } else {
-                const link = document.createElement('a');
-                link.download = `ucpc_poster_${Date.now()}.jpg`;
-                link.href = imageData;
-                link.click();
-                toast.innerText = '✅ Poster saved!';
-            }
-        } catch (err) {
-            console.error(err);
-            toast.innerText = '❌ Failed to create poster.';
-        } finally {
-            setTimeout(() => { toast.style.display = 'none'; }, 2500);
-        }
-    });
-</script>
-{% endblock %}
+    return render_template('view.html', 
+                          ghazal=ghazal, 
+                          poster_verses=poster_verses)
