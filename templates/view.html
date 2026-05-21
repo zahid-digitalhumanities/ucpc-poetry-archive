@@ -1,3 +1,10 @@
+logo
+GLM-Image
+
+中文
+Home
+Creative Description
+Update code 
 {% extends "base.html" %}
 
 {% block title %}{{ ghazal.poet_name }} - UCPC Poetry Archive{% endblock %}
@@ -226,292 +233,252 @@ body{
 
 .poster-dedication{
     margin-top:50px;
+    text-align:ce
+4000/4000
+
+9:16
+
+1K
+No Watermark
+
+generate
+Start Generation
+Creative Description
+9:16
+1K
+Update code 
+{% extends "base.html" %}
+
+{% block title %}{{ ghazal.poet_name }} - UCPC Poetry Archive{% endblock %}
+
+{% block extra_head %}
+<meta property="og:title" content="{{ ghazal.poet_name }} - Urdu Ghazal" />
+<meta property="og:description" content="Beautiful Urdu poetry from UCPC Poetry Archive." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="{{ request.url }}" />
+<meta property="og:site_name" content="UCPC Poetry Archive" />
+<meta name="twitter:card" content="summary_large_image" />
+{% endblock %}
+
+{% block extra_css %}
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    background:#050505;
+    font-family:'Segoe UI',sans-serif;
+    color:white;
+}
+
+/* =========================
+   MAIN PAGE
+========================= */
+
+.page-container{
+    max-width:700px;
+    margin:auto;
+    padding:20px;
+}
+
+.page-title{
+    text-align:center;
+    color:#D4AF37;
+    font-size:1.6rem;
+    font-weight:700;
+    margin-bottom:10px;
+}
+
+.page-subtitle{
+    text-align:center;
+    color:#999;
+    font-size:0.85rem;
+    margin-bottom:25px;
+    letter-spacing:1px;
+}
+
+.dedication-input-area{
+    background:#0f0f0f;
+    border:1px solid rgba(212,175,55,0.25);
+    border-radius:30px;
+    padding:20px;
+    margin-bottom:25px;
+    text-align:center;
+}
+
+.dedication-input-area h3{
+    color:#E0B94F;
+    margin-bottom:15px;
+    font-size:1rem;
+}
+
+.dedication-input-area input{
+    width:220px;
+    max-width:100%;
+    background:#1a1a1a;
+    border:1px solid rgba(212,175,55,0.4);
+    color:#fff;
+    padding:12px 16px;
+    border-radius:50px;
+    outline:none;
+    margin:6px;
+    font-size:0.9rem;
+}
+
+.dedication-input-area input::placeholder{
+    color:#777;
+}
+
+.share-action{
+    text-align:center;
+    margin-top:25px;
+}
+
+.share-btn-poster{
+    background:linear-gradient(135deg,#D4AF37,#F6D878);
+    color:black;
+    border:none;
+    border-radius:50px;
+    padding:14px 26px;
+    font-weight:700;
+    cursor:pointer;
+    font-size:1rem;
+    transition:0.2s;
+}
+
+.share-btn-poster:hover{
+    transform:scale(1.03);
+}
+
+.reel-help{
+    margin-top:30px;
+    background:#0f0f0f;
+    border-radius:25px;
+    padding:20px;
+    border:1px solid rgba(212,175,55,0.2);
+    text-align:center;
+}
+
+.reel-help h4{
+    color:#D4AF37;
+    margin-bottom:12px;
+}
+
+.reel-help p{
+    color:#aaa;
+    font-size:0.82rem;
+    line-height:1.8;
+}
+
+.reel-help a{
+    display:inline-block;
+    margin-top:14px;
+    color:#E0B94F;
+    text-decoration:none;
+    font-weight:bold;
+}
+
+.back-link{
+    text-align:center;
+    margin-top:25px;
+}
+
+.back-link a{
+    color:#777;
+    text-decoration:none;
+    font-size:0.82rem;
+}
+
+/* =========================
+   SOCIAL POSTER
+========================= */
+
+#social-poster{
+    width:1080px;
+    background:#000;
+    position:fixed;
+    left:-99999px;
+    top:0;
+    padding:80px 85px 70px;
+    overflow:hidden;
+}
+
+/* GOLD BORDER */
+
+.poster-frame{
+    border:2px solid rgba(212,175,55,0.55);
+    border-radius:35px;
+    padding:70px 60px;
+    background:linear-gradient(180deg,#000000 0%,#070707 100%);
+}
+
+/* WATERMARK */
+
+.poster-watermark{
+    text-align:center;
+    color:#D4AF37;
+    font-size:34px;
+    letter-spacing:5px;
+    font-weight:700;
+    margin-bottom:18px;
+    text-shadow:0 0 8px rgba(212,175,55,0.15);
+}
+
+.poster-tagline{
+    text-align:center;
+    color:#888;
+    font-size:22px;
+    letter-spacing:3px;
+    margin-bottom:55px;
+}
+
+/* POET */
+
+.poster-poet{
     text-align:center;
     color:#E8C766;
-    font-size:34px;
-    line-height:1.7;
+    font-size:56px;
+    margin-bottom:70px;
+    font-weight:600;
+    text-shadow:0 0 8px rgba(212,175,55,0.12);
 }
 
-.poster-dedication.hidden{
-    display:none;
-}
+/* SHER */
 
-/* FOOTER */
-
-.poster-footer{
-    margin-top:60px;
+.poster-sher{
     text-align:center;
-    color:rgba(212,175,55,0.55);
-    font-size:22px;
-    letter-spacing:2px;
+    direction:rtl;
+    unicode-bidi:embed;
+
+    font-family:
+    'Noto Nastaliq Urdu',
+    'Jameel Noori Nastaleeq',
+    serif;
+
+    color:#fff;
+
+    font-size:58px;
+    font-weight:500;
+
+    line-height:1.8;
+
+    margin-bottom:55px;
+
+    word-spacing:3px;
 }
 
-/* TOAST */
-
-.toast-message{
-    position:fixed;
-    bottom:25px;
-    left:50%;
-    transform:translateX(-50%);
-    background:#D4AF37;
-    color:black;
-    padding:12px 20px;
-    border-radius:50px;
-    font-weight:700;
-    display:none;
-    z-index:9999;
-}
-
-/* MOBILE */
-
-@media(max-width:600px){
-
-    .page-container{
-        padding:16px;
-    }
-
-    .dedication-input-area input{
-        width:100%;
-    }
-
-    .share-btn-poster{
-        width:100%;
-    }
-}
-
-</style>
-{% endblock %}
-
-{% block content %}
-
-<div class="page-container">
-
-    <div class="page-title">
-        ✨ UCPC Poetry Archive
-    </div>
-
-    <div class="page-subtitle">
-        Classical Urdu Poetry • Ghazals • Literature
-    </div>
-
-    <div class="dedication-input-area">
-
-        <h3>💕 Dedicate This Poetry</h3>
-
-        <input type="text"
-               id="fromName"
-               placeholder="Your Name (optional)">
-
-        <input type="text"
-               id="toName"
-               placeholder="Someone Special (optional)">
-
-    </div>
-
-    <div class="share-action">
-        <button class="share-btn-poster" id="sharePosterBtn">
-            📱 Create Poetry Poster
-        </button>
-    </div>
-
-    <!-- REEL GUIDE -->
-
-    <div class="reel-help">
-
-        <h4>🎬 Want to Make a REEL with Sound?</h4>
-
-        <p>
-            1. Create your poetry poster above<br>
-            2. Open CapCut or Instagram Reels<br>
-            3. Add slow emotional music<br>
-            4. Use zoom animation<br>
-            5. Post & tag UCPC Poetry Archive
-        </p>
-
-        <a href="https://www.instagram.com/reels/" target="_blank">
-            📱 Open Instagram Reels →
-        </a>
-
-    </div>
-
-    <div class="back-link">
-        <a href="/poets/{{ ghazal.poet_id }}">← Back to Poet</a>
-        •
-        <a href="/poets">All Poets</a>
-    </div>
-
-</div>
-
-<!-- =========================
-     HIDDEN POSTER
-========================= -->
-
-<div id="social-poster">
-
-    <div class="poster-frame">
-
-        <div class="poster-watermark">
-            UCPC POETRY ARCHIVE
-        </div>
-
-        <div class="poster-tagline">
-            FOLLOW FOR DAILY URDU POETRY
-        </div>
-
-        <div class="poster-poet">
-            {{ ghazal.poet_name }}
-        </div>
-
-        {% for verse in poster_verses %}
-
-        <div class="poster-sher">
-
-            {{ verse.misra1_urdu }}<br>
-            {{ verse.misra2_urdu }}
-
-        </div>
-
-        {% endfor %}
-
-        <div class="poster-dedication hidden"
-             id="posterDedication"></div>
-
-        <div class="poster-footer">
-            https://ucpc-poetry-archive.onrender.com
-        </div>
-
-    </div>
-
-</div>
-
-<div id="toast" class="toast-message"></div>
-
-<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-
-<script>
-
-const fromInput = document.getElementById('fromName');
-const toInput = document.getElementById('toName');
-const posterDedication = document.getElementById('posterDedication');
-
-function escapeHtml(str){
-    if(!str) return '';
-
-    return str.replace(/[&<>]/g,function(m){
-        return m === '&'
-            ? '&amp;'
-            : (m === '<' ? '&lt;' : '&gt;');
-    });
-}
-
-function updatePosterDedication(){
-
-    const from = fromInput.value.trim();
-    const to = toInput.value.trim();
-
-    if(from && to){
-
-        posterDedication.innerHTML = `
-            ✨ Dedicated With Love ✨
-            <br><br>
-            From ${escapeHtml(from)}
-            <br>
-            ❤️
-            <br>
-            To ${escapeHtml(to)}
-        `;
-
-        posterDedication.classList.remove('hidden');
-
-    }
-    else if(to){
-
-        posterDedication.innerHTML = `
-            ✨ Dedicated To ✨
-            <br><br>
-            ${escapeHtml(to)}
-        `;
-
-        posterDedication.classList.remove('hidden');
-
-    }
-    else{
-
-        posterDedication.classList.add('hidden');
-    }
-}
-
-fromInput.addEventListener('input',updatePosterDedication);
-toInput.addEventListener('input',updatePosterDedication);
-
-updatePosterDedication();
-
-document.getElementById('sharePosterBtn')
-.addEventListener('click',async function(){
-
-    const poster = document.getElementById('social-poster');
-    const toast = document.getElementById('toast');
-
-    toast.style.display = 'block';
-    toast.innerText = '🎨 Generating Premium Poster...';
-
-    try{
-
-        const canvas = await html2canvas(poster,{
-            scale:2,
-            backgroundColor:'#000',
-            useCORS:true,
-            logging:false,
-            windowWidth:1080,
-            windowHeight:poster.scrollHeight
-        });
-
-        const imageData = canvas.toDataURL('image/jpeg',0.95);
-
-        const blob = await (await fetch(imageData)).blob();
-
-        if(navigator.share){
-
-            const file = new File(
-                [blob],
-                'ucpc_poetry_poster.jpg',
-                {type:'image/jpeg'}
-            );
-
-            await navigator.share({
-                title:'UCPC Poetry Archive',
-                text:'Beautiful Urdu Poetry',
-                files:[file]
-            });
-
-            toast.innerText = '✅ Poster Shared Successfully';
-
-        }else{
-
-            const link = document.createElement('a');
-
-            link.download = 'ucpc_poetry_poster.jpg';
-            link.href = imageData;
-
-            link.click();
-
-            toast.innerText = '✅ Poster Downloaded';
-        }
-
-    }catch(err){
-
-        console.error(err);
-
-        toast.innerText = '❌ Failed to Generate Poster';
-
-    }
-
-    setTimeout(()=>{
-        toast.style.display='none';
-    },3000);
-
-});
-
-</script>
-
-{% endblock %}
+/* DEDICATION */
+
+.poster-dedication{
+    margin-top:50px;
+    text-align:ce
+
+Default
+Gallery 2056769523704401920
+Default
+Default
+Default
