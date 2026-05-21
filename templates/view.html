@@ -13,7 +13,6 @@
 
 {% block extra_css %}
 <style>
-
 *{
     margin:0;
     padding:0;
@@ -25,10 +24,6 @@ body{
     font-family:'Segoe UI',sans-serif;
     color:white;
 }
-
-/* =========================
-   MAIN PAGE
-========================= */
 
 .page-container{
     max-width:700px;
@@ -145,7 +140,8 @@ body{
 }
 
 /* =========================
-   SOCIAL POSTER
+   SOCIAL POSTER (HIDDEN)
+   FIXED VERSE FORMATTING
 ========================= */
 
 #social-poster{
@@ -158,16 +154,12 @@ body{
     overflow:hidden;
 }
 
-/* GOLD BORDER */
-
 .poster-frame{
     border:2px solid rgba(212,175,55,0.55);
     border-radius:35px;
     padding:70px 60px;
     background:linear-gradient(180deg,#000000 0%,#070707 100%);
 }
-
-/* WATERMARK */
 
 .poster-watermark{
     text-align:center;
@@ -187,8 +179,6 @@ body{
     margin-bottom:55px;
 }
 
-/* POET */
-
 .poster-poet{
     text-align:center;
     color:#E8C766;
@@ -198,31 +188,31 @@ body{
     text-shadow:0 0 8px rgba(212,175,55,0.12);
 }
 
-/* SHER */
-
-.poster-sher{
-    text-align:center;
-    direction:rtl;
-    unicode-bidi:embed;
-
-    font-family:
-    'Noto Nastaliq Urdu',
-    'Jameel Noori Nastaleeq',
-    serif;
-
-    color:#fff;
-
-    font-size:58px;
-    font-weight:500;
-
-    line-height:1.8;
-
-    margin-bottom:55px;
-
-    word-spacing:3px;
+/* FIXED SHER STYLES - PROPER 2-LINE FORMATTING */
+.poster-sher {
+    text-align: center;
+    direction: rtl;
+    unicode-bidi: embed;
+    font-family: 'Noto Nastaliq Urdu', 'Jameel Noori Nastaleeq', serif;
+    color: #fff;
+    font-size: 58px;
+    font-weight: 500;
+    line-height: 2.2;
+    margin-bottom: 55px;
+    word-spacing: 3px;
+    white-space: normal;
+    word-break: break-word;
+    display: block;
 }
 
-/* DEDICATION */
+.poster-sher .misra1 {
+    display: block;
+    margin-bottom: 20px;
+}
+
+.poster-sher .misra2 {
+    display: block;
+}
 
 .poster-dedication{
     margin-top:50px;
@@ -236,8 +226,6 @@ body{
     display:none;
 }
 
-/* FOOTER */
-
 .poster-footer{
     margin-top:60px;
     text-align:center;
@@ -245,8 +233,6 @@ body{
     font-size:22px;
     letter-spacing:2px;
 }
-
-/* TOAST */
 
 .toast-message{
     position:fixed;
@@ -262,193 +248,106 @@ body{
     z-index:9999;
 }
 
-/* MOBILE */
-
 @media(max-width:600px){
-
     .page-container{
         padding:16px;
     }
-
     .dedication-input-area input{
         width:100%;
     }
-
     .share-btn-poster{
         width:100%;
     }
 }
-
 </style>
 {% endblock %}
 
 {% block content %}
-
 <div class="page-container">
-
-    <div class="page-title">
-        ✨ UCPC Poetry Archive
-    </div>
-
-    <div class="page-subtitle">
-        Classical Urdu Poetry • Ghazals • Literature
-    </div>
+    <div class="page-title">✨ UCPC Poetry Archive</div>
+    <div class="page-subtitle">Classical Urdu Poetry • Ghazals • Literature</div>
 
     <div class="dedication-input-area">
-
         <h3>💕 Dedicate This Poetry</h3>
-
-        <input type="text"
-               id="fromName"
-               placeholder="Your Name (optional)">
-
-        <input type="text"
-               id="toName"
-               placeholder="Someone Special (optional)">
-
+        <input type="text" id="fromName" placeholder="Your Name (optional)">
+        <input type="text" id="toName" placeholder="Someone Special (optional)">
     </div>
 
     <div class="share-action">
-        <button class="share-btn-poster" id="sharePosterBtn">
-            📱 Create Poetry Poster
-        </button>
+        <button class="share-btn-poster" id="sharePosterBtn">📱 Create Poetry Poster</button>
     </div>
 
-    <!-- REEL GUIDE -->
-
     <div class="reel-help">
-
         <h4>🎬 Want to Make a REEL with Sound?</h4>
-
-        <p>
-            1. Create your poetry poster above<br>
-            2. Open CapCut or Instagram Reels<br>
-            3. Add slow emotional music<br>
-            4. Use zoom animation<br>
-            5. Post & tag UCPC Poetry Archive
-        </p>
-
-        <a href="https://www.instagram.com/reels/" target="_blank">
-            📱 Open Instagram Reels →
-        </a>
-
+        <p>1. Create your poetry poster above<br>2. Open CapCut or Instagram Reels<br>3. Add slow emotional music<br>4. Use zoom animation<br>5. Post & tag UCPC Poetry Archive</p>
+        <a href="https://www.instagram.com/reels/" target="_blank">📱 Open Instagram Reels →</a>
     </div>
 
     <div class="back-link">
-        <a href="/poets/{{ ghazal.poet_id }}">← Back to Poet</a>
-        •
-        <a href="/poets">All Poets</a>
+        <a href="/poets/{{ ghazal.poet_id }}">← Back to Poet</a> • <a href="/poets">All Poets</a>
     </div>
-
 </div>
 
-<!-- =========================
-     HIDDEN POSTER
-========================= -->
-
+<!-- HIDDEN POSTER -->
 <div id="social-poster">
-
     <div class="poster-frame">
-
-        <div class="poster-watermark">
-            UCPC POETRY ARCHIVE
-        </div>
-
-        <div class="poster-tagline">
-            FOLLOW FOR DAILY URDU POETRY
-        </div>
-
-        <div class="poster-poet">
-            {{ ghazal.poet_name }}
-        </div>
+        <div class="poster-watermark">UCPC POETRY ARCHIVE</div>
+        <div class="poster-tagline">FOLLOW FOR DAILY URDU POETRY</div>
+        <div class="poster-poet">{{ ghazal.poet_name }}</div>
 
         {% for verse in poster_verses %}
-
-        <div class="poster-sher">
-
-            {{ verse.misra1_urdu }}<br>
-            {{ verse.misra2_urdu }}
-
+        <div class="poster-sher" dir="rtl">
+            <span class="misra1">{{ verse.misra1_urdu }}</span>
+            <span class="misra2">{{ verse.misra2_urdu }}</span>
         </div>
-
         {% endfor %}
 
-        <div class="poster-dedication hidden"
-             id="posterDedication"></div>
-
-        <div class="poster-footer">
-            https://ucpc-poetry-archive.onrender.com
-        </div>
-
+        <div class="poster-dedication hidden" id="posterDedication"></div>
+        <div class="poster-footer">https://ucpc-poetry-archive.onrender.com</div>
     </div>
-
 </div>
 
 <div id="toast" class="toast-message"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-
 <script>
-
 const fromInput = document.getElementById('fromName');
 const toInput = document.getElementById('toName');
 const posterDedication = document.getElementById('posterDedication');
 
 function escapeHtml(str){
     if(!str) return '';
-
     return str.replace(/[&<>]/g,function(m){
-        return m === '&'
-            ? '&amp;'
-            : (m === '<' ? '&lt;' : '&gt;');
+        return m === '&' ? '&amp;' : (m === '<' ? '&lt;' : '&gt;');
     });
 }
 
 function updatePosterDedication(){
-
     const from = fromInput.value.trim();
     const to = toInput.value.trim();
 
     if(from && to){
-
-        posterDedication.innerHTML = `
-            ✨ Dedicated With Love ✨
-            <br><br>
-            From ${escapeHtml(from)}
-            <br>
-            ❤️
-            <br>
-            To ${escapeHtml(to)}
-        `;
-
+        posterDedication.innerHTML = `✨ Dedicated With Love ✨<br><br>From ${escapeHtml(from)}<br>❤️<br>To ${escapeHtml(to)}`;
         posterDedication.classList.remove('hidden');
-
     }
     else if(to){
-
-        posterDedication.innerHTML = `
-            ✨ Dedicated To ✨
-            <br><br>
-            ${escapeHtml(to)}
-        `;
-
+        posterDedication.innerHTML = `✨ Dedicated To ✨<br><br>${escapeHtml(to)}`;
         posterDedication.classList.remove('hidden');
-
+    }
+    else if(from){
+        posterDedication.innerHTML = `✨ Shared By ✨<br><br>${escapeHtml(from)}`;
+        posterDedication.classList.remove('hidden');
     }
     else{
-
         posterDedication.classList.add('hidden');
     }
 }
 
-fromInput.addEventListener('input',updatePosterDedication);
-toInput.addEventListener('input',updatePosterDedication);
-
+fromInput.addEventListener('input', updatePosterDedication);
+toInput.addEventListener('input', updatePosterDedication);
 updatePosterDedication();
 
-document.getElementById('sharePosterBtn')
-.addEventListener('click',async function(){
-
+document.getElementById('sharePosterBtn').addEventListener('click', async function(){
     const poster = document.getElementById('social-poster');
     const toast = document.getElementById('toast');
 
@@ -456,62 +355,39 @@ document.getElementById('sharePosterBtn')
     toast.innerText = '🎨 Generating Premium Poster...';
 
     try{
-
-        const canvas = await html2canvas(poster,{
-            scale:2,
-            backgroundColor:'#000',
-            useCORS:true,
-            logging:false,
-            windowWidth:1080,
-            windowHeight:poster.scrollHeight
+        const canvas = await html2canvas(poster, {
+            scale: 2,
+            backgroundColor: '#000',
+            useCORS: true,
+            logging: false,
+            windowWidth: 1080,
+            windowHeight: poster.scrollHeight
         });
 
-        const imageData = canvas.toDataURL('image/jpeg',0.95);
-
+        const imageData = canvas.toDataURL('image/jpeg', 0.95);
         const blob = await (await fetch(imageData)).blob();
 
         if(navigator.share){
-
-            const file = new File(
-                [blob],
-                'ucpc_poetry_poster.jpg',
-                {type:'image/jpeg'}
-            );
-
+            const file = new File([blob], 'ucpc_poetry_poster.jpg', { type: 'image/jpeg' });
             await navigator.share({
-                title:'UCPC Poetry Archive',
-                text:'Beautiful Urdu Poetry',
-                files:[file]
+                title: 'UCPC Poetry Archive',
+                text: 'Beautiful Urdu Poetry',
+                files: [file]
             });
-
             toast.innerText = '✅ Poster Shared Successfully';
-
         }else{
-
             const link = document.createElement('a');
-
             link.download = 'ucpc_poetry_poster.jpg';
             link.href = imageData;
-
             link.click();
-
             toast.innerText = '✅ Poster Downloaded';
         }
-
     }catch(err){
-
         console.error(err);
-
         toast.innerText = '❌ Failed to Generate Poster';
-
+    }finally{
+        setTimeout(() => { toast.style.display = 'none'; }, 3000);
     }
-
-    setTimeout(()=>{
-        toast.style.display='none';
-    },3000);
-
 });
-
 </script>
-
 {% endblock %}
