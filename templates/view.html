@@ -21,11 +21,14 @@
 
 :root{
     --bg-page:#050505;
-    --glass-bg:rgba(20,20,25,0.7);
+    --glass-bg:rgba(20,20,25,0.72);
+
     --gold-primary:#D4AF37;
     --gold-light:#F6D878;
     --gold-dim:#8a7020;
+
     --text-white:#ffffff;
+    --text-muted:#a0a0a0;
 }
 
 *{
@@ -39,14 +42,14 @@ body{
     background-image:
         radial-gradient(circle at 50% 0%, #151515 0%, #050505 100%);
     color:var(--text-white);
-    font-family:'Montserrat', sans-serif;
+    font-family:'Montserrat',sans-serif;
     min-height:100vh;
     overflow-x:hidden;
 }
 
-/* =========================
-   LAYOUT
-========================= */
+/* =========================================
+   MAIN LAYOUT
+========================================= */
 
 .app-container{
     max-width:1400px;
@@ -62,43 +65,61 @@ body{
     align-items:flex-start;
 }
 
+/* =========================================
+   LEFT PANEL
+========================================= */
+
 .editor-panel{
     flex:1;
     min-width:320px;
     max-width:500px;
+
     background:var(--glass-bg);
+
     border:1px solid rgba(212,175,55,0.15);
+
     border-radius:20px;
+
     padding:35px;
+
     backdrop-filter:blur(15px);
+
     box-shadow:0 15px 40px rgba(0,0,0,0.6);
 }
 
-.preview-panel{
-    width:100%;
-    overflow:auto;
-}
-
 .brand-title{
-    font-family:'Cinzel', serif;
+    font-family:'Cinzel',serif;
     color:var(--gold-primary);
+
     text-align:center;
+
     margin-bottom:30px;
+
     font-weight:700;
     letter-spacing:2px;
+
     font-size:1.5rem;
+
     text-transform:uppercase;
+
     border-bottom:1px solid rgba(212,175,55,0.15);
+
     padding-bottom:15px;
 }
 
 .readonly-info{
     background:rgba(255,255,255,0.03);
+
     border-left:4px solid var(--gold-primary);
+
     border-radius:4px;
+
     padding:18px;
+
     margin-bottom:25px;
-    font-size:0.9rem;
+
+    font-size:0.92rem;
+
     color:#ddd;
 }
 
@@ -109,28 +130,47 @@ body{
 
 .form-label{
     display:block;
+
     color:var(--gold-light);
+
     font-size:0.75rem;
+
     text-transform:uppercase;
+
     letter-spacing:2px;
+
     margin-bottom:12px;
+
     font-weight:700;
 }
 
 .form-input{
     width:100%;
+
     background:rgba(0,0,0,0.3);
+
     border:1px solid #333;
+
     color:white;
+
     padding:16px;
+
     border-radius:10px;
-    font-family:'Montserrat', sans-serif;
+
+    font-family:'Montserrat',sans-serif;
+
     font-size:0.95rem;
+
+    transition:all 0.3s ease;
 }
 
 .form-input:focus{
-    border-color:var(--gold-primary);
     outline:none;
+
+    border-color:var(--gold-primary);
+
+    background:rgba(0,0,0,0.5);
+
     box-shadow:0 0 0 3px rgba(212,175,55,0.1);
 }
 
@@ -149,234 +189,439 @@ body{
 }
 
 .btn-generate{
-    background:linear-gradient(
-        135deg,
-        var(--gold-dim),
-        var(--gold-primary)
-    );
-    color:#000;
-    border:none;
-    padding:18px 32px;
-    border-radius:50px;
-    font-size:1rem;
-    font-weight:800;
-    cursor:pointer;
     width:100%;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--gold-dim),
+            var(--gold-primary)
+        );
+
+    color:#000;
+
+    border:none;
+
+    padding:18px 32px;
+
+    border-radius:50px;
+
+    font-size:1rem;
+
+    font-weight:800;
+
+    cursor:pointer;
+
     text-transform:uppercase;
+
     letter-spacing:1.5px;
+
+    transition:0.2s;
+
     box-shadow:0 5px 25px rgba(212,175,55,0.2);
 }
 
 .btn-generate:hover{
     transform:translateY(-3px);
+
     box-shadow:0 10px 30px rgba(212,175,55,0.4);
 }
 
-/* =========================
+.reel-help{
+    margin-top:35px;
+
+    background:rgba(212,175,55,0.03);
+
+    border-radius:12px;
+
+    padding:20px;
+
+    border:1px solid rgba(212,175,55,0.1);
+
+    text-align:center;
+}
+
+.reel-help h4{
+    color:var(--gold-light);
+
+    margin-bottom:8px;
+
+    font-size:0.9rem;
+
+    letter-spacing:1px;
+}
+
+.reel-help p{
+    color:#888;
+
+    font-size:0.8rem;
+
+    line-height:1.7;
+
+    margin-bottom:12px;
+}
+
+.reel-help a{
+    color:var(--gold-primary);
+
+    text-decoration:none;
+
+    font-weight:600;
+
+    font-size:0.85rem;
+}
+
+.back-link{
+    text-align:center;
+
+    margin-top:25px;
+
+    font-size:0.85rem;
+}
+
+.back-link a{
+    color:#666;
+    text-decoration:none;
+}
+
+.back-link a:hover{
+    color:var(--gold-primary);
+}
+
+/* =========================================
+   PREVIEW AREA
+========================================= */
+
+.preview-panel{
+    width:100%;
+    overflow:hidden;
+}
+
+.preview-wrapper{
+    transform-origin:top center;
+
+    display:flex;
+
+    justify-content:center;
+}
+
+/* =========================================
    POSTER
-========================= */
+========================================= */
 
 #poster-container{
     width:1080px;
     height:1350px;
+
     position:relative;
+
     overflow:hidden;
+
     color:white;
-    font-family:'Montserrat', sans-serif;
+
+    font-family:'Montserrat',sans-serif;
 
     background-color:#020617;
 
     background-image:
-        radial-gradient(circle at 50% 10%,
-        rgba(30,41,59,0.6) 0%,
-        transparent 60%),
-
-        linear-gradient(
-        180deg,
-        #1e293b 0%,
-        #0f172a 40%,
-        #000000 100%
-        ),
-
+        radial-gradient(circle at 50% 10%, rgba(30,41,59,0.6) 0%, transparent 60%),
+        linear-gradient(180deg, #1e293b 0%, #0f172a 40%, #000000 100%),
         repeating-linear-gradient(
-        45deg,
-        rgba(255,255,255,0.02) 0px,
-        rgba(255,255,255,0.02) 1px,
-        transparent 1px,
-        transparent 15px
+            45deg,
+            rgba(255,255,255,0.02) 0px,
+            rgba(255,255,255,0.02) 1px,
+            transparent 1px,
+            transparent 15px
         );
 
     box-shadow:0 0 60px rgba(0,0,0,0.8);
 }
 
-/* WATERMARK */
-
-.poster-watermark{
-    position:absolute;
-    top:50%;
-    left:50%;
-    transform:translate(-50%,-50%) rotate(-18deg);
-    font-size:120px;
-    font-family:'Cinzel', serif;
-    color:rgba(212,175,55,0.03);
-    letter-spacing:8px;
-    pointer-events:none;
-    z-index:0;
-    white-space:nowrap;
-}
-
-/* BORDER */
+/* =========================================
+   GOLD BORDER
+========================================= */
 
 .border-frame{
     position:absolute;
+
     top:35px;
     left:35px;
     right:35px;
     bottom:35px;
+
     border:2px solid rgba(212,175,55,0.5);
+
     z-index:10;
+
+    pointer-events:none;
+
+    box-shadow:
+        inset 0 0 20px rgba(0,0,0,0.5);
 }
 
 .border-frame::after{
     content:'';
+
     position:absolute;
+
     top:4px;
     left:4px;
     right:4px;
     bottom:4px;
+
     border:1px solid rgba(255,255,255,0.15);
 }
 
+/* =========================================
+   CORNER DECORATIONS
+========================================= */
+
 .corner-deco{
     position:absolute;
+
     width:100px;
     height:100px;
+
     border-color:var(--gold-primary);
     border-style:solid;
+
     z-index:11;
+
+    box-shadow:0 0 10px rgba(212,175,55,0.3);
 }
 
 .cd-tl{
     top:40px;
     left:40px;
+
     border-width:6px 0 0 6px;
 }
 
 .cd-tr{
     top:40px;
     right:40px;
+
     border-width:6px 6px 0 0;
 }
 
 .cd-bl{
     bottom:40px;
     left:40px;
+
     border-width:0 0 6px 6px;
 }
 
 .cd-br{
     bottom:40px;
     right:40px;
+
     border-width:0 6px 6px 0;
 }
 
+/* =========================================
+   POSTER CONTENT
+========================================= */
+
 .poster-content{
     height:100%;
+
     display:flex;
+
     flex-direction:column;
+
     justify-content:space-between;
+
     padding:120px 80px 70px;
+
     text-align:center;
+
     position:relative;
+
     z-index:2;
 }
 
-/* HEADER */
+/* =========================================
+   ARCHIVE SEAL
+========================================= */
+
+.archive-seal{
+    position:absolute;
+
+    top:55px;
+    right:70px;
+
+    font-size:14px;
+
+    letter-spacing:3px;
+
+    color:rgba(212,175,55,0.6);
+
+    border:1px solid rgba(212,175,55,0.3);
+
+    padding:8px 14px;
+
+    border-radius:30px;
+
+    font-weight:600;
+}
+
+/* =========================================
+   HEADER
+========================================= */
+
+.poster-header{
+    margin-bottom:10px;
+}
 
 .poster-logo{
-    font-family:'Cinzel', serif;
+    font-family:'Cinzel',serif;
+
     color:var(--gold-primary);
-    font-size:42px;
+
+    font-size:40px;
+
     letter-spacing:6px;
+
     font-weight:700;
+
     margin-bottom:8px;
+
+    text-shadow:0 2px 15px rgba(0,0,0,0.8);
 }
 
 .poster-tagline{
-    color:#94a3b8;
+    color:#8d99ae;
+
     font-size:16px;
-    letter-spacing:4px;
+
+    letter-spacing:5px;
+
     text-transform:uppercase;
+
+    font-weight:500;
 }
 
-/* POET */
+/* =========================================
+   POET NAME
+========================================= */
 
 .poster-poet{
-    font-family:'Cinzel', serif;
+    font-family:'Cinzel',serif;
+
     color:#f8fafc;
+
     font-size:60px;
+
     font-weight:700;
-    margin:25px 0 45px;
+
+    margin:20px 0 40px 0;
+
     text-transform:uppercase;
+
     letter-spacing:2px;
+
     border-bottom:2px solid rgba(212,175,55,0.35);
+
     display:inline-block;
+
     padding-bottom:16px;
+
+    text-shadow:
+        0 0 10px rgba(255,255,255,0.08),
+        0 4px 18px rgba(0,0,0,0.95);
 }
 
-/* VERSES */
+/* =========================================
+   VERSES
+========================================= */
 
 .poster-verses{
     flex-grow:1;
+
     display:flex;
+
     flex-direction:column;
+
     justify-content:center;
+
     margin-bottom:35px;
+
     padding:25px 10px;
 
-    background:linear-gradient(
-        180deg,
-        rgba(255,255,255,0.015),
-        rgba(255,255,255,0.005)
-    );
+    background:
+        linear-gradient(
+            180deg,
+            rgba(255,255,255,0.015),
+            rgba(255,255,255,0.005)
+        );
 
     border-radius:24px;
 
-    border:1px solid rgba(212,175,55,0.08);
+    overflow:hidden;
 
     box-shadow:
-        inset 0 0 40px rgba(212,175,55,0.03),
-        0 0 20px rgba(0,0,0,0.3);
+        inset 0 0 50px rgba(212,175,55,0.03),
+        0 0 40px rgba(212,175,55,0.02);
 }
 
 .poster-sher{
-    font-family:'Noto Nastaliq Urdu', serif;
+    font-family:'Noto Nastaliq Urdu',serif;
+
     direction:rtl;
+
     color:#ffffff;
-    font-size:58px;
+
+    font-size:clamp(38px, 5vw, 64px);
+
     line-height:2.25;
+
     margin-bottom:45px;
+
     text-align:center;
-    font-weight:500;
-    padding:0 15px;
 
     text-shadow:
-        0 4px 16px rgba(0,0,0,0.95),
-        0 0 8px rgba(212,175,55,0.08);
+        0 3px 12px rgba(0,0,0,0.9),
+        0 0 2px rgba(255,255,255,0.08);
+
+    font-weight:500;
+
+    padding:0 15px;
 }
 
-/* DEDICATION */
+.poster-sher:last-child{
+    margin-bottom:0;
+}
+
+/* =========================================
+   DEDICATION
+========================================= */
 
 .poster-dedication{
     color:var(--gold-light);
+
     font-size:24px;
+
     margin-bottom:30px;
+
     line-height:1.8;
+
     font-weight:700;
+
+    letter-spacing:1px;
+
     background:rgba(212,175,55,0.06);
+
     border:1px solid rgba(212,175,55,0.15);
+
     padding:18px 20px;
+
     border-radius:18px;
+
+    backdrop-filter:blur(4px);
+
+    box-shadow:
+        0 0 20px rgba(212,175,55,0.08),
+        inset 0 0 15px rgba(255,255,255,0.02);
 }
 
 .poster-dedication.hidden{
@@ -385,68 +630,119 @@ body{
 
 .dedication-from{
     font-size:18px;
+
     color:#d1d5db;
+
     margin-top:10px;
+
+    font-weight:500;
 }
 
-/* FOOTER */
+/* =========================================
+   FOOTER
+========================================= */
 
 .poster-footer{
+    margin-top:auto;
+
     border-top:1px solid rgba(212,175,55,0.15);
+
     padding-top:28px;
+
+    width:100%;
 }
 
 .footer-follow{
     color:rgba(212,175,55,0.85);
+
     font-size:13px;
+
     text-transform:uppercase;
+
     letter-spacing:5px;
+
     margin-bottom:16px;
+
     font-weight:700;
 }
 
 .footer-item{
     margin-bottom:8px;
+
     font-size:20px;
+
+    line-height:1.4;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    flex-wrap:wrap;
 }
 
 .footer-label{
     color:#94a3b8;
+
     font-weight:600;
+
     font-size:18px;
+
+    margin-right:10px;
+
+    text-transform:uppercase;
 }
 
 .footer-value{
-    color:white;
+    color:#ffffff;
+
     font-weight:700;
 }
 
 .footer-value.url{
     font-size:17px;
+
     color:#f8e7a1;
+
+    font-weight:600;
+
+    letter-spacing:0.5px;
 }
 
-/* PREVIEW */
-
-.preview-wrapper{
-    transform-origin:top center;
-    display:flex;
-    justify-content:center;
-}
-
-/* TOAST */
+/* =========================================
+   TOAST
+========================================= */
 
 .toast{
     position:fixed;
+
     bottom:40px;
     left:50%;
+
     transform:translateX(-50%) translateY(100px);
+
     background:var(--gold-primary);
+
     color:#000;
+
     padding:14px 32px;
+
     border-radius:50px;
+
     font-weight:700;
+
+    box-shadow:0 10px 30px rgba(0,0,0,0.6);
+
+    transition:0.3s;
+
     z-index:9999;
+
+    display:flex;
+
+    align-items:center;
+
+    gap:12px;
 }
 
 .toast.show{
@@ -456,15 +752,48 @@ body{
 .toast-spinner{
     width:18px;
     height:18px;
+
     border:3px solid #000;
+
     border-top-color:transparent;
+
     border-radius:50%;
+
     animation:spin 1s linear infinite;
 }
 
 @keyframes spin{
     100%{
         transform:rotate(360deg);
+    }
+}
+
+/* =========================================
+   MOBILE
+========================================= */
+
+@media(max-width:768px){
+
+    .app-container{
+        padding:20px 10px;
+    }
+
+    .editor-panel{
+        padding:25px;
+    }
+
+    .brand-title{
+        font-size:1.2rem;
+    }
+
+    .btn-generate{
+        font-size:0.9rem;
+        padding:16px;
+    }
+
+    .preview-wrapper{
+        justify-content:center;
+        overflow:hidden;
     }
 }
 
@@ -475,162 +804,209 @@ body{
 
 <div class="app-container">
 
-<div class="two-columns">
+    <div class="two-columns">
 
-<section class="editor-panel">
+        <!-- LEFT PANEL -->
 
-<h1 class="brand-title">
-✨ UCPC Poetry Archive ✨
-</h1>
+        <section class="editor-panel">
 
-<div class="readonly-info">
-📜 <span>Poet:</span> {{ ghazal.poet_name }}<br>
-📖 <span>Verses:</span> {{ poster_verses|length }} couplet(s)
+            <h1 class="brand-title">
+                ✨ UCPC Poetry Archive ✨
+            </h1>
+
+            <div class="readonly-info">
+                📜 <span>Poet:</span> {{ ghazal.poet_name }}<br>
+                📖 <span>Verses:</span> {{ poster_verses|length }} couplet(s)
+            </div>
+
+            <div class="form-group">
+
+                <label class="form-label">
+                    Personalize Your Poster
+                </label>
+
+                <div class="row-inputs">
+
+                    <div>
+                        <input
+                            type="text"
+                            id="inputTo"
+                            class="form-input"
+                            placeholder="To (Someone Special)"
+                        >
+                    </div>
+
+                    <div>
+                        <input
+                            type="text"
+                            id="inputFrom"
+                            class="form-input"
+                            placeholder="From (Your Name)"
+                        >
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="action-area">
+
+                <button class="btn-generate" id="downloadBtn">
+                    📱 Download Poster
+                </button>
+
+                <div style="margin-top:12px;color:#777;font-size:0.75rem;font-weight:500;">
+                    High-Quality 1080x1350px Format
+                </div>
+
+            </div>
+
+            <div class="reel-help">
+
+                <h4>🎬 Viral Reel Tip</h4>
+
+                <p>
+                    1. Download Poster<br>
+                    2. Open CapCut → 9:16 Project<br>
+                    3. Add slow zoom & Sufi music<br>
+                    4. Upload to Facebook Reels
+                </p>
+
+            </div>
+
+            <div class="back-link">
+                <a href="/poets/{{ ghazal.poet_id }}">
+                    ← Back to Poet
+                </a>
+            </div>
+
+        </section>
+
+        <!-- RIGHT PANEL -->
+
+        <section class="preview-panel">
+
+            <div class="preview-wrapper" id="previewWrapper">
+
+                <div id="poster-container">
+
+                    <!-- BORDER -->
+
+                    <div class="border-frame"></div>
+
+                    <div class="corner-deco cd-tl"></div>
+                    <div class="corner-deco cd-tr"></div>
+                    <div class="corner-deco cd-bl"></div>
+                    <div class="corner-deco cd-br"></div>
+
+                    <!-- CONTENT -->
+
+                    <div class="poster-content">
+
+                        <!-- ARCHIVE SEAL -->
+
+                        <div class="archive-seal">
+                            EST. 2026
+                        </div>
+
+                        <!-- HEADER -->
+
+                        <div class="poster-header">
+
+                            <div class="poster-logo">
+                                UCPC Poetry Archive
+                            </div>
+
+                            <div class="poster-tagline">
+                                Digital Preservation of Urdu Poetry
+                            </div>
+
+                        </div>
+
+                        <!-- MAIN -->
+
+                        <div>
+
+                            <div class="poster-poet">
+                                {{ ghazal.poet_name }}
+                            </div>
+
+                            <div class="poster-verses">
+
+                                {% for verse in poster_verses %}
+
+                                <div class="poster-sher" dir="rtl">
+                                    {{ verse.misra1_urdu }}<br>
+                                    {{ verse.misra2_urdu }}
+                                </div>
+
+                                {% endfor %}
+
+                            </div>
+
+                        </div>
+
+                        <!-- FOOTER -->
+
+                        <div>
+
+                            <div
+                                class="poster-dedication hidden"
+                                id="displayDedication"
+                            ></div>
+
+                            <div class="poster-footer">
+
+                                <div class="footer-follow">
+                                    follow
+                                </div>
+
+                                <div class="footer-item">
+                                    <span class="footer-label">
+                                        Facebook :
+                                    </span>
+
+                                    <span class="footer-value">
+                                        UCPC Urdu Poetry Archive
+                                    </span>
+                                </div>
+
+                                <div class="footer-item">
+                                    <span class="footer-label">
+                                        Visit :
+                                    </span>
+
+                                    <span class="footer-value url">
+                                        https://ucpc-poetry-archive.onrender.com
+                                    </span>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </div>
+
 </div>
 
-<div class="form-group">
-
-<label class="form-label">
-Personalize Your Poster
-</label>
-
-<div class="row-inputs">
-
-<div>
-<input type="text"
-id="inputTo"
-class="form-input"
-placeholder="To (Someone Special)">
-</div>
-
-<div>
-<input type="text"
-id="inputFrom"
-class="form-input"
-placeholder="From (Your Name)">
-</div>
-
-</div>
-</div>
-
-<div class="action-area">
-
-<button class="btn-generate" id="downloadBtn">
-📱 Download Poster
-</button>
-
-</div>
-
-</section>
-
-<!-- PREVIEW -->
-
-<section class="preview-panel">
-
-<div class="preview-wrapper" id="previewWrapper">
-
-<div id="poster-container">
-
-<div class="poster-watermark">
-UCPC ARCHIVE
-</div>
-
-<div class="border-frame"></div>
-
-<div class="corner-deco cd-tl"></div>
-<div class="corner-deco cd-tr"></div>
-<div class="corner-deco cd-bl"></div>
-<div class="corner-deco cd-br"></div>
-
-<div class="poster-content">
-
-<div class="poster-header">
-
-<div class="poster-logo">
-UCPC Poetry Archive
-</div>
-
-<div class="poster-tagline">
-Digital Preservation of Classical Urdu Poetry
-</div>
-
-</div>
-
-<div>
-
-<div class="poster-poet">
-{{ ghazal.poet_name }}
-</div>
-
-<div class="poster-verses">
-
-{% for verse in poster_verses %}
-
-<div class="poster-sher" dir="rtl">
-{{ verse.misra1_urdu }}<br>
-{{ verse.misra2_urdu }}
-</div>
-
-{% endfor %}
-
-</div>
-
-</div>
-
-<div>
-
-<div class="poster-dedication hidden"
-id="displayDedication"></div>
-
-<div class="poster-footer">
-
-<div class="footer-follow">
-Follow UCPC Poetry Archive
-</div>
-
-<div class="footer-item">
-
-<span class="footer-label">
-Facebook :
-</span>
-
-<span class="footer-value">
-facebook.com/ucpcpoetryarchive
-</span>
-
-</div>
-
-<div class="footer-item">
-
-<span class="footer-label">
-Visit :
-</span>
-
-<span class="footer-value url">
-https://ucpc-poetry-archive.onrender.com
-</span>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-</section>
-
-</div>
-
-</div>
+<!-- TOAST -->
 
 <div id="toast" class="toast">
-<div class="toast-spinner"></div>
-<span id="toastMessage">Generating...</span>
+
+    <div class="toast-spinner" id="toastSpinner"></div>
+
+    <span id="toastMessage">
+        Generating...
+    </span>
+
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
@@ -641,28 +1017,47 @@ const inputTo = document.getElementById('inputTo');
 const inputFrom = document.getElementById('inputFrom');
 
 const displayDedication =
-document.getElementById('displayDedication');
+    document.getElementById('displayDedication');
 
 const posterContainer =
-document.getElementById('poster-container');
+    document.getElementById('poster-container');
 
 const downloadBtn =
-document.getElementById('downloadBtn');
+    document.getElementById('downloadBtn');
+
+const toast =
+    document.getElementById('toast');
+
+const toastMsg =
+    document.getElementById('toastMessage');
+
+const toastSpinner =
+    document.getElementById('toastSpinner');
+
+/* =========================================
+   DEDICATION LIVE UPDATE
+========================================= */
 
 function escapeHtml(str){
+
     if(!str) return '';
 
     return str.replace(/[&<>]/g, function(m){
+
         return m === '&'
-        ? '&amp;'
-        : (m === '<' ? '&lt;' : '&gt;');
+            ? '&amp;'
+            : (m === '<' ? '&lt;' : '&gt;');
+
     });
 }
 
 function updateDedication(){
 
-    const to = inputTo.value.trim();
-    const from = inputFrom.value.trim();
+    const to =
+        inputTo.value.trim();
+
+    const from =
+        inputFrom.value.trim();
 
     let html = '';
 
@@ -676,15 +1071,18 @@ function updateDedication(){
 
         if(from){
             html += `
-            <div class="dedication-from">
-            From: ${escapeHtml(from)}
-            </div>`;
+                <div class="dedication-from">
+                    From: ${escapeHtml(from)}
+                </div>
+            `;
         }
 
         displayDedication.innerHTML = html;
+
         displayDedication.classList.remove('hidden');
 
     }else{
+
         displayDedication.classList.add('hidden');
     }
 }
@@ -694,87 +1092,13 @@ inputFrom.addEventListener('input', updateDedication);
 
 updateDedication();
 
-/* MOBILE SCALE */
+/* =========================================
+   MOBILE SCALING
+========================================= */
 
 function scalePreview(){
 
     const panel =
-    document.querySelector('.preview-panel');
+        document.querySelector('.preview-panel');
 
-    if(!panel) return;
-
-    const w = panel.clientWidth - 40;
-
-    const original = 1080;
-
-    let scale = w / original;
-
-    if(scale > 1) scale = 1;
-
-    posterContainer.style.transform =
-    `scale(${scale})`;
-
-    document.getElementById('previewWrapper')
-    .style.height = `${1350 * scale}px`;
-}
-
-window.addEventListener('resize', scalePreview);
-
-scalePreview();
-
-/* DOWNLOAD */
-
-downloadBtn.addEventListener('click', async () => {
-
-    const prevTransform =
-    posterContainer.style.transform;
-
-    posterContainer.style.transform = 'none';
-
-    try{
-
-        await new Promise(r =>
-            requestAnimationFrame(r)
-        );
-
-        const canvas =
-        await html2canvas(posterContainer, {
-
-            scale:2,
-            useCORS:true,
-            backgroundColor:'#020617',
-            logging:false
-
-        });
-
-        const dataUrl =
-        canvas.toDataURL("image/jpeg", 0.95);
-
-        const link =
-        document.createElement('a');
-
-        link.download =
-        `UCPC_Premium_Archive_Poster.jpg`;
-
-        link.href = dataUrl;
-
-        link.click();
-
-    }catch(err){
-
-        console.error(err);
-
-        alert("Error generating poster.");
-
-    }
-
-    posterContainer.style.transform =
-    prevTransform;
-
-    scalePreview();
-
-});
-
-</script>
-
-{% endblock %}
+    if(!panel) retu
