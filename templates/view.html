@@ -13,108 +13,182 @@
 
 {% block extra_css %}
 <style>
+    :root {
+        --bg-color: #050505;
+        --card-bg: #121212;
+        --gold-primary: #D4AF37;
+        --gold-light: #F6D878;
+        --gold-dark: #AA8C2C;
+        --text-main: #f0f0f0;
+        --text-muted: #888888;
+    }
+
     * {
         margin: 0;
         padding: 0;
         box-sizing: border-box;
+        outline: none;
     }
 
     body {
-        background: #050505;
-        font-family: 'Segoe UI', sans-serif;
-        color: white;
+        background-color: var(--bg-color);
+        background-image: radial-gradient(circle at 50% 0%, #1a1a1a 0%, #050505 70%);
+        font-family: 'Montserrat', sans-serif;
+        color: var(--text-main);
+        min-height: 100vh;
     }
 
     /* =========================
-       MAIN PAGE
+       MAIN PAGE LAYOUT
     ========================= */
 
-    .page-container {
-        max-width: 700px;
-        margin: auto;
-        padding: 20px;
+    .app-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 40px 20px;
     }
 
-    .page-title {
+    /* Two Column Layout */
+    .two-columns {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 40px;
+        justify-content: center;
+        align-items: flex-start;
+    }
+
+    .editor-panel {
+        flex: 1;
+        min-width: 320px;
+        max-width: 500px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(212, 175, 55, 0.15);
+        border-radius: 20px;
+        padding: 30px;
+        backdrop-filter: blur(10px);
+    }
+
+    .preview-panel {
+        flex: 2;
+        min-width: 320px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    h1.brand-title {
+        font-family: 'Cinzel', serif;
+        color: var(--gold-primary);
         text-align: center;
-        color: #D4AF37;
-        font-size: 1.6rem;
+        margin-bottom: 25px;
         font-weight: 700;
-        margin-bottom: 10px;
+        letter-spacing: 2px;
+        font-size: 1.8rem;
+        text-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
     }
 
-    .page-subtitle {
-        text-align: center;
-        color: #999;
-        font-size: 0.85rem;
-        margin-bottom: 25px;
+    /* --- Form Elements --- */
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-label {
+        display: block;
+        color: var(--gold-primary);
+        font-size: 0.8rem;
+        text-transform: uppercase;
         letter-spacing: 1px;
+        margin-bottom: 8px;
+        font-weight: 600;
     }
 
-    .dedication-input-area {
-        background: #0f0f0f;
-        border: 1px solid rgba(212, 175, 55, 0.25);
-        border-radius: 30px;
-        padding: 20px;
-        margin-bottom: 25px;
-        text-align: center;
+    .form-input {
+        width: 100%;
+        background: #0a0a0a;
+        border: 1px solid #333;
+        color: white;
+        padding: 14px 18px;
+        border-radius: 8px;
+        font-family: 'Montserrat', sans-serif;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
     }
 
-    .dedication-input-area h3 {
-        color: #E0B94F;
-        margin-bottom: 15px;
-        font-size: 1rem;
+    .form-input:focus {
+        border-color: var(--gold-primary);
+        box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.1);
     }
 
-    .dedication-input-area input {
-        width: 220px;
-        max-width: 100%;
+    .row-inputs {
+        display: flex;
+        gap: 15px;
+    }
+    
+    .row-inputs > div {
+        flex: 1;
+    }
+
+    .readonly-info {
         background: #1a1a1a;
-        border: 1px solid rgba(212, 175, 55, 0.4);
-        color: #fff;
+        border-radius: 8px;
         padding: 12px 16px;
-        border-radius: 50px;
-        outline: none;
-        margin: 6px;
         font-size: 0.9rem;
+        color: #aaa;
+        margin-bottom: 20px;
     }
 
-    .dedication-input-area input::placeholder {
-        color: #777;
+    .readonly-info span {
+        color: var(--gold-primary);
+        font-weight: bold;
     }
 
-    .share-action {
+    /* --- Action Buttons --- */
+    .action-area {
+        margin-top: 30px;
         text-align: center;
-        margin-top: 25px;
     }
 
-    .share-btn-poster {
-        background: linear-gradient(135deg, #D4AF37, #F6D878);
-        color: black;
+    .btn-generate {
+        background: linear-gradient(135deg, var(--gold-dark), var(--gold-primary), var(--gold-light));
+        color: #000;
         border: none;
+        padding: 16px 32px;
         border-radius: 50px;
-        padding: 14px 26px;
+        font-size: 1rem;
         font-weight: 700;
         cursor: pointer;
-        font-size: 1rem;
-        transition: 0.2s;
+        width: 100%;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        transition: transform 0.2s, box-shadow 0.2s;
+        box-shadow: 0 4px 20px rgba(212, 175, 55, 0.3);
     }
 
-    .share-btn-poster:hover {
-        transform: scale(1.03);
+    .btn-generate:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 30px rgba(212, 175, 55, 0.5);
     }
 
+    .help-text {
+        margin-top: 15px;
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        line-height: 1.6;
+        text-align: center;
+    }
+
+    /* --- Reel Help Section --- */
     .reel-help {
         margin-top: 30px;
-        background: #0f0f0f;
-        border-radius: 25px;
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 20px;
         padding: 20px;
-        border: 1px solid rgba(212, 175, 55, 0.2);
+        border: 1px solid rgba(212, 175, 55, 0.15);
         text-align: center;
     }
 
     .reel-help h4 {
-        color: #D4AF37;
+        color: var(--gold-primary);
         margin-bottom: 12px;
     }
 
@@ -127,7 +201,7 @@
     .reel-help a {
         display: inline-block;
         margin-top: 14px;
-        color: #E0B94F;
+        color: var(--gold-light);
         text-decoration: none;
         font-weight: bold;
     }
@@ -144,168 +218,306 @@
     }
 
     /* =========================
-       SOCIAL POSTER (HIDDEN)
+       THE POSTER (1080x1350)
     ========================= */
 
-    #social-poster {
+    #poster-container {
         width: 1080px;
-        background: #000;
-        position: fixed;
-        left: -99999px;
-        top: 0;
-        padding: 80px 85px 70px;
+        height: 1350px;
+        background-color: #000;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+        background-image: 
+            linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)),
+            url('https://www.transparenttextures.com/patterns/black-linen.png');
     }
 
-    .poster-frame {
-        border: 2px solid rgba(212, 175, 55, 0.55);
-        border-radius: 35px;
-        padding: 70px 60px;
-        background: linear-gradient(180deg, #000000 0%, #070707 100%);
+    .poster-border {
+        position: absolute;
+        top: 25px;
+        left: 25px;
+        right: 25px;
+        bottom: 25px;
+        border: 2px solid rgba(212, 175, 55, 0.3);
+        border-radius: 4px;
+        pointer-events: none;
+    }
+    
+    .poster-border-inner {
+        position: absolute;
+        top: 35px;
+        left: 35px;
+        right: 35px;
+        bottom: 35px;
+        border: 1px solid rgba(212, 175, 55, 0.15);
+        pointer-events: none;
     }
 
-    .poster-watermark {
+    /* Corner Ornaments */
+    .corner {
+        position: absolute;
+        width: 60px;
+        height: 60px;
+        border-color: var(--gold-primary);
+        border-style: solid;
+        opacity: 0.8;
+    }
+    .tl { top: 40px; left: 40px; border-width: 4px 0 0 4px; }
+    .tr { top: 40px; right: 40px; border-width: 4px 4px 0 0; }
+    .bl { bottom: 40px; left: 40px; border-width: 0 0 4px 4px; }
+    .br { bottom: 40px; right: 40px; border-width: 0 4px 4px 0; }
+
+    .poster-content {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: 100px 80px 80px;
         text-align: center;
-        color: #D4AF37;
-        font-size: 34px;
-        letter-spacing: 5px;
-        font-weight: 700;
-        margin-bottom: 18px;
-        text-shadow: 0 0 8px rgba(212, 175, 55, 0.15);
     }
 
-    .poster-tagline {
-        text-align: center;
-        color: #888;
-        font-size: 22px;
-        letter-spacing: 3px;
-        margin-bottom: 55px;
+    .poster-logo {
+        font-family: 'Cinzel', serif;
+        color: var(--gold-primary);
+        font-size: 32px;
+        letter-spacing: 6px;
+        text-transform: uppercase;
+        margin-bottom: 8px;
+        text-shadow: 0 0 10px rgba(212, 175, 55, 0.2);
+    }
+
+    .poster-sub {
+        font-family: 'Montserrat', sans-serif;
+        color: #666;
+        font-size: 16px;
+        letter-spacing: 4px;
+        text-transform: uppercase;
     }
 
     .poster-poet {
-        text-align: center;
-        color: #E8C766;
+        font-family: 'Cinzel', serif;
+        color: #fff;
         font-size: 56px;
-        margin-bottom: 70px;
-        font-weight: 600;
-        text-shadow: 0 0 8px rgba(212, 175, 55, 0.12);
+        font-weight: 700;
+        margin: 20px 0;
+        text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+        display: inline-block;
+        padding-bottom: 15px;
+    }
+
+    .poster-verses {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 50px;
+        margin: 20px 0;
     }
 
     .poster-sher {
-        text-align: center;
+        font-family: 'Noto Nastaliq Urdu', serif;
         direction: rtl;
-        unicode-bidi: embed;
-        font-family: 'Noto Nastaliq Urdu', 'Jameel Noori Nastaleeq', serif;
         color: #fff;
         font-size: 58px;
-        font-weight: 500;
         line-height: 1.8;
-        margin-bottom: 55px;
-        word-spacing: 3px;
+        text-align: center;
+        text-shadow: 0 4px 15px rgba(0,0,0,0.6);
     }
 
     .poster-dedication {
-        text-align: center;
-        font-size: 48px;
-        color: #E8C766;
-        margin-top: 50px;
-        margin-bottom: 30px;
+        font-family: 'Montserrat', sans-serif;
+        color: var(--gold-primary);
+        font-size: 28px;
+        margin-top: 20px;
+        padding-top: 30px;
+        border-top: 1px solid rgba(255,255,255,0.1);
         line-height: 1.5;
-        font-family: 'Noto Nastaliq Urdu', serif;
+    }
+    
+    .dedication-from {
+        font-size: 22px;
+        color: #aaa;
+        margin-top: 8px;
+    }
+
+    .poster-footer {
+        font-family: 'Montserrat', sans-serif;
+        color: #555;
+        font-size: 18px;
+        letter-spacing: 2px;
+        margin-top: 25px;
     }
 
     .poster-dedication.hidden {
         display: none;
     }
 
-    .poster-footer {
-        text-align: center;
-        font-size: 28px;
-        color: rgba(224, 185, 79, 0.55);
-        letter-spacing: 2px;
-        margin-top: 30px;
+    /* Preview Scaling */
+    .preview-wrapper {
+        transform-origin: top center;
+        display: flex;
+        justify-content: center;
     }
 
-    .toast-message {
+    /* Toast Notification */
+    .toast {
         position: fixed;
         bottom: 30px;
         left: 50%;
-        transform: translateX(-50%);
-        background: #E0B94F;
-        color: #0a0a0a;
-        padding: 0.6rem 1.2rem;
-        border-radius: 60px;
-        font-weight: bold;
-        z-index: 1000;
-        display: none;
-        font-size: 0.8rem;
-        white-space: nowrap;
+        transform: translateX(-50%) translateY(100px);
+        background: rgba(212, 175, 55, 0.95);
+        color: #000;
+        padding: 12px 24px;
+        border-radius: 30px;
+        font-weight: 600;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.4);
+        transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        gap: 10px;
     }
+    .toast.show {
+        transform: translateX(-50%) translateY(0);
+    }
+    .toast-spinner {
+        width: 16px;
+        height: 16px;
+        border: 2px solid #000;
+        border-top-color: transparent;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
-    @media (max-width: 600px) {
-        .dedication-input-area input { width: 150px; font-size: 0.8rem; }
-        .share-btn-poster { padding: 0.6rem 1.2rem; font-size: 0.9rem; }
+    @media (max-width: 900px) {
+        .two-columns { flex-direction: column; align-items: center; }
+        .editor-panel { width: 100%; }
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="page-container">
-    <div class="page-title">✨ UCPC Poetry Archive ✨</div>
-    <div class="page-subtitle">Read • Dedicate • Share</div>
-
-    <div class="dedication-input-area">
-        <h3>🌸 Personalise Your Poetry Poster</h3>
-        <input type="text" id="fromName" placeholder="Your Name (optional)">
-        <input type="text" id="toName" placeholder="Special Someone (optional)">
-        <div style="font-size:0.7rem; color:#aaa; margin-top:12px;">💕 Enter names to appear on the poster</div>
-    </div>
-
-    <div class="share-action">
-        <button class="share-btn-poster" id="sharePosterBtn">📱 Create & Share Poetry Poster</button>
-    </div>
-
-    <div class="reel-help">
-        <h4>🎬 Make a Viral Reel (CapCut)</h4>
-        <p>1. Save poster to gallery<br>
-        2. Open CapCut → New Project → 9:16<br>
-        3. Add slow zoom + soft music<br>
-        4. Export & upload to Facebook Reels</p>
-        <a href="https://play.google.com/store/apps/details?id=com.lemon.lvoverseas" target="_blank">Download CapCut →</a>
-    </div>
-
-    <div class="back-link">
-        <a href="/poets/{{ ghazal.poet_id }}">← Back to Poet</a> • <a href="/poets">All Poets</a>
-    </div>
-</div>
-
-<!-- ========== HIDDEN SOCIAL POSTER ========== -->
-<div id="social-poster">
-    <div class="poster-frame">
-        <div class="poster-watermark">✨ UCPC POETRY ARCHIVE ✨</div>
-        <div class="poster-tagline">classical & urdu ghazals</div>
-        <div class="poster-poet">{{ ghazal.poet_name }}</div>
-
-        <div class="poster-verses">
-            {% for verse in poster_verses %}
-            <div class="poster-sher" dir="rtl">
-                {{ verse.misra1_urdu }}<br>
-                {{ verse.misra2_urdu }}
+<div class="app-container">
+    <div class="two-columns">
+        <!-- INPUT SECTION -->
+        <section class="editor-panel">
+            <h1 class="brand-title">✨ UCPC POETRY ARCHIVE ✨</h1>
+            
+            <div class="readonly-info">
+                📜 <span>Poet:</span> {{ ghazal.poet_name }}<br>
+                📖 <span>Ghazal:</span> {{ poster_verses|length }} couplet(s)
             </div>
-            {% endfor %}
-        </div>
 
-        <div class="poster-dedication hidden" id="posterDedication"></div>
-        <div class="poster-footer">ucpc-poetry-archive.onrender.com</div>
+            <div class="form-group">
+                <label class="form-label">✨ Dedication (Optional)</label>
+                <div class="row-inputs">
+                    <div>
+                        <input type="text" id="inputTo" class="form-input" placeholder="To (Special Someone)">
+                    </div>
+                    <div>
+                        <input type="text" id="inputFrom" class="form-input" placeholder="From (Your Name)">
+                    </div>
+                </div>
+            </div>
+
+            <div class="action-area">
+                <button class="btn-generate" id="downloadBtn">📱 Download Poetry Poster</button>
+                <div class="help-text">
+                    High-resolution 4:5 Format (1080x1350)<br>
+                    Optimized for Facebook, Instagram & Reels
+                </div>
+            </div>
+
+            <div class="reel-help">
+                <h4>🎬 Make a Viral Reel (CapCut)</h4>
+                <p>1. Save poster to gallery<br>
+                2. Open CapCut → New Project → 9:16<br>
+                3. Add slow zoom + soft music<br>
+                4. Export & upload to Facebook Reels</p>
+                <a href="https://play.google.com/store/apps/details?id=com.lemon.lvoverseas" target="_blank">Download CapCut →</a>
+            </div>
+
+            <div class="back-link">
+                <a href="/poets/{{ ghazal.poet_id }}">← Back to Poet</a> • <a href="/poets">All Poets</a>
+            </div>
+        </section>
+
+        <!-- PREVIEW SECTION -->
+        <section class="preview-panel">
+            <div class="preview-wrapper" id="previewWrapper">
+                <div id="poster-container">
+                    <div class="poster-border"></div>
+                    <div class="poster-border-inner"></div>
+                    
+                    <div class="corner tl"></div>
+                    <div class="corner tr"></div>
+                    <div class="corner bl"></div>
+                    <div class="corner br"></div>
+
+                    <div class="poster-content">
+                        <div class="poster-header">
+                            <div class="poster-logo">UCPC Archive</div>
+                            <div class="poster-sub">Classical Urdu Heritage</div>
+                        </div>
+
+                        <div class="poster-poet">{{ ghazal.poet_name }}</div>
+
+                        <div class="poster-verses">
+                            {% for verse in poster_verses %}
+                            <div class="poster-sher" dir="rtl">
+                                {{ verse.misra1_urdu }}<br>
+                                {{ verse.misra2_urdu }}
+                            </div>
+                            {% endfor %}
+                        </div>
+
+                        <div>
+                            <div class="poster-dedication hidden" id="displayDedication"></div>
+                            <div class="poster-footer">ucpc-poetry-archive.onrender.com</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
     </div>
 </div>
 
-<div id="toast" class="toast-message"></div>
+<div id="toast" class="toast">
+    <div class="toast-spinner" id="toastSpinner"></div>
+    <span id="toastMessage">Generating...</span>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script>
-    const fromInput = document.getElementById('fromName');
-    const toInput = document.getElementById('toName');
-    const posterDedication = document.getElementById('posterDedication');
+    // DOM Elements
+    const inputTo = document.getElementById('inputTo');
+    const inputFrom = document.getElementById('inputFrom');
+    const displayDedication = document.getElementById('displayDedication');
+    const posterContainer = document.getElementById('poster-container');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const toast = document.getElementById('toast');
+    const toastMsg = document.getElementById('toastMessage');
+    const toastSpinner = document.getElementById('toastSpinner');
+
+    // Update dedication preview live
+    function updateDedication() {
+        const toName = inputTo.value.trim();
+        const fromName = inputFrom.value.trim();
+        
+        let dedicationHTML = '';
+        if (toName || fromName) {
+            dedicationHTML += `<div style="margin-bottom:10px;">✨ Dedicated ✨</div>`;
+            if (toName) dedicationHTML += `<div>To: ${escapeHtml(toName)}</div>`;
+            if (fromName) dedicationHTML += `<div class="dedication-from">From: ${escapeHtml(fromName)}</div>`;
+            displayDedication.innerHTML = dedicationHTML;
+            displayDedication.classList.remove('hidden');
+        } else {
+            displayDedication.classList.add('hidden');
+        }
+    }
 
     function escapeHtml(str) {
         if (!str) return '';
@@ -314,68 +526,84 @@
         });
     }
 
-    function updatePosterDedication() {
-        const from = fromInput.value.trim();
-        const to = toInput.value.trim();
+    inputTo.addEventListener('input', updateDedication);
+    inputFrom.addEventListener('input', updateDedication);
+    updateDedication();
 
-        if (from && to) {
-            posterDedication.innerHTML = `✨ Dedicated<br>From ${escapeHtml(from)}<br>❤️<br>To ${escapeHtml(to)} ✨`;
-            posterDedication.classList.remove('hidden');
-        } else if (to) {
-            posterDedication.innerHTML = `✨ Dedicated to<br>${escapeHtml(to)} ✨`;
-            posterDedication.classList.remove('hidden');
-        } else if (from) {
-            posterDedication.innerHTML = `✨ Shared by<br>${escapeHtml(from)} ✨`;
-            posterDedication.classList.remove('hidden');
-        } else {
-            posterDedication.classList.add('hidden');
-        }
+    // Scale preview for mobile
+    function scalePreview() {
+        const previewPanel = document.querySelector('.preview-panel');
+        if (!previewPanel) return;
+        const containerWidth = previewPanel.clientWidth - 40;
+        const originalWidth = 1080;
+        let scale = containerWidth / originalWidth;
+        if (scale > 1) scale = 1;
+        posterContainer.style.transform = `scale(${scale})`;
+        const wrapper = document.getElementById('previewWrapper');
+        if (wrapper) wrapper.style.height = `${1350 * scale}px`;
     }
 
-    fromInput.addEventListener('input', updatePosterDedication);
-    toInput.addEventListener('input', updatePosterDedication);
-    updatePosterDedication();
+    window.addEventListener('resize', scalePreview);
+    scalePreview();
 
-    document.getElementById('sharePosterBtn').addEventListener('click', async function() {
-        const poster = document.getElementById('social-poster');
-        const toast = document.getElementById('toast');
+    // Show/hide toast
+    function showToast(message, showSpinner = true) {
+        toastMsg.textContent = message;
+        toastSpinner.style.display = showSpinner ? 'block' : 'none';
+        toast.classList.add('show');
+    }
 
-        toast.style.display = 'block';
-        toast.innerText = '🎨 Generating premium poster...';
+    function hideToast() {
+        setTimeout(() => {
+            toast.classList.remove('show');
+        }, 3000);
+    }
+
+    // Download Poster
+    downloadBtn.addEventListener('click', async () => {
+        showToast("Generating premium poster...", true);
+
+        const currentTransform = posterContainer.style.transform;
+        posterContainer.style.transform = 'none';
 
         try {
-            const canvas = await html2canvas(poster, {
-                scale: 2.5,
-                backgroundColor: '#000000',
-                logging: false,
+            await new Promise(resolve => requestAnimationFrame(resolve));
+
+            const canvas = await html2canvas(posterContainer, {
+                scale: 1.5,
                 useCORS: true,
-                windowWidth: 1080,
-                windowHeight: poster.scrollHeight
+                backgroundColor: '#000000',
+                logging: false
             });
 
-            const imageData = canvas.toDataURL('image/jpeg', 0.92);
-            const blob = await (await fetch(imageData)).blob();
+            const imageData = canvas.toDataURL("image/jpeg", 0.92);
+            
+            const link = document.createElement('a');
+            link.download = `UCPC_Poster_${Date.now()}.jpg`;
+            link.href = imageData;
+            link.click();
 
-            if (navigator.share) {
-                const file = new File([blob], 'ucpc_poster.jpg', { type: 'image/jpeg' });
-                await navigator.share({
-                    title: 'Urdu Poetry Poster',
-                    text: posterDedication.classList.contains('hidden') ? 'Beautiful Urdu Ghazal' : posterDedication.innerText,
-                    files: [file]
-                });
-                toast.innerText = '✅ Shared!';
-            } else {
-                const link = document.createElement('a');
-                link.download = `ucpc_poster_${Date.now()}.jpg`;
-                link.href = imageData;
-                link.click();
-                toast.innerText = '✅ Poster saved! Share on Facebook/Instagram.';
+            showToast("Poster saved successfully!", false);
+
+            // Mobile share
+            if (navigator.share && navigator.canShare) {
+                try {
+                    const blob = await (await fetch(imageData)).blob();
+                    const file = new File([blob], "poster.jpg", { type: "image/jpeg" });
+                    await navigator.share({
+                        title: 'UCPC Poetry',
+                        files: [file]
+                    });
+                } catch (shareErr) {
+                    console.log("Share cancelled");
+                }
             }
         } catch (err) {
             console.error(err);
-            toast.innerText = '❌ Failed to create poster.';
+            showToast("Error creating poster.", false);
         } finally {
-            setTimeout(() => { toast.style.display = 'none'; }, 3000);
+            posterContainer.style.transform = currentTransform;
+            hideToast();
         }
     });
 </script>
