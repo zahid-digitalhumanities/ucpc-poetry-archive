@@ -221,7 +221,6 @@ body {
     justify-content: center;
 }
 
-/* Facebook Reel size 1080x1920 (9:16 aspect ratio) */
 #poster-container {
     width: 1080px;
     height: 1920px;
@@ -232,15 +231,15 @@ body {
     border-radius: 0px;
 }
 
-/* Borders */
+/* Borders - TIGHTENED */
 .border-frame {
     position: absolute;
-    top: 20px;
-    left: 20px;
-    right: 20px;
-    bottom: 20px;
+    top: 18px;
+    left: 18px;
+    right: 18px;
+    bottom: 18px;
     border: 2px solid rgba(212,175,55,0.4);
-    border-radius: 20px;
+    border-radius: 18px;
     z-index: 10;
     pointer-events: none;
 }
@@ -253,23 +252,23 @@ body {
     right: 6px;
     bottom: 6px;
     border: 1px solid rgba(255,255,255,0.06);
-    border-radius: 14px;
+    border-radius: 12px;
 }
 
-/* Corner Decorations - Smaller for tighter design */
+/* Corner Decorations - SMALLER */
 .corner-deco {
     position: absolute;
-    width: 50px;
-    height: 50px;
+    width: 45px;
+    height: 45px;
     border-color: var(--gold-primary);
     border-style: solid;
     z-index: 11;
     pointer-events: none;
 }
-.cd-tl { top: 18px; left: 18px; border-width: 3px 0 0 3px; }
-.cd-tr { top: 18px; right: 18px; border-width: 3px 3px 0 0; }
-.cd-bl { bottom: 18px; left: 18px; border-width: 0 0 3px 3px; }
-.cd-br { bottom: 18px; right: 18px; border-width: 0 3px 3px 0; }
+.cd-tl { top: 16px; left: 16px; border-width: 3px 0 0 3px; }
+.cd-tr { top: 16px; right: 16px; border-width: 3px 3px 0 0; }
+.cd-bl { bottom: 16px; left: 16px; border-width: 0 0 3px 3px; }
+.cd-br { bottom: 16px; right: 16px; border-width: 0 3px 3px 0; }
 
 /* Poster Content - TIGHTENED SPACING */
 .poster-content {
@@ -279,18 +278,18 @@ body {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    padding: 50px 50px 40px;
+    padding: 35px 50px 30px;
     text-align: center;
 }
 
-/* Header Section - REDUCED SPACING */
+/* Header Section - TIGHTENED */
 .poster-header {
     margin-bottom: 0;
 }
 
 .poster-logo {
     font-family: 'Cinzel', serif;
-    font-size: 46px;
+    font-size: 44px;
     font-weight: 800;
     color: var(--gold-primary);
     letter-spacing: 4px;
@@ -298,39 +297,39 @@ body {
 }
 
 .poster-tagline {
-    margin-top: 8px;
-    margin-bottom: 15px;
-    font-size: 16px;
+    margin-top: 6px;
+    margin-bottom: 8px;
+    font-size: 15px;
     letter-spacing: 3px;
     font-weight: 700;
     color: var(--gold-bright);
     text-transform: uppercase;
     background: rgba(212,175,55,0.1);
     display: inline-block;
-    padding: 4px 16px;
+    padding: 3px 14px;
     border-radius: 30px;
 }
 
-/* Poet Name - TIGHTENED SPACING */
+/* Poet Name - TIGHTENED */
 .poster-poet {
-    margin: 0 0 25px 0;
+    margin: 0 0 18px 0;
     font-family: 'Cinzel', serif;
-    font-size: 52px;
+    font-size: 48px;
     font-weight: 700;
     color: white;
-    text-shadow: 0 2px 10px rgba(0,0,0,0.4);
+    text-shadow: 0 2px 8px rgba(0,0,0,0.4);
     border-bottom: 2px solid rgba(212,175,55,0.3);
     display: inline-block;
-    padding-bottom: 8px;
+    padding-bottom: 6px;
 }
 
-/* Verses Section - TIGHTENED SPACING */
+/* Verses Section - TIGHTENED */
 .poster-verses {
     flex: 1;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    gap: 35px;
+    gap: 22px;
     padding: 0 10px;
 }
 
@@ -342,72 +341,72 @@ body {
 
 .sher-misra1 {
     display: block;
-    font-size: 48px;
-    line-height: 1.7;
+    font-size: 44px;
+    line-height: 1.6;
     color: #ffffff;
-    padding: 5px 10px;
-    margin-bottom: 10px;
+    padding: 4px 10px;
+    margin-bottom: 8px;
     border-bottom: 1px dashed rgba(212,175,55,0.3);
 }
 
 .sher-misra2 {
     display: block;
-    font-size: 48px;
-    line-height: 1.7;
+    font-size: 44px;
+    line-height: 1.6;
     color: var(--gold-light);
-    padding: 5px 18px;
+    padding: 4px 18px;
     border-right: 3px solid var(--gold-primary);
-    margin-right: 15px;
+    margin-right: 12px;
 }
 
 /* Ghazal Link Box - COMPACT */
 .ghazal-link-box {
     background: linear-gradient(135deg, rgba(212,175,55,0.12), rgba(212,175,55,0.04));
     border: 1px solid var(--gold-primary);
-    border-radius: 20px;
-    padding: 10px 18px;
-    margin: 10px 0 15px 0;
+    border-radius: 18px;
+    padding: 8px 15px;
+    margin: 6px 0 10px 0;
     text-align: center;
 }
 
 .ghazal-link-icon {
-    font-size: 24px;
+    font-size: 20px;
 }
 
 .ghazal-link-label {
     color: var(--gold-primary);
-    font-size: 12px;
+    font-size: 11px;
     letter-spacing: 2px;
     font-weight: 700;
     text-transform: uppercase;
-    margin: 3px 0 6px 0;
+    margin: 2px 0 5px 0;
 }
 
 .ghazal-link-url {
     color: var(--gold-light);
-    font-size: 11px;
+    font-size: 10px;
     word-break: break-all;
     background: rgba(0,0,0,0.5);
-    padding: 6px;
-    border-radius: 10px;
+    padding: 5px;
+    border-radius: 8px;
     font-family: monospace;
 }
 
 .ghazal-link-id {
     color: #aaa;
-    font-size: 9px;
-    margin-top: 5px;
+    font-size: 8px;
+    margin-top: 4px;
 }
 
 /* Dedication - COMPACT */
 .poster-dedication {
     background: rgba(212,175,55,0.08);
     border: 1px solid rgba(212,175,55,0.2);
-    border-radius: 18px;
-    padding: 8px;
-    margin-bottom: 10px;
+    border-radius: 16px;
+    padding: 6px;
+    margin-bottom: 8px;
     color: var(--gold-light);
-    font-size: 16px;
+    font-size: 14px;
     font-weight: 600;
 }
 
@@ -417,45 +416,45 @@ body {
 
 .dedication-from {
     color: white;
-    font-size: 14px;
-    margin-top: 3px;
+    font-size: 12px;
+    margin-top: 2px;
 }
 
 .dedication-heart {
-    font-size: 22px;
+    font-size: 18px;
 }
 
 /* Footer - COMPACT */
 .poster-footer {
-    border-top: 1px solid rgba(212,175,55,0.15);
-    padding-top: 12px;
+    border-top: 1px solid rgba(212,175,55,0.12);
+    padding-top: 8px;
 }
 
 .footer-follow {
     color: var(--gold-primary);
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 700;
     letter-spacing: 2px;
     text-transform: uppercase;
-    margin-bottom: 6px;
+    margin-bottom: 4px;
     background: rgba(212,175,55,0.06);
     display: inline-block;
-    padding: 4px 16px;
+    padding: 3px 14px;
     border-radius: 25px;
 }
 
 .footer-item {
-    margin: 4px 0;
+    margin: 3px 0;
 }
 
 .footer-label {
     color: #888;
-    font-size: 10px;
+    font-size: 9px;
 }
 
 .footer-value {
     color: var(--gold-light);
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 600;
 }
 
@@ -580,7 +579,7 @@ body {
                         <div class="corner-deco cd-br"></div>
 
                         <div class="poster-content">
-                            <!-- HEADER - TIGHTENED -->
+                            <!-- HEADER -->
                             <div>
                                 <div class="poster-logo">UCPC POETRY ARCHIVE</div>
                                 <div class="poster-tagline">📖 FOLLOW DAILY UPDATES 📖</div>
@@ -781,7 +780,7 @@ body {
             
         } catch (error) {
             console.error('Download error:', error);
-            showToast('❌ Failed. Try refreshing the page.', false);
+            showToast('❌ Failed. Try refreshing the page.', error);
         } finally {
             posterContainer.style.transform = originalTransform;
             hideToast();
