@@ -231,15 +231,15 @@ body {
     border-radius: 0px;
 }
 
-/* Borders - TIGHTENED */
+/* Borders */
 .border-frame {
     position: absolute;
-    top: 18px;
-    left: 18px;
-    right: 18px;
-    bottom: 18px;
+    top: 15px;
+    left: 15px;
+    right: 15px;
+    bottom: 15px;
     border: 2px solid rgba(212,175,55,0.4);
-    border-radius: 18px;
+    border-radius: 16px;
     z-index: 10;
     pointer-events: none;
 }
@@ -247,30 +247,30 @@ body {
 .border-frame::after {
     content: '';
     position: absolute;
-    top: 6px;
-    left: 6px;
-    right: 6px;
-    bottom: 6px;
+    top: 5px;
+    left: 5px;
+    right: 5px;
+    bottom: 5px;
     border: 1px solid rgba(255,255,255,0.06);
-    border-radius: 12px;
+    border-radius: 11px;
 }
 
-/* Corner Decorations - SMALLER */
+/* Corner Decorations */
 .corner-deco {
     position: absolute;
-    width: 45px;
-    height: 45px;
+    width: 40px;
+    height: 40px;
     border-color: var(--gold-primary);
     border-style: solid;
     z-index: 11;
     pointer-events: none;
 }
-.cd-tl { top: 16px; left: 16px; border-width: 3px 0 0 3px; }
-.cd-tr { top: 16px; right: 16px; border-width: 3px 3px 0 0; }
-.cd-bl { bottom: 16px; left: 16px; border-width: 0 0 3px 3px; }
-.cd-br { bottom: 16px; right: 16px; border-width: 0 3px 3px 0; }
+.cd-tl { top: 13px; left: 13px; border-width: 3px 0 0 3px; }
+.cd-tr { top: 13px; right: 13px; border-width: 3px 3px 0 0; }
+.cd-bl { bottom: 13px; left: 13px; border-width: 0 0 3px 3px; }
+.cd-br { bottom: 13px; right: 13px; border-width: 0 3px 3px 0; }
 
-/* Poster Content - TIGHTENED SPACING */
+/* Poster Content - MINIMUM SPACING */
 .poster-content {
     position: relative;
     z-index: 5;
@@ -278,59 +278,59 @@ body {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    padding: 35px 50px 30px;
+    padding: 25px 40px 25px;
     text-align: center;
 }
 
-/* Header Section - TIGHTENED */
+/* Header Section - MINIMUM SPACING */
 .poster-header {
     margin-bottom: 0;
 }
 
 .poster-logo {
     font-family: 'Cinzel', serif;
-    font-size: 44px;
+    font-size: 42px;
     font-weight: 800;
     color: var(--gold-primary);
-    letter-spacing: 4px;
-    text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+    letter-spacing: 3px;
+    text-shadow: 0 2px 6px rgba(0,0,0,0.5);
 }
 
 .poster-tagline {
-    margin-top: 6px;
-    margin-bottom: 8px;
-    font-size: 15px;
-    letter-spacing: 3px;
+    margin-top: 4px;
+    margin-bottom: 2px;
+    font-size: 14px;
+    letter-spacing: 2px;
     font-weight: 700;
     color: var(--gold-bright);
     text-transform: uppercase;
     background: rgba(212,175,55,0.1);
     display: inline-block;
-    padding: 3px 14px;
-    border-radius: 30px;
+    padding: 2px 12px;
+    border-radius: 25px;
 }
 
-/* Poet Name - TIGHTENED */
+/* Poet Name - MINIMUM SPACING */
 .poster-poet {
-    margin: 0 0 18px 0;
+    margin: 0 0 12px 0;
     font-family: 'Cinzel', serif;
-    font-size: 48px;
+    font-size: 45px;
     font-weight: 700;
     color: white;
-    text-shadow: 0 2px 8px rgba(0,0,0,0.4);
+    text-shadow: 0 2px 6px rgba(0,0,0,0.4);
     border-bottom: 2px solid rgba(212,175,55,0.3);
     display: inline-block;
-    padding-bottom: 6px;
+    padding-bottom: 4px;
 }
 
-/* Verses Section - TIGHTENED */
+/* Verses Section - MINIMUM SPACING */
 .poster-verses {
     flex: 1;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    gap: 22px;
-    padding: 0 10px;
+    gap: 18px;
+    padding: 0 5px;
 }
 
 .poster-sher {
@@ -341,72 +341,72 @@ body {
 
 .sher-misra1 {
     display: block;
-    font-size: 44px;
-    line-height: 1.6;
+    font-size: 42px;
+    line-height: 1.55;
     color: #ffffff;
-    padding: 4px 10px;
-    margin-bottom: 8px;
+    padding: 2px 8px;
+    margin-bottom: 6px;
     border-bottom: 1px dashed rgba(212,175,55,0.3);
 }
 
 .sher-misra2 {
     display: block;
-    font-size: 44px;
-    line-height: 1.6;
+    font-size: 42px;
+    line-height: 1.55;
     color: var(--gold-light);
-    padding: 4px 18px;
+    padding: 2px 15px;
     border-right: 3px solid var(--gold-primary);
-    margin-right: 12px;
+    margin-right: 10px;
 }
 
-/* Ghazal Link Box - COMPACT */
+/* Ghazal Link Box */
 .ghazal-link-box {
     background: linear-gradient(135deg, rgba(212,175,55,0.12), rgba(212,175,55,0.04));
     border: 1px solid var(--gold-primary);
-    border-radius: 18px;
-    padding: 8px 15px;
-    margin: 6px 0 10px 0;
+    border-radius: 16px;
+    padding: 6px 12px;
+    margin: 5px 0 8px 0;
     text-align: center;
 }
 
 .ghazal-link-icon {
-    font-size: 20px;
+    font-size: 18px;
 }
 
 .ghazal-link-label {
     color: var(--gold-primary);
-    font-size: 11px;
+    font-size: 10px;
     letter-spacing: 2px;
     font-weight: 700;
     text-transform: uppercase;
-    margin: 2px 0 5px 0;
+    margin: 2px 0 4px 0;
 }
 
 .ghazal-link-url {
     color: var(--gold-light);
-    font-size: 10px;
+    font-size: 9px;
     word-break: break-all;
     background: rgba(0,0,0,0.5);
-    padding: 5px;
-    border-radius: 8px;
+    padding: 4px;
+    border-radius: 6px;
     font-family: monospace;
 }
 
 .ghazal-link-id {
     color: #aaa;
-    font-size: 8px;
-    margin-top: 4px;
+    font-size: 7px;
+    margin-top: 3px;
 }
 
-/* Dedication - COMPACT */
+/* Dedication */
 .poster-dedication {
     background: rgba(212,175,55,0.08);
     border: 1px solid rgba(212,175,55,0.2);
-    border-radius: 16px;
-    padding: 6px;
-    margin-bottom: 8px;
+    border-radius: 14px;
+    padding: 5px;
+    margin-bottom: 6px;
     color: var(--gold-light);
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 600;
 }
 
@@ -416,60 +416,60 @@ body {
 
 .dedication-from {
     color: white;
-    font-size: 12px;
+    font-size: 11px;
     margin-top: 2px;
 }
 
 .dedication-heart {
-    font-size: 18px;
+    font-size: 16px;
 }
 
-/* Footer - COMPACT */
+/* Footer */
 .poster-footer {
-    border-top: 1px solid rgba(212,175,55,0.12);
-    padding-top: 8px;
+    border-top: 1px solid rgba(212,175,55,0.1);
+    padding-top: 6px;
 }
 
 .footer-follow {
     color: var(--gold-primary);
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 700;
     letter-spacing: 2px;
     text-transform: uppercase;
-    margin-bottom: 4px;
+    margin-bottom: 3px;
     background: rgba(212,175,55,0.06);
     display: inline-block;
-    padding: 3px 14px;
-    border-radius: 25px;
+    padding: 2px 12px;
+    border-radius: 20px;
 }
 
 .footer-item {
-    margin: 3px 0;
+    margin: 2px 0;
 }
 
 .footer-label {
     color: #888;
-    font-size: 9px;
+    font-size: 8px;
 }
 
 .footer-value {
     color: var(--gold-light);
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 600;
 }
 
 /* Click Hint */
 .click-hint {
-    margin-top: 10px;
+    margin-top: 8px;
     text-align: center;
-    font-size: 10px;
+    font-size: 9px;
     color: #666;
 }
 
 .click-hint span {
     background: rgba(212,175,55,0.1);
-    padding: 3px 10px;
-    border-radius: 25px;
+    padding: 2px 8px;
+    border-radius: 20px;
 }
 
 /* Toast */
@@ -480,13 +480,13 @@ body {
     transform: translateX(-50%) translateY(100px);
     background: var(--gold-primary);
     color: #000;
-    padding: 12px 25px;
-    border-radius: 50px;
+    padding: 10px 20px;
+    border-radius: 40px;
     font-weight: 700;
     z-index: 10000;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
     transition: 0.25s ease;
 }
 
@@ -495,8 +495,8 @@ body {
 }
 
 .toast-spinner {
-    width: 16px;
-    height: 16px;
+    width: 14px;
+    height: 14px;
     border: 2px solid #000;
     border-top-color: transparent;
     border-radius: 50%;
@@ -515,7 +515,6 @@ body {
 {% endblock %}
 
 {% block content %}
-{# FIXED: Correct URL for full ghazal page #}
 {% set ghazal_full_url = request.host_url.rstrip('/') + '/ghazal/' + ghazal.id|string %}
 <div class="app-container">
     <div class="two-columns">
@@ -638,7 +637,6 @@ body {
 
 <script>
 (function() {
-    // DOM Elements
     const inputFrom = document.getElementById('inputFrom');
     const inputTo = document.getElementById('inputTo');
     const dedicationBox = document.getElementById('dedicationBox');
@@ -651,7 +649,6 @@ body {
 
     let scaleTimeout = null;
 
-    // Theme mapping
     const themes = {
         'classic': 'theme-classic',
         'gold': 'theme-gold',
@@ -698,7 +695,6 @@ body {
     inputTo.addEventListener('input', updateDedication);
     updateDedication();
 
-    // Scale preview for 1920 height
     function scalePreview() {
         const wrapper = document.getElementById('previewWrapper');
         if (!wrapper || !posterContainer) return;
@@ -741,7 +737,6 @@ body {
         }, 2000);
     }
 
-    // Download poster for 1920x1080 Reel size
     downloadBtn.addEventListener('click', async function(e) {
         e.preventDefault();
         
@@ -750,7 +745,7 @@ body {
             return;
         }
         
-        showToast('🎨 Generating your poster...', true);
+        showToast('🎨 Generating poster...', true);
         
         const originalTransform = posterContainer.style.transform;
         posterContainer.style.transform = 'none';
@@ -776,11 +771,11 @@ body {
             link.href = imageData;
             link.click();
             
-            showToast('✅ Poster saved! Ready for Facebook Reel!', false);
+            showToast('✅ Poster saved!', false);
             
         } catch (error) {
             console.error('Download error:', error);
-            showToast('❌ Failed. Try refreshing the page.', error);
+            showToast('❌ Failed. Try again.', false);
         } finally {
             posterContainer.style.transform = originalTransform;
             hideToast();
