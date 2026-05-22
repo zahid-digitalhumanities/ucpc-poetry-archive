@@ -1,140 +1,284 @@
 {% extends "base.html" %}
 
-{% block title %}UCPC Viral AI Poster System{% endblock %}
+{% block title %}{{ ghazal.poet_name }} - UCPC Poetry Archive{% endblock %}
 
 {% block extra_head %}
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Montserrat:wght@300;400;600;700&family=Noto+Nastaliq+Urdu:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Montserrat:wght@300;400;600;700;800&family=Noto+Nastaliq+Urdu:wght@400;500;600;700&display=swap" rel="stylesheet">
 {% endblock %}
 
 {% block extra_css %}
 <style>
 
-*{margin:0;padding:0;box-sizing:border-box}
+/* ================= RESET ================= */
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
 
 body{
 background:#050505;
 font-family:'Montserrat',sans-serif;
 color:#fff;
+overflow-x:hidden;
 }
 
-/* layout */
+/* ================= PAGE LAYOUT ================= */
+
 .app{
 max-width:1400px;
 margin:auto;
-padding:40px 20px;
+padding:30px 20px;
 }
 
-.grid{
+.layout{
 display:flex;
-gap:40px;
 flex-wrap:wrap;
+gap:35px;
 justify-content:center;
+align-items:flex-start;
 }
 
-/* panel */
+/* ================= CONTROL PANEL ================= */
+
 .panel{
-width:380px;
-background:rgba(20,20,25,0.85);
-border:1px solid rgba(212,175,55,0.2);
-border-radius:20px;
-padding:22px;
-backdrop-filter:blur(12px);
+width:340px;
+background:rgba(20,20,25,0.92);
+border:1px solid rgba(212,175,55,0.18);
+border-radius:22px;
+padding:24px;
+backdrop-filter:blur(10px);
 }
 
-.title{
-text-align:center;
-font-family:'Cinzel';
-color:#D4AF37;
+.panel-title{
+font-family:'Cinzel',serif;
 font-size:22px;
-margin-bottom:15px;
+color:#D4AF37;
+text-align:center;
+margin-bottom:18px;
+padding-bottom:10px;
+border-bottom:1px solid rgba(212,175,55,0.15);
 }
 
-/* poster */
+.label{
+font-size:12px;
+letter-spacing:1px;
+margin-bottom:8px;
+color:#F6D878;
+font-weight:700;
+display:block;
+}
+
+select,
+input{
+width:100%;
+padding:12px;
+border:none;
+border-radius:12px;
+background:#111;
+color:#fff;
+font-size:14px;
+margin-bottom:14px;
+}
+
+.double{
+display:flex;
+gap:10px;
+}
+
+.double div{
+flex:1;
+}
+
+button{
+width:100%;
+border:none;
+border-radius:40px;
+padding:14px;
+font-size:15px;
+font-weight:800;
+cursor:pointer;
+background:linear-gradient(90deg,#B88A1A,#FFD86B);
+color:#000;
+margin-top:8px;
+}
+
+/* ================= POSTER WRAPPER ================= */
+
+.preview{
+display:flex;
+justify-content:center;
+align-items:flex-start;
+}
+
 #poster{
 width:1080px;
 height:1920px;
 position:relative;
-background:#000;
 overflow:hidden;
-box-shadow:0 30px 60px rgba(0,0,0,0.8);
+box-shadow:0 35px 70px rgba(0,0,0,0.85);
 }
 
+/* ================= THEMES ================= */
+
+.theme-1{
+background:#000;
+background-image:
+radial-gradient(circle at top, rgba(212,175,55,0.10), transparent 40%);
+}
+
+.theme-2{
+background:linear-gradient(145deg,#1b1300,#000);
+}
+
+.theme-3{
+background:linear-gradient(145deg,#2b0912,#000);
+}
+
+.theme-4{
+background:linear-gradient(145deg,#09142b,#000);
+}
+
+.theme-5{
+background:linear-gradient(145deg,#101010,#000);
+background-image:
+radial-gradient(circle at center, rgba(255,255,255,0.05), transparent 60%);
+}
+
+/* ================= BORDER ================= */
+
+.border{
+position:absolute;
+top:8px;
+left:8px;
+right:8px;
+bottom:8px;
+border:1px solid rgba(212,175,55,0.20);
+border-radius:18px;
+pointer-events:none;
+}
+
+/* ================= POSTER CONTENT ================= */
+
 .content{
+position:relative;
+z-index:5;
 height:100%;
 display:flex;
 flex-direction:column;
-justify-content:space-between;
-padding:12px 26px;
+align-items:center;
+text-align:center;
+padding:26px 42px 20px;
+}
+
+/* ================= HEADER ================= */
+
+.logo{
+font-family:'Cinzel',serif;
+font-size:34px;
+font-weight:800;
+line-height:1;
+color:#D4AF37;
+}
+
+.follow{
+font-size:11px;
+font-weight:700;
+color:#F6D878;
+margin-top:2px;
+margin-bottom:14px;
+letter-spacing:1px;
+}
+
+/* ================= POET ================= */
+
+.poet{
+font-family:'Cinzel',serif;
+font-size:40px;
+font-weight:700;
+line-height:1.1;
+border-bottom:1px solid rgba(212,175,55,0.22);
+padding-bottom:4px;
+margin-bottom:20px;
+}
+
+/* ================= VERSES ================= */
+
+.verses{
+width:100%;
+display:flex;
+flex-direction:column;
+gap:14px;
+margin-bottom:24px;
+}
+
+.line{
+font-family:'Noto Nastaliq Urdu',serif;
+direction:rtl;
+font-size:38px;
+line-height:1.6;
 text-align:center;
 }
 
-.logo{
-font-family:'Cinzel';
-font-size:34px;
-color:#D4AF37;
-font-weight:800;
-}
-
-.poet{
-font-size:34px;
-border-bottom:1px solid rgba(212,175,55,0.2);
-display:inline-block;
-margin-top:2px;
-}
-
-.sher{
-direction:rtl;
-font-family:'Noto Nastaliq Urdu';
-font-size:30px;
-line-height:1.5;
-margin:10px 0;
-}
-
-.m2{
+.gold{
 color:#F6D878;
-border-right:2px solid #D4AF37;
-padding-right:10px;
 }
 
-/* AI BOXES */
-.ai-box{
+/* ================= DEDICATION ================= */
+
+.dedication{
 background:rgba(212,175,55,0.08);
-border:1px solid rgba(212,175,55,0.2);
-border-radius:12px;
-padding:10px;
-margin-top:10px;
-font-size:12px;
+border:1px solid rgba(212,175,55,0.18);
+padding:10px 18px;
+border-radius:18px;
+font-size:14px;
+color:#F6D878;
+margin-bottom:20px;
+min-width:280px;
 }
 
-.hashtags{
-color:#F6D878;
+.dedication.hidden{
+display:none;
+}
+
+/* ================= FOOTER ================= */
+
+.linkbox{
+background:rgba(212,175,55,0.06);
+border:1px solid rgba(212,175,55,0.15);
+padding:10px 18px;
+border-radius:14px;
 font-size:11px;
+margin-bottom:12px;
+max-width:90%;
 word-break:break-word;
 }
 
-.score{
-font-size:14px;
-font-weight:700;
-color:#00ff88;
+.footer{
+font-size:10px;
+color:#999;
 }
 
-button,select{
+/* ================= MOBILE ================= */
+
+@media(max-width:768px){
+
+.app{
+padding:20px 10px;
+}
+
+.panel{
 width:100%;
-padding:10px;
-margin-top:10px;
-border-radius:10px;
-border:none;
-font-weight:700;
 }
 
-button{
-background:linear-gradient(90deg,#d4af37,#ffdf85);
-cursor:pointer;
+.preview{
+overflow:auto;
 }
 
-select{
-background:#111;
-color:#fff;
 }
 
 </style>
@@ -142,67 +286,110 @@ color:#fff;
 
 {% block content %}
 
+{% set ghazal_url = request.host_url.rstrip('/') + '/ghazal/' + ghazal.id|string %}
+
 <div class="app">
-<div class="grid">
 
-<!-- CONTROL PANEL -->
+<div class="layout">
+
+<!-- ================= CONTROL PANEL ================= -->
+
 <div class="panel">
-<div class="title">🔥 UCPC VIRAL AI ENGINE</div>
 
-<button onclick="generateAI()">🧠 Generate AI Caption + Hashtags</button>
-<button onclick="downloadPoster()">📥 Download Poster</button>
+<div class="panel-title">
+✨ UCPC POSTER ENGINE
+</div>
 
-<select id="mood">
-<option value="romantic">❤️ Romantic</option>
-<option value="sad">🥀 Sad</option>
-<option value="deep">🖤 Deep Thought</option>
-<option value="motivational">🔥 Motivational</option>
+<label class="label">
+🎨 Select Background
+</label>
+
+<select id="themeSelect">
+<option value="theme-1">Classic Black</option>
+<option value="theme-2">Royal Gold</option>
+<option value="theme-3">Velvet Maroon</option>
+<option value="theme-4">Night Blue</option>
+<option value="theme-5">Dark Silver</option>
 </select>
 
-<div class="ai-box">
-<div>🧠 Caption:</div>
-<div id="caption">Click generate...</div>
+<label class="label">
+💝 Dedication (Optional)
+</label>
+
+<div class="double">
+<div>
+<input type="text" id="fromInput" placeholder="From">
 </div>
 
-<div class="ai-box">
-<div># Hashtags:</div>
-<div id="hashtags" class="hashtags"></div>
+<div>
+<input type="text" id="toInput" placeholder="To">
+</div>
 </div>
 
-<div class="ai-box">
-<div>🔥 Viral Score:</div>
-<div id="score" class="score">0%</div>
-</div>
+<button id="downloadBtn">
+📥 DOWNLOAD POSTER
+</button>
 
 </div>
 
-<!-- POSTER -->
-<div id="poster">
+<!-- ================= POSTER ================= -->
+
+<div class="preview">
+
+<div id="poster" class="theme-1">
+
+<div class="border"></div>
 
 <div class="content">
 
 <!-- HEADER -->
-<div>
-<div class="logo">UCPC POETRY ARCHIVE</div>
-<div class="poet">{{ ghazal.poet_name }}</div>
+
+<div class="logo">
+UCPC POETRY ARCHIVE
 </div>
 
-<!-- VERSE -->
-<div>
-<div class="sher">
-<span>{{ poster_verses[0].misra1_urdu }}</span><br>
-<span class="m2">{{ poster_verses[0].misra2_urdu }}</span>
-</div>
+<div class="follow">
+📖 FOLLOW DAILY UPDATES 📖
 </div>
 
-<!-- AI FOOTER -->
-<div>
-<div class="ai-box">
-📜 {{ request.host_url }}ghazal/{{ ghazal.id }}
+<!-- POET -->
+
+<div class="poet">
+{{ ghazal.poet_name }}
 </div>
 
-<div class="ai-box">
-🔔 UCPC Poetry Archive • Viral AI System
+<!-- VERSES -->
+
+<div class="verses">
+
+{% for verse in poster_verses[:2] %}
+
+<div class="line">
+{{ verse.misra1_urdu }}
+</div>
+
+<div class="line gold">
+{{ verse.misra2_urdu }}
+</div>
+
+{% endfor %}
+
+</div>
+
+<!-- DEDICATION -->
+
+<div id="dedicationBox" class="dedication hidden">
+💝 Dedicated With Love
+</div>
+
+<!-- FOOTER -->
+
+<div class="linkbox">
+📜 {{ ghazal_url }}
+</div>
+
+<div class="footer">
+🔔 UCPC Poetry Archive
 </div>
 
 </div>
@@ -211,61 +398,82 @@ color:#fff;
 
 </div>
 
-</div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
 <script>
 
-/* ================= AI ENGINE (BASIC LOCAL LOGIC) ================= */
+const themeSelect=document.getElementById("themeSelect");
+const poster=document.getElementById("poster");
 
-function generateAI(){
+const fromInput=document.getElementById("fromInput");
+const toInput=document.getElementById("toInput");
 
-let mood=document.getElementById("mood").value;
+const dedicationBox=document.getElementById("dedicationBox");
 
-/* CAPTION ENGINE */
-let captions={
-romantic:"Love written in silence and poetry ❤️",
-sad:"Some words hurt more than silence 🥀",
-deep:"Not every feeling needs explanation 🖤",
-motivational:"Rise through words, not noise 🔥"
-};
+themeSelect.addEventListener("change",function(){
 
-document.getElementById("caption").innerText=captions[mood];
+poster.className=themeSelect.value;
 
-/* HASHTAG ENGINE */
-let tags={
-romantic:"#love #urdupoetry #romance #shayari #poetry",
-sad:"#sadshayari #urdupoetry #brokenheart #shayari #poetry",
-deep:"#deepthoughts #urdupoetry #philosophy #shayari",
-motivational:"#motivation #urdupoetry #inspiration #success"
-};
+});
 
-document.getElementById("hashtags").innerText=tags[mood];
+/* ================= DEDICATION ================= */
 
-/* VIRAL SCORE (simple heuristic) */
-let score=Math.floor(Math.random()*35)+65;
-document.getElementById("score").innerText=score+"% 🔥";
+function updateDedication(){
+
+const from=fromInput.value.trim();
+const to=toInput.value.trim();
+
+if(from || to){
+
+let text="💝 ";
+
+if(from){
+text+="From: "+from;
 }
+
+if(from && to){
+text+=" ❤️ ";
+}
+
+if(to){
+text+="To: "+to;
+}
+
+dedicationBox.innerText=text;
+dedicationBox.classList.remove("hidden");
+
+}else{
+
+dedicationBox.classList.add("hidden");
+
+}
+
+}
+
+fromInput.addEventListener("input",updateDedication);
+toInput.addEventListener("input",updateDedication);
 
 /* ================= DOWNLOAD ================= */
 
-async function downloadPoster(){
-
-let poster=document.getElementById("poster");
+document.getElementById("downloadBtn").addEventListener("click",async function(){
 
 const canvas=await html2canvas(poster,{
 scale:2.5,
-useCORS:true,
-backgroundColor:"#000"
+backgroundColor:null,
+useCORS:true
 });
 
-let a=document.createElement("a");
-a.download="ucpc-viral-"+Date.now()+".jpg";
-a.href=canvas.toDataURL("image/jpeg",0.95);
-a.click();
-}
+const link=document.createElement("a");
+
+link.download="ucpc-poster-"+Date.now()+".jpg";
+
+link.href=canvas.toDataURL("image/jpeg",0.95);
+
+link.click();
+
+});
 
 </script>
 
