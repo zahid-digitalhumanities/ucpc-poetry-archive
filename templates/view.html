@@ -18,12 +18,9 @@
 {% block extra_css %}
 <style>
 :root {
-    --bg-page: #050505;
-    --glass-bg: rgba(20,20,25,0.72);
     --gold-primary: #D4AF37;
     --gold-light: #F6D878;
     --gold-bright: #FFD700;
-    --gold-dim: #8a7020;
 }
 
 * {
@@ -194,7 +191,6 @@ body {
     color: var(--gold-primary);
 }
 
-/* ==================== POSTER THEMES ==================== */
 .theme-classic {
     background: #000000;
     background-image: radial-gradient(circle at top, rgba(255,215,0,.08), transparent 40%);
@@ -212,7 +208,6 @@ body {
     background-image: radial-gradient(circle at top, rgba(100,100,255,0.1), transparent 50%);
 }
 
-/* ==================== POSTER CONTAINER - FACEBOOK REEL SIZE ==================== */
 .preview-wrapper {
     transform-origin: top center;
     display: flex;
@@ -228,49 +223,36 @@ body {
     overflow: hidden;
     color: #fff;
     box-shadow: 0 0 60px rgba(0,0,0,.9);
-    border-radius: 0px;
 }
 
-/* Borders */
+/* EXTREME TIGHT BORDERS */
 .border-frame {
     position: absolute;
-    top: 15px;
-    left: 15px;
-    right: 15px;
-    bottom: 15px;
-    border: 2px solid rgba(212,175,55,0.4);
-    border-radius: 16px;
+    top: 8px;
+    left: 8px;
+    right: 8px;
+    bottom: 8px;
+    border: 1.5px solid rgba(212,175,55,0.35);
+    border-radius: 12px;
     z-index: 10;
     pointer-events: none;
 }
 
-.border-frame::after {
-    content: '';
-    position: absolute;
-    top: 5px;
-    left: 5px;
-    right: 5px;
-    bottom: 5px;
-    border: 1px solid rgba(255,255,255,0.06);
-    border-radius: 11px;
-}
-
-/* Corner Decorations */
 .corner-deco {
     position: absolute;
-    width: 40px;
-    height: 40px;
+    width: 25px;
+    height: 25px;
     border-color: var(--gold-primary);
     border-style: solid;
     z-index: 11;
     pointer-events: none;
 }
-.cd-tl { top: 13px; left: 13px; border-width: 3px 0 0 3px; }
-.cd-tr { top: 13px; right: 13px; border-width: 3px 3px 0 0; }
-.cd-bl { bottom: 13px; left: 13px; border-width: 0 0 3px 3px; }
-.cd-br { bottom: 13px; right: 13px; border-width: 0 3px 3px 0; }
+.cd-tl { top: 6px; left: 6px; border-width: 2px 0 0 2px; }
+.cd-tr { top: 6px; right: 6px; border-width: 2px 2px 0 0; }
+.cd-bl { bottom: 6px; left: 6px; border-width: 0 0 2px 2px; }
+.cd-br { bottom: 6px; right: 6px; border-width: 0 2px 2px 0; }
 
-/* Poster Content - MINIMUM SPACING */
+/* EXTREME TIGHT CONTENT */
 .poster-content {
     position: relative;
     z-index: 5;
@@ -278,135 +260,129 @@ body {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    padding: 25px 40px 25px;
+    padding: 8px 30px 12px;
     text-align: center;
 }
 
-/* Header Section - MINIMUM SPACING */
-.poster-header {
-    margin-bottom: 0;
-}
-
+/* HEADER - TIGHTEST */
 .poster-logo {
     font-family: 'Cinzel', serif;
-    font-size: 42px;
+    font-size: 34px;
     font-weight: 800;
     color: var(--gold-primary);
-    letter-spacing: 3px;
-    text-shadow: 0 2px 6px rgba(0,0,0,0.5);
+    letter-spacing: 2px;
+    line-height: 1.1;
 }
 
 .poster-tagline {
-    margin-top: 4px;
-    margin-bottom: 2px;
-    font-size: 14px;
-    letter-spacing: 2px;
+    margin-top: 2px;
+    margin-bottom: 0px;
+    font-size: 11px;
+    letter-spacing: 1.5px;
     font-weight: 700;
     color: var(--gold-bright);
     text-transform: uppercase;
-    background: rgba(212,175,55,0.1);
+    background: rgba(212,175,55,0.08);
     display: inline-block;
-    padding: 2px 12px;
-    border-radius: 25px;
+    padding: 1px 8px;
+    border-radius: 20px;
 }
 
-/* Poet Name - MINIMUM SPACING */
+/* POET NAME - TIGHTEST */
 .poster-poet {
-    margin: 0 0 12px 0;
+    margin: 2px 0 4px 0;
     font-family: 'Cinzel', serif;
-    font-size: 45px;
+    font-size: 36px;
     font-weight: 700;
     color: white;
-    text-shadow: 0 2px 6px rgba(0,0,0,0.4);
-    border-bottom: 2px solid rgba(212,175,55,0.3);
+    border-bottom: 1px solid rgba(212,175,55,0.3);
     display: inline-block;
-    padding-bottom: 4px;
+    padding-bottom: 2px;
+    line-height: 1.15;
 }
 
-/* Verses Section - MINIMUM SPACING */
+/* VERSES - TIGHTEST */
 .poster-verses {
     flex: 1;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    gap: 18px;
-    padding: 0 5px;
+    gap: 4px;
+    padding: 0;
 }
 
 .poster-sher {
-    font-family: 'Noto Nastaliq Urdu', 'Jameel Noori Nastaleeq', 'Alvi Nastaleeq', 'Urdu Typesetting', serif;
+    font-family: 'Noto Nastaliq Urdu', 'Jameel Noori Nastaleeq', serif;
     direction: rtl;
     text-align: center;
 }
 
 .sher-misra1 {
     display: block;
-    font-size: 42px;
-    line-height: 1.55;
+    font-size: 32px;
+    line-height: 1.25;
     color: #ffffff;
-    padding: 2px 8px;
-    margin-bottom: 6px;
-    border-bottom: 1px dashed rgba(212,175,55,0.3);
+    padding: 0px 5px;
+    margin-bottom: 1px;
 }
 
 .sher-misra2 {
     display: block;
-    font-size: 42px;
-    line-height: 1.55;
+    font-size: 32px;
+    line-height: 1.25;
     color: var(--gold-light);
-    padding: 2px 15px;
-    border-right: 3px solid var(--gold-primary);
-    margin-right: 10px;
+    padding: 0px 10px;
+    border-right: 2px solid var(--gold-primary);
+    margin-right: 5px;
 }
 
-/* Ghazal Link Box */
+/* GHAZAL LINK - TIGHTEST */
 .ghazal-link-box {
-    background: linear-gradient(135deg, rgba(212,175,55,0.12), rgba(212,175,55,0.04));
-    border: 1px solid var(--gold-primary);
-    border-radius: 16px;
-    padding: 6px 12px;
-    margin: 5px 0 8px 0;
+    background: rgba(212,175,55,0.08);
+    border: 1px solid rgba(212,175,55,0.35);
+    border-radius: 10px;
+    padding: 3px 8px;
+    margin: 2px 0 3px 0;
     text-align: center;
 }
 
 .ghazal-link-icon {
-    font-size: 18px;
+    font-size: 14px;
 }
 
 .ghazal-link-label {
     color: var(--gold-primary);
-    font-size: 10px;
-    letter-spacing: 2px;
+    font-size: 8px;
+    letter-spacing: 1px;
     font-weight: 700;
     text-transform: uppercase;
-    margin: 2px 0 4px 0;
+    margin: 0px 0 2px 0;
 }
 
 .ghazal-link-url {
     color: var(--gold-light);
-    font-size: 9px;
+    font-size: 7px;
     word-break: break-all;
     background: rgba(0,0,0,0.5);
-    padding: 4px;
-    border-radius: 6px;
-    font-family: monospace;
+    padding: 2px;
+    border-radius: 4px;
 }
 
 .ghazal-link-id {
     color: #aaa;
-    font-size: 7px;
-    margin-top: 3px;
+    font-size: 6px;
+    margin-top: 1px;
 }
 
-/* Dedication */
+/* DEDICATION - TIGHTEST */
 .poster-dedication {
-    background: rgba(212,175,55,0.08);
-    border: 1px solid rgba(212,175,55,0.2);
-    border-radius: 14px;
-    padding: 5px;
-    margin-bottom: 6px;
+    background: rgba(212,175,55,0.06);
+    border: 1px solid rgba(212,175,55,0.15);
+    border-radius: 10px;
+    padding: 2px;
+    margin-bottom: 2px;
     color: var(--gold-light);
-    font-size: 13px;
+    font-size: 9px;
     font-weight: 600;
 }
 
@@ -416,63 +392,61 @@ body {
 
 .dedication-from {
     color: white;
-    font-size: 11px;
-    margin-top: 2px;
+    font-size: 8px;
+    margin-top: 1px;
 }
 
 .dedication-heart {
-    font-size: 16px;
+    font-size: 12px;
 }
 
-/* Footer */
+/* FOOTER - TIGHTEST */
 .poster-footer {
-    border-top: 1px solid rgba(212,175,55,0.1);
-    padding-top: 6px;
+    border-top: 1px solid rgba(212,175,55,0.08);
+    padding-top: 2px;
 }
 
 .footer-follow {
     color: var(--gold-primary);
-    font-size: 10px;
+    font-size: 8px;
     font-weight: 700;
-    letter-spacing: 2px;
+    letter-spacing: 1px;
     text-transform: uppercase;
-    margin-bottom: 3px;
-    background: rgba(212,175,55,0.06);
+    margin-bottom: 1px;
+    background: rgba(212,175,55,0.05);
     display: inline-block;
-    padding: 2px 12px;
-    border-radius: 20px;
+    padding: 1px 8px;
+    border-radius: 12px;
 }
 
 .footer-item {
-    margin: 2px 0;
+    margin: 0px;
 }
 
 .footer-label {
     color: #888;
-    font-size: 8px;
+    font-size: 6px;
 }
 
 .footer-value {
     color: var(--gold-light);
-    font-size: 10px;
+    font-size: 8px;
     font-weight: 600;
 }
 
-/* Click Hint */
 .click-hint {
-    margin-top: 8px;
+    margin-top: 4px;
     text-align: center;
-    font-size: 9px;
+    font-size: 7px;
     color: #666;
 }
 
 .click-hint span {
-    background: rgba(212,175,55,0.1);
-    padding: 2px 8px;
-    border-radius: 20px;
+    background: rgba(212,175,55,0.08);
+    padding: 1px 5px;
+    border-radius: 12px;
 }
 
-/* Toast */
 .toast {
     position: fixed;
     bottom: 35px;
@@ -480,13 +454,13 @@ body {
     transform: translateX(-50%) translateY(100px);
     background: var(--gold-primary);
     color: #000;
-    padding: 10px 20px;
+    padding: 8px 16px;
     border-radius: 40px;
     font-weight: 700;
     z-index: 10000;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
     transition: 0.25s ease;
 }
 
@@ -495,8 +469,8 @@ body {
 }
 
 .toast-spinner {
-    width: 14px;
-    height: 14px;
+    width: 12px;
+    height: 12px;
     border: 2px solid #000;
     border-top-color: transparent;
     border-radius: 50%;
@@ -518,16 +492,12 @@ body {
 {% set ghazal_full_url = request.host_url.rstrip('/') + '/ghazal/' + ghazal.id|string %}
 <div class="app-container">
     <div class="two-columns">
-        <!-- LEFT PANEL -->
         <div class="editor-panel">
             <h1 class="brand-title">✨ UCPC Poetry Archive ✨</h1>
-
             <div class="readonly-info">
                 📜 <span>Poet:</span> {{ ghazal.poet_name }}<br>
                 📖 <span>Verses:</span> {{ poster_verses|length }} couplet(s)
             </div>
-
-            <!-- Theme Selection -->
             <div>
                 <label class="form-label">🎨 Poster Theme</label>
                 <select id="themeSelect" class="theme-select">
@@ -537,8 +507,6 @@ body {
                     <option value="nightblue">🌙 Night Blue</option>
                 </select>
             </div>
-
-            <!-- Dedication Fields -->
             <div style="margin-top: 20px;">
                 <label class="form-label">💝 Personalize Your Poster</label>
                 <div class="row-inputs">
@@ -546,45 +514,34 @@ body {
                     <div><input type="text" id="inputTo" class="form-input" placeholder="To (special person)"></div>
                 </div>
             </div>
-
             <div class="action-area">
                 <button id="downloadBtn" class="btn-generate">📱 DOWNLOAD POSTER</button>
-                <div style="margin-top: 8px; color: #777; font-size: 11px; text-align: center;">
-                    1080 × 1920 px • Facebook Reel Size (9:16)
-                </div>
+                <div style="margin-top: 8px; color: #777; font-size: 11px; text-align: center;">1080 × 1920 px • Facebook Reel Size</div>
             </div>
-
             <div class="reel-help">
                 <h4>🎬 Make a Viral Reel</h4>
                 <p>Download poster → Import to CapCut → Add keyframe zoom & soft music</p>
                 <a href="https://play.google.com/store/apps/details?id=com.lemon.lvoverseas" target="_blank">Open CapCut →</a>
             </div>
-
             <div class="back-link">
                 <a href="/poets/{{ ghazal.poet_id }}">← Back to Poet</a>
             </div>
         </div>
 
-        <!-- RIGHT PANEL - CLICKABLE POSTER PREVIEW -->
         <div class="preview-panel">
             <div class="preview-wrapper" id="previewWrapper">
                 <a href="{{ ghazal_full_url }}" target="_blank" style="text-decoration: none; display: block;">
                     <div id="poster-container" class="theme-classic">
-                        <!-- Borders -->
                         <div class="border-frame"></div>
                         <div class="corner-deco cd-tl"></div>
                         <div class="corner-deco cd-tr"></div>
                         <div class="corner-deco cd-bl"></div>
                         <div class="corner-deco cd-br"></div>
-
                         <div class="poster-content">
-                            <!-- HEADER -->
                             <div>
                                 <div class="poster-logo">UCPC POETRY ARCHIVE</div>
                                 <div class="poster-tagline">📖 FOLLOW DAILY UPDATES 📖</div>
                             </div>
-
-                            <!-- POET & VERSES -->
                             <div>
                                 <div class="poster-poet">{{ ghazal.poet_name }}</div>
                                 <div class="poster-verses">
@@ -596,18 +553,14 @@ body {
                                     {% endfor %}
                                 </div>
                             </div>
-
-                            <!-- FOOTER WITH GHAZAL LINK -->
                             <div>
                                 <div id="dedicationBox" class="poster-dedication hidden"></div>
-
                                 <div class="ghazal-link-box">
                                     <div class="ghazal-link-icon">📜</div>
                                     <div class="ghazal-link-label">READ FULL GHAZAL</div>
                                     <div class="ghazal-link-url">{{ ghazal_full_url }}</div>
                                     <div class="ghazal-link-id">GHAZAL ID: #{{ ghazal.id }}</div>
                                 </div>
-
                                 <div class="poster-footer">
                                     <div class="footer-follow">🔔 FOLLOW FOR MORE 🔔</div>
                                     <div class="footer-item">
@@ -619,15 +572,12 @@ body {
                         </div>
                     </div>
                 </a>
-                <div class="click-hint">
-                    <span>🔗 Click anywhere on the poster to read full ghazal →</span>
-                </div>
+                <div class="click-hint"><span>🔗 Click anywhere on the poster to read full ghazal →</span></div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- TOAST -->
 <div id="toast" class="toast">
     <div id="toastSpinner" class="toast-spinner"></div>
     <span id="toastMessage">Generating...</span>
