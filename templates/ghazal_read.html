@@ -1,0 +1,195 @@
+{% extends "base.html" %}
+
+{% block title %}{{ ghazal.poet_name }} - Full Ghazal | UCPC Poetry Archive{% endblock %}
+
+{% block extra_head %}
+<meta property="og:title" content="{{ ghazal.poet_name }} - Full Ghazal" />
+<meta property="og:description" content="Complete Urdu ghazal by {{ ghazal.poet_name }}. Digitally preserved at UCPC Poetry Archive." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="{{ request.url }}" />
+<meta property="og:site_name" content="UCPC Poetry Archive" />
+<meta property="og:image" content="{{ request.host_url.rstrip('/') }}/static/og-image.jpg" />
+<meta name="twitter:card" content="summary_large_image" />
+
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Montserrat:wght@300;400;500;600;700&family=Noto+Nastaliq+Urdu:wght@400;500;600;700&display=swap" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        background: #050505;
+        background-image: radial-gradient(circle at top, #171717 0%, #050505 100%);
+        color: #ffffff;
+        font-family: 'Montserrat', sans-serif;
+        min-height: 100vh;
+    }
+
+    .reader-container {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 60px 30px;
+    }
+
+    /* Header Section */
+    .reader-header {
+        text-align: center;
+        margin-bottom: 60px;
+        padding-bottom: 30px;
+        border-bottom: 2px solid rgba(212, 175, 55, 0.3);
+    }
+
+    .reader-logo {
+        font-family: 'Cinzel', serif;
+        font-size: 32px;
+        font-weight: 800;
+        color: #D4AF37;
+        letter-spacing: 4px;
+        margin-bottom: 20px;
+    }
+
+    .reader-poet {
+        font-family: 'Cinzel', serif;
+        font-size: 48px;
+        font-weight: 700;
+        color: #F6D878;
+        margin: 20px 0 10px 0;
+    }
+
+    .reader-title {
+        font-size: 16px;
+        color: #aaa;
+        letter-spacing: 2px;
+    }
+
+    /* Poetry Section */
+    .sher {
+        text-align: right;
+        direction: rtl;
+        margin-bottom: 50px;
+        background: rgba(255, 255, 255, 0.03);
+        padding: 30px;
+        border-radius: 20px;
+        border-right: 4px solid #D4AF37;
+        transition: 0.2s ease;
+    }
+
+    .sher:hover {
+        background: rgba(255, 255, 255, 0.05);
+        border-right-color: #F6D878;
+    }
+
+    .misra {
+        font-family: 'Noto Nastaliq Urdu', 'Jameel Noori Nastaleeq', 'Alvi Nastaleeq', serif;
+        font-size: 32px;
+        line-height: 2.2;
+        color: #ffffff;
+        margin: 10px 0;
+    }
+
+    .misra-gold {
+        font-family: 'Noto Nastaliq Urdu', 'Jameel Noori Nastaleeq', 'Alvi Nastaleeq', serif;
+        font-size: 32px;
+        line-height: 2.2;
+        color: #F6D878;
+        margin: 10px 0;
+    }
+
+    .couplet-number {
+        font-size: 12px;
+        color: #D4AF37;
+        text-align: left;
+        margin-bottom: 15px;
+        letter-spacing: 2px;
+    }
+
+    /* Footer */
+    .reader-footer {
+        text-align: center;
+        margin-top: 60px;
+        padding-top: 30px;
+        border-top: 1px solid rgba(212, 175, 55, 0.2);
+    }
+
+    .reader-footer p {
+        color: #888;
+        font-size: 13px;
+        margin: 8px 0;
+        letter-spacing: 1px;
+    }
+
+    .reader-footer a {
+        color: #D4AF37;
+        text-decoration: none;
+    }
+
+    .reader-footer a:hover {
+        color: #F6D878;
+    }
+
+    /* Back Button */
+    .back-button {
+        display: inline-block;
+        margin-top: 20px;
+        padding: 10px 25px;
+        background: rgba(212, 175, 55, 0.1);
+        border: 1px solid rgba(212, 175, 55, 0.3);
+        border-radius: 50px;
+        color: #D4AF37;
+        text-decoration: none;
+        font-size: 13px;
+        letter-spacing: 2px;
+        transition: 0.2s;
+    }
+
+    .back-button:hover {
+        background: rgba(212, 175, 55, 0.2);
+        border-color: #D4AF37;
+    }
+
+    @media (max-width: 768px) {
+        .reader-container {
+            padding: 40px 20px;
+        }
+        .reader-poet {
+            font-size: 32px;
+        }
+        .misra, .misra-gold {
+            font-size: 24px;
+            line-height: 1.9;
+        }
+        .sher {
+            padding: 20px;
+        }
+    }
+</style>
+
+<div class="reader-container">
+    <div class="reader-header">
+        <div class="reader-logo">UCPC POETRY ARCHIVE</div>
+        <div class="reader-poet">{{ ghazal.poet_name }}</div>
+        {% if ghazal.title %}
+        <div class="reader-title">{{ ghazal.title }}</div>
+        {% endif %}
+    </div>
+
+    {% for verse in all_verses %}
+    <div class="sher">
+        <div class="couplet-number">{{ loop.index }}.</div>
+        <div class="misra">{{ verse.misra1_urdu|safe }}</div>
+        <div class="misra-gold">{{ verse.misra2_urdu|safe }}</div>
+    </div>
+    {% endfor %}
+
+    <div class="reader-footer">
+        <p>📜 Digitally Preserved Urdu Poetry | UCPC Archive</p>
+        <p>🔗 Share this ghazal: <a href="{{ request.url }}">{{ request.url }}</a></p>
+        <a href="/" class="back-button">← BACK TO ARCHIVE</a>
+    </div>
+</div>
+{% endblock %}
