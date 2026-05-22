@@ -60,7 +60,7 @@ body {
     flex: 1;
     min-width: 320px;
     max-width: 500px;
-    background: var(--glass-bg);
+    background: rgba(20,20,25,0.85);
     border: 1px solid rgba(212,175,55,.14);
     border-radius: 22px;
     padding: 35px;
@@ -215,12 +215,18 @@ body {
 }
 
 /* ==================== POSTER CONTAINER ==================== */
+.preview-panel {
+    overflow: auto;
+    width: 100%;
+}
+
 .preview-wrapper {
     transform-origin: top center;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    position: relative;
 }
 
 #poster-container {
@@ -231,6 +237,19 @@ body {
     color: #fff;
     box-shadow: 0 0 60px rgba(0,0,0,.9);
     border-radius: 8px;
+}
+
+/* FIXED: Overlay link instead of wrapping anchor */
+.poster-overlay-link {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 20;
+    cursor: pointer;
+    text-decoration: none;
+    display: block;
 }
 
 /* Borders */
@@ -272,7 +291,7 @@ body {
 .cd-bl { bottom: 26px; left: 26px; border-width: 0 0 4px 4px; }
 .cd-br { bottom: 26px; right: 26px; border-width: 0 4px 4px 0; }
 
-/* Poster Content - FIXED BOUNDARIES */
+/* Poster Content */
 .poster-content {
     position: relative;
     z-index: 5;
@@ -324,7 +343,7 @@ body {
     padding-bottom: 10px;
 }
 
-/* Verses Section - SCROLLABLE IF NEEDED */
+/* FIXED: Removed overflow-y: auto and max-height - CRITICAL FIX */
 .poster-verses {
     flex: 1;
     display: flex;
@@ -332,8 +351,6 @@ body {
     justify-content: center;
     gap: 38px;
     padding: 5px 10px;
-    overflow-y: auto;
-    max-height: 580px;
 }
 
 .poster-sher {
@@ -342,10 +359,11 @@ body {
     text-align: center;
 }
 
+/* FIXED: Better line-height for Nastaliq (1.9 instead of 1.65) */
 .sher-misra1 {
     display: block;
     font-size: 48px;
-    line-height: 1.65;
+    line-height: 1.9;
     color: #ffffff;
     padding: 8px 12px;
     margin-bottom: 12px;
@@ -355,7 +373,7 @@ body {
 .sher-misra2 {
     display: block;
     font-size: 48px;
-    line-height: 1.65;
+    line-height: 1.9;
     color: var(--gold-light);
     padding: 8px 20px;
     border-right: 4px solid var(--gold-primary);
@@ -427,7 +445,7 @@ body {
     font-size: 24px;
 }
 
-/* Footer */
+/* Footer - FIXED: Recoverable attribution */
 .poster-footer {
     border-top: 1px solid rgba(212,175,55,0.2);
     padding-top: 15px;
@@ -459,6 +477,16 @@ body {
     color: var(--gold-light);
     font-size: 13px;
     font-weight: 600;
+}
+
+/* NEW: Corpus authenticity text - Anti-content-theft */
+.corpus-authenticity {
+    margin-top: 10px;
+    font-size: 9px;
+    letter-spacing: 1px;
+    color: rgba(212,175,55,0.5);
+    text-transform: uppercase;
+    font-weight: 400;
 }
 
 /* Click Hint */
@@ -518,6 +546,7 @@ body {
 {% endblock %}
 
 {% block content %}
+{% set ghazal_full_url = request.host_url.rstrip('/') + '/ghazal/' + ghazal.id|string %}
 <div class="app-container">
     <div class="two-columns">
         <!-- LEFT PANEL -->
@@ -529,7 +558,7 @@ body {
                 📖 <span>Verses:</span> {{ poster_verses|length }} couplet(s)
             </div>
 
-            <!-- Theme Selection - NEW FEATURE -->
+            <!-- Theme Selection -->
             <div>
                 <label class="form-label">🎨 Poster Theme</label>
                 <select id="themeSelect" class="theme-select">
@@ -570,57 +599,62 @@ body {
         <!-- RIGHT PANEL - CLICKABLE POSTER PREVIEW -->
         <div class="preview-panel">
             <div class="preview-wrapper" id="previewWrapper">
-                <a href="/ghazal/{{ ghazal.id }}" target="_blank" style="text-decoration: none; display: block;">
-                    <div id="poster-container" class="theme-classic">
-                        <!-- Borders -->
-                        <div class="border-frame"></div>
-                        <div class="corner-deco cd-tl"></div>
-                        <div class="corner-deco cd-tr"></div>
-                        <div class="corner-deco cd-bl"></div>
-                        <div class="corner-deco cd-br"></div>
+                <div id="poster-container" class="theme-classic">
+                    <!-- FIXED: Overlay link instead of wrapper anchor -->
+                    <a href="{{ ghazal_full_url }}" target="_blank" class="poster-overlay-link" aria-label="Read Full Ghazal"></a>
+                    
+                    <!-- Borders -->
+                    <div class="border-frame"></div>
+                    <div class="corner-deco cd-tl"></div>
+                    <div class="corner-deco cd-tr"></div>
+                    <div class="corner-deco cd-bl"></div>
+                    <div class="corner-deco cd-br"></div>
 
-                        <div class="poster-content">
-                            <!-- HEADER -->
-                            <div>
-                                <div class="poster-logo">UCPC POETRY ARCHIVE</div>
-                                <div class="poster-tagline">📖 FOLLOW DAILY UPDATES 📖</div>
+                    <div class="poster-content">
+                        <!-- HEADER -->
+                        <div>
+                            <div class="poster-logo">UCPC POETRY ARCHIVE</div>
+                            <div class="poster-tagline">📖 FOLLOW DAILY UPDATES 📖</div>
+                        </div>
+
+                        <!-- POET & VERSES -->
+                        <div>
+                            <div class="poster-poet">{{ ghazal.poet_name }}</div>
+                            <div class="poster-verses">
+                                {% for verse in poster_verses[:2] %}
+                                <div class="poster-sher" dir="rtl">
+                                    <span class="sher-misra1">{{ verse.misra1_urdu|safe }}</span>
+                                    <span class="sher-misra2">{{ verse.misra2_urdu|safe }}</span>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <!-- FOOTER WITH GHAZAL LINK -->
+                        <div>
+                            <div id="dedicationBox" class="poster-dedication hidden"></div>
+
+                            <div class="ghazal-link-box">
+                                <div class="ghazal-link-icon">📜</div>
+                                <div class="ghazal-link-label">READ FULL GHAZAL</div>
+                                <div class="ghazal-link-url">{{ ghazal_full_url }}</div>
+                                <div class="ghazal-link-id">GHAZAL ID: #{{ ghazal.id }}</div>
                             </div>
 
-                            <!-- POET & VERSES -->
-                            <div>
-                                <div class="poster-poet">{{ ghazal.poet_name }}</div>
-                                <div class="poster-verses">
-                                    {% for verse in poster_verses[:2] %}
-                                    <div class="poster-sher" dir="rtl">
-                                        <span class="sher-misra1">{{ verse.misra1_urdu|safe }}</span>
-                                        <span class="sher-misra2">{{ verse.misra2_urdu|safe }}</span>
-                                    </div>
-                                    {% endfor %}
+                            <div class="poster-footer">
+                                <div class="footer-follow">🔔 FOLLOW FOR MORE 🔔</div>
+                                <div class="footer-item">
+                                    <span class="footer-label">Facebook :</span>
+                                    <span class="footer-value">facebook.com/UCPCPoetryArchive</span>
                                 </div>
-                            </div>
-
-                            <!-- FOOTER WITH GHAZAL LINK -->
-                            <div>
-                                <div id="dedicationBox" class="poster-dedication hidden"></div>
-
-                                <div class="ghazal-link-box">
-                                    <div class="ghazal-link-icon">📜</div>
-                                    <div class="ghazal-link-label">READ FULL GHAZAL</div>
-                                    <div class="ghazal-link-url">{{ request.host_url.rstrip('/') }}/ghazal/{{ ghazal.id }}</div>
-                                    <div class="ghazal-link-id">GHAZAL ID: #{{ ghazal.id }}</div>
-                                </div>
-
-                                <div class="poster-footer">
-                                    <div class="footer-follow">🔔 FOLLOW FOR MORE 🔔</div>
-                                    <div class="footer-item">
-                                        <span class="footer-label">Facebook :</span>
-                                        <span class="footer-value">@UCPCPoetryArchive</span>
-                                    </div>
+                                <!-- NEW: Corpus authenticity text - Anti-content-theft -->
+                                <div class="corpus-authenticity">
+                                    📜 Digitally Preserved Urdu Poetry | UCPC Archive
                                 </div>
                             </div>
                         </div>
                     </div>
-                </a>
+                </div>
                 <div class="click-hint">
                     <span>🔗 Click anywhere on the poster to read full ghazal →</span>
                 </div>
@@ -663,11 +697,9 @@ body {
     // Change theme
     function changeTheme() {
         const selectedTheme = themeSelect.value;
-        // Remove all theme classes
         Object.values(themes).forEach(themeClass => {
             posterContainer.classList.remove(themeClass);
         });
-        // Add selected theme class
         posterContainer.classList.add(themes[selectedTheme]);
     }
 
@@ -704,7 +736,7 @@ body {
     inputTo.addEventListener('input', updateDedication);
     updateDedication();
 
-    // Scale preview - FIXED BOUNDARIES
+    // Scale preview
     function scalePreview() {
         const wrapper = document.getElementById('previewWrapper');
         if (!wrapper || !posterContainer) return;
@@ -759,26 +791,32 @@ body {
         
         showToast('🎨 Generating your poster...', true);
         
+        // Store original styles
         const originalTransform = posterContainer.style.transform;
+        const originalOverflow = posterContainer.style.overflow;
+        
+        // Temporarily remove scaling
         posterContainer.style.transform = 'none';
+        posterContainer.style.overflow = 'visible';
         
         try {
-            await new Promise(function(r) { setTimeout(r, 100); });
+            await new Promise(function(r) { setTimeout(r, 150); });
             
             const canvas = await html2canvas(posterContainer, {
                 scale: 2.5,
                 backgroundColor: null,
                 useCORS: true,
                 logging: false,
+                allowTaint: false,
                 windowWidth: 1080,
                 windowHeight: 1580
             });
             
             const imageData = canvas.toDataURL('image/jpeg', 0.95);
-            
             const link = document.createElement('a');
             const timestamp = Date.now();
-            link.download = `UCPC_Poetry_Poster_${timestamp}.jpg`;
+            const poetName = "{{ ghazal.poet_name|replace(' ', '_') }}";
+            link.download = `UCPC_${poetName}_Poster_${timestamp}.jpg`;
             link.href = imageData;
             link.click();
             
@@ -789,6 +827,7 @@ body {
             showToast('❌ Failed. Try refreshing the page.', false);
         } finally {
             posterContainer.style.transform = originalTransform;
+            posterContainer.style.overflow = originalOverflow;
             hideToast();
         }
     });
