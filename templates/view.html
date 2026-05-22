@@ -195,17 +195,22 @@ body {
     color: var(--gold-primary);
 }
 
+/* ====================
+   POSTER PREVIEW
+   ==================== */
+
 .preview-wrapper {
     transform-origin: top center;
     display: flex;
     justify-content: center;
+    overflow: visible;
 }
 
 #poster-container {
     width: 1080px;
-    height: 1350px;
+    height: 1580px;  /* INCREASED from 1350px to 1580px - FIXES CUTOFF */
     position: relative;
-    overflow: hidden;
+    overflow: visible;
     background: #000;
     background-image: radial-gradient(circle at top, rgba(255,215,0,.08), transparent 40%),
                       linear-gradient(180deg, #0a0a0a 0%, #000000 100%);
@@ -256,12 +261,12 @@ body {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    padding: 105px 80px 60px;
+    padding: 80px 60px 50px;  /* ADJUSTED PADDING */
     text-align: center;
 }
 
 .poster-header {
-    margin-bottom: 8px;
+    margin-bottom: 5px;
 }
 
 .poster-logo {
@@ -291,15 +296,15 @@ body {
 
 .poster-poet {
     margin-top: 22px;
-    margin-bottom: 42px;
+    margin-bottom: 35px;  /* REDUCED from 42px */
     font-family: 'Cinzel', serif;
-    font-size: 62px;
+    font-size: 58px;  /* SLIGHTLY SMALLER */
     font-weight: 700;
     color: #f8f8f8;
     text-shadow: 0 4px 15px rgba(0,0,0,.85);
     border-bottom: 2px solid rgba(212,175,55,.28);
     display: inline-block;
-    padding-bottom: 14px;
+    padding-bottom: 12px;
 }
 
 .poster-verses {
@@ -307,43 +312,51 @@ body {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    padding: 15px 10px;
+    padding: 10px 10px;
+    max-height: 620px;
+    overflow-y: auto;
 }
 
 .poster-sher {
-    font-family: 'Noto Nastaliq Urdu', serif;
+    font-family: 'Noto Nastaliq Urdu', 'Jameel Noori Nastaleeq', 'Urdu Typesetting', serif;
     direction: rtl;
-    font-size: 58px;
-    margin-bottom: 55px;
+    font-size: 54px;
+    margin-bottom: 40px;  /* REDUCED from 55px */
     text-align: center;
-    text-shadow: 0 3px 12px rgba(0,0,0,.92);
+    font-weight: 500;
+    letter-spacing: 0.5px;
 }
 
 .sher-misra1 {
     display: block;
-    line-height: 1.8;
-    margin-bottom: 20px;
-    padding: 10px 20px;
+    line-height: 1.7;
+    margin-bottom: 18px;
+    padding: 8px 20px;
     border-bottom: 2px dotted rgba(212,175,55,0.35);
     color: #ffffff;
+    word-wrap: break-word;
+    white-space: normal;
 }
 
 .sher-misra2 {
     display: block;
-    line-height: 1.8;
-    padding: 10px 20px;
-    color: #F6D878;
+    line-height: 1.7;
+    padding: 8px 20px;
+    color: #FFD700;
     border-right: 4px solid #D4AF37;
     margin-right: 15px;
-    background: linear-gradient(90deg, rgba(212,175,55,0.08), transparent);
+    background: linear-gradient(90deg, rgba(212,175,55,0.06), transparent);
+    word-wrap: break-word;
+    white-space: normal;
 }
 
+/* GHAZAL LINK BOX - PROMINENT */
 .ghazal-link-box {
     background: linear-gradient(135deg, rgba(212,175,55,0.18), rgba(212,175,55,0.06));
     border: 2px solid #D4AF37;
     border-radius: 24px;
-    padding: 20px 20px;
-    margin: 15px 0 25px 0;
+    padding: 15px 20px;
+    margin: 10px 0 20px 0;
     text-align: center;
     backdrop-filter: blur(5px);
     box-shadow: 0 5px 25px rgba(212,175,55,0.2);
@@ -360,16 +373,16 @@ body {
     letter-spacing: 3px;
     font-weight: 800;
     text-transform: uppercase;
-    margin-bottom: 12px;
+    margin-bottom: 10px;
 }
 
 .ghazal-link-url {
     color: #F6D878;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 600;
     word-break: break-all;
     background: rgba(0,0,0,0.6);
-    padding: 12px;
+    padding: 10px;
     border-radius: 14px;
     font-family: monospace;
     letter-spacing: 0.5px;
@@ -377,8 +390,8 @@ body {
 
 .ghazal-link-id {
     color: #aaa;
-    font-size: 12px;
-    margin-top: 12px;
+    font-size: 11px;
+    margin-top: 10px;
     letter-spacing: 1px;
 }
 
@@ -388,11 +401,11 @@ body {
     background: rgba(212,175,55,.08);
     border: 1px solid rgba(212,175,55,.2);
     border-radius: 22px;
-    padding: 18px;
+    padding: 15px;
     color: var(--gold-light);
-    font-size: 22px;
+    font-size: 20px;
     font-weight: 700;
-    line-height: 1.8;
+    line-height: 1.6;
 }
 
 .poster-dedication.hidden {
@@ -401,18 +414,18 @@ body {
 
 .dedication-from {
     color: #fff;
-    font-size: 19px;
-    margin-top: 6px;
+    font-size: 18px;
+    margin-top: 5px;
 }
 
 .dedication-heart {
-    font-size: 30px;
+    font-size: 28px;
     line-height: 1;
 }
 
 .poster-footer {
     border-top: 1px solid rgba(212,175,55,0.25);
-    padding-top: 20px;
+    padding-top: 18px;
     margin-top: 5px;
 }
 
@@ -422,30 +435,31 @@ body {
     font-weight: 800;
     letter-spacing: 3px;
     text-transform: uppercase;
-    margin-bottom: 12px;
+    margin-bottom: 10px;
     background: rgba(212,175,55,0.1);
     display: inline-block;
-    padding: 6px 18px;
+    padding: 5px 18px;
     border-radius: 40px;
 }
 
 .footer-item {
-    margin-bottom: 8px;
-    line-height: 1.5;
+    margin-bottom: 6px;
+    line-height: 1.4;
 }
 
 .footer-label {
     color: #8b8b8b;
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 600;
 }
 
 .footer-value {
     color: #F6D878;
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 600;
 }
 
+/* TOAST MESSAGE */
 .toast {
     position: fixed;
     bottom: 35px;
@@ -480,6 +494,7 @@ body {
     100% { transform: rotate(360deg); }
 }
 
+/* MOBILE RESPONSIVE */
 @media (max-width: 768px) {
     .app-container { padding: 20px 10px; }
     .editor-panel { padding: 25px; }
@@ -514,7 +529,7 @@ body {
 
             <div class="action-area">
                 <button class="btn-generate" id="downloadBtn">📱 Download Poster</button>
-                <div style="margin-top:10px;color:#777;font-size:.78rem;">High Quality Reel Poster — 1080 × 1350</div>
+                <div style="margin-top:10px;color:#777;font-size:.78rem;">High Quality Reel Poster — 1080 × 1580</div>
             </div>
 
             <div class="reel-help">
@@ -532,6 +547,7 @@ body {
         <section class="preview-panel">
             <div class="preview-wrapper" id="previewWrapper">
                 <div id="poster-container">
+                    <!-- DECORATIVE FRAME -->
                     <div class="border-frame"></div>
                     <div class="corner-deco cd-tl"></div>
                     <div class="corner-deco cd-tr"></div>
@@ -545,7 +561,7 @@ body {
                             <div class="poster-tagline">📖 FOLLOW DAILY UPDATES 📖</div>
                         </div>
 
-                        <!-- POET & VERSES -->
+                        <!-- POET NAME & VERSES -->
                         <div>
                             <div class="poster-poet">{{ ghazal.poet_name }}</div>
                             <div class="poster-verses">
@@ -558,11 +574,12 @@ body {
                             </div>
                         </div>
 
-                        <!-- FOOTER WITH GHAZAL LINK -->
+                        <!-- FOOTER WITH GHAZAL LINK (NOW FULLY VISIBLE) -->
                         <div>
+                            <!-- DEDICATION (shows only when user adds names) -->
                             <div class="poster-dedication hidden" id="displayDedication"></div>
 
-                            <!-- FULL GHAZAL LINK BOX -->
+                            <!-- FULL GHAZAL LINK BOX - PROMINENTLY DISPLAYED -->
                             <div class="ghazal-link-box">
                                 <div class="ghazal-link-icon">📜</div>
                                 <div class="ghazal-link-label">READ FULL GHAZAL</div>
@@ -570,6 +587,7 @@ body {
                                 <div class="ghazal-link-id">GHAZAL ID: #{{ ghazal.id }}</div>
                             </div>
 
+                            <!-- FOLLOW SECTION -->
                             <div class="poster-footer">
                                 <div class="footer-follow">🔔 FOLLOW FOR MORE 🔔</div>
                                 <div class="footer-item">
@@ -585,7 +603,7 @@ body {
     </div>
 </div>
 
-<!-- TOAST -->
+<!-- TOAST NOTIFICATION -->
 <div id="toast" class="toast">
     <div class="toast-spinner" id="toastSpinner"></div>
     <span id="toastMessage">Generating...</span>
@@ -594,6 +612,7 @@ body {
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
 <script>
+// DOM Elements
 const inputTo = document.getElementById('inputTo');
 const inputFrom = document.getElementById('inputFrom');
 const displayDedication = document.getElementById('displayDedication');
@@ -603,6 +622,7 @@ const toast = document.getElementById('toast');
 const toastMsg = document.getElementById('toastMessage');
 const toastSpinner = document.getElementById('toastSpinner');
 
+// Helper: Escape HTML
 function escapeHtml(str) {
     if (!str) return '';
     return str.replace(/[&<>]/g, function(m) {
@@ -610,6 +630,7 @@ function escapeHtml(str) {
     });
 }
 
+// Update dedication section based on user input
 function updateDedication() {
     const to = inputTo.value.trim();
     const from = inputFrom.value.trim();
@@ -626,24 +647,28 @@ function updateDedication() {
     }
 }
 
+// Event listeners for dedication
 inputTo.addEventListener('input', updateDedication);
 inputFrom.addEventListener('input', updateDedication);
 updateDedication();
 
+// Scale preview to fit screen (UPDATED for 1580px height)
 function scalePreview() {
     const panel = document.querySelector('.preview-panel');
     if (!panel) return;
     const w = panel.clientWidth - 40;
-    const original = 1080;
-    let scale = w / original;
+    const originalWidth = 1080;
+    const originalHeight = 1580;
+    let scale = w / originalWidth;
     if (scale > 1) scale = 1;
     posterContainer.style.transform = `scale(${scale})`;
-    document.getElementById('previewWrapper').style.height = `${1350 * scale}px`;
+    document.getElementById('previewWrapper').style.height = `${originalHeight * scale}px`;
 }
 
 window.addEventListener('resize', scalePreview);
 scalePreview();
 
+// Toast notification functions
 function showToast(msg, loading = true) {
     toastMsg.textContent = msg;
     toastSpinner.style.display = loading ? 'block' : 'none';
@@ -654,6 +679,7 @@ function hideToast() {
     setTimeout(() => toast.classList.remove('show'), 2500);
 }
 
+// Download poster as image
 downloadBtn.addEventListener('click', async () => {
     showToast("Generating Premium Poster...", true);
     const prevTransform = posterContainer.style.transform;
@@ -665,17 +691,18 @@ downloadBtn.addEventListener('click', async () => {
             scale: 2,
             useCORS: true,
             backgroundColor: '#000',
-            logging: false
+            logging: false,
+            allowTaint: false
         });
-        const dataUrl = canvas.toDataURL('image/jpeg', 0.98);
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.95);
         const link = document.createElement('a');
         link.download = `UCPC_Poster_${Date.now()}.jpg`;
         link.href = dataUrl;
         link.click();
-        showToast("Poster Downloaded Successfully!", false);
+        showToast("✅ Poster Downloaded Successfully!", false);
     } catch (err) {
         console.error(err);
-        showToast("Download Failed", false);
+        showToast("❌ Download Failed. Please try again.", false);
     } finally {
         posterContainer.style.transform = prevTransform;
         hideToast();
