@@ -55,37 +55,35 @@ body {
     align-items: flex-start;
 }
 
-/* ==================== LEFT PANEL ==================== */
 .editor-panel {
     flex: 1;
     min-width: 320px;
     max-width: 500px;
     background: rgba(20,20,25,0.85);
-    border: 1px solid rgba(212,175,55,.14);
-    border-radius: 22px;
+    border: 1px solid rgba(212,175,55,0.2);
+    border-radius: 24px;
     padding: 35px;
     backdrop-filter: blur(14px);
-    box-shadow: 0 10px 35px rgba(0,0,0,.65);
 }
 
 .brand-title {
     text-align: center;
     color: var(--gold-primary);
     font-family: 'Cinzel', serif;
-    letter-spacing: 2px;
+    font-size: 24px;
     margin-bottom: 28px;
     padding-bottom: 14px;
-    border-bottom: 1px solid rgba(212,175,55,.15);
+    border-bottom: 1px solid rgba(212,175,55,0.2);
 }
 
 .readonly-info {
-    background: rgba(255,255,255,.03);
+    background: rgba(255,255,255,0.03);
     border-left: 4px solid var(--gold-primary);
     padding: 16px;
-    border-radius: 8px;
+    border-radius: 12px;
     margin-bottom: 25px;
     color: #ddd;
-    line-height: 1.7;
+    line-height: 1.8;
 }
 
 .readonly-info span {
@@ -117,8 +115,8 @@ body {
     width: 100%;
     padding: 14px;
     border-radius: 12px;
-    background: rgba(0,0,0,.35);
-    border: 1px solid #333;
+    background: rgba(0,0,0,0.5);
+    border: 1px solid #444;
     color: #fff;
     font-size: 14px;
     font-family: 'Montserrat', sans-serif;
@@ -143,14 +141,14 @@ body {
     border: none;
     cursor: pointer;
     padding: 16px 24px;
-    border-radius: 50px;
-    background: linear-gradient(135deg, var(--gold-dim), var(--gold-primary));
+    border-radius: 60px;
+    background: linear-gradient(135deg, #8a7020, #D4AF37);
     color: #000;
     font-size: 16px;
     font-weight: 800;
     letter-spacing: 1px;
     text-transform: uppercase;
-    transition: .2s ease;
+    transition: 0.2s;
     margin-bottom: 10px;
 }
 
@@ -160,9 +158,9 @@ body {
 
 .reel-help {
     margin-top: 25px;
-    background: rgba(212,175,55,.03);
-    border: 1px solid rgba(212,175,55,.10);
-    border-radius: 14px;
+    background: rgba(212,175,55,0.05);
+    border: 1px solid rgba(212,175,55,0.12);
+    border-radius: 16px;
     padding: 18px;
     text-align: center;
 }
@@ -214,42 +212,24 @@ body {
     background-image: radial-gradient(circle at top, rgba(100,100,255,0.1), transparent 50%);
 }
 
-/* ==================== POSTER CONTAINER ==================== */
-.preview-panel {
-    overflow: auto;
-    width: 100%;
-}
-
+/* ==================== POSTER CONTAINER - FACEBOOK REEL SIZE ==================== */
 .preview-wrapper {
     transform-origin: top center;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    position: relative;
 }
 
+/* FIXED: Facebook Reel size 1080x1920 (9:16 aspect ratio) */
 #poster-container {
     width: 1080px;
-    height: 1580px;
+    height: 1920px;
     position: relative;
-    overflow: visible;
+    overflow: hidden;
     color: #fff;
     box-shadow: 0 0 60px rgba(0,0,0,.9);
-    border-radius: 8px;
-}
-
-/* FIXED: Overlay link instead of wrapping anchor */
-.poster-overlay-link {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 20;
-    cursor: pointer;
-    text-decoration: none;
-    display: block;
+    border-radius: 0px;
 }
 
 /* Borders */
@@ -259,7 +239,7 @@ body {
     left: 28px;
     right: 28px;
     bottom: 28px;
-    border: 2px solid rgba(212,175,55,.55);
+    border: 2px solid rgba(212,175,55,0.5);
     border-radius: 24px;
     z-index: 10;
     pointer-events: none;
@@ -272,7 +252,7 @@ body {
     left: 6px;
     right: 6px;
     bottom: 6px;
-    border: 1px solid rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.08);
     border-radius: 18px;
 }
 
@@ -291,7 +271,7 @@ body {
 .cd-bl { bottom: 26px; left: 26px; border-width: 0 0 4px 4px; }
 .cd-br { bottom: 26px; right: 26px; border-width: 0 4px 4px 0; }
 
-/* Poster Content */
+/* Poster Content - Adjusted for 1920 height */
 .poster-content {
     position: relative;
     z-index: 5;
@@ -299,7 +279,7 @@ body {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    padding: 75px 60px 50px;
+    padding: 100px 70px 80px;
     text-align: center;
 }
 
@@ -310,15 +290,15 @@ body {
 
 .poster-logo {
     font-family: 'Cinzel', serif;
-    font-size: 42px;
+    font-size: 48px;
     font-weight: 800;
     color: var(--gold-primary);
-    letter-spacing: 3px;
+    letter-spacing: 4px;
     text-shadow: 0 2px 10px rgba(0,0,0,0.6);
 }
 
 .poster-tagline {
-    margin-top: 10px;
+    margin-top: 12px;
     font-size: 18px;
     letter-spacing: 3px;
     font-weight: 800;
@@ -326,96 +306,95 @@ body {
     text-transform: uppercase;
     background: rgba(212,175,55,0.12);
     display: inline-block;
-    padding: 5px 18px;
+    padding: 6px 20px;
     border-radius: 40px;
 }
 
 /* Poet Name */
 .poster-poet {
-    margin: 18px 0 28px 0;
+    margin: 25px 0 35px 0;
     font-family: 'Cinzel', serif;
-    font-size: 52px;
+    font-size: 58px;
     font-weight: 700;
     color: white;
     text-shadow: 0 3px 12px rgba(0,0,0,0.5);
     border-bottom: 2px solid rgba(212,175,55,0.3);
     display: inline-block;
-    padding-bottom: 10px;
+    padding-bottom: 12px;
 }
 
-/* FIXED: Removed overflow-y: auto and max-height - CRITICAL FIX */
+/* Verses Section */
 .poster-verses {
     flex: 1;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    gap: 38px;
-    padding: 5px 10px;
+    gap: 45px;
+    padding: 10px 15px;
 }
 
 .poster-sher {
-    font-family: 'Noto Nastaliq Urdu', 'Jameel Noori Nastaleeq', 'Urdu Typesetting', serif;
+    font-family: 'Noto Nastaliq Urdu', 'Jameel Noori Nastaleeq', 'Alvi Nastaleeq', 'Urdu Typesetting', serif;
     direction: rtl;
     text-align: center;
 }
 
-/* FIXED: Better line-height for Nastaliq (1.9 instead of 1.65) */
 .sher-misra1 {
     display: block;
-    font-size: 48px;
-    line-height: 1.9;
+    font-size: 52px;
+    line-height: 1.8;
     color: #ffffff;
     padding: 8px 12px;
-    margin-bottom: 12px;
+    margin-bottom: 15px;
     border-bottom: 1px dashed rgba(212,175,55,0.35);
 }
 
 .sher-misra2 {
     display: block;
-    font-size: 48px;
-    line-height: 1.9;
+    font-size: 52px;
+    line-height: 1.8;
     color: var(--gold-light);
     padding: 8px 20px;
     border-right: 4px solid var(--gold-primary);
-    margin-right: 18px;
+    margin-right: 20px;
 }
 
 /* Ghazal Link Box */
 .ghazal-link-box {
     background: linear-gradient(135deg, rgba(212,175,55,0.15), rgba(212,175,55,0.05));
     border: 1.5px solid var(--gold-primary);
-    border-radius: 20px;
-    padding: 12px 18px;
-    margin: 12px 0 18px 0;
+    border-radius: 24px;
+    padding: 16px 22px;
+    margin: 15px 0 22px 0;
     text-align: center;
 }
 
 .ghazal-link-icon {
-    font-size: 26px;
+    font-size: 30px;
 }
 
 .ghazal-link-label {
     color: var(--gold-primary);
-    font-size: 13px;
+    font-size: 14px;
     letter-spacing: 2px;
     font-weight: 700;
     text-transform: uppercase;
-    margin: 4px 0 8px 0;
+    margin: 5px 0 10px 0;
 }
 
 .ghazal-link-url {
     color: var(--gold-light);
-    font-size: 11px;
+    font-size: 12px;
     word-break: break-all;
     background: rgba(0,0,0,0.5);
-    padding: 8px;
-    border-radius: 10px;
+    padding: 10px;
+    border-radius: 12px;
     font-family: monospace;
 }
 
 .ghazal-link-id {
     color: #aaa;
-    font-size: 10px;
+    font-size: 11px;
     margin-top: 8px;
 }
 
@@ -423,11 +402,11 @@ body {
 .poster-dedication {
     background: rgba(212,175,55,0.1);
     border: 1px solid rgba(212,175,55,0.25);
-    border-radius: 18px;
-    padding: 12px;
-    margin-bottom: 12px;
+    border-radius: 20px;
+    padding: 14px;
+    margin-bottom: 15px;
     color: var(--gold-light);
-    font-size: 18px;
+    font-size: 20px;
     font-weight: 600;
 }
 
@@ -437,56 +416,46 @@ body {
 
 .dedication-from {
     color: white;
-    font-size: 16px;
-    margin-top: 4px;
+    font-size: 17px;
+    margin-top: 5px;
 }
 
 .dedication-heart {
-    font-size: 24px;
+    font-size: 26px;
 }
 
-/* Footer - FIXED: Recoverable attribution */
+/* Footer */
 .poster-footer {
     border-top: 1px solid rgba(212,175,55,0.2);
-    padding-top: 15px;
+    padding-top: 20px;
 }
 
 .footer-follow {
     color: var(--gold-primary);
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 800;
     letter-spacing: 2px;
     text-transform: uppercase;
-    margin-bottom: 8px;
+    margin-bottom: 10px;
     background: rgba(212,175,55,0.08);
     display: inline-block;
-    padding: 4px 16px;
+    padding: 5px 20px;
     border-radius: 30px;
 }
 
 .footer-item {
-    margin: 4px 0;
+    margin: 6px 0;
 }
 
 .footer-label {
     color: #888;
-    font-size: 11px;
+    font-size: 12px;
 }
 
 .footer-value {
     color: var(--gold-light);
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 600;
-}
-
-/* NEW: Corpus authenticity text - Anti-content-theft */
-.corpus-authenticity {
-    margin-top: 10px;
-    font-size: 9px;
-    letter-spacing: 1px;
-    color: rgba(212,175,55,0.5);
-    text-transform: uppercase;
-    font-weight: 400;
 }
 
 /* Click Hint */
@@ -518,7 +487,7 @@ body {
     display: flex;
     align-items: center;
     gap: 10px;
-    transition: .25s ease;
+    transition: 0.25s ease;
 }
 
 .toast.show {
@@ -581,7 +550,7 @@ body {
             <div class="action-area">
                 <button id="downloadBtn" class="btn-generate">📱 DOWNLOAD POSTER</button>
                 <div style="margin-top: 8px; color: #777; font-size: 11px; text-align: center;">
-                    1080 × 1580 px • Perfect for Facebook & Instagram
+                    1080 × 1920 px • Facebook Reel Size (9:16)
                 </div>
             </div>
 
@@ -599,62 +568,57 @@ body {
         <!-- RIGHT PANEL - CLICKABLE POSTER PREVIEW -->
         <div class="preview-panel">
             <div class="preview-wrapper" id="previewWrapper">
-                <div id="poster-container" class="theme-classic">
-                    <!-- FIXED: Overlay link instead of wrapper anchor -->
-                    <a href="{{ ghazal_full_url }}" target="_blank" class="poster-overlay-link" aria-label="Read Full Ghazal"></a>
-                    
-                    <!-- Borders -->
-                    <div class="border-frame"></div>
-                    <div class="corner-deco cd-tl"></div>
-                    <div class="corner-deco cd-tr"></div>
-                    <div class="corner-deco cd-bl"></div>
-                    <div class="corner-deco cd-br"></div>
+                <a href="{{ ghazal_full_url }}" target="_blank" style="text-decoration: none; display: block;">
+                    <div id="poster-container" class="theme-classic">
+                        <!-- Borders -->
+                        <div class="border-frame"></div>
+                        <div class="corner-deco cd-tl"></div>
+                        <div class="corner-deco cd-tr"></div>
+                        <div class="corner-deco cd-bl"></div>
+                        <div class="corner-deco cd-br"></div>
 
-                    <div class="poster-content">
-                        <!-- HEADER -->
-                        <div>
-                            <div class="poster-logo">UCPC POETRY ARCHIVE</div>
-                            <div class="poster-tagline">📖 FOLLOW DAILY UPDATES 📖</div>
-                        </div>
-
-                        <!-- POET & VERSES -->
-                        <div>
-                            <div class="poster-poet">{{ ghazal.poet_name }}</div>
-                            <div class="poster-verses">
-                                {% for verse in poster_verses[:2] %}
-                                <div class="poster-sher" dir="rtl">
-                                    <span class="sher-misra1">{{ verse.misra1_urdu|safe }}</span>
-                                    <span class="sher-misra2">{{ verse.misra2_urdu|safe }}</span>
-                                </div>
-                                {% endfor %}
-                            </div>
-                        </div>
-
-                        <!-- FOOTER WITH GHAZAL LINK -->
-                        <div>
-                            <div id="dedicationBox" class="poster-dedication hidden"></div>
-
-                            <div class="ghazal-link-box">
-                                <div class="ghazal-link-icon">📜</div>
-                                <div class="ghazal-link-label">READ FULL GHAZAL</div>
-                                <div class="ghazal-link-url">{{ ghazal_full_url }}</div>
-                                <div class="ghazal-link-id">GHAZAL ID: #{{ ghazal.id }}</div>
+                        <div class="poster-content">
+                            <!-- HEADER -->
+                            <div>
+                                <div class="poster-logo">UCPC POETRY ARCHIVE</div>
+                                <div class="poster-tagline">📖 FOLLOW DAILY UPDATES 📖</div>
                             </div>
 
-                            <div class="poster-footer">
-                                <div class="footer-follow">🔔 FOLLOW FOR MORE 🔔</div>
-                                <div class="footer-item">
-                                    <span class="footer-label">Facebook :</span>
-                                    <span class="footer-value">facebook.com/UCPCPoetryArchive</span>
+                            <!-- POET & VERSES -->
+                            <div>
+                                <div class="poster-poet">{{ ghazal.poet_name }}</div>
+                                <div class="poster-verses">
+                                    {% for verse in poster_verses[:2] %}
+                                    <div class="poster-sher" dir="rtl">
+                                        <span class="sher-misra1">{{ verse.misra1_urdu|safe }}</span>
+                                        <span class="sher-misra2">{{ verse.misra2_urdu|safe }}</span>
+                                    </div>
+                                    {% endfor %}
                                 </div>
-                                <!-- NEW: Corpus authenticity text - Anti-content-theft -->
-                                <div class="corpus-authenticity">
-                                    📜 Digitally Preserved Urdu Poetry | UCPC Archive
+                            </div>
+
+                            <!-- FOOTER WITH GHAZAL LINK -->
+                            <div>
+                                <div id="dedicationBox" class="poster-dedication hidden"></div>
+
+                                <div class="ghazal-link-box">
+                                    <div class="ghazal-link-icon">📜</div>
+                                    <div class="ghazal-link-label">READ FULL GHAZAL</div>
+                                    <div class="ghazal-link-url">{{ ghazal_full_url }}</div>
+                                    <div class="ghazal-link-id">GHAZAL ID: #{{ ghazal.id }}</div>
+                                </div>
+
+                                <div class="poster-footer">
+                                    <div class="footer-follow">🔔 FOLLOW FOR MORE 🔔</div>
+                                    <div class="footer-item">
+                                        <span class="footer-label">Facebook :</span>
+                                        <span class="footer-value">facebook.com/UCPCPoetryArchive</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                </a>
                 <div class="click-hint">
                     <span>🔗 Click anywhere on the poster to read full ghazal →</span>
                 </div>
@@ -694,7 +658,6 @@ body {
         'nightblue': 'theme-nightblue'
     };
 
-    // Change theme
     function changeTheme() {
         const selectedTheme = themeSelect.value;
         Object.values(themes).forEach(themeClass => {
@@ -705,7 +668,6 @@ body {
 
     themeSelect.addEventListener('change', changeTheme);
 
-    // Escape HTML
     function escapeHtml(str) {
         if (!str) return '';
         return str.replace(/[&<>]/g, function(m) {
@@ -716,7 +678,6 @@ body {
         });
     }
 
-    // Update dedication
     function updateDedication() {
         const from = inputFrom.value.trim();
         const to = inputTo.value.trim();
@@ -736,7 +697,7 @@ body {
     inputTo.addEventListener('input', updateDedication);
     updateDedication();
 
-    // Scale preview
+    // Scale preview for 1920 height
     function scalePreview() {
         const wrapper = document.getElementById('previewWrapper');
         if (!wrapper || !posterContainer) return;
@@ -746,11 +707,11 @@ body {
         
         const panelWidth = panel.clientWidth - 20;
         const containerWidth = 1080;
-        const containerHeight = 1580;
+        const containerHeight = 1920;
         
         let scale = panelWidth / containerWidth;
         if (scale > 1) scale = 1;
-        if (scale < 0.35) scale = 0.35;
+        if (scale < 0.3) scale = 0.3;
         
         posterContainer.style.transform = `scale(${scale})`;
         posterContainer.style.transformOrigin = 'top center';
@@ -767,7 +728,6 @@ body {
     
     scalePreview();
 
-    // Toast functions
     function showToast(msg, isLoading) {
         toastMessage.textContent = msg;
         toastSpinner.style.display = isLoading ? 'block' : 'none';
@@ -780,7 +740,7 @@ body {
         }, 2000);
     }
 
-    // Download poster
+    // Download poster - FIXED for 1920x1080
     downloadBtn.addEventListener('click', async function(e) {
         e.preventDefault();
         
@@ -791,25 +751,20 @@ body {
         
         showToast('🎨 Generating your poster...', true);
         
-        // Store original styles
         const originalTransform = posterContainer.style.transform;
-        const originalOverflow = posterContainer.style.overflow;
-        
-        // Temporarily remove scaling
         posterContainer.style.transform = 'none';
-        posterContainer.style.overflow = 'visible';
         
         try {
             await new Promise(function(r) { setTimeout(r, 150); });
             
             const canvas = await html2canvas(posterContainer, {
                 scale: 2.5,
-                backgroundColor: null,
+                backgroundColor: '#000000',
                 useCORS: true,
                 logging: false,
                 allowTaint: false,
                 windowWidth: 1080,
-                windowHeight: 1580
+                windowHeight: 1920
             });
             
             const imageData = canvas.toDataURL('image/jpeg', 0.95);
@@ -820,14 +775,13 @@ body {
             link.href = imageData;
             link.click();
             
-            showToast('✅ Poster saved to your device!', false);
+            showToast('✅ Poster saved! Ready for Facebook Reel!', false);
             
         } catch (error) {
             console.error('Download error:', error);
             showToast('❌ Failed. Try refreshing the page.', false);
         } finally {
             posterContainer.style.transform = originalTransform;
-            posterContainer.style.overflow = originalOverflow;
             hideToast();
         }
     });
