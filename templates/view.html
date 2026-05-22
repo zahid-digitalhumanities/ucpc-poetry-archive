@@ -12,833 +12,786 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Montserrat:wght@300;400;600;700;800&family=Noto+Nastaliq+Urdu:wght@400;500;600;700&display=swap" rel="stylesheet">
+{% endblock %}
 
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Montserrat:wght@300;400;500;600;700;800&family=Noto+Nastaliq+Urdu:wght@400;500;600;700&display=swap" rel="stylesheet">
-
+{% block extra_css %}
 <style>
-
-:root{
-    --gold-primary:#D4AF37;
-    --gold-light:#F6D878;
-    --gold-bright:#FFD700;
-    --gold-dim:#8a7020;
+:root {
+    --bg-page: #050505;
+    --glass-bg: rgba(20,20,25,0.72);
+    --gold-primary: #D4AF37;
+    --gold-light: #F6D878;
+    --gold-bright: #FFD700;
+    --gold-dim: #8a7020;
 }
 
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
-body{
-    background:#050505;
-    background-image:radial-gradient(circle at top,#161616 0%,#050505 100%);
-    color:#fff;
-    font-family:'Montserrat',sans-serif;
-    min-height:100vh;
-    overflow-x:hidden;
+body {
+    background: #050505;
+    background-image: radial-gradient(circle at top, #171717 0%, #050505 100%);
+    color: #fff;
+    font-family: 'Montserrat', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
 }
 
-.app-container{
-    max-width:1400px;
-    margin:0 auto;
-    padding:40px 20px;
+.app-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 40px 20px;
 }
 
-.two-columns{
-    display:flex;
-    flex-wrap:wrap;
-    gap:45px;
-    justify-content:center;
-    align-items:flex-start;
+.two-columns {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 45px;
+    justify-content: center;
+    align-items: flex-start;
 }
 
-.editor-panel{
-    flex:1;
-    min-width:320px;
-    max-width:500px;
-    background:rgba(20,20,25,0.85);
-    border:1px solid rgba(212,175,55,0.2);
-    border-radius:24px;
-    padding:35px;
-    backdrop-filter:blur(14px);
-    box-shadow:0 15px 40px rgba(0,0,0,0.5);
+/* ==================== LEFT PANEL ==================== */
+.editor-panel {
+    flex: 1;
+    min-width: 320px;
+    max-width: 500px;
+    background: var(--glass-bg);
+    border: 1px solid rgba(212,175,55,.14);
+    border-radius: 22px;
+    padding: 35px;
+    backdrop-filter: blur(14px);
+    box-shadow: 0 10px 35px rgba(0,0,0,.65);
 }
 
-.brand-title{
-    text-align:center;
-    color:var(--gold-primary);
-    font-family:'Cinzel',serif;
-    font-size:24px;
-    margin-bottom:28px;
-    padding-bottom:14px;
-    border-bottom:1px solid rgba(212,175,55,0.2);
-    letter-spacing:1px;
+.brand-title {
+    text-align: center;
+    color: var(--gold-primary);
+    font-family: 'Cinzel', serif;
+    letter-spacing: 2px;
+    margin-bottom: 28px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid rgba(212,175,55,.15);
 }
 
-.readonly-info{
-    background:rgba(255,255,255,0.03);
-    border-left:4px solid var(--gold-primary);
-    padding:16px;
-    border-radius:12px;
-    margin-bottom:25px;
-    color:#ddd;
-    line-height:1.8;
+.readonly-info {
+    background: rgba(255,255,255,.03);
+    border-left: 4px solid var(--gold-primary);
+    padding: 16px;
+    border-radius: 8px;
+    margin-bottom: 25px;
+    color: #ddd;
+    line-height: 1.7;
 }
 
-.readonly-info span{
-    color:var(--gold-primary);
-    font-weight:700;
+.readonly-info span {
+    color: var(--gold-primary);
+    font-weight: 700;
 }
 
-.form-label{
-    display:block;
-    margin-bottom:12px;
-    color:var(--gold-light);
-    font-size:12px;
-    letter-spacing:2px;
-    text-transform:uppercase;
-    font-weight:700;
+.form-label {
+    display: block;
+    margin-bottom: 12px;
+    color: var(--gold-light);
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-weight: 700;
 }
 
-.row-inputs{
-    display:flex;
-    gap:14px;
+.row-inputs {
+    display: flex;
+    gap: 14px;
+    margin-bottom: 20px;
 }
 
-.row-inputs > div{
-    flex:1;
+.row-inputs > div {
+    flex: 1;
 }
 
-.form-input{
-    width:100%;
-    padding:16px;
-    border-radius:12px;
-    background:rgba(0,0,0,0.5);
-    border:1px solid #444;
-    color:#fff;
-    font-size:15px;
-    font-family:'Montserrat',sans-serif;
-    transition:0.25s;
+.form-input, .theme-select {
+    width: 100%;
+    padding: 14px;
+    border-radius: 12px;
+    background: rgba(0,0,0,.35);
+    border: 1px solid #333;
+    color: #fff;
+    font-size: 14px;
+    font-family: 'Montserrat', sans-serif;
 }
 
-.form-input:focus{
-    outline:none;
-    border-color:var(--gold-primary);
-    box-shadow:0 0 0 3px rgba(212,175,55,0.15);
+.form-input:focus, .theme-select:focus {
+    outline: none;
+    border-color: var(--gold-primary);
 }
 
-.action-area{
-    margin-top:35px;
+.theme-select option {
+    background: #1a1a1a;
+    color: #fff;
 }
 
-.btn-generate{
-    width:100%;
-    border:none;
-    cursor:pointer;
-    padding:18px 24px;
-    border-radius:60px;
-    background:linear-gradient(135deg,#8a7020,#D4AF37);
-    color:#000;
-    font-size:16px;
-    font-weight:800;
-    letter-spacing:1px;
-    text-transform:uppercase;
-    transition:0.2s;
-    box-shadow:0 10px 30px rgba(212,175,55,0.2);
+.action-area {
+    margin-top: 25px;
 }
 
-.btn-generate:hover{
-    transform:translateY(-2px);
-    filter:brightness(1.05);
+.btn-generate {
+    width: 100%;
+    border: none;
+    cursor: pointer;
+    padding: 16px 24px;
+    border-radius: 50px;
+    background: linear-gradient(135deg, var(--gold-dim), var(--gold-primary));
+    color: #000;
+    font-size: 16px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    transition: .2s ease;
+    margin-bottom: 10px;
 }
 
-.reel-help{
-    margin-top:30px;
-    background:rgba(212,175,55,0.05);
-    border:1px solid rgba(212,175,55,0.12);
-    border-radius:16px;
-    padding:20px;
-    text-align:center;
+.btn-generate:hover {
+    transform: translateY(-2px);
 }
 
-.reel-help h4{
-    color:var(--gold-light);
-    margin-bottom:10px;
+.reel-help {
+    margin-top: 25px;
+    background: rgba(212,175,55,.03);
+    border: 1px solid rgba(212,175,55,.10);
+    border-radius: 14px;
+    padding: 18px;
+    text-align: center;
 }
 
-.reel-help p{
-    color:#999;
-    font-size:13px;
-    line-height:1.7;
+.reel-help h4 {
+    color: var(--gold-light);
+    margin-bottom: 8px;
 }
 
-.reel-help a{
-    color:var(--gold-primary);
-    text-decoration:none;
+.reel-help p {
+    color: #999;
+    font-size: 13px;
 }
 
-.back-link{
-    margin-top:25px;
-    text-align:center;
+.reel-help a {
+    color: var(--gold-primary);
+    text-decoration: none;
 }
 
-.back-link a{
-    color:#777;
-    text-decoration:none;
+.back-link {
+    margin-top: 20px;
+    text-align: center;
 }
 
-.back-link a:hover{
-    color:var(--gold-primary);
+.back-link a {
+    color: #777;
+    text-decoration: none;
 }
 
-.preview-panel{
-    flex:1;
-    min-width:450px;
-    display:flex;
-    justify-content:center;
+.back-link a:hover {
+    color: var(--gold-primary);
 }
 
-.preview-wrapper{
-    display:flex;
-    justify-content:center;
-    align-items:flex-start;
+/* ==================== POSTER THEMES ==================== */
+.theme-classic {
+    background: #000000;
+    background-image: radial-gradient(circle at top, rgba(255,215,0,.08), transparent 40%);
+}
+.theme-gold {
+    background: linear-gradient(145deg, #1a1200 0%, #0a0800 100%);
+    background-image: radial-gradient(circle at top, rgba(255,215,0,.15), transparent 50%);
+}
+.theme-maroon {
+    background: linear-gradient(145deg, #1a0508 0%, #0a0204 100%);
+    background-image: radial-gradient(circle at top, rgba(139,0,0,0.3), transparent 50%);
+}
+.theme-nightblue {
+    background: linear-gradient(145deg, #0a0a2a 0%, #020214 100%);
+    background-image: radial-gradient(circle at top, rgba(100,100,255,0.1), transparent 50%);
 }
 
-#poster-container{
-    width:1080px;
-    height:1350px;
-    position:relative;
-    background:linear-gradient(145deg,#0a0a0a 0%,#000000 100%);
-    overflow:hidden;
-    border-radius:10px;
-    box-shadow:0 30px 60px rgba(0,0,0,0.7);
+/* ==================== POSTER CONTAINER ==================== */
+.preview-wrapper {
+    transform-origin: top center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
 
-#poster-container::before{
-    content:'UCPC';
-    position:absolute;
-    top:50%;
-    left:50%;
-    transform:translate(-50%,-50%);
-    font-size:180px;
-    font-family:'Cinzel',serif;
-    color:rgba(212,175,55,0.03);
-    letter-spacing:12px;
-    z-index:1;
-    pointer-events:none;
+#poster-container {
+    width: 1080px;
+    height: 1580px;
+    position: relative;
+    overflow: visible;
+    color: #fff;
+    box-shadow: 0 0 60px rgba(0,0,0,.9);
+    border-radius: 8px;
 }
 
-.border-frame{
-    position:absolute;
-    top:28px;
-    left:28px;
-    right:28px;
-    bottom:28px;
-    border:2px solid rgba(212,175,55,0.5);
-    border-radius:24px;
-    z-index:10;
-    pointer-events:none;
+/* Borders */
+.border-frame {
+    position: absolute;
+    top: 28px;
+    left: 28px;
+    right: 28px;
+    bottom: 28px;
+    border: 2px solid rgba(212,175,55,.55);
+    border-radius: 24px;
+    z-index: 10;
+    pointer-events: none;
 }
 
-.border-frame::after{
-    content:'';
-    position:absolute;
-    top:6px;
-    left:6px;
-    right:6px;
-    bottom:6px;
-    border:1px solid rgba(255,255,255,0.08);
-    border-radius:18px;
+.border-frame::after {
+    content: '';
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    right: 6px;
+    bottom: 6px;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 18px;
 }
 
-.corner-deco{
-    position:absolute;
-    width:80px;
-    height:80px;
-    border-color:var(--gold-primary);
-    border-style:solid;
-    z-index:11;
-    pointer-events:none;
+/* Corner Decorations */
+.corner-deco {
+    position: absolute;
+    width: 75px;
+    height: 75px;
+    border-color: var(--gold-primary);
+    border-style: solid;
+    z-index: 11;
+    pointer-events: none;
+}
+.cd-tl { top: 26px; left: 26px; border-width: 4px 0 0 4px; }
+.cd-tr { top: 26px; right: 26px; border-width: 4px 4px 0 0; }
+.cd-bl { bottom: 26px; left: 26px; border-width: 0 0 4px 4px; }
+.cd-br { bottom: 26px; right: 26px; border-width: 0 4px 4px 0; }
+
+/* Poster Content - FIXED BOUNDARIES */
+.poster-content {
+    position: relative;
+    z-index: 5;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 75px 60px 50px;
+    text-align: center;
 }
 
-.cd-tl{
-    top:26px;
-    left:26px;
-    border-width:4px 0 0 4px;
+/* Header Section */
+.poster-header {
+    margin-bottom: 5px;
 }
 
-.cd-tr{
-    top:26px;
-    right:26px;
-    border-width:4px 4px 0 0;
+.poster-logo {
+    font-family: 'Cinzel', serif;
+    font-size: 42px;
+    font-weight: 800;
+    color: var(--gold-primary);
+    letter-spacing: 3px;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.6);
 }
 
-.cd-bl{
-    bottom:26px;
-    left:26px;
-    border-width:0 0 4px 4px;
+.poster-tagline {
+    margin-top: 10px;
+    font-size: 18px;
+    letter-spacing: 3px;
+    font-weight: 800;
+    color: var(--gold-bright);
+    text-transform: uppercase;
+    background: rgba(212,175,55,0.12);
+    display: inline-block;
+    padding: 5px 18px;
+    border-radius: 40px;
 }
 
-.cd-br{
-    bottom:26px;
-    right:26px;
-    border-width:0 4px 4px 0;
+/* Poet Name */
+.poster-poet {
+    margin: 18px 0 28px 0;
+    font-family: 'Cinzel', serif;
+    font-size: 52px;
+    font-weight: 700;
+    color: white;
+    text-shadow: 0 3px 12px rgba(0,0,0,0.5);
+    border-bottom: 2px solid rgba(212,175,55,0.3);
+    display: inline-block;
+    padding-bottom: 10px;
 }
 
-.poster-content{
-    position:relative;
-    z-index:5;
-    height:100%;
-    display:flex;
-    flex-direction:column;
-    justify-content:space-between;
-    padding:85px 65px 50px;
-    text-align:center;
+/* Verses Section - SCROLLABLE IF NEEDED */
+.poster-verses {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 38px;
+    padding: 5px 10px;
+    overflow-y: auto;
+    max-height: 580px;
 }
 
-.poster-logo{
-    font-family:'Cinzel',serif;
-    font-size:42px;
-    font-weight:800;
-    color:var(--gold-primary);
-    letter-spacing:4px;
-    text-shadow:0 2px 10px rgba(0,0,0,0.6);
+.poster-sher {
+    font-family: 'Noto Nastaliq Urdu', 'Jameel Noori Nastaleeq', 'Urdu Typesetting', serif;
+    direction: rtl;
+    text-align: center;
 }
 
-.poster-tagline{
-    margin-top:12px;
-    font-size:15px;
-    letter-spacing:4px;
-    font-weight:700;
-    color:#9ca3af;
-    text-transform:uppercase;
+.sher-misra1 {
+    display: block;
+    font-size: 48px;
+    line-height: 1.65;
+    color: #ffffff;
+    padding: 8px 12px;
+    margin-bottom: 12px;
+    border-bottom: 1px dashed rgba(212,175,55,0.35);
 }
 
-.poster-poet{
-    margin:18px 0 28px 0;
-    font-family:'Cinzel',serif;
-    font-size:58px;
-    font-weight:700;
-    color:#fff;
-    border-bottom:2px solid rgba(212,175,55,0.3);
-    display:inline-block;
-    padding-bottom:12px;
-    text-shadow:0 3px 12px rgba(0,0,0,0.7);
+.sher-misra2 {
+    display: block;
+    font-size: 48px;
+    line-height: 1.65;
+    color: var(--gold-light);
+    padding: 8px 20px;
+    border-right: 4px solid var(--gold-primary);
+    margin-right: 18px;
 }
 
-.poster-verses{
-    flex:1;
-    display:flex;
-    flex-direction:column;
-    justify-content:center;
-    gap:60px;
-    padding:10px 15px;
+/* Ghazal Link Box */
+.ghazal-link-box {
+    background: linear-gradient(135deg, rgba(212,175,55,0.15), rgba(212,175,55,0.05));
+    border: 1.5px solid var(--gold-primary);
+    border-radius: 20px;
+    padding: 12px 18px;
+    margin: 12px 0 18px 0;
+    text-align: center;
 }
 
-.poster-sher{
-    font-family:'Noto Nastaliq Urdu','Jameel Noori Nastaleeq','Urdu Typesetting',serif;
-    direction:rtl;
-    text-align:center;
+.ghazal-link-icon {
+    font-size: 26px;
 }
 
-.sher-misra1{
-    display:block;
-    font-size:56px;
-    line-height:1.8;
-    color:#ffffff;
-    margin-bottom:18px;
+.ghazal-link-label {
+    color: var(--gold-primary);
+    font-size: 13px;
+    letter-spacing: 2px;
+    font-weight: 700;
+    text-transform: uppercase;
+    margin: 4px 0 8px 0;
 }
 
-.sher-misra2{
-    display:block;
-    font-size:56px;
-    line-height:1.8;
-    color:#ffffff;
+.ghazal-link-url {
+    color: var(--gold-light);
+    font-size: 11px;
+    word-break: break-all;
+    background: rgba(0,0,0,0.5);
+    padding: 8px;
+    border-radius: 10px;
+    font-family: monospace;
 }
 
-.poster-dedication{
-    background:rgba(212,175,55,0.08);
-    border:1px solid rgba(212,175,55,0.2);
-    border-radius:20px;
-    padding:18px;
-    margin-bottom:20px;
-    color:var(--gold-light);
-    font-size:22px;
-    font-weight:700;
+.ghazal-link-id {
+    color: #aaa;
+    font-size: 10px;
+    margin-top: 8px;
 }
 
-.poster-dedication.hidden{
-    display:none;
+/* Dedication */
+.poster-dedication {
+    background: rgba(212,175,55,0.1);
+    border: 1px solid rgba(212,175,55,0.25);
+    border-radius: 18px;
+    padding: 12px;
+    margin-bottom: 12px;
+    color: var(--gold-light);
+    font-size: 18px;
+    font-weight: 600;
 }
 
-.dedication-from{
-    color:#fff;
-    font-size:20px;
-    margin-top:8px;
+.poster-dedication.hidden {
+    display: none;
 }
 
-.dedication-heart{
-    font-size:28px;
-    margin-top:8px;
+.dedication-from {
+    color: white;
+    font-size: 16px;
+    margin-top: 4px;
 }
 
-.ghazal-link-box{
-    background:linear-gradient(135deg,rgba(212,175,55,0.12),rgba(212,175,55,0.04));
-    border:1.5px solid rgba(212,175,55,0.4);
-    border-radius:20px;
-    padding:18px;
-    margin-bottom:18px;
+.dedication-heart {
+    font-size: 24px;
 }
 
-.ghazal-link-label{
-    color:var(--gold-primary);
-    font-size:12px;
-    font-weight:800;
-    letter-spacing:2px;
-    text-transform:uppercase;
-    margin-bottom:10px;
+/* Footer */
+.poster-footer {
+    border-top: 1px solid rgba(212,175,55,0.2);
+    padding-top: 15px;
 }
 
-.ghazal-link-url{
-    color:var(--gold-light);
-    font-size:15px;
-    font-weight:600;
-    word-break:break-all;
-    line-height:1.6;
+.footer-follow {
+    color: var(--gold-primary);
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    background: rgba(212,175,55,0.08);
+    display: inline-block;
+    padding: 4px 16px;
+    border-radius: 30px;
 }
 
-.ghazal-link-id{
-    color:#888;
-    font-size:11px;
-    margin-top:8px;
-    letter-spacing:1px;
+.footer-item {
+    margin: 4px 0;
 }
 
-.poster-footer{
-    border-top:1px solid rgba(212,175,55,0.2);
-    padding-top:16px;
+.footer-label {
+    color: #888;
+    font-size: 11px;
 }
 
-.footer-follow{
-    color:var(--gold-primary);
-    font-size:12px;
-    font-weight:800;
-    letter-spacing:2px;
-    text-transform:uppercase;
-    margin-bottom:10px;
+.footer-value {
+    color: var(--gold-light);
+    font-size: 13px;
+    font-weight: 600;
 }
 
-.footer-item{
-    margin:5px 0;
+/* Click Hint */
+.click-hint {
+    margin-top: 12px;
+    text-align: center;
+    font-size: 11px;
+    color: #666;
 }
 
-.footer-label{
-    color:#888;
-    font-size:12px;
+.click-hint span {
+    background: rgba(212,175,55,0.12);
+    padding: 4px 12px;
+    border-radius: 30px;
 }
 
-.footer-value{
-    color:var(--gold-light);
-    font-size:14px;
-    font-weight:600;
+/* Toast */
+.toast {
+    position: fixed;
+    bottom: 35px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: var(--gold-primary);
+    color: #000;
+    padding: 12px 25px;
+    border-radius: 50px;
+    font-weight: 700;
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: .25s ease;
 }
 
-.toast{
-    position:fixed;
-    bottom:30px;
-    left:50%;
-    transform:translateX(-50%) translateY(100px);
-    background:var(--gold-primary);
-    color:#000;
-    padding:14px 28px;
-    border-radius:60px;
-    font-weight:700;
-    z-index:10000;
-    display:flex;
-    align-items:center;
-    gap:12px;
-    transition:0.25s;
+.toast.show {
+    transform: translateX(-50%) translateY(0);
 }
 
-.toast.show{
-    transform:translateX(-50%) translateY(0);
+.toast-spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid #000;
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
 }
 
-.toast-spinner{
-    width:18px;
-    height:18px;
-    border:2px solid black;
-    border-top-color:transparent;
-    border-radius:50%;
-    animation:spin 0.8s linear infinite;
+@keyframes spin {
+    to { transform: rotate(360deg); }
 }
 
-@keyframes spin{
-    to{
-        transform:rotate(360deg);
-    }
+@media (max-width: 768px) {
+    .app-container { padding: 20px 10px; }
+    .editor-panel { padding: 20px; }
 }
-
-@media (max-width:1000px){
-
-    .preview-wrapper{
-        transform:scale(0.62);
-        transform-origin:top center;
-    }
-
-}
-
-@media (max-width:700px){
-
-    .preview-wrapper{
-        transform:scale(0.45);
-    }
-
-}
-
 </style>
 {% endblock %}
 
 {% block content %}
-
 <div class="app-container">
-
     <div class="two-columns">
-
+        <!-- LEFT PANEL -->
         <div class="editor-panel">
-
-            <h1 class="brand-title">UCPC Poetry Archive</h1>
+            <h1 class="brand-title">✨ UCPC Poetry Archive ✨</h1>
 
             <div class="readonly-info">
                 📜 <span>Poet:</span> {{ ghazal.poet_name }}<br>
                 📖 <span>Verses:</span> {{ poster_verses|length }} couplet(s)
             </div>
 
+            <!-- Theme Selection - NEW FEATURE -->
             <div>
+                <label class="form-label">🎨 Poster Theme</label>
+                <select id="themeSelect" class="theme-select">
+                    <option value="classic">🌑 Classic Black (Default)</option>
+                    <option value="gold">✨ Royal Gold</option>
+                    <option value="maroon">❤️ Deep Maroon</option>
+                    <option value="nightblue">🌙 Night Blue</option>
+                </select>
+            </div>
 
-                <label class="form-label">Dedicate this poster</label>
-
+            <!-- Dedication Fields -->
+            <div style="margin-top: 20px;">
+                <label class="form-label">💝 Personalize Your Poster</label>
                 <div class="row-inputs">
-
-                    <div>
-                        <input type="text" id="inputFrom" class="form-input" placeholder="From">
-                    </div>
-
-                    <div>
-                        <input type="text" id="inputTo" class="form-input" placeholder="To">
-                    </div>
-
+                    <div><input type="text" id="inputFrom" class="form-input" placeholder="From (your name)"></div>
+                    <div><input type="text" id="inputTo" class="form-input" placeholder="To (special person)"></div>
                 </div>
-
             </div>
 
             <div class="action-area">
-
-                <button id="downloadBtn" class="btn-generate">
-                    Download Poster
-                </button>
-
-                <div style="margin-top:12px;color:#777;font-size:12px;text-align:center;">
-                    1080 × 1350 px • Facebook & Instagram Optimized
+                <button id="downloadBtn" class="btn-generate">📱 DOWNLOAD POSTER</button>
+                <div style="margin-top: 8px; color: #777; font-size: 11px; text-align: center;">
+                    1080 × 1580 px • Perfect for Facebook & Instagram
                 </div>
-
             </div>
 
             <div class="reel-help">
-
-                <h4>🎬 Viral Reel Strategy</h4>
-
-                <p>
-                    Download → Upload to CapCut → Add Slow Zoom →
-                    Add Soft Urdu Music → Post on Facebook Reels
-                </p>
-
-                <a href="https://play.google.com/store/apps/details?id=com.lemon.lvoverseas" target="_blank">
-                    Open CapCut →
-                </a>
-
+                <h4>🎬 Make a Viral Reel</h4>
+                <p>Download poster → Import to CapCut → Add slow zoom & soft Urdu poetry music</p>
+                <a href="https://play.google.com/store/apps/details?id=com.lemon.lvoverseas" target="_blank">Open CapCut →</a>
             </div>
 
             <div class="back-link">
                 <a href="/poets/{{ ghazal.poet_id }}">← Back to Poet</a>
             </div>
-
         </div>
 
+        <!-- RIGHT PANEL - CLICKABLE POSTER PREVIEW -->
         <div class="preview-panel">
-
             <div class="preview-wrapper" id="previewWrapper">
+                <a href="/ghazal/{{ ghazal.id }}" target="_blank" style="text-decoration: none; display: block;">
+                    <div id="poster-container" class="theme-classic">
+                        <!-- Borders -->
+                        <div class="border-frame"></div>
+                        <div class="corner-deco cd-tl"></div>
+                        <div class="corner-deco cd-tr"></div>
+                        <div class="corner-deco cd-bl"></div>
+                        <div class="corner-deco cd-br"></div>
 
-                <div id="poster-container">
-
-                    <div class="border-frame"></div>
-
-                    <div class="corner-deco cd-tl"></div>
-                    <div class="corner-deco cd-tr"></div>
-                    <div class="corner-deco cd-bl"></div>
-                    <div class="corner-deco cd-br"></div>
-
-                    <div class="poster-content">
-
-                        <div>
-
-                            <div class="poster-logo">
-                                UCPC POETRY ARCHIVE
+                        <div class="poster-content">
+                            <!-- HEADER -->
+                            <div>
+                                <div class="poster-logo">UCPC POETRY ARCHIVE</div>
+                                <div class="poster-tagline">📖 FOLLOW DAILY UPDATES 📖</div>
                             </div>
 
-                            <div class="poster-tagline">
-                                FOLLOW FOR DAILY URDU POETRY
+                            <!-- POET & VERSES -->
+                            <div>
+                                <div class="poster-poet">{{ ghazal.poet_name }}</div>
+                                <div class="poster-verses">
+                                    {% for verse in poster_verses[:2] %}
+                                    <div class="poster-sher" dir="rtl">
+                                        <span class="sher-misra1">{{ verse.misra1_urdu|safe }}</span>
+                                        <span class="sher-misra2">{{ verse.misra2_urdu|safe }}</span>
+                                    </div>
+                                    {% endfor %}
+                                </div>
                             </div>
 
+                            <!-- FOOTER WITH GHAZAL LINK -->
+                            <div>
+                                <div id="dedicationBox" class="poster-dedication hidden"></div>
+
+                                <div class="ghazal-link-box">
+                                    <div class="ghazal-link-icon">📜</div>
+                                    <div class="ghazal-link-label">READ FULL GHAZAL</div>
+                                    <div class="ghazal-link-url">{{ request.host_url.rstrip('/') }}/ghazal/{{ ghazal.id }}</div>
+                                    <div class="ghazal-link-id">GHAZAL ID: #{{ ghazal.id }}</div>
+                                </div>
+
+                                <div class="poster-footer">
+                                    <div class="footer-follow">🔔 FOLLOW FOR MORE 🔔</div>
+                                    <div class="footer-item">
+                                        <span class="footer-label">Facebook :</span>
+                                        <span class="footer-value">@UCPCPoetryArchive</span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-
-                        <div>
-
-                            <div class="poster-poet">
-                                {{ ghazal.poet_name }}
-                            </div>
-
-                            <div class="poster-verses">
-
-                                {% for verse in poster_verses[:2] %}
-
-                                <div class="poster-sher" dir="rtl">
-
-                                    <span class="sher-misra1">
-                                        {{ verse.misra1_urdu|safe }}
-                                    </span>
-
-                                    <span class="sher-misra2">
-                                        {{ verse.misra2_urdu|safe }}
-                                    </span>
-
-                                </div>
-
-                                {% endfor %}
-
-                            </div>
-
-                        </div>
-
-                        <div>
-
-                            <div id="dedicationBox" class="poster-dedication hidden"></div>
-
-                            <div class="ghazal-link-box">
-
-                                <div class="ghazal-link-label">
-                                    READ FULL GHAZAL
-                                </div>
-
-                                <div class="ghazal-link-url">
-                                    ucpc-poetry-archive.onrender.com/g/{{ ghazal.id }}
-                                </div>
-
-                                <div class="ghazal-link-id">
-                                    GHAZAL ID: #{{ ghazal.id }}
-                                </div>
-
-                            </div>
-
-                            <div class="poster-footer">
-
-                                <div class="footer-follow">
-                                    FOLLOW FOR MORE
-                                </div>
-
-                                <div class="footer-item">
-
-                                    <span class="footer-label">
-                                        Facebook:
-                                    </span>
-
-                                    <span class="footer-value">
-                                        facebook.com/UCPCPoetryArchive
-                                    </span>
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
                     </div>
-
+                </a>
+                <div class="click-hint">
+                    <span>🔗 Click anywhere on the poster to read full ghazal →</span>
                 </div>
-
             </div>
-
         </div>
-
     </div>
-
 </div>
 
+<!-- TOAST -->
 <div id="toast" class="toast">
-
     <div id="toastSpinner" class="toast-spinner"></div>
-
-    <span id="toastMessage">
-        Generating poster...
-    </span>
-
+    <span id="toastMessage">Generating...</span>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
 <script>
-
-(function(){
-
+(function() {
+    // DOM Elements
     const inputFrom = document.getElementById('inputFrom');
     const inputTo = document.getElementById('inputTo');
-
     const dedicationBox = document.getElementById('dedicationBox');
-
     const posterContainer = document.getElementById('poster-container');
-
     const downloadBtn = document.getElementById('downloadBtn');
-
+    const themeSelect = document.getElementById('themeSelect');
     const toast = document.getElementById('toast');
-
     const toastMessage = document.getElementById('toastMessage');
-
     const toastSpinner = document.getElementById('toastSpinner');
 
-    function escapeHtml(str){
+    let scaleTimeout = null;
 
-        if(!str) return '';
+    // Theme mapping
+    const themes = {
+        'classic': 'theme-classic',
+        'gold': 'theme-gold',
+        'maroon': 'theme-maroon',
+        'nightblue': 'theme-nightblue'
+    };
 
-        return str.replace(/[&<>]/g,function(m){
-
-            if(m === '&') return '&amp;';
-            if(m === '<') return '&lt;';
-            if(m === '>') return '&gt;';
-
-            return m;
-
+    // Change theme
+    function changeTheme() {
+        const selectedTheme = themeSelect.value;
+        // Remove all theme classes
+        Object.values(themes).forEach(themeClass => {
+            posterContainer.classList.remove(themeClass);
         });
-
+        // Add selected theme class
+        posterContainer.classList.add(themes[selectedTheme]);
     }
 
-    function updateDedication(){
+    themeSelect.addEventListener('change', changeTheme);
 
+    // Escape HTML
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+
+    // Update dedication
+    function updateDedication() {
         const from = inputFrom.value.trim();
         const to = inputTo.value.trim();
-
-        if(from || to){
-
+        
+        if (from || to) {
             let html = '<div>✨ Dedicated With Love ✨</div>';
-
-            if(to){
-                html += `<div class="dedication-from">To: ${escapeHtml(to)}</div>`;
-            }
-
-            if(from){
-                html += `<div class="dedication-heart">❤️</div>`;
-                html += `<div class="dedication-from">From: ${escapeHtml(from)}</div>`;
-            }
-
+            if (from) html += `<div class="dedication-from">💝 From: ${escapeHtml(from)}</div>`;
+            if (to) html += `<div class="dedication-heart">❤️</div><div class="dedication-from">To: ${escapeHtml(to)}</div>`;
             dedicationBox.innerHTML = html;
-
             dedicationBox.classList.remove('hidden');
-
-        }else{
-
+        } else {
             dedicationBox.classList.add('hidden');
-
         }
-
     }
 
-    inputFrom.addEventListener('input',updateDedication);
-
-    inputTo.addEventListener('input',updateDedication);
-
+    inputFrom.addEventListener('input', updateDedication);
+    inputTo.addEventListener('input', updateDedication);
     updateDedication();
 
-    function showToast(msg,isLoading){
-
-        toastMessage.textContent = msg;
-
-        toastSpinner.style.display = isLoading ? 'block' : 'none';
-
-        toast.classList.add('show');
-
+    // Scale preview - FIXED BOUNDARIES
+    function scalePreview() {
+        const wrapper = document.getElementById('previewWrapper');
+        if (!wrapper || !posterContainer) return;
+        
+        const panel = document.querySelector('.preview-panel');
+        if (!panel) return;
+        
+        const panelWidth = panel.clientWidth - 20;
+        const containerWidth = 1080;
+        const containerHeight = 1580;
+        
+        let scale = panelWidth / containerWidth;
+        if (scale > 1) scale = 1;
+        if (scale < 0.35) scale = 0.35;
+        
+        posterContainer.style.transform = `scale(${scale})`;
+        posterContainer.style.transformOrigin = 'top center';
+        
+        const scaledHeight = containerHeight * scale;
+        wrapper.style.height = scaledHeight + 'px';
+        wrapper.style.width = (containerWidth * scale) + 'px';
     }
 
-    function hideToast(){
-
-        setTimeout(function(){
-
-            toast.classList.remove('show');
-
-        },2000);
-
-    }
-
-    downloadBtn.addEventListener('click',async function(e){
-
-        e.preventDefault();
-
-        showToast('Generating poster...',true);
-
-        const originalTransform = posterContainer.style.transform;
-
-        posterContainer.style.transform = 'none';
-
-        try{
-
-            await new Promise(function(r){
-
-                setTimeout(r,100);
-
-            });
-
-            const canvas = await html2canvas(posterContainer,{
-
-                scale:2.5,
-                backgroundColor:'#000000',
-                useCORS:true,
-                logging:false,
-                windowWidth:1080,
-                windowHeight:1350
-
-            });
-
-            const imageData = canvas.toDataURL('image/jpeg',0.95);
-
-            const link = document.createElement('a');
-
-            link.download = `UCPC_Poster_${Date.now()}.jpg`;
-
-            link.href = imageData;
-
-            link.click();
-
-            showToast('Poster downloaded successfully!',false);
-
-        }
-        catch(error){
-
-            console.error(error);
-
-            showToast('Download failed!',false);
-
-        }
-        finally{
-
-            posterContainer.style.transform = originalTransform;
-
-            hideToast();
-
-        }
-
+    window.addEventListener('resize', function() {
+        if (scaleTimeout) clearTimeout(scaleTimeout);
+        scaleTimeout = setTimeout(scalePreview, 100);
     });
+    
+    scalePreview();
 
+    // Toast functions
+    function showToast(msg, isLoading) {
+        toastMessage.textContent = msg;
+        toastSpinner.style.display = isLoading ? 'block' : 'none';
+        toast.classList.add('show');
+    }
+
+    function hideToast() {
+        setTimeout(function() {
+            toast.classList.remove('show');
+        }, 2000);
+    }
+
+    // Download poster
+    downloadBtn.addEventListener('click', async function(e) {
+        e.preventDefault();
+        
+        if (!posterContainer) {
+            alert('Poster container not found');
+            return;
+        }
+        
+        showToast('🎨 Generating your poster...', true);
+        
+        const originalTransform = posterContainer.style.transform;
+        posterContainer.style.transform = 'none';
+        
+        try {
+            await new Promise(function(r) { setTimeout(r, 100); });
+            
+            const canvas = await html2canvas(posterContainer, {
+                scale: 2.5,
+                backgroundColor: null,
+                useCORS: true,
+                logging: false,
+                windowWidth: 1080,
+                windowHeight: 1580
+            });
+            
+            const imageData = canvas.toDataURL('image/jpeg', 0.95);
+            
+            const link = document.createElement('a');
+            const timestamp = Date.now();
+            link.download = `UCPC_Poetry_Poster_${timestamp}.jpg`;
+            link.href = imageData;
+            link.click();
+            
+            showToast('✅ Poster saved to your device!', false);
+            
+        } catch (error) {
+            console.error('Download error:', error);
+            showToast('❌ Failed. Try refreshing the page.', false);
+        } finally {
+            posterContainer.style.transform = originalTransform;
+            hideToast();
+        }
+    });
 })();
-
 </script>
-
 {% endblock %}
