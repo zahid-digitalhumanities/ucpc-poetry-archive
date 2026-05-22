@@ -225,34 +225,32 @@ body {
     box-shadow: 0 0 60px rgba(0,0,0,.9);
 }
 
-/* EXTREME TIGHT BORDERS */
 .border-frame {
     position: absolute;
-    top: 8px;
-    left: 8px;
-    right: 8px;
-    bottom: 8px;
-    border: 1.5px solid rgba(212,175,55,0.35);
-    border-radius: 12px;
+    top: 6px;
+    left: 6px;
+    right: 6px;
+    bottom: 6px;
+    border: 1px solid rgba(212,175,55,0.3);
+    border-radius: 10px;
     z-index: 10;
     pointer-events: none;
 }
 
 .corner-deco {
     position: absolute;
-    width: 25px;
-    height: 25px;
+    width: 20px;
+    height: 20px;
     border-color: var(--gold-primary);
     border-style: solid;
     z-index: 11;
     pointer-events: none;
 }
-.cd-tl { top: 6px; left: 6px; border-width: 2px 0 0 2px; }
-.cd-tr { top: 6px; right: 6px; border-width: 2px 2px 0 0; }
-.cd-bl { bottom: 6px; left: 6px; border-width: 0 0 2px 2px; }
-.cd-br { bottom: 6px; right: 6px; border-width: 0 2px 2px 0; }
+.cd-tl { top: 4px; left: 4px; border-width: 1.5px 0 0 1.5px; }
+.cd-tr { top: 4px; right: 4px; border-width: 1.5px 1.5px 0 0; }
+.cd-bl { bottom: 4px; left: 4px; border-width: 0 0 1.5px 1.5px; }
+.cd-br { bottom: 4px; right: 4px; border-width: 0 1.5px 1.5px 0; }
 
-/* EXTREME TIGHT CONTENT */
 .poster-content {
     position: relative;
     z-index: 5;
@@ -260,54 +258,51 @@ body {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    padding: 8px 30px 12px;
+    padding: 5px 25px 8px;
     text-align: center;
 }
 
-/* HEADER - TIGHTEST */
 .poster-logo {
     font-family: 'Cinzel', serif;
-    font-size: 34px;
+    font-size: 32px;
     font-weight: 800;
     color: var(--gold-primary);
     letter-spacing: 2px;
-    line-height: 1.1;
+    line-height: 1.05;
 }
 
 .poster-tagline {
-    margin-top: 2px;
+    margin-top: 1px;
     margin-bottom: 0px;
-    font-size: 11px;
-    letter-spacing: 1.5px;
+    font-size: 10px;
+    letter-spacing: 1px;
     font-weight: 700;
     color: var(--gold-bright);
     text-transform: uppercase;
     background: rgba(212,175,55,0.08);
     display: inline-block;
-    padding: 1px 8px;
-    border-radius: 20px;
+    padding: 1px 6px;
+    border-radius: 15px;
 }
 
-/* POET NAME - TIGHTEST */
 .poster-poet {
-    margin: 2px 0 4px 0;
+    margin: 1px 0 2px 0;
     font-family: 'Cinzel', serif;
-    font-size: 36px;
+    font-size: 34px;
     font-weight: 700;
     color: white;
     border-bottom: 1px solid rgba(212,175,55,0.3);
     display: inline-block;
-    padding-bottom: 2px;
-    line-height: 1.15;
+    padding-bottom: 1px;
+    line-height: 1.1;
 }
 
-/* VERSES - TIGHTEST */
 .poster-verses {
     flex: 1;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    gap: 4px;
+    gap: 2px;
     padding: 0;
 }
 
@@ -319,70 +314,68 @@ body {
 
 .sher-misra1 {
     display: block;
-    font-size: 32px;
-    line-height: 1.25;
+    font-size: 30px;
+    line-height: 1.2;
     color: #ffffff;
-    padding: 0px 5px;
-    margin-bottom: 1px;
+    padding: 0px 4px;
+    margin-bottom: 0px;
 }
 
 .sher-misra2 {
     display: block;
-    font-size: 32px;
-    line-height: 1.25;
+    font-size: 30px;
+    line-height: 1.2;
     color: var(--gold-light);
-    padding: 0px 10px;
-    border-right: 2px solid var(--gold-primary);
-    margin-right: 5px;
+    padding: 0px 8px;
+    border-right: 1.5px solid var(--gold-primary);
+    margin-right: 4px;
 }
 
-/* GHAZAL LINK - TIGHTEST */
 .ghazal-link-box {
     background: rgba(212,175,55,0.08);
-    border: 1px solid rgba(212,175,55,0.35);
-    border-radius: 10px;
-    padding: 3px 8px;
-    margin: 2px 0 3px 0;
+    border: 1px solid rgba(212,175,55,0.3);
+    border-radius: 8px;
+    padding: 2px 6px;
+    margin: 1px 0 2px 0;
     text-align: center;
 }
 
 .ghazal-link-icon {
-    font-size: 14px;
+    font-size: 12px;
 }
 
 .ghazal-link-label {
     color: var(--gold-primary);
-    font-size: 8px;
+    font-size: 7px;
     letter-spacing: 1px;
     font-weight: 700;
     text-transform: uppercase;
-    margin: 0px 0 2px 0;
+    margin: 0px;
 }
 
 .ghazal-link-url {
     color: var(--gold-light);
-    font-size: 7px;
+    font-size: 6px;
     word-break: break-all;
     background: rgba(0,0,0,0.5);
-    padding: 2px;
-    border-radius: 4px;
+    padding: 1px;
+    border-radius: 3px;
 }
 
 .ghazal-link-id {
     color: #aaa;
-    font-size: 6px;
+    font-size: 5px;
     margin-top: 1px;
 }
 
-/* DEDICATION - TIGHTEST */
 .poster-dedication {
     background: rgba(212,175,55,0.06);
-    border: 1px solid rgba(212,175,55,0.15);
-    border-radius: 10px;
-    padding: 2px;
-    margin-bottom: 2px;
+    border: 1px solid rgba(212,175,55,0.12);
+    border-radius: 8px;
+    padding: 1px;
+    margin-bottom: 1px;
     color: var(--gold-light);
-    font-size: 9px;
+    font-size: 8px;
     font-weight: 600;
 }
 
@@ -392,31 +385,30 @@ body {
 
 .dedication-from {
     color: white;
-    font-size: 8px;
-    margin-top: 1px;
+    font-size: 7px;
+    margin-top: 0px;
 }
 
 .dedication-heart {
-    font-size: 12px;
+    font-size: 10px;
 }
 
-/* FOOTER - TIGHTEST */
 .poster-footer {
-    border-top: 1px solid rgba(212,175,55,0.08);
-    padding-top: 2px;
+    border-top: 0.5px solid rgba(212,175,55,0.08);
+    padding-top: 1px;
 }
 
 .footer-follow {
     color: var(--gold-primary);
-    font-size: 8px;
+    font-size: 7px;
     font-weight: 700;
     letter-spacing: 1px;
     text-transform: uppercase;
     margin-bottom: 1px;
     background: rgba(212,175,55,0.05);
     display: inline-block;
-    padding: 1px 8px;
-    border-radius: 12px;
+    padding: 0px 6px;
+    border-radius: 10px;
 }
 
 .footer-item {
@@ -425,26 +417,26 @@ body {
 
 .footer-label {
     color: #888;
-    font-size: 6px;
+    font-size: 5px;
 }
 
 .footer-value {
     color: var(--gold-light);
-    font-size: 8px;
+    font-size: 7px;
     font-weight: 600;
 }
 
 .click-hint {
-    margin-top: 4px;
+    margin-top: 3px;
     text-align: center;
-    font-size: 7px;
+    font-size: 6px;
     color: #666;
 }
 
 .click-hint span {
     background: rgba(212,175,55,0.08);
-    padding: 1px 5px;
-    border-radius: 12px;
+    padding: 0px 4px;
+    border-radius: 10px;
 }
 
 .toast {
