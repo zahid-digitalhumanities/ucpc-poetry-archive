@@ -12,599 +12,488 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Montserrat:wght@300;400;600;700&family=Noto+Nastaliq+Urdu:wght@400;700&display=swap" rel="stylesheet">
 {% endblock %}
 
 {% block extra_css %}
 <style>
-
-:root{
-    --bg-page:#050505;
-    --glass-bg:rgba(20,20,25,0.72);
-    --gold-primary:#D4AF37;
-    --gold-light:#F6D878;
-    --gold-dim:#8a7020;
-    --text-white:#ffffff;
+:root {
+    --bg-page: #050505;
+    --glass-bg: rgba(20,20,25,0.72);
+    --gold-primary: #D4AF37;
+    --gold-light: #F6D878;
+    --gold-bright: #FFD700;
+    --gold-dim: #8a7020;
+    --text-white: #ffffff;
 }
 
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
-body{
-    background:#050505;
-    background-image:
-        radial-gradient(circle at top,#171717 0%,#050505 70%);
-    color:#fff;
-    font-family:'Montserrat',sans-serif;
-    min-height:100vh;
-    overflow-x:hidden;
+body {
+    background: #050505;
+    background-image: radial-gradient(circle at top, #171717 0%, #050505 70%);
+    color: #fff;
+    font-family: 'Montserrat', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
 }
 
-/* =========================
-   APP LAYOUT
-========================= */
-
-.app-container{
-    max-width:1400px;
-    margin:auto;
-    padding:40px 20px;
+.app-container {
+    max-width: 1400px;
+    margin: auto;
+    padding: 40px 20px;
 }
 
-.two-columns{
-    display:flex;
-    flex-wrap:wrap;
-    gap:45px;
-    justify-content:center;
-    align-items:flex-start;
+.two-columns {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 45px;
+    justify-content: center;
+    align-items: flex-start;
 }
 
-.editor-panel{
-    flex:1;
-    min-width:320px;
-    max-width:500px;
-
-    background:var(--glass-bg);
-    border:1px solid rgba(212,175,55,.14);
-    border-radius:22px;
-    padding:35px;
-
-    backdrop-filter:blur(14px);
-
-    box-shadow:
-        0 10px 35px rgba(0,0,0,.65);
+.editor-panel {
+    flex: 1;
+    min-width: 320px;
+    max-width: 500px;
+    background: var(--glass-bg);
+    border: 1px solid rgba(212,175,55,.14);
+    border-radius: 22px;
+    padding: 35px;
+    backdrop-filter: blur(14px);
+    box-shadow: 0 10px 35px rgba(0,0,0,.65);
 }
 
-.brand-title{
-    text-align:center;
-    color:var(--gold-primary);
-    font-family:'Cinzel',serif;
-    letter-spacing:2px;
-    margin-bottom:28px;
-    padding-bottom:14px;
-    border-bottom:1px solid rgba(212,175,55,.15);
+.brand-title {
+    text-align: center;
+    color: var(--gold-primary);
+    font-family: 'Cinzel', serif;
+    letter-spacing: 2px;
+    margin-bottom: 28px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid rgba(212,175,55,.15);
 }
 
-.readonly-info{
-    background:rgba(255,255,255,.03);
-    border-left:4px solid var(--gold-primary);
-    padding:16px;
-    border-radius:8px;
-    margin-bottom:25px;
-    color:#ddd;
-    line-height:1.7;
+.readonly-info {
+    background: rgba(255,255,255,.03);
+    border-left: 4px solid var(--gold-primary);
+    padding: 16px;
+    border-radius: 8px;
+    margin-bottom: 25px;
+    color: #ddd;
+    line-height: 1.7;
 }
 
-.readonly-info span{
-    color:var(--gold-primary);
-    font-weight:700;
+.readonly-info span {
+    color: var(--gold-primary);
+    font-weight: 700;
 }
 
-.form-label{
-    display:block;
-    margin-bottom:12px;
-
-    color:var(--gold-light);
-    font-size:.78rem;
-    letter-spacing:2px;
-    text-transform:uppercase;
-    font-weight:700;
+.form-label {
+    display: block;
+    margin-bottom: 12px;
+    color: var(--gold-light);
+    font-size: .78rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-weight: 700;
 }
 
-.row-inputs{
-    display:flex;
-    gap:14px;
+.row-inputs {
+    display: flex;
+    gap: 14px;
 }
 
-.row-inputs > div{
-    flex:1;
+.row-inputs > div {
+    flex: 1;
 }
 
-.form-input{
-    width:100%;
-    padding:16px;
-    border-radius:12px;
-
-    background:rgba(0,0,0,.35);
-    border:1px solid #333;
-    color:#fff;
-
-    font-size:.95rem;
-    font-family:'Montserrat',sans-serif;
-
-    transition:.25s ease;
+.form-input {
+    width: 100%;
+    padding: 16px;
+    border-radius: 12px;
+    background: rgba(0,0,0,.35);
+    border: 1px solid #333;
+    color: #fff;
+    font-size: .95rem;
+    font-family: 'Montserrat', sans-serif;
+    transition: .25s ease;
 }
 
-.form-input:focus{
-    outline:none;
-    border-color:var(--gold-primary);
-    background:rgba(0,0,0,.55);
-    box-shadow:0 0 0 3px rgba(212,175,55,.12);
+.form-input:focus {
+    outline: none;
+    border-color: var(--gold-primary);
+    background: rgba(0,0,0,.55);
+    box-shadow: 0 0 0 3px rgba(212,175,55,.12);
 }
 
-.action-area{
-    margin-top:35px;
+.action-area {
+    margin-top: 35px;
 }
 
-.btn-generate{
-    width:100%;
-    border:none;
-    cursor:pointer;
-
-    padding:18px 24px;
-    border-radius:50px;
-
-    background:
-        linear-gradient(
-            135deg,
-            var(--gold-dim),
-            var(--gold-primary)
-        );
-
-    color:#000;
-    font-size:1rem;
-    font-weight:800;
-    letter-spacing:1px;
-    text-transform:uppercase;
-
-    transition:.2s ease;
-
-    box-shadow:
-        0 8px 25px rgba(212,175,55,.22);
+.btn-generate {
+    width: 100%;
+    border: none;
+    cursor: pointer;
+    padding: 18px 24px;
+    border-radius: 50px;
+    background: linear-gradient(135deg, var(--gold-dim), var(--gold-primary));
+    color: #000;
+    font-size: 1rem;
+    font-weight: 800;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    transition: .2s ease;
+    box-shadow: 0 8px 25px rgba(212,175,55,.22);
 }
 
-.btn-generate:hover{
-    transform:translateY(-2px);
+.btn-generate:hover {
+    transform: translateY(-2px);
 }
 
-.reel-help{
-    margin-top:30px;
-
-    background:rgba(212,175,55,.03);
-    border:1px solid rgba(212,175,55,.10);
-
-    border-radius:14px;
-    padding:20px;
-
-    text-align:center;
+.reel-help {
+    margin-top: 30px;
+    background: rgba(212,175,55,.03);
+    border: 1px solid rgba(212,175,55,.10);
+    border-radius: 14px;
+    padding: 20px;
+    text-align: center;
 }
 
-.reel-help h4{
-    color:var(--gold-light);
-    margin-bottom:10px;
+.reel-help h4 {
+    color: var(--gold-light);
+    margin-bottom: 10px;
 }
 
-.reel-help p{
-    color:#999;
-    font-size:.84rem;
-    line-height:1.7;
+.reel-help p {
+    color: #999;
+    font-size: .84rem;
+    line-height: 1.7;
 }
 
-.reel-help a{
-    color:var(--gold-primary);
-    text-decoration:none;
-    font-weight:700;
+.reel-help a {
+    color: var(--gold-primary);
+    text-decoration: none;
+    font-weight: 700;
 }
 
-.back-link{
-    margin-top:25px;
-    text-align:center;
+.back-link {
+    margin-top: 25px;
+    text-align: center;
 }
 
-.back-link a{
-    color:#777;
-    text-decoration:none;
+.back-link a {
+    color: #777;
+    text-decoration: none;
 }
 
-.back-link a:hover{
-    color:var(--gold-primary);
+.back-link a:hover {
+    color: var(--gold-primary);
 }
 
-/* =========================
-   POSTER
-========================= */
-
-.preview-wrapper{
-    transform-origin:top center;
-    display:flex;
-    justify-content:center;
+.preview-wrapper {
+    transform-origin: top center;
+    display: flex;
+    justify-content: center;
 }
 
-#poster-container{
-    width:1080px;
-    height:1350px;
-
-    position:relative;
-    overflow:hidden;
-
-    background:#000;
-
-    background-image:
-        radial-gradient(circle at top, rgba(255,215,0,.08), transparent 40%),
-        linear-gradient(180deg,#0a0a0a 0%,#000000 100%);
-
-    color:#fff;
-
-    box-shadow:
-        0 0 60px rgba(0,0,0,.9);
+#poster-container {
+    width: 1080px;
+    height: 1350px;
+    position: relative;
+    overflow: hidden;
+    background: #000;
+    background-image: radial-gradient(circle at top, rgba(255,215,0,.08), transparent 40%),
+                      linear-gradient(180deg, #0a0a0a 0%, #000000 100%);
+    color: #fff;
+    box-shadow: 0 0 60px rgba(0,0,0,.9);
 }
 
-/* OUTER FRAME */
-
-.border-frame{
-    position:absolute;
-    top:32px;
-    left:32px;
-    right:32px;
-    bottom:32px;
-
-    border:2px solid rgba(212,175,55,.48);
-    border-radius:28px;
-
-    z-index:10;
+.border-frame {
+    position: absolute;
+    top: 32px;
+    left: 32px;
+    right: 32px;
+    bottom: 32px;
+    border: 2px solid rgba(212,175,55,.48);
+    border-radius: 28px;
+    z-index: 10;
 }
 
-.border-frame::after{
-    content:'';
-    position:absolute;
-
-    top:5px;
-    left:5px;
-    right:5px;
-    bottom:5px;
-
-    border:1px solid rgba(255,255,255,.08);
-    border-radius:24px;
+.border-frame::after {
+    content: '';
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    right: 5px;
+    bottom: 5px;
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 24px;
 }
 
-/* CORNERS */
-
-.corner-deco{
-    position:absolute;
-    width:95px;
-    height:95px;
-
-    border-color:var(--gold-primary);
-    border-style:solid;
-    z-index:11;
+.corner-deco {
+    position: absolute;
+    width: 95px;
+    height: 95px;
+    border-color: var(--gold-primary);
+    border-style: solid;
+    z-index: 11;
 }
 
-.cd-tl{
-    top:30px;
-    left:30px;
-    border-width:5px 0 0 5px;
+.cd-tl { top: 30px; left: 30px; border-width: 5px 0 0 5px; }
+.cd-tr { top: 30px; right: 30px; border-width: 5px 5px 0 0; }
+.cd-bl { bottom: 30px; left: 30px; border-width: 0 0 5px 5px; }
+.cd-br { bottom: 30px; right: 30px; border-width: 0 5px 5px 0; }
+
+.poster-content {
+    position: relative;
+    z-index: 2;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 105px 80px 60px;
+    text-align: center;
 }
 
-.cd-tr{
-    top:30px;
-    right:30px;
-    border-width:5px 5px 0 0;
+.poster-header {
+    margin-bottom: 8px;
 }
 
-.cd-bl{
-    bottom:30px;
-    left:30px;
-    border-width:0 0 5px 5px;
+.poster-logo {
+    font-family: 'Cinzel', serif;
+    font-size: 48px;
+    font-weight: 700;
+    color: var(--gold-primary);
+    letter-spacing: 4px;
+    text-shadow: 0 2px 15px rgba(0,0,0,.85);
 }
 
-.cd-br{
-    bottom:30px;
-    right:30px;
-    border-width:0 5px 5px 0;
+.poster-tagline {
+    margin-top: 12px;
+    font-size: 20px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    font-weight: 800;
+    background: linear-gradient(135deg, #D4AF37, #FFD700, #F6D878);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    display: inline-block;
+    padding: 6px 20px;
+    border-radius: 40px;
+    background-color: rgba(212,175,55,0.12);
 }
 
-/* CONTENT */
-
-.poster-content{
-    position:relative;
-    z-index:2;
-
-    height:100%;
-
-    display:flex;
-    flex-direction:column;
-    justify-content:space-between;
-
-    padding:105px 80px 60px;
-
-    text-align:center;
+.poster-poet {
+    margin-top: 22px;
+    margin-bottom: 42px;
+    font-family: 'Cinzel', serif;
+    font-size: 62px;
+    font-weight: 700;
+    color: #f8f8f8;
+    text-shadow: 0 4px 15px rgba(0,0,0,.85);
+    border-bottom: 2px solid rgba(212,175,55,.28);
+    display: inline-block;
+    padding-bottom: 14px;
 }
 
-/* HEADER */
-
-.poster-header{
-    margin-bottom:8px;
+.poster-verses {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 15px 10px;
 }
 
-.poster-logo{
-    font-family:'Cinzel',serif;
-    font-size:48px;
-    font-weight:700;
-
-    color:var(--gold-primary);
-
-    letter-spacing:4px;
-
-    text-shadow:
-        0 2px 15px rgba(0,0,0,.85);
+.poster-sher {
+    font-family: 'Noto Nastaliq Urdu', serif;
+    direction: rtl;
+    font-size: 58px;
+    margin-bottom: 55px;
+    text-align: center;
+    text-shadow: 0 3px 12px rgba(0,0,0,.92);
 }
 
-.poster-tagline{
-    margin-top:8px;
-
-    color:#9a9a9a;
-
-    font-size:14px;
-    letter-spacing:4px;
-
-    text-transform:uppercase;
+.sher-misra1 {
+    display: block;
+    line-height: 1.8;
+    margin-bottom: 20px;
+    padding: 10px 20px;
+    border-bottom: 2px dotted rgba(212,175,55,0.35);
+    color: #ffffff;
 }
 
-/* POET */
-
-.poster-poet{
-    margin-top:22px;
-    margin-bottom:42px;
-
-    font-family:'Cinzel',serif;
-    font-size:62px;
-    font-weight:700;
-
-    color:#f8f8f8;
-
-    text-shadow:
-        0 4px 15px rgba(0,0,0,.85);
-
-    border-bottom:2px solid rgba(212,175,55,.28);
-
-    display:inline-block;
-    padding-bottom:14px;
+.sher-misra2 {
+    display: block;
+    line-height: 1.8;
+    padding: 10px 20px;
+    color: #F6D878;
+    border-right: 4px solid #D4AF37;
+    margin-right: 15px;
+    background: linear-gradient(90deg, rgba(212,175,55,0.08), transparent);
 }
 
-/* VERSES */
-
-.poster-verses{
-    flex-grow:1;
-
-    display:flex;
-    flex-direction:column;
-    justify-content:center;
-
-    padding:15px 10px;
+.ghazal-link-box {
+    background: linear-gradient(135deg, rgba(212,175,55,0.18), rgba(212,175,55,0.06));
+    border: 2px solid #D4AF37;
+    border-radius: 24px;
+    padding: 20px 20px;
+    margin: 15px 0 25px 0;
+    text-align: center;
+    backdrop-filter: blur(5px);
+    box-shadow: 0 5px 25px rgba(212,175,55,0.2);
 }
 
-.poster-sher{
-    font-family:'Noto Nastaliq Urdu',serif;
-
-    direction:rtl;
-
-    color:#fff;
-
-    font-size:67px;
-    line-height:2.15;
-
-    margin-bottom:50px;
-
-    text-align:center;
-
-    text-shadow:
-        0 3px 12px rgba(0,0,0,.92);
+.ghazal-link-icon {
+    font-size: 32px;
+    margin-bottom: 5px;
 }
 
-.poster-sher:last-child{
-    margin-bottom:0;
+.ghazal-link-label {
+    color: #D4AF37;
+    font-size: 15px;
+    letter-spacing: 3px;
+    font-weight: 800;
+    text-transform: uppercase;
+    margin-bottom: 12px;
 }
 
-/* DEDICATION */
-
-.poster-dedication{
-    margin-top:18px;
-    margin-bottom:24px;
-
-    background:rgba(212,175,55,.05);
-
-    border:1px solid rgba(212,175,55,.14);
-
-    border-radius:22px;
-
-    padding:22px;
-
-    color:var(--gold-light);
-
-    font-size:22px;
-    font-weight:700;
-    line-height:1.8;
-
-    box-shadow:
-        inset 0 0 15px rgba(255,255,255,.02);
+.ghazal-link-url {
+    color: #F6D878;
+    font-size: 14px;
+    font-weight: 600;
+    word-break: break-all;
+    background: rgba(0,0,0,0.6);
+    padding: 12px;
+    border-radius: 14px;
+    font-family: monospace;
+    letter-spacing: 0.5px;
 }
 
-.poster-dedication.hidden{
-    display:none;
+.ghazal-link-id {
+    color: #aaa;
+    font-size: 12px;
+    margin-top: 12px;
+    letter-spacing: 1px;
 }
 
-.dedication-from{
-    color:#fff;
-    font-size:19px;
-    margin-top:6px;
+.poster-dedication {
+    margin-top: 8px;
+    margin-bottom: 15px;
+    background: rgba(212,175,55,.08);
+    border: 1px solid rgba(212,175,55,.2);
+    border-radius: 22px;
+    padding: 18px;
+    color: var(--gold-light);
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1.8;
 }
 
-.dedication-heart{
-    font-size:30px;
-    line-height:1;
+.poster-dedication.hidden {
+    display: none;
 }
 
-/* FOOTER */
-
-.poster-footer{
-    margin-top:auto;
-
-    border-top:1px solid rgba(212,175,55,.12);
-
-    padding-top:24px;
+.dedication-from {
+    color: #fff;
+    font-size: 19px;
+    margin-top: 6px;
 }
 
-.footer-follow{
-    color:rgba(212,175,55,.9);
-
-    font-size:12px;
-    font-weight:700;
-
-    letter-spacing:5px;
-    text-transform:uppercase;
-
-    margin-bottom:14px;
+.dedication-heart {
+    font-size: 30px;
+    line-height: 1;
 }
 
-.footer-item{
-    margin-bottom:8px;
-    line-height:1.5;
+.poster-footer {
+    border-top: 1px solid rgba(212,175,55,0.25);
+    padding-top: 20px;
+    margin-top: 5px;
 }
 
-.footer-label{
-    color:#8b8b8b;
-    font-size:16px;
-    font-weight:700;
+.footer-follow {
+    color: #D4AF37;
+    font-size: 14px;
+    font-weight: 800;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    background: rgba(212,175,55,0.1);
+    display: inline-block;
+    padding: 6px 18px;
+    border-radius: 40px;
 }
 
-.footer-value{
-    color:#fff;
-    font-size:18px;
-    font-weight:700;
+.footer-item {
+    margin-bottom: 8px;
+    line-height: 1.5;
 }
 
-.footer-link{
-    margin-top:16px;
-
-    color:#f6d878;
-
-    font-size:17px;
-    font-weight:700;
-
-    line-height:1.7;
+.footer-label {
+    color: #8b8b8b;
+    font-size: 13px;
+    font-weight: 600;
 }
 
-.footer-link small{
-    display:block;
-
-    color:#888;
-    font-size:12px;
-    letter-spacing:2px;
-
-    margin-bottom:4px;
+.footer-value {
+    color: #F6D878;
+    font-size: 15px;
+    font-weight: 600;
 }
 
-.footer-link span{
-    word-break:break-word;
+.toast {
+    position: fixed;
+    bottom: 35px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: var(--gold-primary);
+    color: #000;
+    padding: 14px 30px;
+    border-radius: 50px;
+    font-weight: 700;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: .3s ease;
 }
 
-/* TOAST */
-
-.toast{
-    position:fixed;
-
-    bottom:35px;
-    left:50%;
-
-    transform:translateX(-50%) translateY(100px);
-
-    background:var(--gold-primary);
-    color:#000;
-
-    padding:14px 30px;
-    border-radius:50px;
-
-    font-weight:700;
-
-    z-index:9999;
-
-    display:flex;
-    align-items:center;
-    gap:12px;
-
-    transition:.3s ease;
+.toast.show {
+    transform: translateX(-50%) translateY(0);
 }
 
-.toast.show{
-    transform:translateX(-50%) translateY(0);
+.toast-spinner {
+    width: 18px;
+    height: 18px;
+    border: 3px solid #000;
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
 }
 
-.toast-spinner{
-    width:18px;
-    height:18px;
-
-    border:3px solid #000;
-    border-top-color:transparent;
-
-    border-radius:50%;
-
-    animation:spin 1s linear infinite;
+@keyframes spin {
+    100% { transform: rotate(360deg); }
 }
 
-@keyframes spin{
-    100%{
-        transform:rotate(360deg);
-    }
+@media (max-width: 768px) {
+    .app-container { padding: 20px 10px; }
+    .editor-panel { padding: 25px; }
+    .preview-wrapper { overflow-x: auto; justify-content: flex-start; padding-bottom: 10px; }
 }
-
-/* MOBILE */
-
-@media(max-width:768px){
-
-    .app-container{
-        padding:20px 10px;
-    }
-
-    .editor-panel{
-        padding:25px;
-    }
-
-    .preview-wrapper{
-        overflow-x:auto;
-        justify-content:flex-start;
-        padding-bottom:10px;
-    }
-}
-
 </style>
 {% endblock %}
 
 {% block content %}
-
 <div class="app-container">
-
     <div class="two-columns">
-
         <!-- LEFT PANEL -->
-
         <section class="editor-panel">
-
-            <h1 class="brand-title">
-                ✨ UCPC Poetry Archive ✨
-            </h1>
+            <h1 class="brand-title">✨ UCPC Poetry Archive ✨</h1>
 
             <div class="readonly-info">
                 📜 <span>Poet:</span> {{ ghazal.poet_name }}<br>
@@ -612,408 +501,185 @@ body{
             </div>
 
             <div class="form-group">
-
-                <label class="form-label">
-                    Personalize Your Poster
-                </label>
-
+                <label class="form-label">Personalize Your Poster</label>
                 <div class="row-inputs">
-
                     <div>
-                        <input
-                            type="text"
-                            id="inputFrom"
-                            class="form-input"
-                            placeholder="From"
-                        >
+                        <input type="text" id="inputFrom" class="form-input" placeholder="From">
                     </div>
-
                     <div>
-                        <input
-                            type="text"
-                            id="inputTo"
-                            class="form-input"
-                            placeholder="To"
-                        >
+                        <input type="text" id="inputTo" class="form-input" placeholder="To">
                     </div>
-
                 </div>
-
             </div>
 
             <div class="action-area">
-
-                <button class="btn-generate" id="downloadBtn">
-                    📱 Download Poster
-                </button>
-
-                <div style="margin-top:10px;color:#777;font-size:.78rem;">
-                    High Quality Reel Poster — 1080 × 1350
-                </div>
-
+                <button class="btn-generate" id="downloadBtn">📱 Download Poster</button>
+                <div style="margin-top:10px;color:#777;font-size:.78rem;">High Quality Reel Poster — 1080 × 1350</div>
             </div>
 
             <div class="reel-help">
-
                 <h4>🎬 Viral Reel Tip</h4>
-
-                <p>
-                    Download → Add Slow Zoom → Add Soft Music →
-                    Upload to Facebook Reels
-                </p>
-
-                <a
-                    href="https://play.google.com/store/apps/details?id=com.lemon.lvoverseas"
-                    target="_blank"
-                >
-                    Open CapCut →
-                </a>
-
+                <p>Download → Add Slow Zoom → Add Soft Music → Upload to Facebook Reels</p>
+                <a href="https://play.google.com/store/apps/details?id=com.lemon.lvoverseas" target="_blank">Open CapCut →</a>
             </div>
 
             <div class="back-link">
-                <a href="/poets/{{ ghazal.poet_id }}">
-                    ← Back to Poet
-                </a>
+                <a href="/poets/{{ ghazal.poet_id }}">← Back to Poet</a>
             </div>
-
         </section>
 
-        <!-- RIGHT PANEL -->
-
+        <!-- RIGHT PANEL - POSTER PREVIEW -->
         <section class="preview-panel">
-
             <div class="preview-wrapper" id="previewWrapper">
-
                 <div id="poster-container">
-
-                    <!-- FRAME -->
-
                     <div class="border-frame"></div>
-
                     <div class="corner-deco cd-tl"></div>
                     <div class="corner-deco cd-tr"></div>
                     <div class="corner-deco cd-bl"></div>
                     <div class="corner-deco cd-br"></div>
 
-                    <!-- CONTENT -->
-
                     <div class="poster-content">
-
                         <!-- HEADER -->
-
                         <div class="poster-header">
-
-                            <div class="poster-logo">
-                                UCPC POETRY ARCHIVE
-                            </div>
-
-                            <div class="poster-tagline">
-                                FOLLOW FOR DAILY URDU POETRY
-                            </div>
-
+                            <div class="poster-logo">UCPC POETRY ARCHIVE</div>
+                            <div class="poster-tagline">📖 FOLLOW DAILY UPDATES 📖</div>
                         </div>
 
-                        <!-- MAIN -->
-
+                        <!-- POET & VERSES -->
                         <div>
-
-                            <div class="poster-poet">
-                                {{ ghazal.poet_name }}
-                            </div>
-
+                            <div class="poster-poet">{{ ghazal.poet_name }}</div>
                             <div class="poster-verses">
-
                                 {% for verse in poster_verses[:2] %}
                                 <div class="poster-sher" dir="rtl">
-
-                                    {{ verse.misra1_urdu }}<br>
-                                    {{ verse.misra2_urdu }}
-
+                                    <span class="sher-misra1">{{ verse.misra1_urdu }}</span>
+                                    <span class="sher-misra2">{{ verse.misra2_urdu }}</span>
                                 </div>
                                 {% endfor %}
-
                             </div>
-
                         </div>
 
-                        <!-- FOOTER -->
-
+                        <!-- FOOTER WITH GHAZAL LINK -->
                         <div>
+                            <div class="poster-dedication hidden" id="displayDedication"></div>
 
-                            <!-- OPTIONAL DEDICATION -->
-
-                            <div
-                                class="poster-dedication hidden"
-                                id="displayDedication"
-                            ></div>
+                            <!-- FULL GHAZAL LINK BOX -->
+                            <div class="ghazal-link-box">
+                                <div class="ghazal-link-icon">📜</div>
+                                <div class="ghazal-link-label">READ FULL GHAZAL</div>
+                                <div class="ghazal-link-url">{{ request.host_url.rstrip('/') }}/ghazal/{{ ghazal.id }}</div>
+                                <div class="ghazal-link-id">GHAZAL ID: #{{ ghazal.id }}</div>
+                            </div>
 
                             <div class="poster-footer">
-
-                                <div class="footer-follow">
-                                    READ FULL GHAZAL
-                                </div>
-
-                                <div class="footer-link">
-
-                                    <small>FULL GHAZAL LINK</small>
-
-                                    <span>
-                                        {{ request.host_url.rstrip('/') }}/ghazal/{{ ghazal.id }}
-                                    </span>
-
-                                </div>
-
+                                <div class="footer-follow">🔔 FOLLOW FOR MORE 🔔</div>
                                 <div class="footer-item">
-
-                                    <span class="footer-label">
-                                        Facebook :
-                                    </span>
-
-                                    <span class="footer-value">
-                                        UCPC Poetry Archive
-                                    </span>
-
+                                    <span class="footer-label">Facebook :</span>
+                                    <span class="footer-value">@UCPCPoetryArchive</span>
                                 </div>
-
                             </div>
-
                         </div>
-
                     </div>
-
                 </div>
-
             </div>
-
         </section>
-
     </div>
-
 </div>
 
 <!-- TOAST -->
-
 <div id="toast" class="toast">
-
     <div class="toast-spinner" id="toastSpinner"></div>
-
-    <span id="toastMessage">
-        Generating...
-    </span>
-
+    <span id="toastMessage">Generating...</span>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
 <script>
-
 const inputTo = document.getElementById('inputTo');
 const inputFrom = document.getElementById('inputFrom');
+const displayDedication = document.getElementById('displayDedication');
+const posterContainer = document.getElementById('poster-container');
+const downloadBtn = document.getElementById('downloadBtn');
+const toast = document.getElementById('toast');
+const toastMsg = document.getElementById('toastMessage');
+const toastSpinner = document.getElementById('toastSpinner');
 
-const displayDedication =
-    document.getElementById('displayDedication');
-
-const posterContainer =
-    document.getElementById('poster-container');
-
-const downloadBtn =
-    document.getElementById('downloadBtn');
-
-const toast =
-    document.getElementById('toast');
-
-const toastMsg =
-    document.getElementById('toastMessage');
-
-const toastSpinner =
-    document.getElementById('toastSpinner');
-
-/* =========================
-   DEDICATION
-========================= */
-
-function escapeHtml(str){
-
-    if(!str) return '';
-
-    return str.replace(/[&<>]/g,function(m){
-
-        return m === '&'
-            ? '&amp;'
-            : (m === '<' ? '&lt;' : '&gt;');
-
+function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/[&<>]/g, function(m) {
+        return m === '&' ? '&amp;' : (m === '<' ? '&lt;' : '&gt;');
     });
-
 }
 
-function updateDedication(){
-
+function updateDedication() {
     const to = inputTo.value.trim();
     const from = inputFrom.value.trim();
-
     let html = '';
 
-    if(to || from){
-
-        html += `
-            <div>✨ Dedicated With Love ✨</div>
-        `;
-
-        if(from){
-
-            html += `
-                <div class="dedication-from">
-                    From ${escapeHtml(from)}
-                </div>
-            `;
-
-        }
-
-        if(to){
-
-            html += `
-                <div class="dedication-heart">❤️</div>
-
-                <div class="dedication-from">
-                    To ${escapeHtml(to)}
-                </div>
-            `;
-
-        }
-
+    if (to || from) {
+        html += `<div>✨ Dedicated With Love ✨</div>`;
+        if (from) html += `<div class="dedication-from">From ${escapeHtml(from)}</div>`;
+        if (to) html += `<div class="dedication-heart">❤️</div><div class="dedication-from">To ${escapeHtml(to)}</div>`;
         displayDedication.innerHTML = html;
-
         displayDedication.classList.remove('hidden');
-
-    }else{
-
+    } else {
         displayDedication.classList.add('hidden');
-
     }
-
 }
 
-inputTo.addEventListener('input',updateDedication);
-inputFrom.addEventListener('input',updateDedication);
-
+inputTo.addEventListener('input', updateDedication);
+inputFrom.addEventListener('input', updateDedication);
 updateDedication();
 
-/* =========================
-   SCALE PREVIEW
-========================= */
-
-function scalePreview(){
-
-    const panel =
-        document.querySelector('.preview-panel');
-
-    if(!panel) return;
-
+function scalePreview() {
+    const panel = document.querySelector('.preview-panel');
+    if (!panel) return;
     const w = panel.clientWidth - 40;
-
     const original = 1080;
-
     let scale = w / original;
-
-    if(scale > 1) scale = 1;
-
-    posterContainer.style.transform =
-        `scale(${scale})`;
-
-    document.getElementById('previewWrapper').style.height =
-        `${1350 * scale}px`;
-
+    if (scale > 1) scale = 1;
+    posterContainer.style.transform = `scale(${scale})`;
+    document.getElementById('previewWrapper').style.height = `${1350 * scale}px`;
 }
 
-window.addEventListener('resize',scalePreview);
-
+window.addEventListener('resize', scalePreview);
 scalePreview();
 
-/* =========================
-   TOAST
-========================= */
-
-function showToast(msg,loading=true){
-
+function showToast(msg, loading = true) {
     toastMsg.textContent = msg;
-
-    toastSpinner.style.display =
-        loading ? 'block' : 'none';
-
+    toastSpinner.style.display = loading ? 'block' : 'none';
     toast.classList.add('show');
-
 }
 
-function hideToast(){
-
-    setTimeout(()=>{
-
-        toast.classList.remove('show');
-
-    },2500);
-
+function hideToast() {
+    setTimeout(() => toast.classList.remove('show'), 2500);
 }
 
-/* =========================
-   DOWNLOAD
-========================= */
-
-downloadBtn.addEventListener('click',async()=>{
-
-    showToast("Generating Premium Poster...",true);
-
-    const prevTransform =
-        posterContainer.style.transform;
-
+downloadBtn.addEventListener('click', async () => {
+    showToast("Generating Premium Poster...", true);
+    const prevTransform = posterContainer.style.transform;
     posterContainer.style.transform = 'none';
 
-    try{
-
-        await new Promise(r=>requestAnimationFrame(r));
-
-        const canvas = await html2canvas(
-            posterContainer,
-            {
-                scale:2,
-                useCORS:true,
-                backgroundColor:'#000',
-                logging:false
-            }
-        );
-
-        const dataUrl =
-            canvas.toDataURL('image/jpeg',0.98);
-
-        const link =
-            document.createElement('a');
-
-        link.download =
-            `UCPC_Poster_${Date.now()}.jpg`;
-
+    try {
+        await new Promise(r => requestAnimationFrame(r));
+        const canvas = await html2canvas(posterContainer, {
+            scale: 2,
+            useCORS: true,
+            backgroundColor: '#000',
+            logging: false
+        });
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.98);
+        const link = document.createElement('a');
+        link.download = `UCPC_Poster_${Date.now()}.jpg`;
         link.href = dataUrl;
-
         link.click();
-
-        showToast("Poster Downloaded Successfully!",false);
-
-    }catch(err){
-
+        showToast("Poster Downloaded Successfully!", false);
+    } catch (err) {
         console.error(err);
-
-        showToast("Download Failed",false);
-
-    }finally{
-
-        posterContainer.style.transform =
-            prevTransform;
-
+        showToast("Download Failed", false);
+    } finally {
+        posterContainer.style.transform = prevTransform;
         hideToast();
-
     }
-
 });
-
 </script>
-
 {% endblock %}
