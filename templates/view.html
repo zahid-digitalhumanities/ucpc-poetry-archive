@@ -3,13 +3,16 @@
 {% block title %}{{ ghazal.poet_name }} - UCPC Poetry Archive{% endblock %}
 
 {% block extra_head %}
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Montserrat:wght@300;400;600;700;800&family=Noto+Nastaliq+Urdu:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Montserrat:wght@300;400;600;700&family=Noto+Nastaliq+Urdu:wght@400;500;600;700&display=swap" rel="stylesheet">
+
 {% endblock %}
 
 {% block extra_css %}
+
 <style>
 
 /* ================= RESET ================= */
@@ -23,14 +26,14 @@ box-sizing:border-box;
 body{
 background:#050505;
 font-family:'Montserrat',sans-serif;
-color:#fff;
 overflow-x:hidden;
+color:#fff;
 }
 
-/* ================= PAGE LAYOUT ================= */
+/* ================= LAYOUT ================= */
 
-.app{
-max-width:1400px;
+.wrapper{
+max-width:1500px;
 margin:auto;
 padding:30px 20px;
 }
@@ -43,84 +46,83 @@ justify-content:center;
 align-items:flex-start;
 }
 
-/* ================= CONTROL PANEL ================= */
+/* ================= PANEL ================= */
 
 .panel{
 width:340px;
-background:rgba(20,20,25,0.92);
-border:1px solid rgba(212,175,55,0.18);
+background:rgba(18,18,18,0.92);
+border:1px solid rgba(212,175,55,0.15);
 border-radius:22px;
 padding:24px;
-backdrop-filter:blur(10px);
+backdrop-filter:blur(12px);
 }
 
 .panel-title{
 font-family:'Cinzel',serif;
 font-size:22px;
-color:#D4AF37;
 text-align:center;
+color:#D4AF37;
 margin-bottom:18px;
-padding-bottom:10px;
-border-bottom:1px solid rgba(212,175,55,0.15);
+padding-bottom:12px;
+border-bottom:1px solid rgba(212,175,55,0.12);
 }
 
 .label{
+display:block;
 font-size:12px;
+font-weight:700;
 letter-spacing:1px;
 margin-bottom:8px;
 color:#F6D878;
-font-weight:700;
-display:block;
 }
 
-select,
-input{
+select,input{
 width:100%;
 padding:12px;
 border:none;
 border-radius:12px;
 background:#111;
 color:#fff;
-font-size:14px;
 margin-bottom:14px;
+font-size:14px;
 }
 
-.double{
+.row{
 display:flex;
 gap:10px;
 }
 
-.double div{
+.row div{
 flex:1;
 }
 
 button{
 width:100%;
 border:none;
-border-radius:40px;
 padding:14px;
+border-radius:40px;
+background:linear-gradient(90deg,#B88A1A,#FFD86B);
 font-size:15px;
 font-weight:800;
 cursor:pointer;
-background:linear-gradient(90deg,#B88A1A,#FFD86B);
 color:#000;
-margin-top:8px;
 }
 
-/* ================= POSTER WRAPPER ================= */
+/* ================= PREVIEW ================= */
 
 .preview{
-display:flex;
-justify-content:center;
-align-items:flex-start;
+overflow:auto;
 }
 
+/* ================= POSTER ================= */
+
 #poster{
-width:1080px;
-height:1920px;
+width:1220px;
+min-height:1450px;
 position:relative;
 overflow:hidden;
-box-shadow:0 35px 70px rgba(0,0,0,0.85);
+padding:28px;
+box-shadow:0 30px 70px rgba(0,0,0,0.85);
 }
 
 /* ================= THEMES ================= */
@@ -128,7 +130,7 @@ box-shadow:0 35px 70px rgba(0,0,0,0.85);
 .theme-1{
 background:#000;
 background-image:
-radial-gradient(circle at top, rgba(212,175,55,0.10), transparent 40%);
+radial-gradient(circle at top, rgba(212,175,55,0.08), transparent 45%);
 }
 
 .theme-2{
@@ -151,59 +153,72 @@ radial-gradient(circle at center, rgba(255,255,255,0.05), transparent 60%);
 
 /* ================= BORDER ================= */
 
-.border{
+.poster-border{
 position:absolute;
-top:8px;
-left:8px;
-right:8px;
-bottom:8px;
-border:1px solid rgba(212,175,55,0.20);
-border-radius:18px;
+top:10px;
+left:10px;
+right:10px;
+bottom:10px;
+border:2px solid rgba(212,175,55,0.65);
+border-radius:24px;
 pointer-events:none;
 }
 
-/* ================= POSTER CONTENT ================= */
+/* ================= CONTENT ================= */
 
 .content{
 position:relative;
 z-index:5;
-height:100%;
 display:flex;
 flex-direction:column;
 align-items:center;
 text-align:center;
-padding:26px 42px 20px;
 }
 
-/* ================= HEADER ================= */
+/* ================= LOGO ================= */
 
 .logo{
 font-family:'Cinzel',serif;
-font-size:34px;
+font-size:52px;
 font-weight:800;
-line-height:1;
 color:#D4AF37;
+line-height:1;
 }
 
 .follow{
-font-size:11px;
+font-size:16px;
 font-weight:700;
-color:#F6D878;
-margin-top:2px;
-margin-bottom:14px;
 letter-spacing:1px;
+color:#F6D878;
+margin-top:4px;
+margin-bottom:14px;
 }
 
 /* ================= POET ================= */
 
+.poet-line{
+width:100%;
+display:flex;
+align-items:center;
+justify-content:center;
+gap:18px;
+margin-bottom:30px;
+}
+
+.poet-line::before,
+.poet-line::after{
+content:"";
+height:2px;
+flex:1;
+background:rgba(212,175,55,0.55);
+}
+
 .poet{
 font-family:'Cinzel',serif;
-font-size:40px;
+font-size:58px;
 font-weight:700;
-line-height:1.1;
-border-bottom:1px solid rgba(212,175,55,0.22);
-padding-bottom:4px;
-margin-bottom:20px;
+color:#D4AF37;
+white-space:nowrap;
 }
 
 /* ================= VERSES ================= */
@@ -212,83 +227,111 @@ margin-bottom:20px;
 width:100%;
 display:flex;
 flex-direction:column;
-gap:14px;
-margin-bottom:24px;
+gap:10px;
+margin-bottom:26px;
 }
 
 .line{
 font-family:'Noto Nastaliq Urdu',serif;
 direction:rtl;
-font-size:38px;
-line-height:1.6;
+font-size:54px;
+line-height:1.75;
+white-space:nowrap;
 text-align:center;
+overflow:hidden;
 }
 
 .gold{
-color:#F6D878;
+color:#E6C56B;
 }
 
 /* ================= DEDICATION ================= */
 
-.dedication{
-background:rgba(212,175,55,0.08);
-border:1px solid rgba(212,175,55,0.18);
-padding:10px 18px;
-border-radius:18px;
-font-size:14px;
-color:#F6D878;
-margin-bottom:20px;
-min-width:280px;
+.dedication-wrap{
+width:100%;
+display:flex;
+align-items:center;
+justify-content:center;
+gap:14px;
+margin-bottom:22px;
 }
 
-.dedication.hidden{
-display:none;
+.dedication-wrap::before,
+.dedication-wrap::after{
+content:"";
+height:2px;
+flex:1;
+background:rgba(212,175,55,0.35);
+}
+
+.dedication{
+font-size:26px;
+color:#F6D878;
+white-space:nowrap;
+}
+
+/* ================= LINK ================= */
+
+.link-box{
+width:100%;
+display:flex;
+align-items:center;
+justify-content:center;
+gap:12px;
+margin-bottom:18px;
+}
+
+.link-box::before,
+.link-box::after{
+content:"";
+height:2px;
+flex:1;
+background:rgba(212,175,55,0.25);
+}
+
+.link{
+font-size:22px;
+color:#F6D878;
+white-space:nowrap;
 }
 
 /* ================= FOOTER ================= */
 
-.linkbox{
-background:rgba(212,175,55,0.06);
-border:1px solid rgba(212,175,55,0.15);
-padding:10px 18px;
-border-radius:14px;
-font-size:11px;
-margin-bottom:12px;
-max-width:90%;
-word-break:break-word;
-}
-
 .footer{
-font-size:10px;
-color:#999;
+font-size:20px;
+color:#D4AF37;
+margin-bottom:8px;
 }
 
 /* ================= MOBILE ================= */
 
 @media(max-width:768px){
 
-.app{
-padding:20px 10px;
-}
-
 .panel{
 width:100%;
 }
 
+#poster{
+transform:scale(0.45);
+transform-origin:top left;
+}
+
 .preview{
+width:100%;
 overflow:auto;
 }
 
 }
 
 </style>
+
 {% endblock %}
 
 {% block content %}
 
 {% set ghazal_url = request.host_url.rstrip('/') + '/ghazal/' + ghazal.id|string %}
 
-<div class="app">
+<div class="wrapper">
 
 <div class="layout">
 
@@ -305,18 +348,21 @@ overflow:auto;
 </label>
 
 <select id="themeSelect">
+
 <option value="theme-1">Classic Black</option>
 <option value="theme-2">Royal Gold</option>
 <option value="theme-3">Velvet Maroon</option>
 <option value="theme-4">Night Blue</option>
 <option value="theme-5">Dark Silver</option>
+
 </select>
 
 <label class="label">
-💝 Dedication (Optional)
+💝 Dedication
 </label>
 
-<div class="double">
+<div class="row">
+
 <div>
 <input type="text" id="fromInput" placeholder="From">
 </div>
@@ -324,6 +370,7 @@ overflow:auto;
 <div>
 <input type="text" id="toInput" placeholder="To">
 </div>
+
 </div>
 
 <button id="downloadBtn">
@@ -338,24 +385,28 @@ overflow:auto;
 
 <div id="poster" class="theme-1">
 
-<div class="border"></div>
+<div class="poster-border"></div>
 
 <div class="content">
 
 <!-- HEADER -->
 
 <div class="logo">
-UCPC POETRY ARCHIVE
+✨ UCPC POETRY ARCHIVE ✨
 </div>
 
 <div class="follow">
-📖 FOLLOW DAILY UPDATES 📖
+FOLLOW DAILY UPDATES
 </div>
 
 <!-- POET -->
 
+<div class="poet-line">
+
 <div class="poet">
 {{ ghazal.poet_name }}
+</div>
+
 </div>
 
 <!-- VERSES -->
@@ -378,18 +429,27 @@ UCPC POETRY ARCHIVE
 
 <!-- DEDICATION -->
 
-<div id="dedicationBox" class="dedication hidden">
-💝 Dedicated With Love
+<div class="dedication-wrap" id="dedicationWrap" style="display:none;">
+
+<div class="dedication" id="dedicationText">
+</div>
+
+</div>
+
+<!-- LINK -->
+
+<div class="link-box">
+
+<div class="link">
+📜 {{ ghazal_url }}
+</div>
+
 </div>
 
 <!-- FOOTER -->
 
-<div class="linkbox">
-📜 {{ ghazal_url }}
-</div>
-
 <div class="footer">
-🔔 UCPC Poetry Archive
+🔔 UCPC Poetry Archive 🔔
 </div>
 
 </div>
@@ -404,21 +464,23 @@ UCPC POETRY ARCHIVE
 
 <script>
 
-const themeSelect=document.getElementById("themeSelect");
+/* ================= THEME ================= */
+
 const poster=document.getElementById("poster");
 
-const fromInput=document.getElementById("fromInput");
-const toInput=document.getElementById("toInput");
+document.getElementById("themeSelect").addEventListener("change",function(){
 
-const dedicationBox=document.getElementById("dedicationBox");
-
-themeSelect.addEventListener("change",function(){
-
-poster.className=themeSelect.value;
+poster.className=this.value;
 
 });
 
 /* ================= DEDICATION ================= */
+
+const fromInput=document.getElementById("fromInput");
+const toInput=document.getElementById("toInput");
+
+const dedicationWrap=document.getElementById("dedicationWrap");
+const dedicationText=document.getElementById("dedicationText");
 
 function updateDedication(){
 
@@ -430,7 +492,7 @@ if(from || to){
 let text="💝 ";
 
 if(from){
-text+="From: "+from;
+text+="From "+from;
 }
 
 if(from && to){
@@ -438,15 +500,16 @@ text+=" ❤️ ";
 }
 
 if(to){
-text+="To: "+to;
+text+="To "+to;
 }
 
-dedicationBox.innerText=text;
-dedicationBox.classList.remove("hidden");
+dedicationText.innerText=text;
+
+dedicationWrap.style.display="flex";
 
 }else{
 
-dedicationBox.classList.add("hidden");
+dedicationWrap.style.display="none";
 
 }
 
@@ -461,13 +524,13 @@ document.getElementById("downloadBtn").addEventListener("click",async function()
 
 const canvas=await html2canvas(poster,{
 scale:2.5,
-backgroundColor:null,
-useCORS:true
+useCORS:true,
+backgroundColor:null
 });
 
 const link=document.createElement("a");
 
-link.download="ucpc-poster-"+Date.now()+".jpg";
+link.download="UCPC-"+Date.now()+".jpg";
 
 link.href=canvas.toDataURL("image/jpeg",0.95);
 
