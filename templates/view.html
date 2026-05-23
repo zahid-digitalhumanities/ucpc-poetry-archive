@@ -15,8 +15,6 @@
 
 <style>
 
-/* ================= RESET ================= */
-
 *{
 margin:0;
 padding:0;
@@ -30,9 +28,9 @@ overflow-x:hidden;
 color:#fff;
 }
 
-/* ================= LAYOUT ================= */
+/* ================= MAIN ================= */
 
-.wrapper{
+.main-wrapper{
 max-width:1500px;
 margin:auto;
 padding:30px 20px;
@@ -41,29 +39,29 @@ padding:30px 20px;
 .layout{
 display:flex;
 flex-wrap:wrap;
-gap:35px;
+gap:30px;
 justify-content:center;
 align-items:flex-start;
 }
 
-/* ================= PANEL ================= */
+/* ================= CONTROL PANEL ================= */
 
-.panel{
+.control-panel{
 width:340px;
 background:rgba(18,18,18,0.92);
 border:1px solid rgba(212,175,55,0.15);
-border-radius:22px;
+border-radius:24px;
 padding:24px;
 backdrop-filter:blur(12px);
 }
 
 .panel-title{
 font-family:'Cinzel',serif;
-font-size:22px;
-text-align:center;
+font-size:24px;
 color:#D4AF37;
-margin-bottom:18px;
-padding-bottom:12px;
+text-align:center;
+margin-bottom:22px;
+padding-bottom:14px;
 border-bottom:1px solid rgba(212,175,55,0.12);
 }
 
@@ -78,12 +76,12 @@ color:#F6D878;
 
 select,input{
 width:100%;
-padding:12px;
+padding:13px;
 border:none;
 border-radius:12px;
 background:#111;
 color:#fff;
-margin-bottom:14px;
+margin-bottom:15px;
 font-size:14px;
 }
 
@@ -96,11 +94,11 @@ gap:10px;
 flex:1;
 }
 
-button{
+.download-btn{
 width:100%;
 border:none;
-padding:14px;
-border-radius:40px;
+padding:15px;
+border-radius:50px;
 background:linear-gradient(90deg,#B88A1A,#FFD86B);
 font-size:15px;
 font-weight:800;
@@ -117,11 +115,11 @@ overflow:auto;
 /* ================= POSTER ================= */
 
 #poster{
-width:1220px;
+width:1080px;
 min-height:1450px;
 position:relative;
 overflow:hidden;
-padding:28px;
+padding:22px;
 box-shadow:0 30px 70px rgba(0,0,0,0.85);
 }
 
@@ -130,7 +128,7 @@ box-shadow:0 30px 70px rgba(0,0,0,0.85);
 .theme-1{
 background:#000;
 background-image:
-radial-gradient(circle at top, rgba(212,175,55,0.08), transparent 45%);
+radial-gradient(circle at top, rgba(212,175,55,0.07), transparent 45%);
 }
 
 .theme-2{
@@ -146,9 +144,7 @@ background:linear-gradient(145deg,#09142b,#000);
 }
 
 .theme-5{
-background:linear-gradient(145deg,#101010,#000);
-background-image:
-radial-gradient(circle at center, rgba(255,255,255,0.05), transparent 60%);
+background:linear-gradient(145deg,#111,#000);
 }
 
 /* ================= BORDER ================= */
@@ -159,50 +155,51 @@ top:10px;
 left:10px;
 right:10px;
 bottom:10px;
-border:2px solid rgba(212,175,55,0.65);
+border:2px solid rgba(212,175,55,0.7);
 border-radius:24px;
 pointer-events:none;
 }
 
 /* ================= CONTENT ================= */
 
-.content{
+.poster-content{
 position:relative;
 z-index:5;
 display:flex;
 flex-direction:column;
 align-items:center;
 text-align:center;
+padding:10px 35px 18px;
 }
 
-/* ================= LOGO ================= */
+/* ================= HEADER ================= */
 
-.logo{
+.poster-logo{
 font-family:'Cinzel',serif;
-font-size:52px;
+font-size:58px;
 font-weight:800;
-color:#D4AF37;
 line-height:1;
+color:#D4AF37;
 }
 
-.follow{
-font-size:16px;
+.poster-follow{
+font-size:15px;
 font-weight:700;
 letter-spacing:1px;
 color:#F6D878;
-margin-top:4px;
+margin-top:3px;
 margin-bottom:14px;
 }
 
-/* ================= POET ================= */
+/* ================= POET LINE ================= */
 
 .poet-line{
 width:100%;
 display:flex;
 align-items:center;
 justify-content:center;
-gap:18px;
-margin-bottom:30px;
+gap:16px;
+margin-bottom:40px;
 }
 
 .poet-line::before,
@@ -213,9 +210,9 @@ flex:1;
 background:rgba(212,175,55,0.55);
 }
 
-.poet{
+.poster-poet{
 font-family:'Cinzel',serif;
-font-size:58px;
+font-size:72px;
 font-weight:700;
 color:#D4AF37;
 white-space:nowrap;
@@ -223,21 +220,21 @@ white-space:nowrap;
 
 /* ================= VERSES ================= */
 
-.verses{
+.poster-verses{
 width:100%;
 display:flex;
 flex-direction:column;
-gap:10px;
-margin-bottom:26px;
+gap:18px;
+margin-bottom:34px;
 }
 
-.line{
+.poster-line{
 font-family:'Noto Nastaliq Urdu',serif;
 direction:rtl;
-font-size:54px;
-line-height:1.75;
-white-space:nowrap;
 text-align:center;
+font-size:54px;
+line-height:1.8;
+white-space:nowrap;
 overflow:hidden;
 }
 
@@ -247,7 +244,7 @@ color:#E6C56B;
 
 /* ================= DEDICATION ================= */
 
-.dedication-wrap{
+.dedication-line{
 width:100%;
 display:flex;
 align-items:center;
@@ -256,63 +253,62 @@ gap:14px;
 margin-bottom:22px;
 }
 
-.dedication-wrap::before,
-.dedication-wrap::after{
+.dedication-line::before,
+.dedication-line::after{
 content:"";
 height:2px;
 flex:1;
 background:rgba(212,175,55,0.35);
 }
 
-.dedication{
-font-size:26px;
+.dedication-text{
+font-size:22px;
 color:#F6D878;
 white-space:nowrap;
 }
 
 /* ================= LINK ================= */
 
-.link-box{
+.link-line{
 width:100%;
 display:flex;
 align-items:center;
 justify-content:center;
 gap:12px;
-margin-bottom:18px;
+margin-bottom:16px;
 }
 
-.link-box::before,
-.link-box::after{
+.link-line::before,
+.link-line::after{
 content:"";
 height:2px;
 flex:1;
-background:rgba(212,175,55,0.25);
+background:rgba(212,175,55,0.22);
 }
 
-.link{
-font-size:22px;
+.poster-link{
+font-size:18px;
 color:#F6D878;
 white-space:nowrap;
 }
 
 /* ================= FOOTER ================= */
 
-.footer{
-font-size:20px;
+.poster-footer{
+font-size:18px;
 color:#D4AF37;
-margin-bottom:8px;
 }
 
 /* ================= MOBILE ================= */
 
 @media(max-width:768px){
 
-.panel{
+.control-panel{
 width:100%;
 }
 
 #poster{
-transform:scale(0.45);
+transform:scale(0.42);
 transform-origin:top left;
 }
 
@@ -331,13 +327,13 @@ overflow:auto;
 
 {% set ghazal_url = request.host_url.rstrip('/') + '/ghazal/' + ghazal.id|string %}
 
-<div class="wrapper">
+<div class="main-wrapper">
 
 <div class="layout">
 
 <!-- ================= CONTROL PANEL ================= -->
 
-<div class="panel">
+<div class="control-panel">
 
 <div class="panel-title">
 ✨ UCPC POSTER ENGINE
@@ -373,7 +369,7 @@ overflow:auto;
 
 </div>
 
-<button id="downloadBtn">
+<button id="downloadBtn" class="download-btn">
 📥 DOWNLOAD POSTER
 </button>
 
@@ -387,15 +383,15 @@ overflow:auto;
 
 <div class="poster-border"></div>
 
-<div class="content">
+<div class="poster-content">
 
 <!-- HEADER -->
 
-<div class="logo">
+<div class="poster-logo">
 ✨ UCPC POETRY ARCHIVE ✨
 </div>
 
-<div class="follow">
+<div class="poster-follow">
 FOLLOW DAILY UPDATES
 </div>
 
@@ -403,7 +399,7 @@ FOLLOW DAILY UPDATES
 
 <div class="poet-line">
 
-<div class="poet">
+<div class="poster-poet">
 {{ ghazal.poet_name }}
 </div>
 
@@ -411,15 +407,15 @@ FOLLOW DAILY UPDATES
 
 <!-- VERSES -->
 
-<div class="verses">
+<div class="poster-verses">
 
 {% for verse in poster_verses[:2] %}
 
-<div class="line">
+<div class="poster-line">
 {{ verse.misra1_urdu }}
 </div>
 
-<div class="line gold">
+<div class="poster-line gold">
 {{ verse.misra2_urdu }}
 </div>
 
@@ -429,18 +425,17 @@ FOLLOW DAILY UPDATES
 
 <!-- DEDICATION -->
 
-<div class="dedication-wrap" id="dedicationWrap" style="display:none;">
+<div class="dedication-line" id="dedicationBox" style="display:none;">
 
-<div class="dedication" id="dedicationText">
-</div>
+<div class="dedication-text" id="dedicationText"></div>
 
 </div>
 
 <!-- LINK -->
 
-<div class="link-box">
+<div class="link-line">
 
-<div class="link">
+<div class="poster-link">
 📜 {{ ghazal_url }}
 </div>
 
@@ -448,7 +443,7 @@ FOLLOW DAILY UPDATES
 
 <!-- FOOTER -->
 
-<div class="footer">
+<div class="poster-footer">
 🔔 UCPC Poetry Archive 🔔
 </div>
 
@@ -479,7 +474,7 @@ poster.className=this.value;
 const fromInput=document.getElementById("fromInput");
 const toInput=document.getElementById("toInput");
 
-const dedicationWrap=document.getElementById("dedicationWrap");
+const dedicationBox=document.getElementById("dedicationBox");
 const dedicationText=document.getElementById("dedicationText");
 
 function updateDedication(){
@@ -505,11 +500,11 @@ text+="To "+to;
 
 dedicationText.innerText=text;
 
-dedicationWrap.style.display="flex";
+dedicationBox.style.display="flex";
 
 }else{
 
-dedicationWrap.style.display="none";
+dedicationBox.style.display="none";
 
 }
 
