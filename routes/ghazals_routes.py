@@ -3,42 +3,40 @@ from models.db import get_db
 
 ghazals_bp = Blueprint('ghazals', __name__)
 
+# =========================================
+# MAIN GHAZAL VIEW ROUTES
+# =========================================
 
-# =========================================
-# POSTER / REEL GENERATOR PAGE
-# =========================================
 @ghazals_bp.route('/view/<int:text_id>')
+@ghazals_bp.route('/ghazal/<int:text_id>')
 def view_ghazal(text_id):
-    """
-    Page for generating posters (1080x1920 for Reels)
-    Shows: poster, download button, themes, dedication fields
-    Only shows FIRST 2 couplets
-    """
+
     conn = get_db()
     cur = conn.cursor()
 
+    # GET GHAZAL INFO
     cur.execute("""
-        SELECT
+        SELECT 
             t.id,
-            t.title,
+            t.verse_count,
             t.poet_id,
-            p.name AS poet_name,
-            p.name_urdu AS poet_name_urdu
+            p.name as poet_name,
+            p.name_urdu as poet_name_urdu
         FROM texts t
-        LEFT JOIN poets p
-        ON t.poet_id = p.id
+        LEFT JOIN poets p ON t.poet_id = p.id
         WHERE t.id = %s
     """, (text_id,))
 
     ghazal = cur.fetchone()
 
-    if not ghazal:
+    if ghazal is None:
         cur.close()
         conn.close()
         abort(404)
 
+    # GET ALL VERSES
     cur.execute("""
-        SELECT
+        SELECT 
             misra1_urdu,
             misra2_urdu,
             couplet_index
@@ -52,67 +50,12 @@ def view_ghazal(text_id):
     cur.close()
     conn.close()
 
-    # ONLY FIRST 2 COUPLETS FOR POSTER (Reel format)
+    # ONLY FIRST 2 COUPLETS FOR POSTER
     poster_verses = all_verses[:2]
 
     return render_template(
         'view.html',
         ghazal=ghazal,
-        poster_verses=poster_verses
-    )
-
-
-# =========================================
-# FULL GHAZAL READING PAGE
-# =========================================
-@ghazals_bp.route('/ghazal/<int:text_id>')
-def read_full_ghazal(text_id):
-    """
-    Page for reading COMPLETE ghazal
-    Shows: ALL couplets, clean reading interface
-    NO poster generator, NO download button
-    Used for Facebook sharing
-    """
-    conn = get_db()
-    cur = conn.cursor()
-
-    cur.execute("""
-        SELECT
-            t.id,
-            t.title,
-            t.poet_id,
-            p.name AS poet_name,
-            p.name_urdu AS poet_name_urdu
-        FROM texts t
-        LEFT JOIN poets p
-        ON t.poet_id = p.id
-        WHERE t.id = %s
-    """, (text_id,))
-
-    ghazal = cur.fetchone()
-
-    if not ghazal:
-        cur.close()
-        conn.close()
-        abort(404)
-
-    cur.execute("""
-        SELECT
-            misra1_urdu,
-            misra2_urdu,
-            couplet_index
-        FROM verses
-        WHERE text_id = %s
-        ORDER BY couplet_index ASC
-    """, (text_id,))
-
-    all_verses = cur.fetchall()
-
-    cur.close()
-    conn.close()
-
-    return render_template(
-        'ghazal_read.html',
-        ghazal=ghazal,
+        poster_verses=poster_verses,
         all_verses=all_verses
     )
