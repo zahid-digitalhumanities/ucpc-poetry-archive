@@ -1,93 +1,332 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
     <meta charset="UTF-8">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}UCPC Poetry Archive{% endblock %}</title>
+
+    <title>
+        {% block title %}UCPC Poetry Archive{% endblock %}
+    </title>
+
+    <!-- Google Fonts -->
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+
+    *{
+        margin:0;
+        padding:0;
+        box-sizing:border-box;
+    }
+
+    :root{
+        --gold:#D4AF37;
+        --gold-light:#FFD966;
+        --bg:#0a0a0a;
+        --card:#111;
+    }
+
+    body{
+
+        background:
+            radial-gradient(circle at top,
+            rgba(212,175,55,0.05),
+            transparent 40%),
+            #050505;
+
+        color:#e0e0e0;
+
+        font-family:'Montserrat',sans-serif;
+
+        min-height:100vh;
+
+        display:flex;
+        flex-direction:column;
+    }
+
+    /* ===================== */
+    /* NAVBAR */
+    /* ===================== */
+
+    .navbar{
+
+        background:rgba(10,10,10,0.95);
+
+        border-bottom:1px solid rgba(212,175,55,0.25);
+
+        padding:1rem 2rem;
+
+        display:flex;
+
+        justify-content:space-between;
+
+        align-items:center;
+
+        flex-wrap:wrap;
+
+        gap:1rem;
+
+        position:sticky;
+
+        top:0;
+
+        z-index:999;
+
+        backdrop-filter:blur(12px);
+    }
+
+    .nav-brand{
+
+        font-family:'Cinzel',serif;
+
+        color:var(--gold);
+
+        font-size:1.4rem;
+
+        font-weight:800;
+
+        letter-spacing:1px;
+    }
+
+    .nav-links{
+
+        display:flex;
+
+        gap:1rem;
+
+        flex-wrap:wrap;
+
+        align-items:center;
+    }
+
+    .navbar a{
+
+        color:#e0e0e0;
+
+        text-decoration:none;
+
+        font-weight:600;
+
+        padding:0.65rem 1.2rem;
+
+        border-radius:40px;
+
+        transition:0.25s;
+
+        border:1px solid transparent;
+    }
+
+    .navbar a:hover{
+
+        background:var(--gold);
+
+        color:#000;
+
+        transform:translateY(-2px);
+    }
+
+    /* ===================== */
+    /* VISITOR BADGE */
+    /* ===================== */
+
+    .visitor-badge{
+
+        background:
+            linear-gradient(
+                135deg,
+                rgba(212,175,55,0.18),
+                rgba(212,175,55,0.06)
+            );
+
+        border:1px solid rgba(212,175,55,0.22);
+
+        padding:0.7rem 1rem;
+
+        border-radius:50px;
+
+        color:var(--gold-light);
+
+        font-size:0.95rem;
+
+        font-weight:700;
+
+        white-space:nowrap;
+    }
+
+    /* ===================== */
+    /* MAIN CONTENT */
+    /* ===================== */
+
+    .main-content{
+
+        flex:1;
+
+        width:100%;
+
+        max-width:1200px;
+
+        margin:0 auto;
+
+        padding:2rem;
+    }
+
+    /* ===================== */
+    /* FOOTER */
+    /* ===================== */
+
+    footer{
+
+        margin-top:3rem;
+
+        text-align:center;
+
+        padding:2rem 1rem;
+
+        border-top:1px solid rgba(212,175,55,0.1);
+
+        background:#080808;
+    }
+
+    .footer-title{
+
+        color:var(--gold);
+
+        font-family:'Cinzel',serif;
+
+        font-size:1.2rem;
+
+        margin-bottom:0.8rem;
+    }
+
+    .footer-text{
+
+        color:#777;
+
+        font-size:0.92rem;
+
+        line-height:1.8;
+    }
+
+    /* ===================== */
+    /* MOBILE */
+    /* ===================== */
+
+    @media (max-width:768px){
+
+        .navbar{
+
+            justify-content:center;
+
+            text-align:center;
         }
 
-        body {
-            background: #0a0a0a;
-            color: #e0e0e0;
-            font-family: 'Segoe UI', Arial, sans-serif;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
+        .nav-links{
+
+            justify-content:center;
         }
 
-        /* Navigation */
-        .navbar {
-            background: #0a0a0a;
-            border-bottom: 2px solid #D4AF37;
-            padding: 1rem 2rem;
-            display: flex;
-            justify-content: center;
-            gap: 2rem;
-            flex-wrap: wrap;
-            position: sticky;
-            top: 0;
-            z-index: 100;
+        .main-content{
+
+            padding:1rem;
         }
 
-        .navbar a {
-            color: #e0e0e0;
-            text-decoration: none;
-            font-weight: 500;
-            padding: 0.5rem 1rem;
-            border-radius: 30px;
-            transition: 0.2s;
+        .nav-brand{
+
+            width:100%;
         }
 
-        .navbar a:hover {
-            background: #D4AF37;
-            color: #0a0a0a;
+        .visitor-badge{
+
+            width:100%;
+
+            text-align:center;
         }
 
-        /* Main Content */
-        .main-content {
-            flex: 1;
-            max-width: 1000px;
-            margin: 0 auto;
-            padding: 2rem;
-            width: 100%;
-        }
+    }
 
-        /* Footer */
-        footer {
-            text-align: center;
-            padding: 1.5rem;
-            color: #555;
-            border-top: 1px solid #222;
-            font-size: 0.8rem;
-        }
-
-        @media (max-width: 600px) {
-            .navbar { gap: 1rem; }
-            .navbar a { font-size: 0.9rem; }
-            .main-content { padding: 1rem; }
-        }
     </style>
+
     {% block extra_css %}{% endblock %}
+
 </head>
+
 <body>
+
+    <!-- NAVBAR -->
+
     <nav class="navbar">
-        <a href="/">🏠 Home</a>
-        <a href="/poets">📜 Poets</a>
+
+        <div class="nav-brand">
+            ✨ UCPC Poetry Archive
+        </div>
+
+        <div class="nav-links">
+
+            <a href="/">
+                🏠 Home
+            </a>
+
+            <a href="/poets">
+                📜 Poets
+            </a>
+
+            <a href="/ghazals/view/2138">
+                📖 Read Ghazal
+            </a>
+
+        </div>
+
+        <!-- VISITOR COUNTER -->
+
+        <div class="visitor-badge">
+
+            🌍 Visitors:
+            {{ total_visitors if total_visitors else 0 }}
+
+        </div>
+
     </nav>
 
+    <!-- MAIN -->
+
     <main class="main-content">
-        {% block content %}{% endblock %}
+
+        {% block content %}
+        {% endblock %}
+
     </main>
 
+    <!-- FOOTER -->
+
     <footer>
-        UCPC – Urdu Classical Poetry Archive | Read • Share • Dedicate
+
+        <div class="footer-title">
+            📜 UCPC – Urdu Classical Poetry Archive
+        </div>
+
+        <div class="footer-text">
+
+            Read • Share • Dedicate • Preserve Urdu Literature
+
+            <br><br>
+
+            Powered by Digital Humanities & Computational Philology
+
+        </div>
+
     </footer>
 
-    {% block extra_js %}{% endblock %}
+    {% block extra_js %}
+    {% endblock %}
+
 </body>
+
 </html>
