@@ -3,6 +3,7 @@
 {% block title %}{{ ghazal.poet_name }} - UCPC Poetry Archive{% endblock %}
 
 {% block extra_head %}
+
 <meta property="og:title" content="{{ ghazal.poet_name }} - Urdu Ghazal" />
 <meta property="og:description" content="Beautiful Urdu poetry from UCPC Poetry Archive." />
 <meta property="og:type" content="article" />
@@ -14,14 +15,16 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Montserrat:wght@300;400;600;700;800&family=Noto+Nastaliq+Urdu:wght@400;500;600;700&display=swap" rel="stylesheet">
+
 {% endblock %}
 
 {% block extra_css %}
+
 <style>
 
-:root {
-    --gold-primary: #D4AF37;
-    --gold-light: #F6D878;
+:root{
+    --gold-primary:#D4AF37;
+    --gold-light:#F6D878;
 }
 
 body{
@@ -30,18 +33,14 @@ body{
     font-family:'Montserrat',sans-serif;
 }
 
-/* ===================== */
-/* LOCAL URDU FONT */
-/* ===================== */
+/* FONT */
 
-@font-face {
-    font-family: 'Jameel Noori Nastaleeq';
-    src: url('{{ url_for('static', filename='fonts/JameelNooriNastaleeq.ttf') }}') format('truetype');
+@font-face{
+    font-family:'Jameel Noori Nastaleeq';
+    src:url('{{ url_for("static", filename="fonts/JameelNooriNastaleeq.ttf") }}') format('truetype');
 }
 
-/* ===================== */
 /* LAYOUT */
-/* ===================== */
 
 .app-container{
     max-width:1400px;
@@ -98,9 +97,7 @@ body{
     cursor:pointer;
 }
 
-/* ===================== */
 /* POSTER */
-/* ===================== */
 
 .preview-wrapper{
     display:flex;
@@ -133,9 +130,7 @@ body{
     padding:35px;
 }
 
-/* ===================== */
 /* HEADER */
-/* ===================== */
 
 .logo-row{
     text-align:center;
@@ -172,9 +167,7 @@ body{
     font-weight:700;
 }
 
-/* ===================== */
 /* VERSES */
-/* ===================== */
 
 .verses-area{
     margin-top:40px;
@@ -196,69 +189,66 @@ body{
     color:#f3d27a;
 }
 
-/* ===================== */
-/* PREMIUM DEDICATION */
-/* ===================== */
+/* DEDICATION */
 
-.dedication {
-    margin-top: 35px;
-    text-align: center;
-
-    font-family: 'Cinzel', serif;
-
-    font-size: 64px;
-
-    color: #f3d27a;
-
-    font-weight: 800;
-    line-height: 1.45;
-    letter-spacing: 1px;
-
-    background: linear-gradient(
+.dedication{
+    margin-top:35px;
+    text-align:center;
+    font-family:'Cinzel',serif;
+    font-size:64px;
+    color:#f3d27a;
+    font-weight:800;
+    line-height:1.45;
+    background:linear-gradient(
         135deg,
         rgba(212,175,55,0.18),
         rgba(212,175,55,0.05)
     );
-
-    border: 2px solid rgba(212,175,55,0.38);
-
-    border-radius: 28px;
-
-    padding: 30px 22px;
-
-    box-shadow:
-        0 0 25px rgba(212,175,55,0.10),
-        inset 0 0 18px rgba(255,255,255,0.03);
-
-    text-shadow:
-        0 3px 10px rgba(0,0,0,0.7),
-        0 0 12px rgba(212,175,55,0.25);
+    border:2px solid rgba(212,175,55,0.38);
+    border-radius:28px;
+    padding:30px 22px;
 }
 
-.dedication.hidden {
-    display: none;
+.dedication.hidden{
+    display:none;
 }
 
-.dedication span {
-    color: #ffffff;
-    font-weight: 900;
+.dedication span{
+    color:#fff;
+    font-weight:900;
 }
 
-.dedication-heart {
-    font-size: 70px;
-    display: block;
-    margin: 10px 0;
+.dedication-heart{
+    font-size:70px;
+    display:block;
+    margin:10px 0;
 }
 
-/* ===================== */
-/* LINKS */
-/* ===================== */
+/* VISITOR BOX */
+
+.visitor-box{
+    margin-top:25px;
+    text-align:center;
+    padding:18px;
+    border-radius:22px;
+    border:1px solid rgba(212,175,55,0.25);
+    background:rgba(212,175,55,0.05);
+}
+
+.visitor-count{
+    font-size:46px;
+    color:#FFD700;
+    font-weight:800;
+    margin-top:10px;
+}
+
+/* LINK */
 
 .ghazal-link{
     margin-top:30px;
     text-align:center;
-    padding:18px;
-    border-radius:20px;
+    padding:22px;
+    border-radius:22px;
     border:1px solid rgba(212,175,55,0.3);
     background:rgba(212,175,55,0.06);
 }
@@ -266,16 +256,21 @@ body{
 .ghazal-link a{
     color:#f3d27a;
     text-decoration:none;
-    font-size:22px;
+    font-size:24px;
     word-break:break-all;
+    font-weight:700;
 }
 
+/* FOOTER */
+
 .footer-box{
-    margin-top:25px;
+    margin-top:30px;
     text-align:center;
     color:#D4AF37;
     font-size:24px;
 }
+
+/* THEMES */
 
 .theme-black{
     background:#020202;
@@ -297,7 +292,10 @@ body{
     background:#12071a;
 }
 
-@media (max-width:1100px){
+/* MOBILE */
+
+@media(max-width:1100px){
+
     #poster-container{
         transform:scale(0.45);
         transform-origin:top center;
@@ -305,35 +303,43 @@ body{
 }
 
 </style>
+
 {% endblock %}
 
 {% block content %}
 
-{% set ghazal_full_url = request.host_url.rstrip('/') + '/ghazals/view/' + ghazal.id|string %}
+{% set ghazal_full_url = request.host_url.rstrip('/') + '/ghazal/' + ghazal.id|string %}
 
 <div class="app-container">
 
 <div class="two-columns">
 
-<!-- LEFT PANEL -->
+<!-- LEFT -->
 
 <div class="editor-panel">
 
 <h1 class="brand-title">✨ UCPC Poetry Archive ✨</h1>
 
 <select id="themeSelect" class="theme-select">
+
 <option value="black">Classic Black</option>
 <option value="maroon">Deep Maroon</option>
 <option value="blue">Night Blue</option>
 <option value="green">Elegant Green</option>
 <option value="purple">Royal Purple</option>
+
 </select>
 
 <div style="margin-top:20px;">
+
 <div class="row-inputs">
+
 <input type="text" id="inputFrom" class="form-input" placeholder="From">
+
 <input type="text" id="inputTo" class="form-input" placeholder="To">
+
 </div>
+
 </div>
 
 <button id="downloadBtn" class="btn-generate">
@@ -352,17 +358,27 @@ body{
 
 <div class="poster-inner">
 
-<div class="logo-row">✨ UCPC POETRY ARCHIVE ✨</div>
+<div class="logo-row">
+✨ UCPC POETRY ARCHIVE ✨
+</div>
 
 <div class="follow-line">
 FOLLOW DAILY UPDATES
 </div>
 
 <div class="poet-line-wrap">
+
 <div class="line"></div>
-<div class="poet-name">{{ ghazal.poet_name }}</div>
-<div class="line"></div>
+
+<div class="poet-name">
+{{ ghazal.poet_name }}
 </div>
+
+<div class="line"></div>
+
+</div>
+
+<!-- VERSES -->
 
 <div class="verses-area">
 
@@ -398,16 +414,36 @@ To <span id="dedTo">_____</span>
 
 </div>
 
-<!-- LINK -->
+<!-- VISITOR COUNT -->
+
+<div class="visitor-box">
+
+<div style="font-size:28px;color:#f3d27a;">
+🌍 Total Readers
+</div>
+
+<div class="visitor-count">
+{{ ghazal.views if ghazal.views else 0 }}
+</div>
+
+</div>
+
+<!-- FULL GHAZAL LINK -->
 
 <div class="ghazal-link">
 
-<div style="margin-bottom:10px;font-size:26px;">
+<div style="margin-bottom:12px;font-size:28px;">
 📖 Read Full Ghazal
 </div>
 
+<div style="margin-bottom:10px;font-size:22px;color:#FFD700;">
+GHAZAL ID : #{{ ghazal.id }}
+</div>
+
 <a href="{{ ghazal_full_url }}" target="_blank">
+
 {{ ghazal_full_url }}
+
 </a>
 
 </div>
@@ -430,31 +466,32 @@ To <span id="dedTo">_____</span>
 
 <script>
 
-const inputFrom = document.getElementById('inputFrom');
-const inputTo = document.getElementById('inputTo');
+const inputFrom=document.getElementById('inputFrom');
+const inputTo=document.getElementById('inputTo');
 
-const dedicationBox = document.getElementById('dedicationBox');
+const dedicationBox=document.getElementById('dedicationBox');
 
-const dedFrom = document.getElementById('dedFrom');
-const dedTo = document.getElementById('dedTo');
+const dedFrom=document.getElementById('dedFrom');
+const dedTo=document.getElementById('dedTo');
 
-const posterContainer = document.getElementById('poster-container');
+const posterContainer=document.getElementById('poster-container');
 
-const themeSelect = document.getElementById('themeSelect');
+const themeSelect=document.getElementById('themeSelect');
 
 function updateDedication(){
 
-    const from = inputFrom.value.trim();
-    const to = inputTo.value.trim();
+    const from=inputFrom.value.trim();
+    const to=inputTo.value.trim();
 
     if(from || to){
 
         dedicationBox.classList.remove('hidden');
 
-        dedFrom.textContent = from || '_____';
-        dedTo.textContent = to || '_____';
+        dedFrom.textContent=from || '_____';
+        dedTo.textContent=to || '_____';
 
     }else{
+
         dedicationBox.classList.add('hidden');
     }
 }
@@ -474,7 +511,7 @@ themeSelect.addEventListener('change',function(){
 
 document.getElementById('downloadBtn').addEventListener('click',async()=>{
 
-    const canvas = await html2canvas(posterContainer,{
+    const canvas=await html2canvas(posterContainer,{
         scale:2,
         useCORS:true,
         backgroundColor:null
