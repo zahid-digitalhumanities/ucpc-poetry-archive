@@ -34,14 +34,12 @@ body{
 }
 
 /* FONT */
-
 @font-face{
     font-family:'Jameel Noori Nastaleeq';
     src:url('{{ url_for("static", filename="fonts/JameelNooriNastaleeq.ttf") }}') format('truetype');
 }
 
 /* LAYOUT */
-
 .app-container{
     max-width:1400px;
     margin:auto;
@@ -95,10 +93,15 @@ body{
     color:#000;
     font-weight:800;
     cursor:pointer;
+    transition:0.2s;
+}
+
+.btn-generate:hover{
+    transform:translateY(-2px);
+    box-shadow:0 5px 20px rgba(212,175,55,0.3);
 }
 
 /* POSTER */
-
 .preview-wrapper{
     display:flex;
     flex-direction:column;
@@ -131,7 +134,6 @@ body{
 }
 
 /* HEADER */
-
 .logo-row{
     text-align:center;
     font-family:'Cinzel',serif;
@@ -162,23 +164,23 @@ body{
 
 .poet-name{
     font-family:'Cinzel',serif;
-    font-size:82px;
+    font-size:76px;
     color:#D4AF37;
     font-weight:700;
+    white-space:nowrap;
 }
 
-/* VERSES */
-
+/* VERSES - INCREASED FONT SIZE */
 .verses-area{
-    margin-top:40px;
+    margin-top:45px;
     text-align:center;
 }
 
 .misra{
     direction:rtl;
     font-family:'Jameel Noori Nastaleeq','Noto Nastaliq Urdu',serif;
-    font-size:58px;
-    line-height:1.9;
+    font-size:72px;
+    line-height:2.1;
 }
 
 .white{
@@ -189,24 +191,19 @@ body{
     color:#f3d27a;
 }
 
-/* DEDICATION */
-
+/* DEDICATION - BALANCED SIZE */
 .dedication{
-    margin-top:35px;
+    margin-top:40px;
     text-align:center;
     font-family:'Cinzel',serif;
-    font-size:64px;
+    font-size:52px;
     color:#f3d27a;
     font-weight:800;
-    line-height:1.45;
-    background:linear-gradient(
-        135deg,
-        rgba(212,175,55,0.18),
-        rgba(212,175,55,0.05)
-    );
+    line-height:1.5;
+    background:linear-gradient(135deg, rgba(212,175,55,0.18), rgba(212,175,55,0.05));
     border:2px solid rgba(212,175,55,0.38);
     border-radius:28px;
-    padding:30px 22px;
+    padding:28px 22px;
 }
 
 .dedication.hidden{
@@ -216,18 +213,18 @@ body{
 .dedication span{
     color:#fff;
     font-weight:900;
+    font-size:56px;
 }
 
 .dedication-heart{
-    font-size:70px;
+    font-size:68px;
     display:block;
-    margin:10px 0;
+    margin:12px 0;
 }
 
 /* VISITOR BOX */
-
 .visitor-box{
-    margin-top:25px;
+    margin-top:28px;
     text-align:center;
     padding:18px;
     border-radius:22px;
@@ -236,18 +233,17 @@ body{
 }
 
 .visitor-count{
-    font-size:46px;
+    font-size:48px;
     color:#FFD700;
     font-weight:800;
     margin-top:10px;
 }
 
 /* LINK */
-
 .ghazal-link{
     margin-top:30px;
     text-align:center;
-    padding:22px;
+    padding:20px;
     border-radius:22px;
     border:1px solid rgba(212,175,55,0.3);
     background:rgba(212,175,55,0.06);
@@ -262,7 +258,6 @@ body{
 }
 
 /* FOOTER */
-
 .footer-box{
     margin-top:30px;
     text-align:center;
@@ -271,31 +266,24 @@ body{
 }
 
 /* THEMES */
-
 .theme-black{
     background:#020202;
 }
-
 .theme-maroon{
     background:#140507;
 }
-
 .theme-blue{
     background:#07111f;
 }
-
 .theme-green{
     background:#07140b;
 }
-
 .theme-purple{
     background:#12071a;
 }
 
-/* MOBILE */
-
+/* MOBILE SCALING */
 @media(max-width:1100px){
-
     #poster-container{
         transform:scale(0.45);
         transform-origin:top center;
@@ -314,7 +302,7 @@ body{
 
 <div class="two-columns">
 
-<!-- LEFT -->
+<!-- LEFT PANEL -->
 
 <div class="editor-panel">
 
@@ -334,9 +322,9 @@ body{
 
 <div class="row-inputs">
 
-<input type="text" id="inputFrom" class="form-input" placeholder="From">
+<input type="text" id="inputFrom" class="form-input" placeholder="From (Your Name)">
 
-<input type="text" id="inputTo" class="form-input" placeholder="To">
+<input type="text" id="inputTo" class="form-input" placeholder="To (Special Person)">
 
 </div>
 
@@ -348,7 +336,7 @@ body{
 
 </div>
 
-<!-- POSTER -->
+<!-- POSTER PREVIEW -->
 
 <div class="preview-wrapper">
 
@@ -357,6 +345,8 @@ body{
 <div class="poster-border"></div>
 
 <div class="poster-inner">
+
+<!-- HEADER -->
 
 <div class="logo-row">
 ✨ UCPC POETRY ARCHIVE ✨
@@ -378,7 +368,7 @@ FOLLOW DAILY UPDATES
 
 </div>
 
-<!-- VERSES -->
+<!-- VERSES - LARGER FONT -->
 
 <div class="verses-area">
 
@@ -396,7 +386,7 @@ FOLLOW DAILY UPDATES
 
 </div>
 
-<!-- DEDICATION -->
+<!-- DEDICATION - BALANCED -->
 
 <div id="dedicationBox" class="dedication hidden">
 
@@ -466,65 +456,50 @@ GHAZAL ID : #{{ ghazal.id }}
 
 <script>
 
-const inputFrom=document.getElementById('inputFrom');
-const inputTo=document.getElementById('inputTo');
-
-const dedicationBox=document.getElementById('dedicationBox');
-
-const dedFrom=document.getElementById('dedFrom');
-const dedTo=document.getElementById('dedTo');
-
-const posterContainer=document.getElementById('poster-container');
-
-const themeSelect=document.getElementById('themeSelect');
+const inputFrom = document.getElementById('inputFrom');
+const inputTo = document.getElementById('inputTo');
+const dedicationBox = document.getElementById('dedicationBox');
+const dedFrom = document.getElementById('dedFrom');
+const dedTo = document.getElementById('dedTo');
+const posterContainer = document.getElementById('poster-container');
+const themeSelect = document.getElementById('themeSelect');
 
 function updateDedication(){
 
-    const from=inputFrom.value.trim();
-    const to=inputTo.value.trim();
+    const from = inputFrom.value.trim();
+    const to = inputTo.value.trim();
 
     if(from || to){
-
         dedicationBox.classList.remove('hidden');
-
-        dedFrom.textContent=from || '_____';
-        dedTo.textContent=to || '_____';
-
+        dedFrom.textContent = from || '_____';
+        dedTo.textContent = to || '_____';
     }else{
-
         dedicationBox.classList.add('hidden');
     }
 }
 
-inputFrom.addEventListener('input',updateDedication);
-inputTo.addEventListener('input',updateDedication);
+inputFrom.addEventListener('input', updateDedication);
+inputTo.addEventListener('input', updateDedication);
 
-themeSelect.addEventListener('change',function(){
-
-    posterContainer.className='';
-
-    posterContainer.id='poster-container';
-
-    posterContainer.classList.add('theme-'+this.value);
-
+themeSelect.addEventListener('change', function(){
+    posterContainer.className = '';
+    posterContainer.id = 'poster-container';
+    posterContainer.classList.add('theme-' + this.value);
 });
 
-document.getElementById('downloadBtn').addEventListener('click',async()=>{
-
-    const canvas=await html2canvas(posterContainer,{
-        scale:2,
-        useCORS:true,
-        backgroundColor:null
+document.getElementById('downloadBtn').addEventListener('click', async () => {
+    
+    const canvas = await html2canvas(posterContainer, {
+        scale: 2.5,
+        useCORS: true,
+        backgroundColor: null
     });
-
-    const link=document.createElement('a');
-
-    link.download='UCPC_Poster.png';
-
-    link.href=canvas.toDataURL();
-
+    
+    const link = document.createElement('a');
+    link.download = 'UCPC_Poster.png';
+    link.href = canvas.toDataURL();
     link.click();
-
+    
 });
 
 </script>
