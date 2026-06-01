@@ -32,3 +32,18 @@ def index():
                          total_poets=poets_count,
                          total_ghazals=ghazals_count,
                          total_readers=readers_count)
+
+
+# Context processor to make total_visitors available to all templates
+@main_bp.context_processor
+def utility_processor():
+    def get_total_visitors():
+        conn = get_db()
+        cur = conn.cursor()
+        cur.execute("SELECT COALESCE(SUM(views), 0) as total FROM texts")
+        result = cur.fetchone()
+        cur.close()
+        conn.close()
+        return result['total'] if result else 0
+    
+    return dict(total_visitors=get_total_visitors())
