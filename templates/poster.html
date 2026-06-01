@@ -33,8 +33,6 @@ body {
     background: #050505;
     color: #fff;
     font-family: 'Montserrat', sans-serif;
-    user-select: none;
-    -webkit-user-select: none;
 }
 
 /* Allow selection on buttons and inputs only */
@@ -325,11 +323,11 @@ button, .btn-generate, .btn-ghazal, select, input {
                 📖 READ COMPLETE GHAZAL
             </a>
             
-            <!-- GHAZAL ID LINK - ADDED -->
+            <!-- GHAZAL ID LINK - Direct link to ghazal page only -->
             <div class="ghazal-id-link">
-                <div class="ghazal-id-label">🔗 GHAZAL ID / PERMALINK</div>
+                <div class="ghazal-id-label">🔗 GHAZAL PERMALINK</div>
                 <div class="ghazal-id-value">
-                    <a href="{{ url_for('ghazals.ghazal_page', text_id=ghazal.id) }}" target="_blank">
+                    <a href="{{ url_for('ghazals.ghazal_page', text_id=ghazal.id, _external=True) }}" target="_blank">
                         {{ url_for('ghazals.ghazal_page', text_id=ghazal.id, _external=True) }}
                     </a>
                 </div>
@@ -382,9 +380,8 @@ document.addEventListener('contextmenu', function(e) {
     return false;
 });
 
-// Disable keyboard shortcuts (Ctrl+C, Ctrl+V, Ctrl+X, Ctrl+U, F12)
+// Disable keyboard shortcuts
 document.addEventListener('keydown', function(e) {
-    // Disable Ctrl combinations
     if (e.ctrlKey && (e.key === 'c' || e.key === 'C' || 
                        e.key === 'v' || e.key === 'V' ||
                        e.key === 'x' || e.key === 'X' ||
@@ -394,20 +391,12 @@ document.addEventListener('keydown', function(e) {
         return false;
     }
     
-    // Disable F12 (Developer Tools)
     if (e.key === 'F12') {
         e.preventDefault();
         return false;
     }
     
-    // Disable Ctrl+Shift+I (Developer Tools)
-    if (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i')) {
-        e.preventDefault();
-        return false;
-    }
-    
-    // Disable Ctrl+Shift+J (Console)
-    if (e.ctrlKey && e.shiftKey && (e.key === 'J' || e.key === 'j')) {
+    if (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.key === 'J' || e.key === 'j')) {
         e.preventDefault();
         return false;
     }
