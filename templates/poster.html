@@ -123,6 +123,38 @@ button, .btn-generate, .btn-ghazal, select, input {
     color: #000;
 }
 
+/* Ghazal ID Link Styles */
+.ghazal-id-link {
+    margin-top: 15px;
+    padding: 12px;
+    text-align: center;
+    background: rgba(212, 175, 55, 0.05);
+    border-radius: 12px;
+    border: 1px solid rgba(212, 175, 55, 0.15);
+}
+
+.ghazal-id-label {
+    font-size: 12px;
+    color: #888;
+    margin-bottom: 5px;
+}
+
+.ghazal-id-value {
+    font-size: 14px;
+    color: #D4AF37;
+    font-weight: 700;
+    word-break: break-all;
+}
+
+.ghazal-id-value a {
+    color: #D4AF37;
+    text-decoration: none;
+}
+
+.ghazal-id-value a:hover {
+    text-decoration: underline;
+}
+
 #poster-container {
     width: 1080px;
     min-height: 1920px;
@@ -292,6 +324,16 @@ button, .btn-generate, .btn-ghazal, select, input {
             <a href="{{ url_for('ghazals.ghazal_page', text_id=ghazal.id) }}" class="btn-ghazal">
                 📖 READ COMPLETE GHAZAL
             </a>
+            
+            <!-- GHAZAL ID LINK - ADDED -->
+            <div class="ghazal-id-link">
+                <div class="ghazal-id-label">🔗 GHAZAL ID / PERMALINK</div>
+                <div class="ghazal-id-value">
+                    <a href="{{ url_for('ghazals.ghazal_page', text_id=ghazal.id) }}" target="_blank">
+                        {{ url_for('ghazals.ghazal_page', text_id=ghazal.id, _external=True) }}
+                    </a>
+                </div>
+            </div>
         </div>
 
         <div class="preview-wrapper">
