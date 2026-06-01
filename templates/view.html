@@ -261,7 +261,11 @@ body {
             </div>
 
             <button id="downloadBtn" class="btn-generate">📱 DOWNLOAD POSTER</button>
-            <a href="{{ ghazal_full_url }}" class="btn-ghazal">📖 READ COMPLETE GHAZAL</a>
+            
+            <!-- ✅ FIXED: Link to FULL GHAZAL page, not poster page -->
+            <a href="{{ url_for('ghazals.full_ghazal', text_id=ghazal.id) }}" class="btn-ghazal">
+                📖 READ COMPLETE GHAZAL
+            </a>
         </div>
 
         <div class="preview-wrapper">
