@@ -6,31 +6,42 @@ poets_bp = Blueprint('poets', __name__)
 
 @poets_bp.route('/')
 def poets_list():
+    """Display all poets with ghazal count"""
     conn = get_db()
     cur = conn.cursor()
+
     cur.execute("""
-        SELECT p.id, p.name, p.name_urdu, COUNT(t.id) as ghazal_count
+        SELECT 
+            p.id, 
+            p.name, 
+            p.name_urdu,
+            COUNT(t.id) as ghazal_count
         FROM poets p
         LEFT JOIN texts t ON p.id = t.poet_id
         GROUP BY p.id, p.name, p.name_urdu
         ORDER BY p.name ASC
     """)
+    
     poets = cur.fetchall()
     cur.close()
     conn.close()
+
     return render_template('poets.html', poets=poets)
 
 
 @poets_bp.route('/<int:poet_id>')
 def poet_detail(poet_id):
+    """Display a single poet and their ghazals"""
     conn = get_db()
     cur = conn.cursor()
 
     # Get poet info
     cur.execute("""
         SELECT id, name, name_urdu, birth_year, death_year
-        FROM poets WHERE id = %s
+        FROM poets 
+        WHERE id = %s
     """, (poet_id,))
+    
     poet = cur.fetchone()
 
     if poet is None:
@@ -38,12 +49,11 @@ def poet_detail(poet_id):
         conn.close()
         abort(404)
 
-    # Get ghazals with FIRST VERSE from verses table
+    # Get ghazals with first verse
     cur.execute("""
         SELECT 
             t.id,
             t.verse_count,
-            COALESCE(t.first_line, '') as first_couplet,
             v.misra1_urdu,
             v.misra2_urdu
         FROM texts t
