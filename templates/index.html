@@ -371,7 +371,9 @@
         {% for ghazal in recent_ghazals %}
         <div class="ghazal-card">
             <div class="ghazal-couplet" dir="rtl">
-                {{ ghazal.first_couplet|truncate(60) }}
+                {{ ghazal.misra1_urdu|truncate(60) if ghazal.misra1_urdu else '✨ New Ghazal ✨' }}
+                <br>
+                {{ ghazal.misra2_urdu|truncate(60) if ghazal.misra2_urdu else '' }}
             </div>
             <div class="ghazal-poet">
                 🖋️ {{ ghazal.poet_name }}
