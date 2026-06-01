@@ -319,11 +319,12 @@ button, .btn-generate, .btn-ghazal, select, input {
 
             <button id="downloadBtn" class="btn-generate">📱 DOWNLOAD POSTER</button>
             
+            <!-- ✅ READ COMPLETE GHAZAL BUTTON - LINKS TO GHAZAL PAGE -->
             <a href="{{ url_for('ghazals.ghazal_page', text_id=ghazal.id) }}" class="btn-ghazal">
                 📖 READ COMPLETE GHAZAL
             </a>
             
-            <!-- GHAZAL ID LINK - Direct link to ghazal page only -->
+            <!-- Ghazal Permalink -->
             <div class="ghazal-id-link">
                 <div class="ghazal-id-label">🔗 GHAZAL PERMALINK</div>
                 <div class="ghazal-id-value">
