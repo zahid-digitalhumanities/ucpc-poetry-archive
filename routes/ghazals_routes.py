@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, abort, jsonify
+from flask import Blueprint, render_template, abort, jsonify, redirect, url_for
 from models.db import get_db
 
 ghazals_bp = Blueprint('ghazals', __name__)
@@ -13,6 +13,13 @@ def poster_page(text_id):
     """Generate poster with 2 couplets only"""
     conn = get_db()
     cur = conn.cursor()
+
+    # Update view count
+    try:
+        cur.execute("UPDATE texts SET views = COALESCE(views, 0) + 1 WHERE id = %s", (text_id,))
+        conn.commit()
+    except:
+        conn.rollback()
 
     # Get ghazal info
     cur.execute("""
@@ -59,6 +66,13 @@ def ghazal_page(text_id):
     conn = get_db()
     cur = conn.cursor()
 
+    # Update view count
+    try:
+        cur.execute("UPDATE texts SET views = COALESCE(views, 0) + 1 WHERE id = %s", (text_id,))
+        conn.commit()
+    except:
+        conn.rollback()
+
     # Get ghazal info
     cur.execute("""
         SELECT t.id, t.verse_count, t.views, t.poet_id,
@@ -86,17 +100,40 @@ def ghazal_page(text_id):
     cur.close()
     conn.close()
 
-    # Update view count
-    update_views(text_id)
-
     return render_template('ghazal.html', ghazal=ghazal, verses=verses)
 
 
-def update_views(text_id):
-    """Increment view count"""
+# =====================================================
+# BACKWARD COMPATIBILITY (Redirect old URLs)
+# =====================================================
+
+@ghazals_bp.route('/view/<int:text_id>')
+def view_redirect(text_id):
+    """Redirect old /view/ URLs to poster page"""
+    return redirect(url_for('ghazals.poster_page', text_id=text_id))
+
+
+@ghazals_bp.route('/full/<int:text_id>')
+def full_redirect(text_id):
+    """Redirect old /full/ URLs to ghazal page"""
+    return redirect(url_for('ghazals.ghazal_page', text_id=text_id))
+
+
+# =====================================================
+# RANDOM GHAZAL API
+# =====================================================
+
+@ghazals_bp.route('/api/random-ghazal')
+def random_ghazal():
+    """Return random ghazal ID"""
     conn = get_db()
     cur = conn.cursor()
-    cur.execute("UPDATE texts SET views = COALESCE(views, 0) + 1 WHERE id = %s", (text_id,))
-    conn.commit()
+    cur.execute("SELECT id FROM texts ORDER BY RANDOM() LIMIT 1")
+    result = cur.fetchone()
     cur.close()
     conn.close()
+
+    if result:
+        return jsonify({"id": result["id"]})
+    else:
+        return jsonify({"error": "No ghazals found"}), 404
