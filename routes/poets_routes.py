@@ -49,7 +49,7 @@ def poet_detail(poet_id):
         conn.close()
         abort(404)
 
-    # Get ghazals with first verse
+    # Get ghazals with first verse from verses table
     cur.execute("""
         SELECT 
             t.id,
