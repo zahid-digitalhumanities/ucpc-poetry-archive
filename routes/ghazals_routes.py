@@ -4,13 +4,9 @@ from models.db import get_db
 ghazals_bp = Blueprint('ghazals', __name__)
 
 
-# =====================================================
-# POSTER PAGE (2 couplets only)
-# =====================================================
-
 @ghazals_bp.route('/poster/<int:text_id>')
 def poster_page(text_id):
-    """ONLY poster generator - 2 couplets only"""
+    """Poster page - 2 couplets only"""
     conn = get_db()
     cur = conn.cursor()
 
@@ -47,19 +43,14 @@ def poster_page(text_id):
 
     poster_verses = all_verses[:2]
 
-    # ✅ ONLY POSTER TEMPLATE - NO GHAZAL HERE
     return render_template('poster.html', 
                           ghazal=ghazal, 
                           poster_verses=poster_verses)
 
 
-# =====================================================
-# COMPLETE GHAZAL PAGE (All verses)
-# =====================================================
-
 @ghazals_bp.route('/ghazal/<int:text_id>')
 def ghazal_page(text_id):
-    """ONLY complete ghazal reading page - NO poster here"""
+    """Complete ghazal page - all verses (read only)"""
     conn = get_db()
     cur = conn.cursor()
 
@@ -83,7 +74,6 @@ def ghazal_page(text_id):
         conn.close()
         abort(404)
 
-    # ✅ ALL VERSES - FULL GHAZAL
     cur.execute("""
         SELECT misra1_urdu, misra2_urdu, couplet_index
         FROM verses
@@ -95,29 +85,18 @@ def ghazal_page(text_id):
     cur.close()
     conn.close()
 
-    # ✅ ONLY GHAZAL TEMPLATE - NO POSTER
     return render_template('ghazal.html', ghazal=ghazal, verses=verses)
 
 
-# =====================================================
-# BACKWARD COMPATIBILITY
-# =====================================================
-
 @ghazals_bp.route('/view/<int:text_id>')
 def view_redirect(text_id):
-    """Redirect old /view/ URLs to poster page"""
     return redirect(url_for('ghazals.poster_page', text_id=text_id))
 
 
 @ghazals_bp.route('/full/<int:text_id>')
 def full_redirect(text_id):
-    """Redirect old /full/ URLs to ghazal page"""
     return redirect(url_for('ghazals.ghazal_page', text_id=text_id))
 
-
-# =====================================================
-# RANDOM GHAZAL API
-# =====================================================
 
 @ghazals_bp.route('/api/random-ghazal')
 def random_ghazal():
