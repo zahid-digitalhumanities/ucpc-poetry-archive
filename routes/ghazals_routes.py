@@ -4,9 +4,13 @@ from models.db import get_db
 ghazals_bp = Blueprint('ghazals', __name__)
 
 
+# =====================================================
+# POSTER PAGE (2 couplets only)
+# =====================================================
+
 @ghazals_bp.route('/poster/<int:text_id>')
 def poster_page(text_id):
-    """Poster page - 2 couplets only"""
+    """Generate poster with 2 couplets only"""
     conn = get_db()
     cur = conn.cursor()
 
@@ -16,6 +20,7 @@ def poster_page(text_id):
     except:
         conn.rollback()
 
+    # Get ghazal info
     cur.execute("""
         SELECT t.id, t.verse_count, t.views, t.poet_id,
                p.name as poet_name, p.name_urdu as poet_name_urdu
@@ -30,6 +35,7 @@ def poster_page(text_id):
         conn.close()
         abort(404)
 
+    # Get all verses
     cur.execute("""
         SELECT misra1_urdu, misra2_urdu, couplet_index
         FROM verses
@@ -41,6 +47,7 @@ def poster_page(text_id):
     cur.close()
     conn.close()
 
+    # First 2 couplets for poster
     poster_verses = all_verses[:2]
 
     return render_template('poster.html', 
@@ -48,9 +55,13 @@ def poster_page(text_id):
                           poster_verses=poster_verses)
 
 
+# =====================================================
+# COMPLETE GHAZAL PAGE (All verses)
+# =====================================================
+
 @ghazals_bp.route('/ghazal/<int:text_id>')
 def ghazal_page(text_id):
-    """Complete ghazal page - all verses (read only)"""
+    """Display complete ghazal with all verses"""
     conn = get_db()
     cur = conn.cursor()
 
@@ -60,6 +71,7 @@ def ghazal_page(text_id):
     except:
         conn.rollback()
 
+    # Get ghazal info
     cur.execute("""
         SELECT t.id, t.verse_count, t.views, t.poet_id,
                p.name as poet_name, p.name_urdu as poet_name_urdu
@@ -74,6 +86,7 @@ def ghazal_page(text_id):
         conn.close()
         abort(404)
 
+    # Get ALL verses
     cur.execute("""
         SELECT misra1_urdu, misra2_urdu, couplet_index
         FROM verses
@@ -88,18 +101,29 @@ def ghazal_page(text_id):
     return render_template('ghazal.html', ghazal=ghazal, verses=verses)
 
 
+# =====================================================
+# BACKWARD COMPATIBILITY
+# =====================================================
+
 @ghazals_bp.route('/view/<int:text_id>')
 def view_redirect(text_id):
+    """Redirect old /view/ URLs to poster page"""
     return redirect(url_for('ghazals.poster_page', text_id=text_id))
 
 
 @ghazals_bp.route('/full/<int:text_id>')
 def full_redirect(text_id):
+    """Redirect old /full/ URLs to ghazal page"""
     return redirect(url_for('ghazals.ghazal_page', text_id=text_id))
 
 
+# =====================================================
+# RANDOM GHAZAL API
+# =====================================================
+
 @ghazals_bp.route('/api/random-ghazal')
 def random_ghazal():
+    """Return random ghazal ID"""
     conn = get_db()
     cur = conn.cursor()
     cur.execute("SELECT id FROM texts ORDER BY RANDOM() LIMIT 1")
