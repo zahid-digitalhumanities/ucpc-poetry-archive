@@ -3,132 +3,177 @@
 
 {% block extra_css %}
 <style>
+    .page-header {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+    .page-header h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #D4AF37;
+        font-family: 'Cinzel', serif;
+        letter-spacing: 2px;
+        margin-bottom: 0.5rem;
+    }
+    .page-header p {
+        color: #aaa;
+        font-size: 1rem;
+    }
+    .page-header .divider {
+        width: 80px;
+        height: 3px;
+        background: linear-gradient(90deg, #D4AF37, transparent);
+        margin: 15px auto 0;
+    }
+    
     .poets-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
         gap: 2rem;
     }
+    
     .poet-card {
-        background: #ffffff;
-        border-radius: 1.25rem;
+        background: linear-gradient(145deg, #111111, #0a0a0a);
+        border-radius: 1.5rem;
         overflow: hidden;
-        transition: all 0.25s ease;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-        border: 1px solid rgba(212, 175, 55, 0.2);
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(212, 175, 55, 0.15);
         display: flex;
         flex-direction: column;
         align-items: center;
         text-align: center;
     }
+    
     .poet-card:hover {
-        transform: translateY(-6px);
-        box-shadow: 0 20px 30px -12px rgba(0, 0, 0, 0.15);
-        border-color: rgba(212, 175, 55, 0.4);
+        transform: translateY(-8px);
+        box-shadow: 0 20px 35px -12px rgba(212, 175, 55, 0.2);
+        border-color: rgba(212, 175, 55, 0.5);
     }
+    
     .poet-image {
-        width: 140px;
-        height: 140px;
-        margin: 1.5rem auto 0.5rem auto;
+        width: 130px;
+        height: 130px;
+        margin: 1.8rem auto 1rem auto;
         border-radius: 50%;
-        background: linear-gradient(145deg, #f7f3ea, #f0e9dd);
+        background: linear-gradient(145deg, #1a1a1a, #0f0f0f);
         overflow: hidden;
         position: relative;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-        border: 2px solid rgba(212, 175, 55, 0.3);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        border: 2px solid rgba(212, 175, 55, 0.4);
     }
+    
     .poet-image img {
         width: 100%;
         height: 100%;
         object-fit: cover;
         transition: transform 0.4s ease;
     }
+    
     .poet-card:hover .poet-image img {
-        transform: scale(1.05);
+        transform: scale(1.08);
     }
+    
     .poet-image .fallback {
         position: absolute;
         inset: 0;
         display: flex;
         align-items: center;
         justify-content: center;
-        background: linear-gradient(135deg, #fef9e6, #fff4e0);
-        color: #d4af37;
-        font-size: 2rem;
+        background: linear-gradient(135deg, #1a1a1a, #0f0f0f);
+        color: #D4AF37;
+        font-size: 3rem;
         border-radius: 50%;
     }
+    
     .poet-card-body {
-        padding: 0.75rem 1rem 1.5rem;
+        padding: 1rem 1.5rem 1.8rem;
         flex: 1;
         display: flex;
         flex-direction: column;
+        width: 100%;
     }
+    
     .poet-name-urdu {
-        font-family: 'Jameel Noori Nastaleeq', 'Noto Nastaliq Urdu', serif;
-        font-size: 1.7rem;
+        font-family: 'Noto Nastaliq Urdu', 'Jameel Noori Nastaleeq', serif;
+        font-size: 1.8rem;
         direction: rtl;
-        color: #2c3e2f;
-        line-height: 1.3;
-        margin-bottom: 0.25rem;
+        color: #F6D878;
+        line-height: 1.4;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
     }
+    
     .poet-name-en {
-        font-size: 0.85rem;
+        font-size: 0.9rem;
         text-transform: uppercase;
-        letter-spacing: 1px;
-        color: #b68b40;
-        margin-bottom: 0.75rem;
+        letter-spacing: 2px;
+        color: #D4AF37;
+        margin-bottom: 1rem;
+        font-weight: 600;
     }
+    
     .ghazal-count {
         display: inline-block;
-        background: #f5e7d3;
-        color: #9b6a3c;
+        background: rgba(212, 175, 55, 0.12);
+        color: #D4AF37;
         font-size: 0.75rem;
-        font-weight: 600;
-        padding: 0.25rem 0.75rem;
+        font-weight: 700;
+        padding: 0.35rem 1rem;
         border-radius: 2rem;
-        margin-bottom: 1rem;
+        margin-bottom: 1.2rem;
         align-self: center;
+        border: 1px solid rgba(212, 175, 55, 0.2);
     }
+    
     .btn-view {
         background: transparent;
-        border: 1.5px solid #d4af37;
-        color: #d4af37;
-        padding: 0.5rem 1rem;
+        border: 1.5px solid #D4AF37;
+        color: #D4AF37;
+        padding: 0.6rem 1.2rem;
         border-radius: 2rem;
-        font-weight: 600;
+        font-weight: 700;
         font-size: 0.85rem;
-        transition: all 0.2s;
+        transition: all 0.3s ease;
         text-decoration: none;
-        display: inline-block;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        justify-content: center;
         margin-top: auto;
         align-self: center;
+        width: 100%;
+        max-width: 160px;
     }
+    
+    .btn-view i {
+        font-size: 0.85rem;
+        transition: transform 0.2s;
+    }
+    
     .btn-view:hover {
-        background: #d4af37;
-        color: #1e2f3d;
+        background: #D4AF37;
+        color: #0a0a0a;
         text-decoration: none;
+        transform: translateY(-2px);
     }
+    
+    .btn-view:hover i {
+        transform: translateX(4px);
+    }
+    
     @media (max-width: 768px) {
-        .poets-grid { gap: 1.25rem; }
-        .poet-image { width: 110px; height: 110px; margin-top: 1.2rem; }
-        .poet-name-urdu { font-size: 1.4rem; }
-        .poet-name-en { font-size: 0.75rem; }
-        .btn-view { font-size: 0.8rem; padding: 0.4rem 0.9rem; }
+        .poets-grid { gap: 1.5rem; }
+        .poet-image { width: 110px; height: 110px; margin-top: 1.5rem; }
+        .poet-name-urdu { font-size: 1.5rem; }
+        .poet-name-en { font-size: 0.8rem; }
+        .btn-view { font-size: 0.8rem; padding: 0.5rem 1rem; }
+        .page-header h1 { font-size: 2rem; }
     }
-    .page-header {
-        text-align: center;
-        margin-bottom: 2.5rem;
-    }
-    .page-header h1 {
-        font-size: 2.2rem;
-        font-weight: 700;
-        color: #1e3c72;
-    }
-    .page-header p {
-        color: #6c757d;
-        font-size: 1rem;
-    }
-    @media (max-width: 576px) {
-        .page-header h1 { font-size: 1.8rem; }
+    
+    @media (max-width: 480px) {
+        .poets-grid { grid-template-columns: 1fr; }
+        .poet-card { max-width: 320px; margin: 0 auto; width: 100%; }
     }
 </style>
 {% endblock %}
@@ -136,8 +181,9 @@
 {% block content %}
 <div class="container py-4">
     <div class="page-header">
-        <h1>Urdu Poets</h1>
-        <p>Explore the timeless voices of Urdu poetry</p>
+        <h1>📜 Urdu Poets</h1>
+        <p>Explore the timeless voices of classical Urdu poetry</p>
+        <div class="divider"></div>
     </div>
 
     <div class="poets-grid">
@@ -153,8 +199,12 @@
             <div class="poet-card-body">
                 <div class="poet-name-urdu">{{ poet.name_urdu or poet.name }}</div>
                 <div class="poet-name-en">{{ poet.name }}</div>
-                <div class="ghazal-count">{{ poet.ghazal_count }} Ghazals</div>
-                <a href="/poets/{{ poet.id }}" class="btn-view">View Ghazals →</a>
+                <div class="ghazal-count">
+                    <i class="fas fa-book-open"></i> {{ poet.ghazal_count }} Ghazals
+                </div>
+                <a href="/poets/{{ poet.id }}" class="btn-view">
+                    View Ghazals <i class="fas fa-arrow-right"></i>
+                </a>
             </div>
         </div>
         {% endfor %}
