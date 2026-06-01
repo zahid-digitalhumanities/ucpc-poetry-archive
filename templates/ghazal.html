@@ -4,41 +4,24 @@
 
 {% block extra_css %}
 <style>
-    /* ========================================= */
-    /* READ-ONLY PROTECTION STYLES */
-    /* ========================================= */
     .ghazal-container {
         max-width: 1000px;
         margin: 0 auto;
         padding: 40px 20px;
-        
-        /* Disable text selection */
         user-select: none;
         -webkit-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
-        
-        /* Disable tap highlight on mobile */
-        -webkit-tap-highlight-color: transparent;
     }
     
-    /* Disable selection on all elements */
     * {
         user-select: none;
         -webkit-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
     }
     
-    /* Allow selection on buttons only (so users can click) */
     button, a, .btn-share, .btn-poster {
         user-select: auto;
         -webkit-user-select: auto;
-        -moz-user-select: auto;
-        -ms-user-select: auto;
     }
     
-    /* UCPC WATERMARK */
     .ucpc-watermark {
         text-align: center;
         margin-bottom: 30px;
@@ -51,7 +34,6 @@
         color: #D4AF37;
         letter-spacing: 3px;
         font-weight: 700;
-        text-shadow: 0 0 5px rgba(212,175,55,0.3);
     }
     .watermark-tagline {
         font-size: 12px;
@@ -100,12 +82,8 @@
         font-size: 30px;
         line-height: 2.2;
         color: #f0e6d0;
-        
-        /* Extra protection */
         user-select: none;
         -webkit-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
     }
     .verse {
         margin-bottom: 40px;
@@ -176,13 +154,6 @@
         color: #555;
     }
     
-    body {
-        user-select: none;
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
-    }
-    
     @media (max-width: 600px) {
         .poet-name { font-size: 32px; }
         .verses-area { font-size: 22px; }
@@ -198,10 +169,8 @@
      oncut="return false" 
      onpaste="return false" 
      ondragstart="return false" 
-     ondrop="return false"
      oncontextmenu="return false">
     
-    <!-- UCPC WATERMARK TOP -->
     <div class="ucpc-watermark">
         <div class="watermark-logo">✨ UCPC POETRY ARCHIVE ✨</div>
         <div class="watermark-tagline">Digital Preservation of Urdu Poetry</div>
@@ -220,7 +189,6 @@
         </div>
     </div>
 
-    <!-- COMPLETE GHAZAL VERSES -->
     <div class="verses-area" dir="rtl">
         {% for verse in verses %}
         <div class="verse">
@@ -245,64 +213,36 @@
         <a href="/">Home</a>
     </div>
     
-    <!-- FOOTER WATERMARK -->
     <div class="footer-watermark">
         UCPC Poetry Archive • Read • Share • Dedicate • Preserve Urdu Literature
     </div>
 </div>
 
 <script>
-// Disable right click globally
 document.addEventListener('contextmenu', function(e) {
     e.preventDefault();
     return false;
 });
 
-// Disable keyboard shortcuts (Ctrl+C, Ctrl+V, Ctrl+X, Ctrl+U)
 document.addEventListener('keydown', function(e) {
-    // Check for Ctrl key combinations
     if (e.ctrlKey && (e.key === 'c' || e.key === 'C' || 
                        e.key === 'v' || e.key === 'V' ||
                        e.key === 'x' || e.key === 'X' ||
-                       e.key === 'u' || e.key === 'U' ||
-                       e.key === 's' || e.key === 'S')) {
+                       e.key === 'u' || e.key === 'U')) {
         e.preventDefault();
         return false;
     }
-    
-    // Disable F12 (Developer Tools)
     if (e.key === 'F12') {
-        e.preventDefault();
-        return false;
-    }
-    
-    // Disable Ctrl+Shift+I (Developer Tools)
-    if (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i')) {
-        e.preventDefault();
-        return false;
-    }
-    
-    // Disable Ctrl+Shift+J (Console)
-    if (e.ctrlKey && e.shiftKey && (e.key === 'J' || e.key === 'j')) {
         e.preventDefault();
         return false;
     }
 });
 
-// Share function
 function shareGhazal() {
     const url = window.location.href;
     const poetName = document.querySelector('.poet-name').innerText;
     const text = encodeURIComponent(`✨ ${poetName} - Complete Ghazal ✨\n\nRead this beautiful ghazal on UCPC Poetry Archive:\n${url}`);
     window.open(`https://wa.me/?text=${text}`, '_blank');
 }
-
-// Disable print screen (basic protection)
-window.addEventListener('keyup', function(e) {
-    if (e.key === 'PrintScreen') {
-        navigator.clipboard.writeText('Copying content from UCPC Poetry Archive is not allowed. Please visit our website to read poetry: https://ucpc-poetry-archive.onrender.com');
-        alert('Copying content from UCPC Poetry Archive is not allowed. Please respect the poetry and the poets.');
-    }
-});
 </script>
 {% endblock %}
