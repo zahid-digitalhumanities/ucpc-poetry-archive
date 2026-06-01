@@ -26,13 +26,18 @@ def index():
     total_readers = cur.fetchone()
     readers_count = total_readers['total'] if total_readers else 0
 
-    # Get recent ghazals (last 6)
+    # Get recent ghazals with first verse from verses table
     cur.execute("""
-        SELECT t.id, t.first_couplet, t.poet_id,
-               p.name as poet_name
+        SELECT 
+            t.id, 
+            t.poet_id,
+            COALESCE(p.name, 'Unknown Poet') as poet_name,
+            v.misra1_urdu,
+            v.misra2_urdu
         FROM texts t
         LEFT JOIN poets p ON t.poet_id = p.id
-        WHERE t.first_couplet IS NOT NULL
+        LEFT JOIN verses v ON v.text_id = t.id AND v.couplet_index = 1
+        WHERE v.misra1_urdu IS NOT NULL
         ORDER BY t.id DESC
         LIMIT 6
     """)
