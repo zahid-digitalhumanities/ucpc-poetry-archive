@@ -13,6 +13,11 @@
             <i class="fas fa-dice"></i> Random Ghazal
         </a>
         
+        <!-- Optional: Add Full Ghazal Archive Link -->
+        <a href="/archive" class="nav-link" style="color: #e0e0e0; text-decoration: none; padding: 0.5rem 1.2rem; border-radius: 40px; transition: 0.2s;">
+            <i class="fas fa-book"></i> Archive
+        </a>
+        
     </div>
 </nav>
 
@@ -37,12 +42,14 @@
                     if (!response.ok) throw new Error('Failed');
                     const data = await response.json();
                     if (data.id) {
+                        // Redirect to poster page (view.html)
                         window.location.href = `/ghazals/view/${data.id}`;
                     } else {
-                        alert('No ghazals found.');
+                        alert('No ghazals found in the archive.');
                     }
                 } catch (err) {
-                    alert('Could not load random ghazal.');
+                    console.error('Random ghazal error:', err);
+                    alert('Could not load random ghazal. Please try again.');
                 }
             });
         }
