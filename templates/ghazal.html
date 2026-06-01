@@ -171,6 +171,7 @@
      ondragstart="return false" 
      oncontextmenu="return false">
     
+    <!-- UCPC WATERMARK TOP -->
     <div class="ucpc-watermark">
         <div class="watermark-logo">✨ UCPC POETRY ARCHIVE ✨</div>
         <div class="watermark-tagline">Digital Preservation of Urdu Poetry</div>
@@ -189,6 +190,7 @@
         </div>
     </div>
 
+    <!-- COMPLETE GHAZAL VERSES - ALL VERSES -->
     <div class="verses-area" dir="rtl">
         {% for verse in verses %}
         <div class="verse">
@@ -198,6 +200,7 @@
         {% endfor %}
     </div>
 
+    <!-- ACTION BUTTONS - ONLY SHARE AND CREATE POSTER (NO READ COMPLETE GHAZAL) -->
     <div class="action-buttons">
         <button class="btn-share" onclick="shareGhazal()">
             <i class="fab fa-whatsapp"></i> Share on WhatsApp
@@ -213,17 +216,20 @@
         <a href="/">Home</a>
     </div>
     
+    <!-- FOOTER WATERMARK -->
     <div class="footer-watermark">
         UCPC Poetry Archive • Read • Share • Dedicate • Preserve Urdu Literature
     </div>
 </div>
 
 <script>
+// Disable right click
 document.addEventListener('contextmenu', function(e) {
     e.preventDefault();
     return false;
 });
 
+// Disable keyboard shortcuts
 document.addEventListener('keydown', function(e) {
     if (e.ctrlKey && (e.key === 'c' || e.key === 'C' || 
                        e.key === 'v' || e.key === 'V' ||
@@ -238,6 +244,7 @@ document.addEventListener('keydown', function(e) {
     }
 });
 
+// Share function
 function shareGhazal() {
     const url = window.location.href;
     const poetName = document.querySelector('.poet-name').innerText;
