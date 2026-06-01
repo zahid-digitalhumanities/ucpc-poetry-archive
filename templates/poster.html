@@ -26,6 +26,8 @@ body {
     background: #050505;
     color: #fff;
     font-family: 'Montserrat', sans-serif;
+    user-select: none;
+    -webkit-user-select: none;
 }
 
 @font-face {
@@ -239,8 +241,6 @@ body {
 {% endblock %}
 
 {% block content %}
-{% set ghazal_full_url = url_for('ghazals.ghazal_page', text_id=ghazal.id) %}
-
 <div class="app-container">
     <div class="two-columns">
         <div class="editor-panel">
@@ -262,7 +262,7 @@ body {
 
             <button id="downloadBtn" class="btn-generate">📱 DOWNLOAD POSTER</button>
             
-            <a href="{{ ghazal_full_url }}" class="btn-ghazal">
+            <a href="{{ url_for('ghazals.ghazal_page', text_id=ghazal.id) }}" class="btn-ghazal">
                 📖 READ COMPLETE GHAZAL
             </a>
         </div>
