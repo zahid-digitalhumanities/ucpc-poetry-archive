@@ -5,12 +5,12 @@ ghazals_bp = Blueprint('ghazals', __name__)
 
 
 # =====================================================
-# POSTER PAGE (2 couplets only)
+# POSTER PAGE (2 couplets only) - NO GHAZAL HERE
 # =====================================================
 
 @ghazals_bp.route('/poster/<int:text_id>')
 def poster_page(text_id):
-    """Generate poster with 2 couplets only"""
+    """ONLY poster generator - 2 couplets only"""
     conn = get_db()
     cur = conn.cursor()
 
@@ -48,21 +48,22 @@ def poster_page(text_id):
     cur.close()
     conn.close()
 
-    # First 2 couplets for poster
+    # ONLY FIRST 2 COUPLETS FOR POSTER
     poster_verses = all_verses[:2]
 
+    # RENDER ONLY POSTER TEMPLATE
     return render_template('poster.html', 
                           ghazal=ghazal, 
                           poster_verses=poster_verses)
 
 
 # =====================================================
-# COMPLETE GHAZAL PAGE (All verses)
+# COMPLETE GHAZAL PAGE (All verses) - NO POSTER HERE
 # =====================================================
 
 @ghazals_bp.route('/ghazal/<int:text_id>')
 def ghazal_page(text_id):
-    """Display complete ghazal with all verses"""
+    """ONLY complete ghazal reading page - all verses"""
     conn = get_db()
     cur = conn.cursor()
 
@@ -88,7 +89,7 @@ def ghazal_page(text_id):
         conn.close()
         abort(404)
 
-    # Get ALL verses
+    # GET ALL VERSES (full ghazal)
     cur.execute("""
         SELECT misra1_urdu, misra2_urdu, couplet_index
         FROM verses
@@ -100,6 +101,7 @@ def ghazal_page(text_id):
     cur.close()
     conn.close()
 
+    # RENDER ONLY GHAZAL TEMPLATE (no poster)
     return render_template('ghazal.html', ghazal=ghazal, verses=verses)
 
 
