@@ -1,0 +1,347 @@
+{% extends "base.html" %}
+
+{% block title %}{{ ghazal.poet_name }} - UCPC Poetry Poster{% endblock %}
+
+{% block extra_head %}
+<meta property="og:title" content="{{ ghazal.poet_name }} - Urdu Poetry Poster" />
+<meta property="og:description" content="Create beautiful Urdu poetry posters with personal dedications." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="{{ request.url }}" />
+<meta property="og:site_name" content="UCPC Poetry Archive" />
+<meta name="twitter:card" content="summary_large_image" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Montserrat:wght@300;400;600;700;800&family=Noto+Nastaliq+Urdu:wght@400;500;600;700&display=swap" rel="stylesheet">
+{% endblock %}
+
+{% block extra_css %}
+<style>
+:root {
+    --gold-primary: #D4AF37;
+    --gold-light: #F6D878;
+}
+
+body {
+    background: #050505;
+    color: #fff;
+    font-family: 'Montserrat', sans-serif;
+}
+
+@font-face {
+    font-family: 'Jameel Noori Nastaleeq';
+    src: url('{{ url_for("static", filename="fonts/JameelNooriNastaleeq.ttf") }}') format('truetype');
+}
+
+.app-container {
+    max-width: 1400px;
+    margin: auto;
+    padding: 40px 20px;
+}
+
+.two-columns {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 40px;
+    justify-content: center;
+}
+
+.editor-panel {
+    width: 420px;
+    background: rgba(20,20,25,0.9);
+    border: 1px solid rgba(212,175,55,0.2);
+    border-radius: 24px;
+    padding: 30px;
+}
+
+.brand-title {
+    text-align: center;
+    color: var(--gold-primary);
+    font-family: 'Cinzel', serif;
+    margin-bottom: 25px;
+}
+
+.form-input, .theme-select {
+    width: 100%;
+    padding: 14px;
+    border-radius: 12px;
+    border: 1px solid #444;
+    background: #111;
+    color: #fff;
+    margin-top: 10px;
+}
+
+.row-inputs {
+    display: flex;
+    gap: 12px;
+}
+
+.btn-generate {
+    width: 100%;
+    margin-top: 20px;
+    padding: 16px;
+    border: none;
+    border-radius: 50px;
+    background: linear-gradient(135deg, #8a7020, #D4AF37);
+    color: #000;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.btn-ghazal {
+    width: 100%;
+    margin-top: 15px;
+    padding: 14px;
+    border: 2px solid #D4AF37;
+    border-radius: 50px;
+    background: transparent;
+    color: #D4AF37;
+    font-weight: 800;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+}
+
+.btn-ghazal:hover {
+    background: #D4AF37;
+    color: #000;
+}
+
+#poster-container {
+    width: 1080px;
+    min-height: 1920px;
+    background: #020202;
+    position: relative;
+    overflow: hidden;
+    border-radius: 28px;
+    background-image: radial-gradient(circle at top, rgba(255,215,0,0.08), transparent 45%);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+}
+
+.poster-border {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
+    border: 2px solid rgba(212,175,55,0.55);
+    border-radius: 24px;
+}
+
+.poster-inner {
+    padding: 35px;
+}
+
+.logo-row {
+    text-align: center;
+    font-family: 'Cinzel', serif;
+    font-size: 68px;
+    font-weight: 800;
+    color: #D4AF37;
+}
+
+.follow-line {
+    text-align: center;
+    margin-top: 8px;
+    font-size: 22px;
+    color: #f3d27a;
+}
+
+.poet-line-wrap {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.line {
+    flex: 1;
+    height: 2px;
+    background: rgba(212,175,55,0.6);
+}
+
+.poet-name {
+    font-family: 'Cinzel', serif;
+    font-size: 76px;
+    color: #D4AF37;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.verses-area {
+    margin-top: 45px;
+    text-align: center;
+}
+
+.misra {
+    direction: rtl;
+    font-family: 'Jameel Noori Nastaleeq', 'Noto Nastaliq Urdu', serif;
+    font-size: 72px;
+    line-height: 2.1;
+}
+
+.white {
+    color: #fff;
+}
+
+.gold {
+    color: #f3d27a;
+}
+
+.dedication {
+    margin-top: 40px;
+    text-align: center;
+    font-family: 'Cinzel', serif;
+    font-size: 52px;
+    color: #f3d27a;
+    font-weight: 800;
+    background: rgba(212,175,55,0.08);
+    border: 2px solid rgba(212,175,55,0.38);
+    border-radius: 28px;
+    padding: 28px 22px;
+}
+
+.dedication.hidden {
+    display: none;
+}
+
+.visitor-box {
+    margin-top: 28px;
+    text-align: center;
+    padding: 18px;
+    border-radius: 22px;
+    border: 1px solid rgba(212,175,55,0.25);
+    background: rgba(212,175,55,0.05);
+}
+
+.visitor-count {
+    font-size: 48px;
+    color: #FFD700;
+    font-weight: 800;
+    margin-top: 10px;
+}
+
+.footer-box {
+    margin-top: 30px;
+    text-align: center;
+    color: #D4AF37;
+    font-size: 24px;
+}
+
+@media (max-width: 1100px) {
+    #poster-container {
+        transform: scale(0.45);
+        transform-origin: top center;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+{% set ghazal_full_url = url_for('ghazals.ghazal_page', text_id=ghazal.id) %}
+
+<div class="app-container">
+    <div class="two-columns">
+        <div class="editor-panel">
+            <h1 class="brand-title">✨ UCPC Poetry Poster ✨</h1>
+            <select id="themeSelect" class="theme-select">
+                <option value="black">Classic Black</option>
+                <option value="maroon">Deep Maroon</option>
+                <option value="blue">Night Blue</option>
+                <option value="green">Elegant Green</option>
+                <option value="purple">Royal Purple</option>
+            </select>
+
+            <div style="margin-top: 20px;">
+                <div class="row-inputs">
+                    <input type="text" id="inputFrom" class="form-input" placeholder="From (Your Name)">
+                    <input type="text" id="inputTo" class="form-input" placeholder="To (Special Person)">
+                </div>
+            </div>
+
+            <button id="downloadBtn" class="btn-generate">📱 DOWNLOAD POSTER</button>
+            
+            <a href="{{ ghazal_full_url }}" class="btn-ghazal">
+                📖 READ COMPLETE GHAZAL
+            </a>
+        </div>
+
+        <div class="preview-wrapper">
+            <div id="poster-container" class="theme-black">
+                <div class="poster-border"></div>
+                <div class="poster-inner">
+                    <div class="logo-row">✨ UCPC POETRY ARCHIVE ✨</div>
+                    <div class="follow-line">FOLLOW DAILY UPDATES</div>
+                    <div class="poet-line-wrap">
+                        <div class="line"></div>
+                        <div class="poet-name">{{ ghazal.poet_name }}</div>
+                        <div class="line"></div>
+                    </div>
+
+                    <div class="verses-area">
+                        {% for verse in poster_verses[:2] %}
+                        <div class="misra white">{{ verse.misra1_urdu|safe }}</div>
+                        <div class="misra gold">{{ verse.misra2_urdu|safe }}</div>
+                        {% endfor %}
+                    </div>
+
+                    <div id="dedicationBox" class="dedication hidden">
+                        ✨ Dedicated With Love ✨
+                        <div style="margin-top: 16px;">From <span id="dedFrom">_____</span></div>
+                        <div class="dedication-heart">❤️</div>
+                        <div>To <span id="dedTo">_____</span></div>
+                    </div>
+
+                    <div class="visitor-box">
+                        <div style="font-size: 28px; color: #f3d27a;">🌍 Total Readers</div>
+                        <div class="visitor-count">{{ ghazal.views if ghazal.views else 0 }}</div>
+                    </div>
+
+                    <div class="footer-box">🔔 UCPC Poetry Archive 🔔</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script>
+const inputFrom = document.getElementById('inputFrom');
+const inputTo = document.getElementById('inputTo');
+const dedicationBox = document.getElementById('dedicationBox');
+const dedFrom = document.getElementById('dedFrom');
+const dedTo = document.getElementById('dedTo');
+const posterContainer = document.getElementById('poster-container');
+const themeSelect = document.getElementById('themeSelect');
+
+function updateDedication() {
+    const from = inputFrom.value.trim();
+    const to = inputTo.value.trim();
+    if (from || to) {
+        dedicationBox.classList.remove('hidden');
+        dedFrom.textContent = from || '_____';
+        dedTo.textContent = to || '_____';
+    } else {
+        dedicationBox.classList.add('hidden');
+    }
+}
+
+inputFrom.addEventListener('input', updateDedication);
+inputTo.addEventListener('input', updateDedication);
+
+themeSelect.addEventListener('change', function() {
+    posterContainer.className = '';
+    posterContainer.id = 'poster-container';
+    posterContainer.classList.add('theme-' + this.value);
+});
+
+document.getElementById('downloadBtn').addEventListener('click', async () => {
+    const canvas = await html2canvas(posterContainer, { scale: 2, useCORS: true, backgroundColor: null });
+    const link = document.createElement('a');
+    link.download = 'UCPC_Poster.png';
+    link.href = canvas.toDataURL();
+    link.click();
+});
+</script>
+{% endblock %}
