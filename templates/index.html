@@ -1,252 +1,219 @@
 {% extends "base.html" %}
 
-{% block title %}UCPC Poetry Archive{% endblock %}
+{% block title %}UCPC Poetry Archive – Digital Urdu Poetry Archive{% endblock %}
 
 {% block extra_css %}
-
 <style>
-
-.hero{
-    text-align:center;
-    padding:4rem 1rem;
-    background:linear-gradient(135deg,#111,#0a0a0a);
-    border-radius:24px;
-    margin-bottom:2rem;
-    border:1px solid rgba(212,175,55,0.15);
-}
-
-.hero h1{
-    color:#D4AF37;
-    font-size:3rem;
-    margin-bottom:1rem;
-    font-family:'Cinzel',serif;
-}
-
-.hero p{
-    color:#aaa;
-    font-size:1.15rem;
-    margin-bottom:2rem;
-}
-
-.btn-explore{
-    background:#D4AF37;
-    color:#0a0a0a;
-    padding:0.9rem 2.3rem;
-    text-decoration:none;
-    border-radius:50px;
-    font-weight:bold;
-    display:inline-block;
-    transition:0.2s;
-}
-
-.btn-explore:hover{
-    transform:scale(1.05);
-    background:#ffd966;
-}
-
-/* STATS */
-
-.stats-section{
-    margin-top:2rem;
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-    gap:1.2rem;
-}
-
-.stat-card{
-    background:linear-gradient(
-        135deg,
-        rgba(212,175,55,0.12),
-        rgba(212,175,55,0.03)
-    );
-
-    border:1px solid rgba(212,175,55,0.18);
-
-    border-radius:22px;
-
-    padding:2rem 1rem;
-
-    text-align:center;
-}
-
-.stat-number{
-    font-size:3rem;
-    color:#FFD700;
-    font-weight:800;
-    margin-bottom:0.5rem;
-}
-
-.stat-label{
-    color:#ddd;
-    font-size:1rem;
-    letter-spacing:1px;
-}
-
-/* FEATURED */
-
-.featured-section{
-    text-align:center;
-    margin-top:3rem;
-}
-
-.featured-title{
-    color:#D4AF37;
-    font-size:1.7rem;
-    margin-bottom:1.5rem;
-    font-family:'Cinzel',serif;
-}
-
-.poet-links{
-    display:flex;
-    justify-content:center;
-    gap:1.5rem;
-    flex-wrap:wrap;
-}
-
-.poet-links a{
-    color:#aaa;
-    text-decoration:none;
-    padding:10px 18px;
-    border-radius:30px;
-    background:#111;
-    transition:0.2s;
-    border:1px solid rgba(212,175,55,0.1);
-}
-
-.poet-links a:hover{
-    color:#D4AF37;
-    border-color:#D4AF37;
-    transform:translateY(-2px);
-}
-
-/* REELS INFO */
-
-.reels-box{
-    margin-top:3rem;
-    padding:2rem;
-    border-radius:24px;
-    text-align:center;
-
-    background:linear-gradient(
-        135deg,
-        rgba(212,175,55,0.08),
-        rgba(255,255,255,0.02)
-    );
-
-    border:1px solid rgba(212,175,55,0.15);
-}
-
-.reels-box h3{
-    color:#FFD700;
-    margin-bottom:1rem;
-    font-size:1.5rem;
-}
-
-.reels-box p{
-    color:#bbb;
-    line-height:1.8;
-}
-
+    .hero-section {
+        text-align: center;
+        padding: 60px 20px;
+        background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+        border-radius: 30px;
+        margin-bottom: 40px;
+    }
+    .hero-title {
+        font-size: 48px;
+        color: #D4AF37;
+        font-family: 'Cinzel', serif;
+        margin-bottom: 20px;
+    }
+    .hero-subtitle {
+        font-size: 18px;
+        color: #aaa;
+        margin-bottom: 30px;
+    }
+    .stats-container {
+        display: flex;
+        justify-content: center;
+        gap: 40px;
+        flex-wrap: wrap;
+        margin-top: 30px;
+    }
+    .stat-card {
+        text-align: center;
+        padding: 20px 30px;
+        background: rgba(212,175,55,0.1);
+        border-radius: 20px;
+        border: 1px solid rgba(212,175,55,0.3);
+    }
+    .stat-number {
+        font-size: 36px;
+        font-weight: bold;
+        color: #D4AF37;
+    }
+    .stat-label {
+        font-size: 14px;
+        color: #aaa;
+    }
+    .features-section {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 25px;
+        margin: 50px 0;
+    }
+    .feature-card {
+        background: #111;
+        padding: 25px;
+        border-radius: 20px;
+        text-align: center;
+        border: 1px solid #222;
+        transition: 0.3s;
+    }
+    .feature-card:hover {
+        border-color: #D4AF37;
+        transform: translateY(-5px);
+    }
+    .feature-icon {
+        font-size: 40px;
+        margin-bottom: 15px;
+    }
+    .feature-title {
+        font-size: 18px;
+        color: #D4AF37;
+        margin-bottom: 10px;
+        font-weight: bold;
+    }
+    .feature-desc {
+        font-size: 14px;
+        color: #aaa;
+    }
+    .why-section {
+        margin: 50px 0;
+        padding: 40px;
+        background: #111;
+        border-radius: 30px;
+    }
+    .why-title {
+        text-align: center;
+        color: #D4AF37;
+        font-size: 28px;
+        margin-bottom: 30px;
+    }
+    .why-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+    }
+    .why-item {
+        text-align: center;
+        padding: 15px;
+    }
+    .why-check {
+        font-size: 30px;
+        color: #D4AF37;
+        margin-bottom: 10px;
+    }
+    .coming-soon {
+        background: linear-gradient(135deg, #1a1a1a, #0a0a0a);
+        padding: 40px;
+        border-radius: 30px;
+        text-align: center;
+        margin-top: 40px;
+        border: 1px dashed #D4AF37;
+    }
+    .btn-explore {
+        display: inline-block;
+        background: #D4AF37;
+        color: #000;
+        padding: 12px 30px;
+        border-radius: 40px;
+        text-decoration: none;
+        font-weight: bold;
+        margin-top: 20px;
+        transition: 0.3s;
+    }
+    .btn-explore:hover {
+        background: #F6D878;
+        transform: scale(1.02);
+    }
+    @media (max-width: 600px) {
+        .hero-title { font-size: 32px; }
+        .hero-subtitle { font-size: 14px; }
+        .stats-container { gap: 15px; }
+        .stat-card { padding: 10px 20px; }
+        .stat-number { font-size: 24px; }
+    }
 </style>
-
 {% endblock %}
 
 {% block content %}
+<div class="hero-section">
+    <h1 class="hero-title">✨ UCPC Poetry Archive ✨</h1>
+    <p class="hero-subtitle">Read Complete Ghazals • Generate Posters • Discover Poets • AI Search Coming Soon</p>
 
-<div class="hero">
-
-    <h1>📜 UCPC Poetry Archive</h1>
-
-    <p>
-        Classical Urdu Ghazals • Read • Share • Dedicate
-    </p>
-
-    <a href="/poets" class="btn-explore">
-        Explore Poets →
-    </a>
-
+    <div class="stats-container">
+        <div class="stat-card">
+            <div class="stat-number">{{ total_poets }}</div>
+            <div class="stat-label">Total Poets</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ total_ghazals }}</div>
+            <div class="stat-label">Total Ghazals</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ total_readers }}</div>
+            <div class="stat-label">Total Readers</div>
+        </div>
+    </div>
 </div>
 
-<!-- VISITOR STATS -->
-
-<div class="stats-section">
-
-    <div class="stat-card">
-
-        <div class="stat-number">
-            {{ total_visitors if total_visitors else 0 }}
+<div class="why-section">
+    <h2 class="why-title">📌 Why Follow UCPC?</h2>
+    <div class="why-list">
+        <div class="why-item">
+            <div class="why-check">✓</div>
+            <div class="feature-title">Read Complete Ghazals</div>
+            <div class="feature-desc">Full ghazals with all verses, not just quotes</div>
         </div>
-
-        <div class="stat-label">
-            🌍 TOTAL VISITORS
+        <div class="why-item">
+            <div class="why-check">✓</div>
+            <div class="feature-title">Urdu Poetry Archive</div>
+            <div class="feature-desc">Classical and modern Urdu poets</div>
         </div>
-
+        <div class="why-item">
+            <div class="why-check">✓</div>
+            <div class="feature-title">Poet Profiles</div>
+            <div class="feature-desc">Detailed information about each poet</div>
+        </div>
+        <div class="why-item">
+            <div class="why-check">✓</div>
+            <div class="feature-title">AI Semantic Search</div>
+            <div class="feature-desc">Coming soon – smart poetry discovery</div>
+        </div>
+        <div class="why-item">
+            <div class="why-check">✓</div>
+            <div class="feature-title">Digital Humanities Project</div>
+            <div class="feature-desc">Research-grade poetry archive</div>
+        </div>
     </div>
-
-    <div class="stat-card">
-
-        <div class="stat-number">
-            {{ total_poets if total_poets else 0 }}
-        </div>
-
-        <div class="stat-label">
-            ✍️ POETS
-        </div>
-
-    </div>
-
-    <div class="stat-card">
-
-        <div class="stat-number">
-            {{ total_ghazals if total_ghazals else 0 }}
-        </div>
-
-        <div class="stat-label">
-            📖 GHAZALS
-        </div>
-
-    </div>
-
 </div>
 
-<!-- FEATURED -->
-
-<div class="featured-section">
-
-    <div class="featured-title">
-        ✨ Featured Poets
+<div class="features-section">
+    <div class="feature-card">
+        <div class="feature-icon">📖</div>
+        <div class="feature-title">Read Complete Ghazals</div>
+        <div class="feature-desc">Full ghazals from classical poets like Ghalib, Iqbal, Faiz, Mir</div>
     </div>
-
-    <div class="poet-links">
-
-        <a href="/poets/1">Mirza Ghalib</a>
-
-        <a href="/poets/2">Mir Taqi Mir</a>
-
-        <a href="/poets/3">Allama Iqbal</a>
-
-        <a href="/poets/4">Faiz Ahmed Faiz</a>
-
-        <a href="/poets/5">Jaun Elia</a>
-
+    <div class="feature-card">
+        <div class="feature-icon">🖼️</div>
+        <div class="feature-title">Generate Poetry Posters</div>
+        <div class="feature-desc">Create beautiful gold-themed posters with personal dedications</div>
     </div>
-
+    <div class="feature-card">
+        <div class="feature-icon">👤</div>
+        <div class="feature-title">Discover Poets</div>
+        <div class="feature-desc">Browse and explore classical and modern Urdu poets</div>
+    </div>
+    <div class="feature-card">
+        <div class="feature-icon">🔍</div>
+        <div class="feature-title">AI Search (Coming Soon)</div>
+        <div class="feature-desc">Semantic search, poet prediction, and research tools</div>
+    </div>
 </div>
 
-<!-- REELS -->
-
-<div class="reels-box">
-
-    <h3>🎬 Poetry Reels Traffic Tracking</h3>
-
-    <p>
-
-        Every reel poster now includes a direct ghazal link and visitor tracking system.
-        <br><br>
-        You can now monitor whether readers from Facebook reels are opening your poetry archive.
-
-    </p>
-
+<div class="coming-soon">
+    <h3 style="color: #D4AF37; margin-bottom: 15px;">🚀 What's Coming Next</h3>
+    <p style="color: #aaa;">AI Powered Semantic Search • Poet Prediction • Research Dashboard • Similar Ghazal Finder • Digital Humanities Tools</p>
+    <a href="/poets" class="btn-explore">Explore Poets →</a>
 </div>
-
 {% endblock %}
