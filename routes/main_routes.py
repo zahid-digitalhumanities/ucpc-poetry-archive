@@ -1,5 +1,13 @@
+from flask import Blueprint, render_template
+from models.db import get_db
+
+# Create the blueprint
+main_bp = Blueprint('main', __name__)
+
+
 @main_bp.route('/')
 def index():
+    """Homepage with statistics and recent ghazals"""
     conn = get_db()
     cur = conn.cursor()
 
@@ -24,6 +32,7 @@ def index():
                p.name as poet_name
         FROM texts t
         LEFT JOIN poets p ON t.poet_id = p.id
+        WHERE t.first_couplet IS NOT NULL
         ORDER BY t.id DESC
         LIMIT 6
     """)
@@ -31,6 +40,9 @@ def index():
 
     cur.close()
     conn.close()
+
+    if recent_ghazals is None:
+        recent_ghazals = []
 
     return render_template('index.html',
                          total_poets=poets_count,
