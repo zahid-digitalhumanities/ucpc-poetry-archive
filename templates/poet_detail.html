@@ -172,10 +172,12 @@
                 <i class="fas fa-pen-fancy"></i> {{ item.verse_count or 0 }} verses
             </div>
             <div class="action-buttons">
-                <a href="/ghazals/view/{{ item.id }}" class="read-link">
+                <!-- ✅ UPDATED: Direct link to FULL GHAZAL page -->
+                <a href="{{ url_for('ghazals.ghazal_page', text_id=item.id) }}" class="read-link">
                     <i class="fas fa-book-open"></i> Read Full
                 </a>
-                <a href="/ghazals/view/{{ item.id }}" class="poster-link">
+                <!-- ✅ UPDATED: Direct link to POSTER page -->
+                <a href="{{ url_for('ghazals.poster_page', text_id=item.id) }}" class="poster-link">
                     <i class="fas fa-image"></i> Create Poster
                 </a>
             </div>
