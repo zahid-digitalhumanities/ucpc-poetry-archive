@@ -12,7 +12,7 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;900&family=Montserrat:wght@300;400;500;600;700&family=Noto+Nastaliq+Urdu:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;800;900&family=Montserrat:wght@300;400;500;600;700&family=Noto+Nastaliq+Urdu:wght@400;500;600;700&display=swap" rel="stylesheet">
 {% endblock %}
 
 {% block extra_css %}
@@ -21,7 +21,6 @@
     --gold-primary: #C9A961;
     --gold-light: #E5D4A1;
     --gold-dark: #A68B4B;
-    --cream: #F5F0E1;
     --warm-white: #FFF8F0;
     --text-primary: #F5F0E1;
     --text-secondary: #D4C4A8;
@@ -189,7 +188,7 @@ button, .btn-generate, .btn-ghazal, select, input {
 }
 
 /* ===================== */
-/* POSTER STYLES */
+/* PREMIUM POSTER STYLES */
 /* ===================== */
 
 #poster-container {
@@ -201,7 +200,11 @@ button, .btn-generate, .btn-ghazal, select, input {
     box-shadow: 0 40px 100px rgba(0, 0, 0, 0.7);
 }
 
-/* Themes */
+/* Base Theme (shared) */
+.theme-black, .theme-maroon, .theme-blue, .theme-green, .theme-purple {
+    transition: background 0.3s ease;
+}
+
 .theme-black {
     background: radial-gradient(circle at 30% 10%, rgba(201, 169, 97, 0.15) 0%, transparent 40%),
                 radial-gradient(circle at 70% 90%, rgba(201, 169, 97, 0.1) 0%, transparent 35%),
@@ -255,31 +258,50 @@ button, .btn-generate, .btn-ghazal, select, input {
 .corner-br { bottom: 35px; right: 35px; border-width: 0 2px 2px 0; }
 
 .poster-inner {
-    padding: 80px 60px 70px;
+    padding: 70px 60px 60px;
     position: relative;
     z-index: 5;
 }
 
+/* Luxury Logo */
 .logo-row {
     text-align: center;
-    font-family: 'Cinzel', serif;
-    font-size: 44px;
-    color: var(--gold-primary);
-    letter-spacing: 3px;
-    font-weight: 700;
-    text-transform: uppercase;
+    margin-bottom: 15px;
 }
-
+.logo-main {
+    font-family: 'Cinzel', serif;
+    font-size: 72px;
+    font-weight: 900;
+    letter-spacing: 6px;
+    color: var(--gold-primary);
+    line-height: 1.1;
+}
+.logo-sub {
+    font-family: 'Cinzel', serif;
+    font-size: 24px;
+    letter-spacing: 4px;
+    color: var(--gold-light);
+    margin-top: 8px;
+    font-weight: 500;
+}
 .follow-line {
     text-align: center;
-    margin-top: 16px;
+    margin-top: 20px;
     color: var(--text-secondary);
-    font-size: 16px;
+    font-size: 15px;
     letter-spacing: 3px;
     font-weight: 300;
     text-transform: uppercase;
+    opacity: 0.9;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(201, 169, 97, 0.3);
+    display: inline-block;
+    width: auto;
+    margin-left: auto;
+    margin-right: auto;
 }
 
+/* Poet Name */
 .poet-line-wrap {
     display: flex;
     align-items: center;
@@ -287,37 +309,38 @@ button, .btn-generate, .btn-ghazal, select, input {
     margin-top: 40px;
     justify-content: center;
 }
-
 .line {
     flex: 1;
     max-width: 200px;
     height: 1px;
     background: linear-gradient(90deg, transparent, var(--gold-primary), transparent);
 }
-
 .poet-name {
-    font-size: 64px;
-    color: var(--gold-light);
+    font-size: 52px;
     font-family: 'Cinzel', serif;
     font-weight: 700;
     white-space: nowrap;
     text-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
-    letter-spacing: 2px;
+    letter-spacing: 1px;
 }
+/* Theme-specific poet name colors */
+.theme-black .poet-name { color: var(--gold-light); }
+.theme-maroon .poet-name { color: #FFB3B3; }
+.theme-blue .poet-name { color: #9BC7FF; }
+.theme-green .poet-name { color: #B8F2C2; }
+.theme-purple .poet-name { color: #D8B4FE; }
 
+/* Poetry Area */
 .verses-area {
     margin-top: 80px;
     text-align: center;
 }
 
-/* ============================================ */
-/* CRITICAL FIX: No line breaks within each misra */
-/* ============================================ */
 .misra {
     direction: rtl;
     font-family: 'Jameel Noori Nastaleeq', 'Noto Nastaliq Urdu', serif;
     font-size: 86px;
-    line-height: 2.3;
+    line-height: 2.2;
     text-align: center;
     text-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
     white-space: nowrap;
@@ -326,8 +349,6 @@ button, .btn-generate, .btn-ghazal, select, input {
     max-width: 100%;
     scrollbar-width: thin;
 }
-
-/* Scrollbar styling for long verses */
 .misra::-webkit-scrollbar {
     height: 4px;
 }
@@ -339,8 +360,6 @@ button, .btn-generate, .btn-ghazal, select, input {
     background: var(--gold-primary);
     border-radius: 10px;
 }
-
-/* For responsive when text is extremely long */
 @media (max-width: 1080px) {
     .misra {
         white-space: normal;
@@ -353,47 +372,133 @@ button, .btn-generate, .btn-ghazal, select, input {
 .white {
     color: var(--warm-white);
 }
-
 .gold {
+    /* default gold, theme overrides apply to verse color as well */
     color: var(--gold-light);
 }
+/* Theme-specific verse colors */
+.theme-maroon .gold { color: #FFA8A8; }
+.theme-blue .gold { color: #A5D6FF; }
+.theme-green .gold { color: #BBF7D0; }
+.theme-purple .gold { color: #DDD6FE; }
 
+/* Complete Ghazal CTA */
+.complete-ghazal-cta {
+    text-align: center;
+    margin: 50px 0 20px;
+    font-family: 'Cinzel', serif;
+    font-size: 28px;
+    letter-spacing: 2px;
+    color: var(--gold-primary);
+    border-top: 1px solid rgba(201, 169, 97, 0.3);
+    border-bottom: 1px solid rgba(201, 169, 97, 0.3);
+    padding: 15px 0;
+    display: inline-block;
+    width: 100%;
+}
+.complete-ghazal-cta span {
+    background: linear-gradient(135deg, var(--gold-primary), var(--gold-light));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* UCPC Unique Features */
+.ucpc-features {
+    text-align: center;
+    margin: 30px 0;
+    font-size: 24px;
+    color: var(--text-secondary);
+    font-weight: 500;
+    letter-spacing: 1px;
+    background: rgba(255,255,255,0.05);
+    padding: 12px;
+    border-radius: 50px;
+    backdrop-filter: blur(4px);
+}
+
+/* Dedication Box - Reduced size */
 .dedication {
-    margin-top: 60px;
+    margin-top: 40px;
     background: linear-gradient(135deg, rgba(201, 169, 97, 0.12), rgba(229, 212, 161, 0.08), rgba(201, 169, 97, 0.12));
-    backdrop-filter: blur(25px);
+    backdrop-filter: blur(18px);
     border: 1px solid rgba(201, 169, 97, 0.25);
     border-radius: 24px;
-    padding: 45px 40px;
+    padding: 28px 35px;
     color: var(--text-primary);
-    font-size: 42px;
+    font-size: 34px;
     text-align: center;
     font-family: 'Cinzel', serif;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
     position: relative;
 }
-
 .dedication.hidden {
     display: none;
 }
-
 .dedication-heart {
-    font-size: 55px;
-    margin: 18px 0;
+    font-size: 48px;
+    margin: 12px 0;
     animation: heartbeat 1.5s ease-in-out infinite;
 }
-
 @keyframes heartbeat {
     0%, 100% { transform: scale(1); }
     50% { transform: scale(1.1); }
 }
 
-.footer-box {
-    margin-top: 90px;
+/* Follower Attraction Section */
+.follower-attraction {
     text-align: center;
-    color: var(--text-secondary);
-    font-size: 18px;
+    margin: 45px 0 30px;
+    padding: 20px;
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(10px);
+    border-radius: 28px;
+    border: 1px solid rgba(201, 169, 97, 0.2);
+}
+.follower-attraction p {
+    font-size: 26px;
+    font-weight: 600;
+    color: var(--gold-light);
+    margin: 8px 0;
+    font-family: 'Cinzel', serif;
+    letter-spacing: 1px;
+}
+
+/* Footer - Glass card */
+.footer-card {
+    margin-top: 40px;
+    padding: 25px 20px;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(16px);
+    border-radius: 24px;
+    border: 1px solid rgba(201, 169, 97, 0.25);
+    text-align: center;
+}
+.footer-brand {
+    font-family: 'Cinzel', serif;
+    font-size: 22px;
+    color: var(--gold-primary);
     letter-spacing: 2px;
+    font-weight: 700;
+}
+.footer-mission {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin: 8px 0;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+.footer-url {
+    font-size: 16px;
+    color: var(--gold-light);
+    text-decoration: none;
+    word-break: break-all;
+    display: inline-block;
+    margin-top: 8px;
+    font-weight: 500;
+}
+.footer-url:hover {
+    text-decoration: underline;
 }
 
 @media (max-width: 1100px) {
@@ -450,14 +555,21 @@ button, .btn-generate, .btn-ghazal, select, input {
                 <div class="corner-br"></div>
                 <div class="poster-border"></div>
                 <div class="poster-inner">
-                    <div class="logo-row">✨ UCPC Poetry Archive ✨</div>
+                    <!-- Luxury Logo -->
+                    <div class="logo-row">
+                        <div class="logo-main">UCPC</div>
+                        <div class="logo-sub">Poetry Archive</div>
+                    </div>
                     <div class="follow-line">Digital Preservation of Urdu Literature</div>
+
+                    <!-- Poet Name -->
                     <div class="poet-line-wrap">
                         <div class="line"></div>
                         <div class="poet-name">{{ ghazal.poet_name }}</div>
                         <div class="line"></div>
                     </div>
 
+                    <!-- Verses -->
                     <div class="verses-area">
                         {% for verse in poster_verses[:2] %}
                         <div class="misra white">{{ verse.misra1_urdu|safe }}</div>
@@ -465,14 +577,37 @@ button, .btn-generate, .btn-ghazal, select, input {
                         {% endfor %}
                     </div>
 
+                    <!-- Complete Ghazal CTA -->
+                    <div class="complete-ghazal-cta">
+                        <span>📖 Complete Ghazal Available at UCPC Poetry Archive</span>
+                    </div>
+
+                    <!-- UCPC Unique Features -->
+                    <div class="ucpc-features">
+                        📖 Complete Ghazals • 🎨 Poster Generator • ❤️ Dedications
+                    </div>
+
+                    <!-- Dedication -->
                     <div id="dedicationBox" class="dedication hidden">
                         ✨ Dedicated With Love ✨
-                        <div style="margin-top: 22px;">From <span id="dedFrom">_____</span></div>
+                        <div style="margin-top: 16px;">From <span id="dedFrom">_____</span></div>
                         <div class="dedication-heart">❤️</div>
                         <div>To <span id="dedTo">_____</span></div>
                     </div>
 
-                    <div class="footer-box">www.ucpc-poetry-archive.onrender.com</div>
+                    <!-- Follower Attraction -->
+                    <div class="follower-attraction">
+                        <p>🌹 Follow UCPC for Complete Ghazals</p>
+                        <p>🌹 Create Your Own Poetry Posters</p>
+                        <p>🌹 Submit Your Own Poetry</p>
+                    </div>
+
+                    <!-- Footer Card -->
+                    <div class="footer-card">
+                        <div class="footer-brand">✨ UCPC Poetry Archive ✨</div>
+                        <div class="footer-mission">Digital Preservation of Urdu Literature</div>
+                        <a href="https://ucpc-poetry-archive.onrender.com" class="footer-url" target="_blank">ucpc-poetry-archive.onrender.com</a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -508,7 +643,7 @@ inputFrom.addEventListener('input', updateDedication);
 inputTo.addEventListener('input', updateDedication);
 updateDedication();
 
-// Change theme
+// Change theme with dynamic accent colors (CSS handles colors)
 function changeTheme() {
     const selectedTheme = themeSelect.value;
     posterContainer.classList.remove('theme-black', 'theme-maroon', 'theme-blue', 'theme-green', 'theme-purple');
