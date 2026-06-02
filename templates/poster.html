@@ -18,14 +18,11 @@
 {% block extra_css %}
 <style>
 :root {
-    /* Enhanced elegant color palette */
     --gold-primary: #C9A961;
     --gold-light: #E5D4A1;
     --gold-dark: #A68B4B;
     --cream: #F5F0E1;
     --warm-white: #FFF8F0;
-    --deep-purple: #2C1E3A;
-    --navy-dark: #0A1628;
     --text-primary: #F5F0E1;
     --text-secondary: #D4C4A8;
 }
@@ -33,8 +30,6 @@
 * {
     user-select: none;
     -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
 }
 
 body {
@@ -44,7 +39,6 @@ body {
     min-height: 100vh;
 }
 
-/* Allow selection on buttons and inputs only */
 button, .btn-generate, .btn-ghazal, select, input {
     user-select: auto;
     -webkit-user-select: auto;
@@ -160,7 +154,6 @@ button, .btn-generate, .btn-ghazal, select, input {
     transform: translateY(-2px);
 }
 
-/* Ghazal ID Link Styles */
 .ghazal-id-link {
     margin-top: 15px;
     padding: 12px;
@@ -187,12 +180,6 @@ button, .btn-generate, .btn-ghazal, select, input {
 .ghazal-id-value a {
     color: var(--gold-primary);
     text-decoration: none;
-    transition: all 0.3s ease;
-}
-
-.ghazal-id-value a:hover {
-    text-decoration: underline;
-    color: var(--gold-light);
 }
 
 .preview-wrapper {
@@ -202,7 +189,7 @@ button, .btn-generate, .btn-ghazal, select, input {
 }
 
 /* ===================== */
-/* ENHANCED POSTER STYLES */
+/* POSTER STYLES - SIMPLIFIED FOR RELIABILITY */
 /* ===================== */
 
 #poster-container {
@@ -212,51 +199,39 @@ button, .btn-generate, .btn-ghazal, select, input {
     overflow: hidden;
     border-radius: 40px;
     box-shadow: 0 40px 100px rgba(0, 0, 0, 0.7);
-    user-select: none;
-    -webkit-user-select: none;
 }
 
 /* Classic Black Theme */
 .theme-black {
-    background: 
-        radial-gradient(circle at 30% 10%, rgba(201, 169, 97, 0.15) 0%, transparent 40%),
-        radial-gradient(circle at 70% 90%, rgba(201, 169, 97, 0.1) 0%, transparent 35%),
-        linear-gradient(180deg, #0D1117 0%, #161B22 30%, #1F2937 70%, #0D1117 100%);
+    background: radial-gradient(circle at 30% 10%, rgba(201, 169, 97, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 70% 90%, rgba(201, 169, 97, 0.1) 0%, transparent 35%),
+                linear-gradient(180deg, #0D1117 0%, #161B22 30%, #1F2937 70%, #0D1117 100%);
 }
 
-/* Deep Maroon Theme */
 .theme-maroon {
-    background: 
-        radial-gradient(circle at 30% 10%, rgba(229, 62, 62, 0.15) 0%, transparent 40%),
-        radial-gradient(circle at 70% 90%, rgba(139, 0, 0, 0.15) 0%, transparent 35%),
-        linear-gradient(180deg, #1A0A0A 0%, #2D1B1B 30%, #3D2828 70%, #1A0A0A 100%);
+    background: radial-gradient(circle at 30% 10%, rgba(229, 62, 62, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 70% 90%, rgba(139, 0, 0, 0.15) 0%, transparent 35%),
+                linear-gradient(180deg, #1A0A0A 0%, #2D1B1B 30%, #3D2828 70%, #1A0A0A 100%);
 }
 
-/* Night Blue Theme */
 .theme-blue {
-    background: 
-        radial-gradient(circle at 30% 10%, rgba(59, 130, 246, 0.15) 0%, transparent 40%),
-        radial-gradient(circle at 70% 90%, rgba(30, 58, 138, 0.15) 0%, transparent 35%),
-        linear-gradient(180deg, #0A1628 0%, #1E3A5F 30%, #2C4A6E 70%, #0A1628 100%);
+    background: radial-gradient(circle at 30% 10%, rgba(59, 130, 246, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 70% 90%, rgba(30, 58, 138, 0.15) 0%, transparent 35%),
+                linear-gradient(180deg, #0A1628 0%, #1E3A5F 30%, #2C4A6E 70%, #0A1628 100%);
 }
 
-/* Elegant Green Theme */
 .theme-green {
-    background: 
-        radial-gradient(circle at 30% 10%, rgba(34, 197, 94, 0.15) 0%, transparent 40%),
-        radial-gradient(circle at 70% 90%, rgba(6, 78, 59, 0.15) 0%, transparent 35%),
-        linear-gradient(180deg, #0A1F0A 0%, #14532D 30%, #1A4D2E 70%, #0A1F0A 100%);
+    background: radial-gradient(circle at 30% 10%, rgba(34, 197, 94, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 70% 90%, rgba(6, 78, 59, 0.15) 0%, transparent 35%),
+                linear-gradient(180deg, #0A1F0A 0%, #14532D 30%, #1A4D2E 70%, #0A1F0A 100%);
 }
 
-/* Royal Purple Theme */
 .theme-purple {
-    background: 
-        radial-gradient(circle at 30% 10%, rgba(168, 85, 247, 0.15) 0%, transparent 40%),
-        radial-gradient(circle at 70% 90%, rgba(88, 28, 135, 0.15) 0%, transparent 35%),
-        linear-gradient(180deg, #1A0A2E 0%, #2D1B4E 30%, #3D2B5F 70%, #1A0A2E 100%);
+    background: radial-gradient(circle at 30% 10%, rgba(168, 85, 247, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 70% 90%, rgba(88, 28, 135, 0.15) 0%, transparent 35%),
+                linear-gradient(180deg, #1A0A2E 0%, #2D1B4E 30%, #3D2B5F 70%, #1A0A2E 100%);
 }
 
-/* Premium Ornamental Border */
 .poster-border {
     position: absolute;
     top: 15px;
@@ -269,18 +244,6 @@ button, .btn-generate, .btn-ghazal, select, input {
     z-index: 10;
 }
 
-.poster-border::before {
-    content: '';
-    position: absolute;
-    top: -4px;
-    left: -4px;
-    right: -4px;
-    bottom: -4px;
-    border: 1px solid rgba(201, 169, 97, 0.2);
-    border-radius: 38px;
-}
-
-/* Corner Decorations */
 .corner-tl {
     position: absolute;
     top: 35px;
@@ -335,7 +298,6 @@ button, .btn-generate, .btn-ghazal, select, input {
     z-index: 5;
 }
 
-/* Logo - Enhanced */
 .logo-row {
     text-align: center;
     font-family: 'Cinzel', serif;
@@ -344,14 +306,8 @@ button, .btn-generate, .btn-ghazal, select, input {
     letter-spacing: 3px;
     font-weight: 700;
     text-transform: uppercase;
-    background: linear-gradient(135deg, var(--gold-primary), var(--gold-light), var(--gold-primary));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
-/* Follow Line - Enhanced */
 .follow-line {
     text-align: center;
     margin-top: 16px;
@@ -360,10 +316,8 @@ button, .btn-generate, .btn-ghazal, select, input {
     letter-spacing: 3px;
     font-weight: 300;
     text-transform: uppercase;
-    opacity: 0.9;
 }
 
-/* Poet Name - Enhanced */
 .poet-line-wrap {
     display: flex;
     align-items: center;
@@ -385,15 +339,10 @@ button, .btn-generate, .btn-ghazal, select, input {
     font-family: 'Cinzel', serif;
     font-weight: 700;
     white-space: nowrap;
-    background: linear-gradient(135deg, var(--gold-light), var(--gold-primary), var(--gold-light));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
     text-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
     letter-spacing: 2px;
 }
 
-/* Poetry Area - Enhanced */
 .verses-area {
     margin-top: 80px;
     text-align: center;
@@ -410,24 +359,16 @@ button, .btn-generate, .btn-ghazal, select, input {
 
 .white {
     color: var(--warm-white);
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
 }
 
 .gold {
     color: var(--gold-light);
-    text-shadow: 0 2px 8px rgba(201, 169, 97, 0.3);
 }
 
-/* Dedication Box - Premium Blur */
 .dedication {
     margin-top: 60px;
-    background: linear-gradient(135deg, 
-        rgba(201, 169, 97, 0.12), 
-        rgba(229, 212, 161, 0.08),
-        rgba(201, 169, 97, 0.12)
-    );
+    background: linear-gradient(135deg, rgba(201, 169, 97, 0.12), rgba(229, 212, 161, 0.08), rgba(201, 169, 97, 0.12));
     backdrop-filter: blur(25px);
-    -webkit-backdrop-filter: blur(25px);
     border: 1px solid rgba(201, 169, 97, 0.25);
     border-radius: 24px;
     padding: 45px 40px;
@@ -437,26 +378,6 @@ button, .btn-generate, .btn-ghazal, select, input {
     font-family: 'Cinzel', serif;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
     position: relative;
-}
-
-.dedication::before {
-    content: '❝';
-    position: absolute;
-    top: 10px;
-    left: 20px;
-    font-size: 60px;
-    color: var(--gold-primary);
-    opacity: 0.4;
-}
-
-.dedication::after {
-    content: '❞';
-    position: absolute;
-    bottom: 10px;
-    right: 20px;
-    font-size: 60px;
-    color: var(--gold-primary);
-    opacity: 0.4;
 }
 
 .dedication.hidden {
@@ -474,64 +395,12 @@ button, .btn-generate, .btn-ghazal, select, input {
     50% { transform: scale(1.1); }
 }
 
-/* Footer - Enhanced */
 .footer-box {
     margin-top: 90px;
     text-align: center;
     color: var(--text-secondary);
     font-size: 18px;
     letter-spacing: 2px;
-    font-weight: 400;
-    opacity: 0.85;
-}
-
-/* Theme-specific text colors */
-.theme-maroon .poet-name {
-    background: linear-gradient(135deg, #FFB3B3, #FF6B6B, #FFB3B3);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-}
-
-.theme-maroon .gold {
-    color: #FFA8A8;
-    text-shadow: 0 2px 8px rgba(229, 62, 62, 0.3);
-}
-
-.theme-blue .poet-name {
-    background: linear-gradient(135deg, #93C5FD, #60A5FA, #93C5FD);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-}
-
-.theme-blue .gold {
-    color: #A5D6FF;
-    text-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
-}
-
-.theme-green .poet-name {
-    background: linear-gradient(135deg, #86EFAC, #4ADE80, #86EFAC);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-}
-
-.theme-green .gold {
-    color: #BBF7D0;
-    text-shadow: 0 2px 8px rgba(34, 197, 94, 0.3);
-}
-
-.theme-purple .poet-name {
-    background: linear-gradient(135deg, #C4B5FD, #A78BFA, #C4B5FD);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-}
-
-.theme-purple .gold {
-    color: #DDD6FE;
-    text-shadow: 0 2px 8px rgba(168, 85, 247, 0.3);
 }
 
 @media (max-width: 1100px) {
@@ -544,12 +413,7 @@ button, .btn-generate, .btn-ghazal, select, input {
 {% endblock %}
 
 {% block content %}
-<div class="app-container" 
-     oncopy="return false" 
-     oncut="return false" 
-     onpaste="return false" 
-     ondragstart="return false" 
-     oncontextmenu="return false">
+<div class="app-container" oncontextmenu="return false">
     
     <div class="two-columns">
         <div class="editor-panel">
@@ -624,34 +488,7 @@ button, .btn-generate, .btn-ghazal, select, input {
 
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script>
-// Disable right click globally
-document.addEventListener('contextmenu', function(e) {
-    e.preventDefault();
-    return false;
-});
-
-// Disable keyboard shortcuts
-document.addEventListener('keydown', function(e) {
-    if (e.ctrlKey && (e.key === 'c' || e.key === 'C' || 
-                       e.key === 'v' || e.key === 'V' ||
-                       e.key === 'x' || e.key === 'X' ||
-                       e.key === 'u' || e.key === 'U' ||
-                       e.key === 's' || e.key === 'S')) {
-        e.preventDefault();
-        return false;
-    }
-    
-    if (e.key === 'F12') {
-        e.preventDefault();
-        return false;
-    }
-    
-    if (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.key === 'J' || e.key === 'j')) {
-        e.preventDefault();
-        return false;
-    }
-});
-
+// DOM Elements
 const inputFrom = document.getElementById('inputFrom');
 const inputTo = document.getElementById('inputTo');
 const dedicationBox = document.getElementById('dedicationBox');
@@ -659,8 +496,9 @@ const dedFrom = document.getElementById('dedFrom');
 const dedTo = document.getElementById('dedTo');
 const posterContainer = document.getElementById('poster-container');
 const themeSelect = document.getElementById('themeSelect');
-let currentTheme = 'black';
+const downloadBtn = document.getElementById('downloadBtn');
 
+// Update dedication text
 function updateDedication() {
     const from = inputFrom.value.trim();
     const to = inputTo.value.trim();
@@ -675,58 +513,71 @@ function updateDedication() {
 
 inputFrom.addEventListener('input', updateDedication);
 inputTo.addEventListener('input', updateDedication);
+updateDedication();
 
+// Change theme
 function changeTheme() {
-    currentTheme = themeSelect.value;
+    const selectedTheme = themeSelect.value;
     posterContainer.classList.remove('theme-black', 'theme-maroon', 'theme-blue', 'theme-green', 'theme-purple');
-    posterContainer.classList.add('theme-' + currentTheme);
+    posterContainer.classList.add('theme-' + selectedTheme);
 }
-
 themeSelect.addEventListener('change', changeTheme);
 
-// Initialize theme
-changeTheme();
-
-document.getElementById('downloadBtn').addEventListener('click', async () => {
-    // Store current transform
+// Download poster with better error handling
+downloadBtn.addEventListener('click', async function() {
+    // Show loading state
+    const originalText = downloadBtn.innerHTML;
+    downloadBtn.innerHTML = '⏳ Generating...';
+    downloadBtn.disabled = true;
+    downloadBtn.style.opacity = '0.7';
+    
+    // Store original transform
     const originalTransform = posterContainer.style.transform;
     const originalTransformOrigin = posterContainer.style.transformOrigin;
     
     // Temporarily remove scale for capture
     posterContainer.style.transform = 'none';
-    posterContainer.style.transformOrigin = 'center center';
+    posterContainer.style.transformOrigin = 'top left';
     
     try {
-        // Small delay to ensure render
-        await new Promise(resolve => setTimeout(resolve, 50));
+        // Wait for render
+        await new Promise(resolve => setTimeout(resolve, 100));
         
         const canvas = await html2canvas(posterContainer, { 
-            scale: 2.5, 
-            useCORS: true, 
-            backgroundColor: null,
+            scale: 2,
+            useCORS: false,
+            backgroundColor: '#0D1117',
             logging: false,
+            allowTaint: true,
             windowWidth: 1080,
             windowHeight: posterContainer.scrollHeight
         });
         
+        const imageData = canvas.toDataURL('image/png');
         const link = document.createElement('a');
         const poetName = "{{ ghazal.poet_name|replace(' ', '_') }}";
         const timestamp = Date.now();
         link.download = `UCPC_${poetName}_Poster_${timestamp}.png`;
-        link.href = canvas.toDataURL('image/png');
+        link.href = imageData;
         link.click();
         
-        // Show success feedback
-        const btn = document.getElementById('downloadBtn');
-        const originalText = btn.innerHTML;
-        btn.innerHTML = '✅ Downloaded!';
+        // Show success
+        downloadBtn.innerHTML = '✅ Downloaded!';
         setTimeout(() => {
-            btn.innerHTML = originalText;
+            downloadBtn.innerHTML = originalText;
+            downloadBtn.disabled = false;
+            downloadBtn.style.opacity = '1';
         }, 2000);
         
     } catch (err) {
         console.error('Poster capture error:', err);
-        alert('Failed to generate poster. Please try again.');
+        downloadBtn.innerHTML = '❌ Failed! Try Again';
+        alert('Failed to generate poster. Please try again or refresh the page.');
+        setTimeout(() => {
+            downloadBtn.innerHTML = originalText;
+            downloadBtn.disabled = false;
+            downloadBtn.style.opacity = '1';
+        }, 2000);
     } finally {
         // Restore transform
         posterContainer.style.transform = originalTransform;
