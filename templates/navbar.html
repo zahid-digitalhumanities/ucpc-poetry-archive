@@ -1,33 +1,108 @@
-<nav class="navbar" style="background: #0a0a0a; border-bottom: 2px solid #D4AF37; position: sticky; top: 0; z-index: 100; padding: 0.8rem 2rem;">
-    <div style="max-width: 1200px; margin: 0 auto; display: flex; justify-content: center; gap: 1.5rem; flex-wrap: wrap;">
-        
-        <a href="/" class="nav-link {% if request and request.endpoint == 'main.index' %}active{% endif %}" style="color: #e0e0e0; text-decoration: none; padding: 0.5rem 1.2rem; border-radius: 40px; transition: 0.2s;">
-            <i class="fas fa-home"></i> Home
-        </a>
-        
-        <a href="/poets" class="nav-link {% if request and request.endpoint and 'poets' in request.endpoint %}active{% endif %}" style="color: #e0e0e0; text-decoration: none; padding: 0.5rem 1.2rem; border-radius: 40px; transition: 0.2s;">
-            <i class="fas fa-feather-alt"></i> Poets
-        </a>
-        
-        <a href="#" id="randomGhazalBtn" class="nav-link" style="color: #e0e0e0; text-decoration: none; padding: 0.5rem 1.2rem; border-radius: 40px; transition: 0.2s; cursor: pointer;">
-            <i class="fas fa-dice"></i> Random Ghazal
-        </a>
-        
-        <!-- Optional: Add Full Ghazal Archive Link -->
-        <a href="/archive" class="nav-link" style="color: #e0e0e0; text-decoration: none; padding: 0.5rem 1.2rem; border-radius: 40px; transition: 0.2s;">
-            <i class="fas fa-book"></i> Archive
-        </a>
-        
+<nav class="navbar">
+    <div class="nav-container">
+        <div class="nav-brand">
+            <i class="fas fa-feather-alt"></i>
+            <span>UCPC</span>
+        </div>
+        <div class="nav-links">
+            <a href="/" class="nav-link {% if request and request.endpoint == 'main.index' %}active{% endif %}">
+                <i class="fas fa-home"></i> Home
+            </a>
+            <a href="/poets" class="nav-link {% if request and request.endpoint and 'poets' in request.endpoint %}active{% endif %}">
+                <i class="fas fa-feather-alt"></i> Poets
+            </a>
+            <a href="/archive" class="nav-link">
+                <i class="fas fa-archive"></i> Archive
+            </a>
+            <a href="/submit" class="nav-link">
+                <i class="fas fa-pen-fancy"></i> Submit Poetry
+            </a>
+            <a href="#" id="randomGhazalBtn" class="nav-link">
+                <i class="fas fa-dice-d6"></i> Random
+            </a>
+            <a href="/search" class="nav-link">
+                <i class="fas fa-search"></i> Search
+            </a>
+        </div>
+        <!-- Optional: Archive size badge (total ghazals) can be inserted here if needed -->
     </div>
 </nav>
 
 <style>
+    .navbar {
+        background: #0F172A;
+        border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        padding: 0.8rem 2rem;
+        backdrop-filter: blur(8px);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+    .nav-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    .nav-brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-family: 'Cinzel', serif;
+        font-size: 1.5rem;
+        font-weight: 800;
+        letter-spacing: 2px;
+        color: #D4AF37;
+    }
+    .nav-brand i {
+        font-size: 1.4rem;
+    }
+    .nav-links {
+        display: flex;
+        gap: 0.8rem;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+    .nav-link {
+        color: #e0e0e0;
+        text-decoration: none;
+        padding: 0.5rem 1.2rem;
+        border-radius: 40px;
+        transition: 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        border: 1px solid transparent;
+    }
+    .nav-link i {
+        font-size: 1rem;
+        color: #D4AF37;
+        transition: 0.2s;
+    }
     .nav-link:hover, .nav-link.active {
         background: #D4AF37;
-        color: #0a0a0a !important;
+        color: #0a0a0a;
+        transform: translateY(-2px);
+        border-color: #D4AF37;
     }
     .nav-link:hover i, .nav-link.active i {
         color: #0a0a0a;
+    }
+    @media (max-width: 768px) {
+        .nav-container {
+            flex-direction: column;
+            justify-content: center;
+            text-align: center;
+        }
+        .nav-links {
+            justify-content: center;
+        }
     }
 </style>
 
@@ -42,8 +117,8 @@
                     if (!response.ok) throw new Error('Failed');
                     const data = await response.json();
                     if (data.id) {
-                        // Redirect to poster page (view.html)
-                        window.location.href = `/ghazals/view/${data.id}`;
+                        // Redirect to FULL GHAZAL PAGE (not poster)
+                        window.location.href = `/ghazals/ghazal/${data.id}`;
                     } else {
                         alert('No ghazals found in the archive.');
                     }
