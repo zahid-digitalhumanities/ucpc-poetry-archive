@@ -8,20 +8,9 @@
         max-width: 1000px;
         margin: 0 auto;
         padding: 40px 20px;
-        user-select: none;
-        -webkit-user-select: none;
     }
     
-    * {
-        user-select: none;
-        -webkit-user-select: none;
-    }
-    
-    button, a, .btn-share, .btn-poster {
-        user-select: auto;
-        -webkit-user-select: auto;
-    }
-    
+    /* UCPC Watermark */
     .ucpc-watermark {
         text-align: center;
         margin-bottom: 30px;
@@ -41,6 +30,7 @@
         margin-top: 5px;
     }
     
+    /* Poet Header */
     .poet-header {
         text-align: center;
         border-bottom: 2px solid #D4AF37;
@@ -74,7 +64,16 @@
         padding: 8px 20px;
         font-size: 0.9rem;
         color: #D4AF37;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
     }
+    .readers-count {
+        font-weight: bold;
+        font-size: 1.1rem;
+    }
+    
+    /* Verses */
     .verses-area {
         text-align: center;
         direction: rtl;
@@ -82,8 +81,6 @@
         font-size: 30px;
         line-height: 2.2;
         color: #f0e6d0;
-        user-select: none;
-        -webkit-user-select: none;
     }
     .verse {
         margin-bottom: 40px;
@@ -93,6 +90,8 @@
     .verse:last-child {
         border-bottom: none;
     }
+    
+    /* Action Buttons */
     .action-buttons {
         display: flex;
         justify-content: center;
@@ -100,8 +99,8 @@
         margin: 50px 0 30px;
         flex-wrap: wrap;
     }
-    .btn-share, .btn-poster {
-        padding: 14px 30px;
+    .btn-share, .btn-poster, .btn-follow, .btn-copy {
+        padding: 12px 24px;
         border-radius: 50px;
         font-weight: 700;
         cursor: pointer;
@@ -110,8 +109,7 @@
         align-items: center;
         gap: 10px;
         transition: 0.2s;
-        user-select: auto;
-        -webkit-user-select: auto;
+        font-size: 14px;
     }
     .btn-share {
         background: #25D366;
@@ -132,9 +130,91 @@
         color: #000;
         transform: translateY(-2px);
     }
+    .btn-follow {
+        background: #1877F2;
+        color: white;
+        border: none;
+    }
+    .btn-follow:hover {
+        background: #0d6ad1;
+        transform: translateY(-2px);
+    }
+    .btn-copy {
+        background: #333;
+        color: white;
+        border: none;
+    }
+    .btn-copy:hover {
+        background: #555;
+        transform: translateY(-2px);
+    }
+    
+    /* UCPC Features Section */
+    .ucpc-features {
+        background: #111;
+        border-radius: 24px;
+        padding: 35px;
+        margin: 50px 0 30px;
+        text-align: center;
+        border: 1px solid rgba(212, 175, 55, 0.2);
+    }
+    .ucpc-features h3 {
+        color: #D4AF37;
+        font-size: 28px;
+        margin-bottom: 25px;
+        font-family: 'Cinzel', serif;
+    }
+    .feature-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+    }
+    .feature-grid div {
+        background: rgba(255,255,255,0.03);
+        padding: 15px;
+        border-radius: 16px;
+        font-size: 16px;
+        font-weight: 600;
+        color: #F6D878;
+        border-left: 3px solid #D4AF37;
+        text-align: left;
+    }
+    
+    /* Footer */
+    .footer-brand {
+        text-align: center;
+        margin-top: 60px;
+        padding-top: 30px;
+        border-top: 1px solid rgba(212, 175, 55, 0.15);
+    }
+    .footer-logo {
+        font-family: 'Cinzel', serif;
+        font-size: 20px;
+        color: #D4AF37;
+        letter-spacing: 2px;
+        font-weight: 700;
+    }
+    .footer-links {
+        display: flex;
+        justify-content: center;
+        gap: 30px;
+        flex-wrap: wrap;
+        margin: 20px 0;
+        font-size: 14px;
+    }
+    .footer-links span {
+        color: #D4AF37;
+        font-weight: 600;
+    }
+    .footer-mission {
+        font-size: 12px;
+        color: #666;
+        margin-top: 15px;
+    }
+    
     .back-link {
         text-align: center;
-        margin-top: 40px;
+        margin-top: 20px;
     }
     .back-link a {
         color: #888;
@@ -145,31 +225,32 @@
         color: #D4AF37;
     }
     
-    .footer-watermark {
-        text-align: center;
-        margin-top: 60px;
-        padding-top: 20px;
-        border-top: 1px solid rgba(212, 175, 55, 0.1);
-        font-size: 12px;
-        color: #555;
+    .toast-msg {
+        position: fixed;
+        bottom: 30px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #D4AF37;
+        color: #000;
+        padding: 10px 20px;
+        border-radius: 40px;
+        font-weight: bold;
+        z-index: 1000;
+        display: none;
     }
     
     @media (max-width: 600px) {
         .poet-name { font-size: 32px; }
         .verses-area { font-size: 22px; }
         .action-buttons { gap: 10px; }
-        .btn-share, .btn-poster { padding: 10px 20px; font-size: 14px; }
+        .btn-share, .btn-poster, .btn-follow, .btn-copy { padding: 8px 16px; font-size: 12px; }
+        .feature-grid { grid-template-columns: 1fr; }
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="ghazal-container" 
-     oncopy="return false" 
-     oncut="return false" 
-     onpaste="return false" 
-     ondragstart="return false" 
-     oncontextmenu="return false">
+<div class="ghazal-container">
     
     <!-- UCPC WATERMARK TOP -->
     <div class="ucpc-watermark">
@@ -185,12 +266,13 @@
                 <i class="fas fa-book"></i> {{ verses|length }} Verses
             </div>
             <div class="meta-badge">
-                <i class="fas fa-eye"></i> {{ ghazal.views or 0 }} Readers
+                <i class="fas fa-eye"></i> 
+                <span class="readers-count">{{ "{:,}".format(ghazal.views or 0) }}</span> Readers
             </div>
         </div>
     </div>
 
-    <!-- COMPLETE GHAZAL VERSES - ALL VERSES -->
+    <!-- COMPLETE GHAZAL VERSES -->
     <div class="verses-area" dir="rtl">
         {% for verse in verses %}
         <div class="verse">
@@ -200,56 +282,80 @@
         {% endfor %}
     </div>
 
-    <!-- ACTION BUTTONS - ONLY SHARE AND CREATE POSTER (NO READ COMPLETE GHAZAL) -->
+    <!-- ACTION BUTTONS -->
     <div class="action-buttons">
         <button class="btn-share" onclick="shareGhazal()">
             <i class="fab fa-whatsapp"></i> Share on WhatsApp
         </button>
+        <button class="btn-copy" onclick="copyGhazalLink()">
+            <i class="fas fa-link"></i> Copy Link
+        </button>
         <a href="{{ url_for('ghazals.poster_page', text_id=ghazal.id) }}" class="btn-poster">
             <i class="fas fa-image"></i> Create Poster
         </a>
+        <a href="https://facebook.com/UCPCPoetryArchive" target="_blank" class="btn-follow">
+            <i class="fab fa-facebook-f"></i> Follow UCPC
+        </a>
     </div>
 
+    <!-- UCPC UNIQUE FEATURES SECTION -->
+    <div class="ucpc-features">
+        <h3>✨ Why UCPC Poetry Archive?</h3>
+        <div class="feature-grid">
+            <div>📖 Complete Ghazals</div>
+            <div>👤 Poet Archive</div>
+            <div>❤️ Dedication System</div>
+            <div>🎨 Create Your Own Poster</div>
+            <div>✍️ User Poetry Submission</div>
+            <div>📚 Digital Preservation Mission</div>
+        </div>
+    </div>
+
+    <!-- BACK LINK -->
     <div class="back-link">
         <a href="{{ url_for('poets.poet_detail', poet_id=ghazal.poet_id) }}">← Back to Poet</a>
         <span style="color: #444;">•</span>
         <a href="/">Home</a>
     </div>
-    
-    <!-- FOOTER WATERMARK -->
-    <div class="footer-watermark">
-        UCPC Poetry Archive • Read • Share • Dedicate • Preserve Urdu Literature
+
+    <!-- IMPROVED FOOTER -->
+    <div class="footer-brand">
+        <div class="footer-logo">✨ UCPC Poetry Archive ✨</div>
+        <div class="footer-links">
+            <span>📖 Complete Ghazals</span>
+            <span>❤️ Dedication System</span>
+            <span>🎨 Poster Generator</span>
+            <span>✍️ Poetry Submission</span>
+        </div>
+        <div class="footer-mission">
+            Digital Preservation of Urdu Literature
+        </div>
     </div>
 </div>
 
+<div id="toastMsg" class="toast-msg">✅ Link copied!</div>
+
 <script>
-// Disable right click
-document.addEventListener('contextmenu', function(e) {
-    e.preventDefault();
-    return false;
-});
-
-// Disable keyboard shortcuts
-document.addEventListener('keydown', function(e) {
-    if (e.ctrlKey && (e.key === 'c' || e.key === 'C' || 
-                       e.key === 'v' || e.key === 'V' ||
-                       e.key === 'x' || e.key === 'X' ||
-                       e.key === 'u' || e.key === 'U')) {
-        e.preventDefault();
-        return false;
-    }
-    if (e.key === 'F12') {
-        e.preventDefault();
-        return false;
-    }
-});
-
 // Share function
 function shareGhazal() {
     const url = window.location.href;
     const poetName = document.querySelector('.poet-name').innerText;
     const text = encodeURIComponent(`✨ ${poetName} - Complete Ghazal ✨\n\nRead this beautiful ghazal on UCPC Poetry Archive:\n${url}`);
     window.open(`https://wa.me/?text=${text}`, '_blank');
+}
+
+// Copy link function
+function copyGhazalLink() {
+    const url = window.location.href;
+    navigator.clipboard.writeText(url).then(() => {
+        const toast = document.getElementById('toastMsg');
+        toast.style.display = 'block';
+        setTimeout(() => {
+            toast.style.display = 'none';
+        }, 2000);
+    }).catch(() => {
+        alert('Failed to copy link. Manual copy: ' + url);
+    });
 }
 </script>
 {% endblock %}
