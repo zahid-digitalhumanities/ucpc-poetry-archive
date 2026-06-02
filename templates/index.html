@@ -1,428 +1,337 @@
 {% extends "base.html" %}
 
-{% block title %}UCPC Poetry Archive – Digital Urdu Poetry Archive{% endblock %}
+{% block title %}{{ poet.name }} - UCPC Poetry Archive{% endblock %}
 
 {% block extra_css %}
 <style>
-    .hero-section {
+    /* ===================== */
+    /* UCPC Branding & Layout */
+    /* ===================== */
+    .ucpc-brand {
         text-align: center;
-        padding: 60px 20px;
-        background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
-        border-radius: 30px;
-        margin-bottom: 40px;
-    }
-    .hero-title {
-        font-size: 48px;
-        color: #D4AF37;
-        font-family: 'Cinzel', serif;
-        margin-bottom: 20px;
-    }
-    .hero-subtitle {
-        font-size: 18px;
-        color: #aaa;
         margin-bottom: 30px;
-        max-width: 800px;
-        margin-left: auto;
-        margin-right: auto;
     }
-    .hero-buttons {
-        display: flex;
-        justify-content: center;
-        gap: 20px;
-        flex-wrap: wrap;
-        margin-top: 20px;
-    }
-    .btn-explore, .btn-secondary {
-        display: inline-block;
-        padding: 12px 30px;
-        border-radius: 40px;
-        text-decoration: none;
-        font-weight: bold;
-        transition: 0.3s;
-    }
-    .btn-explore {
-        background: #D4AF37;
-        color: #000;
-    }
-    .btn-explore:hover {
-        background: #F6D878;
-        transform: scale(1.02);
-    }
-    .btn-secondary {
-        background: transparent;
-        border: 2px solid #D4AF37;
-        color: #D4AF37;
-    }
-    .btn-secondary:hover {
-        background: #D4AF37;
-        color: #000;
-        transform: scale(1.02);
-    }
-    .stats-container {
-        display: flex;
-        justify-content: center;
-        gap: 40px;
-        flex-wrap: wrap;
-        margin-top: 30px;
-    }
-    .stat-card {
-        text-align: center;
-        padding: 20px 30px;
-        background: rgba(212,175,55,0.1);
-        border-radius: 20px;
-        border: 1px solid rgba(212,175,55,0.3);
-    }
-    .stat-number {
-        font-size: 36px;
-        font-weight: bold;
-        color: #D4AF37;
-    }
-    .stat-label {
-        font-size: 14px;
-        color: #aaa;
-    }
-    
-    /* Why UCPC Different Section */
-    .why-different {
-        margin: 50px 0;
-        padding: 40px;
-        background: #111;
-        border-radius: 30px;
-        text-align: center;
-    }
-    .why-title {
-        color: #D4AF37;
+    .brand-logo {
+        font-family: 'Cinzel', serif;
         font-size: 28px;
-        margin-bottom: 30px;
-        font-family: 'Cinzel', serif;
-    }
-    .why-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 20px;
-        text-align: left;
-    }
-    .why-item {
-        padding: 15px;
-        background: rgba(255,255,255,0.03);
-        border-radius: 16px;
-        border-left: 3px solid #D4AF37;
-    }
-    .why-item strong {
         color: #D4AF37;
-        display: block;
-        margin-bottom: 8px;
-        font-size: 18px;
+        letter-spacing: 4px;
+        font-weight: 700;
     }
-    .why-item p {
+    .brand-mission {
+        font-size: 13px;
         color: #aaa;
-        font-size: 14px;
-        line-height: 1.5;
+        letter-spacing: 2px;
+        margin-top: 6px;
     }
-    
-    /* Featured Poets Section */
-    .featured-poets {
-        margin: 50px 0;
-    }
-    .section-title {
+
+    /* Poet Header */
+    .poet-header {
         text-align: center;
+        border-bottom: 2px solid #D4AF37;
+        padding-bottom: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    .poet-name-en {
         color: #D4AF37;
-        font-size: 28px;
-        margin-bottom: 30px;
+        font-size: 2.8rem;
+        font-weight: bold;
         font-family: 'Cinzel', serif;
+        letter-spacing: 1px;
     }
-    .poets-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 25px;
+    .poet-name-urdu {
+        font-family: 'Noto Nastaliq Urdu', 'Jameel Noori Nastaleeq', serif;
+        font-size: 1.8rem;
+        color: #F6D878;
+        margin-top: 0.5rem;
     }
-    .poet-card {
-        background: #111;
-        border-radius: 20px;
-        padding: 25px;
-        text-align: center;
-        border: 1px solid #2a2a2a;
-        transition: 0.3s;
-        text-decoration: none;
-        display: block;
-    }
-    .poet-card:hover {
-        border-color: #D4AF37;
-        transform: translateY(-5px);
-    }
-    .poet-card h3 {
-        color: #D4AF37;
-        font-size: 22px;
-        margin-bottom: 8px;
-        font-family: 'Cinzel', serif;
-    }
-    .poet-card p {
+    .poet-years {
         color: #888;
-        font-size: 14px;
-        margin-bottom: 12px;
+        margin-top: 0.5rem;
+        font-size: 0.95rem;
     }
-    .poet-card span {
-        color: #F6D878;
-        font-size: 13px;
-        font-weight: bold;
+    .poet-stats {
+        display: flex;
+        justify-content: center;
+        gap: 30px;
+        margin-top: 20px;
+        flex-wrap: wrap;
     }
-    
-    /* Recent Ghazals Section */
-    .recent-ghazals {
-        margin: 50px 0;
-    }
-    .ghazals-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-        gap: 25px;
-    }
-    .ghazal-card {
-        background: #111;
-        border-radius: 20px;
-        padding: 20px;
-        border: 1px solid #2a2a2a;
-        transition: 0.3s;
-    }
-    .ghazal-card:hover {
-        border-color: #D4AF37;
-    }
-    .ghazal-couplet {
-        font-family: 'Noto Nastaliq Urdu', serif;
-        direction: rtl;
-        font-size: 18px;
-        line-height: 1.8;
-        color: #f0e6d0;
-        margin-bottom: 15px;
-        text-align: center;
-    }
-    .ghazal-poet {
+    .stat-badge {
+        background: rgba(212, 175, 55, 0.1);
+        border: 1px solid rgba(212, 175, 55, 0.2);
+        border-radius: 50px;
+        padding: 8px 20px;
+        font-size: 0.85rem;
         color: #D4AF37;
-        font-size: 14px;
-        margin-bottom: 15px;
-        text-align: center;
-    }
-    .ghazal-link {
-        color: #F6D878;
-        text-decoration: none;
-        font-size: 13px;
         display: inline-flex;
         align-items: center;
-        gap: 5px;
+        gap: 8px;
     }
-    .ghazal-link:hover {
-        text-decoration: underline;
+    .stat-badge i {
+        font-size: 1rem;
     }
-    
-    /* Future Roadmap */
-    .roadmap {
-        margin: 50px 0;
-        padding: 40px;
-        background: linear-gradient(135deg, #1a1a1a, #0a0a0a);
-        border-radius: 30px;
+
+    /* Follow Box – Convert to Follower */
+    .follow-box {
+        background: linear-gradient(135deg, rgba(212, 175, 55, 0.12), rgba(212, 175, 55, 0.05));
+        border: 1px solid rgba(212, 175, 55, 0.3);
+        border-radius: 24px;
+        padding: 25px 20px;
+        margin: 30px 0 40px;
         text-align: center;
-        border: 1px dashed #D4AF37;
+        backdrop-filter: blur(8px);
     }
-    .roadmap-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    .follow-box h3 {
+        color: #D4AF37;
+        font-size: 1.6rem;
+        margin-bottom: 15px;
+        font-family: 'Cinzel', serif;
+    }
+    .follow-features {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
         gap: 20px;
-        margin-top: 30px;
+        margin: 20px 0;
     }
-    .roadmap-item {
-        padding: 15px;
-        background: rgba(212,175,55,0.05);
-        border-radius: 16px;
+    .follow-features span {
+        color: #F6D878;
+        font-size: 0.9rem;
+        font-weight: 500;
     }
-    .roadmap-item h4 {
-        color: #D4AF37;
-        margin-bottom: 8px;
+    .btn-follow-page {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        background: #1877F2;
+        color: white;
+        padding: 12px 28px;
+        border-radius: 50px;
+        text-decoration: none;
+        font-weight: bold;
+        transition: 0.2s;
+        margin-top: 10px;
     }
-    .roadmap-item p {
-        color: #888;
-        font-size: 13px;
+    .btn-follow-page:hover {
+        background: #0d6ad1;
+        transform: translateY(-2px);
     }
-    
-    /* Mission Banner */
-    .mission-banner {
-        margin: 50px 0 30px;
-        padding: 40px;
-        background: linear-gradient(135deg, #0a0a0a, #111);
-        border-radius: 30px;
+
+    /* UCPC Mission Section */
+    .ucpc-mission {
+        background: #111;
+        border-radius: 24px;
+        padding: 25px;
+        margin: 40px 0;
         text-align: center;
-        border: 1px solid rgba(212,175,55,0.3);
+        border: 1px solid rgba(212, 175, 55, 0.2);
     }
-    .mission-banner p {
-        color: #ccc;
-        font-size: 18px;
-        line-height: 1.6;
-        max-width: 800px;
-        margin: 0 auto;
+    .ucpc-mission h4 {
+        color: #D4AF37;
+        font-size: 1.3rem;
+        margin-bottom: 15px;
+        font-family: 'Cinzel', serif;
     }
-    .mission-banner strong {
+    .mission-grid {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 25px;
+    }
+    .mission-grid div {
+        color: #f0e6d0;
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+
+    /* Ghazal Cards – Premium Design */
+    .ghazal-list {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+        margin-top: 2rem;
+    }
+    .ghazal-card {
+        background: linear-gradient(145deg, #1a1a1a, #111111);
+        border-radius: 24px;
+        padding: 1.8rem;
+        border: 1px solid rgba(212, 175, 55, 0.15);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
+        transition: all 0.3s ease;
+    }
+    .ghazal-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 15px 35px rgba(212, 175, 55, 0.15);
+        border-color: rgba(212, 175, 55, 0.4);
+    }
+    .first-couplet {
+        font-family: 'Noto Nastaliq Urdu', 'Jameel Noori Nastaleeq', serif;
+        font-size: 1.4rem;
+        text-align: center;
+        direction: rtl;
+        line-height: 2;
+        color: #f0e6d0;
+        margin-bottom: 1rem;
+    }
+    .ghazal-meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid #2a2a2a;
+    }
+    .verse-count {
+        color: #888;
+        font-size: 0.8rem;
+    }
+    .verse-count i {
+        margin-right: 5px;
         color: #D4AF37;
     }
-    
+    .action-buttons {
+        display: flex;
+        gap: 12px;
+    }
+    .read-link, .poster-link {
+        display: inline-block;
+        padding: 0.5rem 1.2rem;
+        border-radius: 50px;
+        text-decoration: none;
+        font-weight: bold;
+        font-size: 0.85rem;
+        transition: 0.2s;
+    }
+    .read-link {
+        background: #D4AF37;
+        color: #0a0a0a;
+    }
+    .read-link:hover {
+        background: #F6D878;
+        transform: translateY(-2px);
+    }
+    .poster-link {
+        background: transparent;
+        border: 1px solid #D4AF37;
+        color: #D4AF37;
+    }
+    .poster-link:hover {
+        background: #D4AF37;
+        color: #0a0a0a;
+        transform: translateY(-2px);
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 3rem;
+        background: #1a1a1a;
+        border-radius: 20px;
+        color: #888;
+    }
+
     @media (max-width: 600px) {
-        .hero-title { font-size: 32px; }
-        .hero-subtitle { font-size: 14px; }
-        .stats-container { gap: 15px; }
-        .stat-card { padding: 10px 20px; }
-        .stat-number { font-size: 24px; }
-        .why-grid { grid-template-columns: 1fr; }
-        .poets-grid { grid-template-columns: repeat(2, 1fr); }
+        .poet-name-en { font-size: 2rem; }
+        .poet-name-urdu { font-size: 1.3rem; }
+        .first-couplet { font-size: 1.1rem; }
+        .action-buttons { flex-wrap: wrap; }
+        .stat-badge { padding: 5px 12px; font-size: 0.75rem; }
+        .follow-features { gap: 12px; }
+        .btn-follow-page { padding: 8px 20px; font-size: 0.85rem; }
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<!-- HERO SECTION -->
-<div class="hero-section">
-    <h1 class="hero-title">✨ UCPC Poetry Archive ✨</h1>
-    <p class="hero-subtitle">Pakistan's Digital Urdu Poetry Archive • Read Complete Ghazals • Create Dedicated Poetry Posters • Discover Classical Poets • Explore Urdu Literature</p>
+
+<!-- UCPC Branding -->
+<div class="ucpc-brand">
+    <div class="brand-logo">✨ UCPC POETRY ARCHIVE ✨</div>
+    <div class="brand-mission">Digital Preservation of Urdu Literature</div>
+</div>
+
+<!-- Poet Header -->
+<div class="poet-header">
+    <div class="poet-name-en">{{ poet.name }}</div>
+    <div class="poet-name-urdu">{{ poet.name_urdu }}</div>
+    {% if poet.birth_year or poet.death_year %}
+    <div class="poet-years">{{ poet.birth_year or '?' }} – {{ poet.death_year or 'Present' }}</div>
+    {% endif %}
     
-    <div class="hero-buttons">
-        <a href="/poets" class="btn-explore">📖 Explore Archive</a>
-        <a href="/ghazals/ghazal/2138" class="btn-secondary">✨ Read a Ghazal</a>
-    </div>
-
-    <div class="stats-container">
-        <div class="stat-card">
-            <div class="stat-number">{{ total_poets }}</div>
-            <div class="stat-label">Total Poets</div>
+    <div class="poet-stats">
+        <div class="stat-badge">
+            <i class="fas fa-book"></i> {{ total }} Ghazals
         </div>
-        <div class="stat-card">
-            <div class="stat-number">{{ total_ghazals }}</div>
-            <div class="stat-label">Total Ghazals</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-number">{{ total_readers }}</div>
-            <div class="stat-label">Total Readers</div>
+        <div class="stat-badge">
+            <i class="fas fa-eye"></i> {{ "{:,}".format(total_readers|default(0)) }} Readers
         </div>
     </div>
 </div>
 
-<!-- WHY UCPC IS DIFFERENT -->
-<div class="why-different">
-    <h2 class="why-title">✨ Why UCPC Is Different</h2>
-    <div class="why-grid">
-        <div class="why-item">
-            <strong>✓ Read Full Ghazals</strong>
-            <p>Complete ghazals with all verses, not just quotes or images</p>
-        </div>
-        <div class="why-item">
-            <strong>✓ Generate Dedication Posters</strong>
-            <p>Create beautiful gold-themed posters with "From ❤️ To" dedications</p>
-        </div>
-        <div class="why-item">
-            <strong>✓ Explore Poet Collections</strong>
-            <p>Browse classical and modern Urdu poets with complete works</p>
-        </div>
-        <div class="why-item">
-            <strong>✓ Research-Grade Urdu Corpus</strong>
-            <p>Digital Humanities project with structured poetry data</p>
-        </div>
-        <div class="why-item">
-            <strong>✓ Digital Humanities Project</strong>
-            <p>Academic-grade archive for researchers and students</p>
-        </div>
-        <div class="why-item">
-            <strong>✓ AI-Powered Poetry Tools</strong>
-            <p>Semantic search, poet prediction, and research tools coming soon</p>
-        </div>
+<!-- Follow Box – Convert to Follower -->
+<div class="follow-box">
+    <h3>📢 Follow UCPC Poetry Archive</h3>
+    <div class="follow-features">
+        <span>✔ Complete Ghazals</span>
+        <span>✔ Create Your Own Poster</span>
+        <span>✔ Dedication System</span>
+        <span>✔ Digital Preservation Mission</span>
+    </div>
+    <a href="https://facebook.com/UCPCPoetryArchive" target="_blank" class="btn-follow-page">
+        <i class="fab fa-facebook-f"></i> Follow on Facebook
+    </a>
+</div>
+
+<!-- UCPC Mission Section -->
+<div class="ucpc-mission">
+    <h4>🌹 Why UCPC?</h4>
+    <div class="mission-grid">
+        <div>📖 Read Complete Ghazals</div>
+        <div>🎨 Create Poetry Posters</div>
+        <div>❤️ Dedicate Poetry To Loved Ones</div>
+        <div>📚 Preserve Urdu Literature</div>
     </div>
 </div>
 
-<!-- FEATURED POETS SECTION -->
-<div class="featured-poets">
-    <h2 class="section-title">🌟 Featured Poets</h2>
-    <div class="poets-grid">
-        <a href="/poets/1" class="poet-card">
-            <h3>Mirza Ghalib</h3>
-            <p>مرزا غالب</p>
-            <span>Explore →</span>
-        </a>
-        <a href="/poets/2" class="poet-card">
-            <h3>Allama Iqbal</h3>
-            <p>علامہ اقبال</p>
-            <span>Explore →</span>
-        </a>
-        <a href="/poets/4" class="poet-card">
-            <h3>Faiz Ahmed Faiz</h3>
-            <p>فیض احمد فیض</p>
-            <span>Explore →</span>
-        </a>
-        <a href="/poets/5" class="poet-card">
-            <h3>Mir Taqi Mir</h3>
-            <p>میر تقی میر</p>
-            <span>Explore →</span>
-        </a>
-        <a href="/poets/6" class="poet-card">
-            <h3>Jaun Elia</h3>
-            <p>جان الیہ</p>
-            <span>Explore →</span>
-        </a>
-    </div>
-</div>
-
-<!-- RECENT GHAZALS SECTION -->
-<div class="recent-ghazals">
-    <h2 class="section-title">📜 Recent Additions</h2>
-    <div class="ghazals-grid">
-        {% for ghazal in recent_ghazals %}
-        <div class="ghazal-card">
-            <div class="ghazal-couplet" dir="rtl">
-                {{ ghazal.misra1_urdu|truncate(60) if ghazal.misra1_urdu else '✨ New Ghazal ✨' }}
-                <br>
-                {{ ghazal.misra2_urdu|truncate(60) if ghazal.misra2_urdu else '' }}
+<!-- Ghazal List -->
+{% if texts and texts|length > 0 %}
+<div class="ghazal-list">
+    {% for item in texts %}
+    <div class="ghazal-card">
+        <div class="first-couplet" dir="rtl">
+            {% if item.misra1_urdu %}
+                {{ item.misra1_urdu }}<br>
+                {{ item.misra2_urdu }}
+            {% elif item.first_couplet %}
+                {{ item.first_couplet }}
+            {% else %}
+                ✨ Ghazal {{ loop.index }} ✨
+            {% endif %}
+        </div>
+        <div class="ghazal-meta">
+            <div class="verse-count">
+                <i class="fas fa-pen-fancy"></i> {{ item.verse_count or 0 }} verses
             </div>
-            <div class="ghazal-poet">
-                🖋️ {{ ghazal.poet_name }}
+            <div class="action-buttons">
+                <a href="{{ url_for('ghazals.ghazal_page', text_id=item.id) }}" class="read-link">
+                    <i class="fas fa-book-open"></i> Read Complete Ghazal
+                </a>
+                <a href="{{ url_for('ghazals.poster_page', text_id=item.id) }}" class="poster-link">
+                    <i class="fas fa-image"></i> Create Poster
+                </a>
             </div>
-            <a href="{{ url_for('ghazals.ghazal_page', text_id=ghazal.id) }}" class="ghazal-link">
-                Read Full Ghazal →
-            </a>
-        </div>
-        {% else %}
-        <div class="ghazal-card">
-            <div class="ghazal-couplet">✨ Explore our growing collection of Urdu ghazals</div>
-            <div class="ghazal-poet">UCPC Poetry Archive</div>
-            <a href="/poets" class="ghazal-link">Explore Poets →</a>
-        </div>
-        {% endfor %}
-    </div>
-</div>
-
-<!-- FUTURE ROADMAP -->
-<div class="roadmap">
-    <h2 class="section-title">🚀 Future Roadmap</h2>
-    <div class="roadmap-grid">
-        <div class="roadmap-item">
-            <h4>🔍 Semantic Poetry Search</h4>
-            <p>AI-powered search by theme, emotion, or keywords</p>
-        </div>
-        <div class="roadmap-item">
-            <h4>🤖 Poet Prediction</h4>
-            <p>ML models to identify unknown ghazal authors</p>
-        </div>
-        <div class="roadmap-item">
-            <h4>📊 Research Dashboard</h4>
-            <p>Analytics and visualization tools for researchers</p>
-        </div>
-        <div class="roadmap-item">
-            <h4>📚 Similar Ghazal Discovery</h4>
-            <p>Find thematically and stylistically similar poetry</p>
-        </div>
-        <div class="roadmap-item">
-            <h4>🧠 Urdu Literary Analytics</h4>
-            <p>Stylometry, thematic analysis, and corpus insights</p>
         </div>
     </div>
+    {% endfor %}
 </div>
+{% else %}
+<div class="empty-state">
+    <i class="fas fa-feather-alt" style="font-size: 3rem; color: #D4AF37; margin-bottom: 1rem; display: inline-block;"></i>
+    <p>No ghazals found for this poet.</p>
+    <p style="font-size: 0.85rem; margin-top: 0.5rem;">Check back soon for updates!</p>
+</div>
+{% endif %}
 
-<!-- MISSION BANNER -->
-<div class="mission-banner">
-    <p>
-        <strong>UCPC is a Digital Humanities project</strong> dedicated to preserving, analyzing, and making Urdu poetry accessible to readers, researchers, and future generations.
-    </p>
-</div>
 {% endblock %}
