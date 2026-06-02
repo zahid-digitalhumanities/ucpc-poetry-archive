@@ -7,7 +7,7 @@ main_bp = Blueprint('main', __name__)
 
 @main_bp.route('/')
 def index():
-    """Homepage with statistics and recent ghazals"""
+    """Homepage with statistics, featured poets, and recent ghazals"""
     conn = get_db()
     cur = conn.cursor()
 
@@ -21,10 +21,25 @@ def index():
     total_ghazals = cur.fetchone()
     ghazals_count = total_ghazals['count'] if total_ghazals else 0
 
-    # Get total readers
+    # Get total readers (sum of all views)
     cur.execute("SELECT COALESCE(SUM(views), 0) as total FROM texts")
     total_readers = cur.fetchone()
     readers_count = total_readers['total'] if total_readers else 0
+
+    # Get featured poets (Ghalib=2, Iqbal=3, Faiz=6, Mir=5)
+    cur.execute("""
+        SELECT 
+            p.id, 
+            p.name, 
+            p.name_urdu,
+            COUNT(t.id) as ghazal_count
+        FROM poets p
+        LEFT JOIN texts t ON p.id = t.poet_id
+        WHERE p.id IN (2, 3, 6, 5)
+        GROUP BY p.id, p.name, p.name_urdu
+        ORDER BY p.name
+    """)
+    featured_poets = cur.fetchall()
 
     # Get recent ghazals with first verse from verses table
     cur.execute("""
@@ -53,4 +68,5 @@ def index():
                          total_poets=poets_count,
                          total_ghazals=ghazals_count,
                          total_readers=readers_count,
+                         featured_poets=featured_poets,
                          recent_ghazals=recent_ghazals)
