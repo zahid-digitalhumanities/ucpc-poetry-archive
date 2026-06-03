@@ -188,7 +188,7 @@ button, .btn-generate, .btn-ghazal, select, input {
 }
 
 /* ===================== */
-/* PREMIUM POSTER STYLES – UPDATED */
+/* PREMIUM POSTER STYLES */
 /* ===================== */
 
 #poster-container {
@@ -200,7 +200,6 @@ button, .btn-generate, .btn-ghazal, select, input {
     box-shadow: 0 40px 100px rgba(0, 0, 0, 0.7);
 }
 
-/* Base Theme (shared) */
 .theme-black, .theme-maroon, .theme-blue, .theme-green, .theme-purple {
     transition: background 0.3s ease;
 }
@@ -263,7 +262,6 @@ button, .btn-generate, .btn-ghazal, select, input {
     z-index: 5;
 }
 
-/* Luxury Logo – unchanged */
 .logo-row {
     text-align: center;
     margin-bottom: 15px;
@@ -301,7 +299,6 @@ button, .btn-generate, .btn-ghazal, select, input {
     margin-right: auto;
 }
 
-/* Poet Name – reduced size */
 .poet-line-wrap {
     display: flex;
     align-items: center;
@@ -323,14 +320,13 @@ button, .btn-generate, .btn-ghazal, select, input {
     text-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
     letter-spacing: 1px;
 }
-/* Theme-specific poet name colors */
 .theme-black .poet-name { color: var(--gold-light); }
 .theme-maroon .poet-name { color: #FFB3B3; }
 .theme-blue .poet-name { color: #9BC7FF; }
 .theme-green .poet-name { color: #B8F2C2; }
 .theme-purple .poet-name { color: #D8B4FE; }
 
-/* Ghazal title – new */
+/* Ghazal title – safe */
 .ghazal-title {
     text-align: center;
     color: #E5D4A1;
@@ -341,14 +337,12 @@ button, .btn-generate, .btn-ghazal, select, input {
     direction: rtl;
 }
 
-/* Poetry Area – more space for poetry */
 .verses-area {
     margin-top: 50px;
     margin-bottom: 40px;
     text-align: center;
 }
 
-/* Updated misra style – larger, tighter line‑height, normal wrap */
 .misra {
     direction: rtl;
     font-family: 'Jameel Noori Nastaleeq', 'Noto Nastaliq Urdu', serif;
@@ -361,7 +355,6 @@ button, .btn-generate, .btn-ghazal, select, input {
     word-break: keep-all;
     margin-bottom: 0.2em;
 }
-
 @media (max-width: 1080px) {
     .misra {
         font-size: clamp(32px, 6vw, 100px);
@@ -375,13 +368,11 @@ button, .btn-generate, .btn-ghazal, select, input {
 .gold {
     color: var(--gold-light);
 }
-/* Theme-specific verse colors (unchanged) */
 .theme-maroon .gold { color: #FFA8A8; }
 .theme-blue .gold { color: #A5D6FF; }
 .theme-green .gold { color: #BBF7D0; }
 .theme-purple .gold { color: #DDD6FE; }
 
-/* Complete Ghazal CTA */
 .complete-ghazal-cta {
     text-align: center;
     margin: 50px 0 20px;
@@ -402,7 +393,6 @@ button, .btn-generate, .btn-ghazal, select, input {
     background-clip: text;
 }
 
-/* UCPC Unique Features – cleaner grid */
 .ucpc-features {
     text-align: center;
     margin: 30px 0;
@@ -422,7 +412,6 @@ button, .btn-generate, .btn-ghazal, select, input {
     backdrop-filter: blur(4px);
 }
 
-/* Value strip – "📖 Complete Ghazal Available" */
 .ucpc-value {
     text-align: center;
     font-size: 30px;
@@ -433,7 +422,6 @@ button, .btn-generate, .btn-ghazal, select, input {
     letter-spacing: 1px;
 }
 
-/* Dedication Box – reduced size, nicer heading */
 .dedication {
     margin-top: 40px;
     background: linear-gradient(135deg, rgba(201, 169, 97, 0.12), rgba(229, 212, 161, 0.08), rgba(201, 169, 97, 0.12));
@@ -461,7 +449,6 @@ button, .btn-generate, .btn-ghazal, select, input {
     50% { transform: scale(1.1); }
 }
 
-/* Footer – redesigned */
 .footer-card {
     margin-top: 40px;
     padding: 25px 20px;
@@ -558,39 +545,41 @@ button, .btn-generate, .btn-ghazal, select, input {
                 <div class="corner-br"></div>
                 <div class="poster-border"></div>
                 <div class="poster-inner">
-                    <!-- Luxury Logo -->
                     <div class="logo-row">
                         <div class="logo-main">UCPC</div>
                         <div class="logo-sub">Poetry Archive</div>
                     </div>
                     <div class="follow-line">Digital Preservation of Urdu Literature</div>
 
-                    <!-- Poet Name -->
                     <div class="poet-line-wrap">
                         <div class="line"></div>
-                        <div class="poet-name">{{ ghazal.poet_name }}</div>
+                        <div class="poet-name">{{ ghazal.poet_name | default('Poet') }}</div>
                         <div class="line"></div>
                     </div>
 
-                    <!-- Ghazal Title (if available) -->
+                    {# Ghazal title (safe) #}
                     {% if ghazal.title_urdu %}
                     <div class="ghazal-title" dir="rtl">{{ ghazal.title_urdu }}</div>
                     {% endif %}
 
-                    <!-- Verses – now 4 couplets (first 4 ashaar) -->
+                    {# Verses – up to 4 couplets #}
+                    {% if poster_verses %}
                     <div class="verses-area">
-                        {% for verse in poster_verses[:4] %}
-                        <div class="misra white">{{ verse.misra1_urdu|safe }}</div>
-                        <div class="misra gold">{{ verse.misra2_urdu|safe }}</div>
+                        {% for verse in poster_verses %}
+                        <div class="misra white">{{ verse.misra1_urdu | safe }}</div>
+                        <div class="misra gold">{{ verse.misra2_urdu | safe }}</div>
                         {% endfor %}
                     </div>
+                    {% else %}
+                    <div class="verses-area">
+                        <div class="misra white">✨ No verses available ✨</div>
+                    </div>
+                    {% endif %}
 
-                    <!-- Complete Ghazal CTA -->
                     <div class="complete-ghazal-cta">
                         <span>📖 Complete Ghazal Available at UCPC Poetry Archive</span>
                     </div>
 
-                    <!-- UCPC Unique Features – cleaner -->
                     <div class="ucpc-features">
                         <span>📖 Complete Ghazals</span>
                         <span>🎨 Poster Generator</span>
@@ -598,12 +587,10 @@ button, .btn-generate, .btn-ghazal, select, input {
                         <span>✍️ Poetry Submission</span>
                     </div>
 
-                    <!-- Value strip: Complete Ghazal Available -->
                     <div class="ucpc-value">
                         📖 Complete Ghazal Available
                     </div>
 
-                    <!-- Dedication -->
                     <div id="dedicationBox" class="dedication hidden">
                         ✨ A Gift of Poetry ✨
                         <div style="margin-top: 16px;">From <span id="dedFrom">_____</span></div>
@@ -611,7 +598,6 @@ button, .btn-generate, .btn-ghazal, select, input {
                         <div>To <span id="dedTo">_____</span></div>
                     </div>
 
-                    <!-- Footer – redesigned -->
                     <div class="footer-card">
                         <div class="footer-read-more">📖 Read Complete Ghazal at UCPC Poetry Archive</div>
                         <div class="footer-brand">✨ UCPC Poetry Archive ✨</div>
@@ -626,7 +612,6 @@ button, .btn-generate, .btn-ghazal, select, input {
 
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script>
-// DOM Elements
 const inputFrom = document.getElementById('inputFrom');
 const inputTo = document.getElementById('inputTo');
 const dedicationBox = document.getElementById('dedicationBox');
@@ -636,7 +621,6 @@ const posterContainer = document.getElementById('poster-container');
 const themeSelect = document.getElementById('themeSelect');
 const downloadBtn = document.getElementById('downloadBtn');
 
-// Update dedication text
 function updateDedication() {
     const from = inputFrom.value.trim();
     const to = inputTo.value.trim();
@@ -653,7 +637,6 @@ inputFrom.addEventListener('input', updateDedication);
 inputTo.addEventListener('input', updateDedication);
 updateDedication();
 
-// Change theme
 function changeTheme() {
     const selectedTheme = themeSelect.value;
     posterContainer.classList.remove('theme-black', 'theme-maroon', 'theme-blue', 'theme-green', 'theme-purple');
@@ -661,9 +644,57 @@ function changeTheme() {
 }
 themeSelect.addEventListener('change', changeTheme);
 
-// Download poster (unchanged)
 downloadBtn.addEventListener('click', async function() {
     const originalText = downloadBtn.innerHTML;
     downloadBtn.innerHTML = '⏳ Generating...';
     downloadBtn.disabled = true;
-    downlo
+    downloadBtn.style.opacity = '0.7';
+
+    const originalTransform = posterContainer.style.transform;
+    const originalTransformOrigin = posterContainer.style.transformOrigin;
+
+    posterContainer.style.transform = 'none';
+    posterContainer.style.transformOrigin = 'top left';
+
+    try {
+        await new Promise(resolve => setTimeout(resolve, 100));
+
+        const canvas = await html2canvas(posterContainer, {
+            scale: 2,
+            useCORS: false,
+            backgroundColor: '#0D1117',
+            logging: false,
+            allowTaint: true,
+            windowWidth: 1080,
+            windowHeight: posterContainer.scrollHeight
+        });
+
+        const imageData = canvas.toDataURL('image/png');
+        const link = document.createElement('a');
+        const poetName = "{{ ghazal.poet_name|replace(' ', '_') }}";
+        const timestamp = Date.now();
+        link.download = `UCPC_${poetName}_Poster_${timestamp}.png`;
+        link.href = imageData;
+        link.click();
+
+        downloadBtn.innerHTML = '✅ Downloaded!';
+        setTimeout(() => {
+            downloadBtn.innerHTML = originalText;
+            downloadBtn.disabled = false;
+            downloadBtn.style.opacity = '1';
+        }, 2000);
+    } catch (err) {
+        console.error('Poster capture error:', err);
+        downloadBtn.innerHTML = '❌ Failed! Try Again';
+        setTimeout(() => {
+            downloadBtn.innerHTML = originalText;
+            downloadBtn.disabled = false;
+            downloadBtn.style.opacity = '1';
+        }, 2000);
+    } finally {
+        posterContainer.style.transform = originalTransform;
+        posterContainer.style.transformOrigin = originalTransformOrigin;
+    }
+});
+</script>
+{% endblock %}
