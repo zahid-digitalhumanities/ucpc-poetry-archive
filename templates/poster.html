@@ -24,6 +24,8 @@
     --warm-white: #FFF8F0;
     --text-primary: #F5F0E1;
     --text-secondary: #D4C4A8;
+    --dedication-bg: linear-gradient(135deg, rgba(201, 169, 97, 0.15), rgba(229, 212, 161, 0.08));
+    --dedication-border: linear-gradient(90deg, transparent, var(--gold-primary), transparent);
 }
 
 * {
@@ -281,7 +283,7 @@ button, .btn-generate, .btn-ghazal, select, input {
 }
 .ucpc-brand .brand-name {
     font-family: 'Cinzel', serif;
-    font-size: 48px;
+    font-size: 52px;
     font-weight: 800;
     letter-spacing: 3px;
     color: #D4AF37;
@@ -290,18 +292,18 @@ button, .btn-generate, .btn-ghazal, select, input {
     color: white;
 }
 
-/* Preservation mission */
+/* Preservation mission - ENLARGED FONT & NEW COLOR */
 .preservation-line {
     text-align: center;
-    font-size: 16px;
-    letter-spacing: 2px;
-    font-weight: 400;
+    font-size: 22px;
+    letter-spacing: 3px;
+    font-weight: 500;
     text-transform: uppercase;
-    color: #ffffff;
-    opacity: 0.8;
-    margin-bottom: 30px;
-    padding-bottom: 12px;
-    border-bottom: 1px solid rgba(201, 169, 97, 0.3);
+    color: #E8D5A3;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    margin-bottom: 35px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid rgba(201, 169, 97, 0.4);
     display: inline-block;
     width: auto;
     margin-left: auto;
@@ -362,24 +364,52 @@ button, .btn-generate, .btn-ghazal, select, input {
     color: #FFD966;
 }
 
-/* Dedication */
+/* Dedication - BEAUTIFUL STYLING WITH ENLARGED FONT */
 .dedication {
-    margin: 30px 0 25px;
+    margin: 35px 0 30px;
     text-align: center;
     font-family: 'Cinzel', serif;
-    font-size: 28px;
-    color: #F6D878;
-    background: rgba(201, 169, 97, 0.05);
-    border-top: 1px solid rgba(201, 169, 97, 0.2);
-    border-bottom: 1px solid rgba(201, 169, 97, 0.2);
-    padding: 18px 20px;
+    background: linear-gradient(135deg, rgba(201, 169, 97, 0.2), rgba(229, 212, 161, 0.1));
+    border-top: 2px solid rgba(201, 169, 97, 0.5);
+    border-bottom: 2px solid rgba(201, 169, 97, 0.5);
+    padding: 25px 30px;
+    border-radius: 20px;
+    backdrop-filter: blur(5px);
 }
 .dedication.hidden {
     display: none;
 }
-.dedication-heart {
+.dedication-title {
     font-size: 32px;
-    margin: 8px 0;
+    font-weight: 700;
+    color: #FFD966;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    letter-spacing: 2px;
+    margin-bottom: 15px;
+}
+.dedication-from, .dedication-to {
+    font-size: 28px;
+    font-weight: 600;
+    color: #E8D5A3;
+    margin: 10px 0;
+}
+.dedication-from span, .dedication-to span {
+    color: #FFD966;
+    font-weight: 800;
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 5px;
+}
+.dedication-heart {
+    font-size: 48px;
+    margin: 12px 0;
+    display: inline-block;
+    animation: heartbeat 1.5s ease-in-out infinite;
+    filter: drop-shadow(0 0 10px rgba(255, 217, 102, 0.5));
+}
+@keyframes heartbeat {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.15); }
 }
 
 /* ===================== */
@@ -391,40 +421,47 @@ button, .btn-generate, .btn-ghazal, select, input {
     padding-top: 40px;
 }
 .cta-main {
-    font-size: 26px;
+    font-size: 28px;
     font-weight: 700;
     font-family: 'Cinzel', serif;
-    margin-bottom: 12px;
+    margin-bottom: 15px;
 }
 .cta-main a {
     color: #FFD966;
     text-decoration: none;
-    background: rgba(0, 0, 0, 0.4);
-    padding: 12px 24px;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 14px 28px;
     border-radius: 60px;
     display: inline-block;
     transition: all 0.2s ease;
+    border: 1px solid rgba(201, 169, 97, 0.4);
 }
 .cta-main a:hover {
     background: rgba(201, 169, 97, 0.2);
     text-decoration: underline;
+    border-color: var(--gold-primary);
 }
 .website-url {
-    font-size: 18px;
+    font-size: 20px;
+    font-weight: 500;
     color: #C9A961;
     text-decoration: none;
-    letter-spacing: 0.5px;
-    border-top: 1px solid rgba(201, 169, 97, 0.2);
-    padding-top: 15px;
+    letter-spacing: 1px;
+    border-top: 1px solid rgba(201, 169, 97, 0.3);
+    padding-top: 18px;
     display: inline-block;
     width: auto;
+    margin-top: 5px;
 }
 .website-url a {
-    color: #C9A961;
+    color: #D4AF37;
     text-decoration: none;
+    font-weight: 600;
+    transition: all 0.2s ease;
 }
 .website-url a:hover {
     text-decoration: underline;
+    color: #FFD966;
 }
 
 /* Responsive preview scaling */
@@ -488,7 +525,7 @@ button, .btn-generate, .btn-ghazal, select, input {
                         </div>
                     </div>
                     
-                    <!-- Preservation Mission -->
+                    <!-- Preservation Mission - ENLARGED -->
                     <div class="preservation-line">Digital Preservation of Urdu Literature</div>
 
                     <!-- Poet Name -->
@@ -511,12 +548,12 @@ button, .btn-generate, .btn-ghazal, select, input {
                         {% endfor %}
                     </div>
 
-                    <!-- Dedication -->
+                    <!-- Dedication - BEAUTIFUL & ENLARGED -->
                     <div id="dedicationBox" class="dedication hidden">
-                        ✨ A Gift of Poetry ✨
-                        <div style="margin-top: 8px;">From <span id="dedFrom">_____</span></div>
+                        <div class="dedication-title">✨ A Gift of Poetry ✨</div>
+                        <div class="dedication-from">From <span id="dedFrom">_____</span></div>
                         <div class="dedication-heart">❤️</div>
-                        <div>To <span id="dedTo">_____</span></div>
+                        <div class="dedication-to">To <span id="dedTo">_____</span></div>
                     </div>
 
                     <!-- CALL TO ACTION -->
