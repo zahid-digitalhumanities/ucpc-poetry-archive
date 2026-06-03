@@ -5,12 +5,12 @@ class PosterModel:
 
     @staticmethod
     def get_ghazal_data(text_id):
-        """Fetch ghazal metadata (poet name, title_urdu, views, etc.)"""
+        """Fetch ghazal metadata - NO first_line"""
         conn = get_db()
         cur = conn.cursor()
         cur.execute("""
-            SELECT t.id, t.verse_count, t.views, t.poet_id, t.title_urdu,
-                   p.name as poet_name, p.name_urdu as poet_name_urdu
+            SELECT t.id, t.verse_count, t.views,
+                   p.id as poet_id, p.name as poet_name, p.name_urdu as poet_name_urdu
             FROM texts t
             LEFT JOIN poets p ON t.poet_id = p.id
             WHERE t.id = %s
@@ -22,7 +22,7 @@ class PosterModel:
 
     @staticmethod
     def get_verses(text_id, limit=4):
-        """Fetch unique verses for poster – strict ordering, no duplicates"""
+        """Fetch ONLY misra1_urdu and misra2_urdu from verses table"""
         conn = get_db()
         cur = conn.cursor()
         cur.execute("""
@@ -33,7 +33,7 @@ class PosterModel:
               AND misra1_urdu != ''
               AND misra2_urdu IS NOT NULL 
               AND misra2_urdu != ''
-            ORDER BY couplet_index ASC, id ASC
+            ORDER BY couplet_index ASC
             LIMIT %s
         """, (text_id, limit))
         verses = cur.fetchall()
@@ -43,7 +43,7 @@ class PosterModel:
 
     @staticmethod
     def increment_views(text_id):
-        """Increase the view counter for this ghazal"""
+        """Increase view counter"""
         conn = get_db()
         cur = conn.cursor()
         try:
