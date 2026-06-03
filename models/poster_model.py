@@ -5,7 +5,7 @@ class PosterModel:
 
     @staticmethod
     def get_ghazal_data(text_id):
-        """Fetch ghazal metadata"""
+        """Fetch ghazal metadata (poet name, title_urdu, views, etc.)"""
         conn = get_db()
         cur = conn.cursor()
         cur.execute("""
@@ -22,19 +22,18 @@ class PosterModel:
 
     @staticmethod
     def get_verses(text_id, limit=4):
-        """Fetch UNIQUE verses for poster - NO DUPLICATES"""
+        """Fetch unique verses for poster – strict ordering, no duplicates"""
         conn = get_db()
         cur = conn.cursor()
         cur.execute("""
-            SELECT DISTINCT ON (couplet_index) 
-                   misra1_urdu, misra2_urdu, couplet_index
+            SELECT misra1_urdu, misra2_urdu, couplet_index
             FROM verses
             WHERE text_id = %s 
               AND misra1_urdu IS NOT NULL 
               AND misra1_urdu != ''
               AND misra2_urdu IS NOT NULL 
               AND misra2_urdu != ''
-            ORDER BY couplet_index ASC
+            ORDER BY couplet_index ASC, id ASC
             LIMIT %s
         """, (text_id, limit))
         verses = cur.fetchall()
@@ -44,7 +43,7 @@ class PosterModel:
 
     @staticmethod
     def increment_views(text_id):
-        """Increase the view counter"""
+        """Increase the view counter for this ghazal"""
         conn = get_db()
         cur = conn.cursor()
         try:
