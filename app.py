@@ -1,6 +1,8 @@
 import os
 from flask import Flask, render_template, jsonify, redirect
 from models.db import get_db
+# Import modules (optional, for future use)
+from modules.poster import PosterService
 
 # =====================================================
 # APP INITIALIZATION
