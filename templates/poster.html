@@ -188,7 +188,7 @@ button, .btn-generate, .btn-ghazal, select, input {
 }
 
 /* ===================== */
-/* PREMIUM POSTER STYLES */
+/* POSTER CONTAINER */
 /* ===================== */
 
 #poster-container {
@@ -200,6 +200,7 @@ button, .btn-generate, .btn-ghazal, select, input {
     box-shadow: 0 40px 100px rgba(0, 0, 0, 0.7);
 }
 
+/* Themes */
 .theme-black, .theme-maroon, .theme-blue, .theme-green, .theme-purple {
     transition: background 0.3s ease;
 }
@@ -257,42 +258,43 @@ button, .btn-generate, .btn-ghazal, select, input {
 .corner-br { bottom: 35px; right: 35px; border-width: 0 2px 2px 0; }
 
 .poster-inner {
-    padding: 60px 50px 50px;
+    padding: 50px 45px 40px;
     position: relative;
     z-index: 5;
 }
 
-/* Luxury Logo */
+/* ===================== */
+/* LOGO - ONE LINE */
+/* ===================== */
 .logo-row {
     text-align: center;
-    margin-bottom: 10px;
+    margin-bottom: 15px;
 }
 .logo-main {
     font-family: 'Cinzel', serif;
-    font-size: 58px;
-    font-weight: 900;
-    letter-spacing: 5px;
-    color: var(--gold-primary);
-    line-height: 1.1;
-}
-.logo-sub {
-    font-family: 'Cinzel', serif;
-    font-size: 20px;
+    font-size: 52px;
+    font-weight: 800;
     letter-spacing: 3px;
-    color: var(--gold-light);
-    margin-top: 5px;
-    font-weight: 500;
+    display: inline-block;
 }
+.logo-main .ucpc {
+    color: var(--gold-primary);
+}
+.logo-main .archive {
+    color: white;
+}
+
+/* Digital Preservation - White, Larger */
 .follow-line {
     text-align: center;
-    margin-top: 15px;
-    color: var(--text-secondary);
-    font-size: 14px;
+    margin-top: 5px;
+    color: #ffffff;
+    font-size: 16px;
     letter-spacing: 2px;
-    font-weight: 300;
+    font-weight: 400;
     text-transform: uppercase;
     opacity: 0.9;
-    padding-bottom: 8px;
+    padding-bottom: 10px;
     border-bottom: 1px solid rgba(201, 169, 97, 0.3);
     display: inline-block;
     width: auto;
@@ -332,25 +334,24 @@ button, .btn-generate, .btn-ghazal, select, input {
 .ghazal-title {
     text-align: center;
     color: #E5D4A1;
-    font-size: 30px;
+    font-size: 28px;
     margin-top: 10px;
     margin-bottom: 20px;
     font-family: 'Jameel Noori Nastaleeq', 'Noto Nastaliq Urdu', serif;
     direction: rtl;
 }
 
-/* Verses Area */
+/* Verses Area - NO DUPLICATE */
 .verses-area {
-    margin-top: 40px;
-    margin-bottom: 30px;
+    margin-top: 35px;
+    margin-bottom: 25px;
     text-align: center;
 }
 
-/* FIXED: Clean verse display - one line each */
 .misra {
     direction: rtl;
     font-family: 'Jameel Noori Nastaleeq', 'Noto Nastaliq Urdu', serif;
-    font-size: 62px;
+    font-size: 58px;
     line-height: 1.7;
     text-align: center;
     text-shadow: 0 3px 8px rgba(0, 0, 0, 0.5);
@@ -376,7 +377,7 @@ button, .btn-generate, .btn-ghazal, select, input {
 
 @media (max-width: 1080px) {
     .misra {
-        font-size: clamp(32px, 5vw, 62px);
+        font-size: clamp(32px, 5vw, 58px);
         white-space: normal;
         word-break: keep-all;
         line-height: 1.6;
@@ -388,14 +389,12 @@ button, .btn-generate, .btn-ghazal, select, input {
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
 }
 
-/* FIXED: Brighter gold for better visibility */
 .gold {
     color: #FFD966;
     text-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
     font-weight: 500;
 }
 
-/* Theme-specific gold colors */
 .theme-maroon .gold { color: #FFC8A8; }
 .theme-blue .gold { color: #B8DFFF; }
 .theme-green .gold { color: #C8F0C8; }
@@ -404,14 +403,14 @@ button, .btn-generate, .btn-ghazal, select, input {
 /* Complete Ghazal CTA */
 .complete-ghazal-cta {
     text-align: center;
-    margin: 40px 0 15px;
+    margin: 30px 0 12px;
     font-family: 'Cinzel', serif;
-    font-size: 24px;
+    font-size: 22px;
     letter-spacing: 1px;
     color: var(--gold-primary);
     border-top: 1px solid rgba(201, 169, 97, 0.3);
     border-bottom: 1px solid rgba(201, 169, 97, 0.3);
-    padding: 12px 0;
+    padding: 10px 0;
     display: inline-block;
     width: 100%;
 }
@@ -425,18 +424,18 @@ button, .btn-generate, .btn-ghazal, select, input {
 /* UCPC Unique Features */
 .ucpc-features {
     text-align: center;
-    margin: 25px 0;
+    margin: 20px 0;
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
-    gap: 15px;
-    font-size: 18px;
+    gap: 12px;
+    font-size: 17px;
     color: var(--text-secondary);
     font-weight: 500;
 }
 .ucpc-features span {
     background: rgba(255,255,255,0.05);
-    padding: 6px 16px;
+    padding: 5px 14px;
     border-radius: 40px;
     backdrop-filter: blur(4px);
 }
@@ -444,9 +443,9 @@ button, .btn-generate, .btn-ghazal, select, input {
 /* Value strip */
 .ucpc-value {
     text-align: center;
-    font-size: 26px;
+    font-size: 24px;
     color: #FFD966;
-    margin: 20px 0;
+    margin: 15px 0;
     font-weight: 700;
     font-family: 'Cinzel', serif;
     letter-spacing: 1px;
@@ -454,14 +453,14 @@ button, .btn-generate, .btn-ghazal, select, input {
 
 /* Dedication Box */
 .dedication {
-    margin-top: 35px;
+    margin-top: 25px;
     background: linear-gradient(135deg, rgba(201, 169, 97, 0.12), rgba(229, 212, 161, 0.08), rgba(201, 169, 97, 0.12));
     backdrop-filter: blur(18px);
     border: 1px solid rgba(201, 169, 97, 0.25);
     border-radius: 24px;
-    padding: 25px 30px;
+    padding: 20px 25px;
     color: var(--text-primary);
-    font-size: 32px;
+    font-size: 30px;
     text-align: center;
     font-family: 'Cinzel', serif;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
@@ -471,8 +470,8 @@ button, .btn-generate, .btn-ghazal, select, input {
     display: none;
 }
 .dedication-heart {
-    font-size: 44px;
-    margin: 10px 0;
+    font-size: 40px;
+    margin: 8px 0;
     animation: heartbeat 1.5s ease-in-out infinite;
 }
 @keyframes heartbeat {
@@ -480,46 +479,46 @@ button, .btn-generate, .btn-ghazal, select, input {
     50% { transform: scale(1.1); }
 }
 
-/* Footer */
+/* Footer - Reduced spacing */
 .footer-card {
-    margin-top: 35px;
-    padding: 20px;
+    margin-top: 20px;
+    padding: 15px 20px;
     background: rgba(0, 0, 0, 0.4);
     backdrop-filter: blur(16px);
-    border-radius: 24px;
+    border-radius: 20px;
     border: 1px solid rgba(201, 169, 97, 0.25);
     text-align: center;
 }
 .footer-brand {
     font-family: 'Cinzel', serif;
-    font-size: 20px;
+    font-size: 18px;
     color: var(--gold-primary);
     letter-spacing: 2px;
     font-weight: 700;
 }
 .footer-mission {
-    font-size: 12px;
+    font-size: 11px;
     color: var(--text-secondary);
-    margin: 6px 0;
+    margin: 5px 0;
     text-transform: uppercase;
     letter-spacing: 1px;
 }
 .footer-url {
-    font-size: 15px;
+    font-size: 14px;
     color: var(--gold-light);
     text-decoration: none;
     word-break: break-all;
     display: inline-block;
-    margin-top: 6px;
+    margin-top: 5px;
     font-weight: 500;
 }
 .footer-url:hover {
     text-decoration: underline;
 }
 .footer-read-more {
-    font-size: 16px;
+    font-size: 14px;
     font-weight: 700;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
     color: var(--gold-light);
 }
 
@@ -577,10 +576,12 @@ button, .btn-generate, .btn-ghazal, select, input {
                 <div class="corner-br"></div>
                 <div class="poster-border"></div>
                 <div class="poster-inner">
-                    <!-- Luxury Logo -->
+                    <!-- LOGO - ONE LINE -->
                     <div class="logo-row">
-                        <div class="logo-main">UCPC</div>
-                        <div class="logo-sub">Poetry Archive</div>
+                        <div class="logo-main">
+                            <span class="ucpc">UCPC</span>
+                            <span class="archive"> Poetry Archive</span>
+                        </div>
                     </div>
                     <div class="follow-line">Digital Preservation of Urdu Literature</div>
 
@@ -596,7 +597,7 @@ button, .btn-generate, .btn-ghazal, select, input {
                     <div class="ghazal-title" dir="rtl">{{ ghazal.title_urdu }}</div>
                     {% endif %}
 
-                    <!-- Verses - Only unique verses from database -->
+                    <!-- VERSES - NO DUPLICATE, ONLY misra1 and misra2 -->
                     <div class="verses-area">
                         {% for verse in poster_verses %}
                         <div class="misra white">{{ verse.misra1_urdu|safe }}</div>
@@ -625,12 +626,12 @@ button, .btn-generate, .btn-ghazal, select, input {
                     <!-- Dedication -->
                     <div id="dedicationBox" class="dedication hidden">
                         ✨ A Gift of Poetry ✨
-                        <div style="margin-top: 14px;">From <span id="dedFrom">_____</span></div>
+                        <div style="margin-top: 12px;">From <span id="dedFrom">_____</span></div>
                         <div class="dedication-heart">❤️</div>
                         <div>To <span id="dedTo">_____</span></div>
                     </div>
 
-                    <!-- Footer -->
+                    <!-- FOOTER - REDUCED SPACING -->
                     <div class="footer-card">
                         <div class="footer-read-more">📖 Read Complete Ghazal at UCPC Poetry Archive</div>
                         <div class="footer-brand">✨ UCPC Poetry Archive ✨</div>
