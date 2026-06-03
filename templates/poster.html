@@ -4,7 +4,7 @@
 
 {% block extra_head %}
 <meta property="og:title" content="{{ ghazal.poet_name }} - Urdu Poetry Poster" />
-<meta property="og:description" content="Create beautiful Urdu poetry posters with personal dedications." />
+<meta property="og:description" content="A preserved Urdu ghazal from the UCPC Digital Archive." />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="{{ request.url }}" />
 <meta property="og:site_name" content="UCPC Poetry Archive" />
@@ -188,7 +188,7 @@ button, .btn-generate, .btn-ghazal, select, input {
 }
 
 /* ===================== */
-/* POSTER CONTAINER */
+/* POSTER CONTAINER - FIXED VERSION */
 /* ===================== */
 
 #poster-container {
@@ -198,77 +198,101 @@ button, .btn-generate, .btn-ghazal, select, input {
     overflow: hidden;
     border-radius: 40px;
     box-shadow: 0 40px 100px rgba(0, 0, 0, 0.7);
+    display: flex;
+    flex-direction: column;
 }
 
-/* Themes */
-.theme-black, .theme-maroon, .theme-blue, .theme-green, .theme-purple {
-    transition: background 0.3s ease;
+/* Subtle manuscript texture overlay */
+#poster-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgdmlld0JveD0iMCAwIDQwIDQwIj48cGF0aCBmaWxsPSIjZmZmIiBmaWxsLW9wYWNpdHk9IjAuMDMiIGQ9Ik0wIDBoNDB2NDBIMHoiLz48cGF0aCBkPSJNMjAgMThhMiAyIDAgMSAwIDAgNCAyIDIgMCAwIDAgMC00eiIgZmlsbD0iI2ZmZiIgZmlsbC1vcGFjaXR5PSIwLjA1Ii8+PC9zdmc+');
+    background-repeat: repeat;
+    background-blend-mode: overlay;
+    pointer-events: none;
+    z-index: 2;
+    opacity: 0.4;
 }
 
-.theme-black {
-    background: radial-gradient(circle at 30% 10%, rgba(201, 169, 97, 0.15) 0%, transparent 40%),
-                radial-gradient(circle at 70% 90%, rgba(201, 169, 97, 0.1) 0%, transparent 35%),
-                linear-gradient(180deg, #0D1117 0%, #161B22 30%, #1F2937 70%, #0D1117 100%);
-}
-.theme-maroon {
-    background: radial-gradient(circle at 30% 10%, rgba(229, 62, 62, 0.15) 0%, transparent 40%),
-                radial-gradient(circle at 70% 90%, rgba(139, 0, 0, 0.15) 0%, transparent 35%),
-                linear-gradient(180deg, #1A0A0A 0%, #2D1B1B 30%, #3D2828 70%, #1A0A0A 100%);
-}
-.theme-blue {
-    background: radial-gradient(circle at 30% 10%, rgba(59, 130, 246, 0.15) 0%, transparent 40%),
-                radial-gradient(circle at 70% 90%, rgba(30, 58, 138, 0.15) 0%, transparent 35%),
-                linear-gradient(180deg, #0A1628 0%, #1E3A5F 30%, #2C4A6E 70%, #0A1628 100%);
-}
-.theme-green {
-    background: radial-gradient(circle at 30% 10%, rgba(34, 197, 94, 0.15) 0%, transparent 40%),
-                radial-gradient(circle at 70% 90%, rgba(6, 78, 59, 0.15) 0%, transparent 35%),
-                linear-gradient(180deg, #0A1F0A 0%, #14532D 30%, #1A4D2E 70%, #0A1F0A 100%);
-}
-.theme-purple {
-    background: radial-gradient(circle at 30% 10%, rgba(168, 85, 247, 0.15) 0%, transparent 40%),
-                radial-gradient(circle at 70% 90%, rgba(88, 28, 135, 0.15) 0%, transparent 35%),
-                linear-gradient(180deg, #1A0A2E 0%, #2D1B4E 30%, #3D2B5F 70%, #1A0A2E 100%);
+.poster-inner {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    padding: 50px 45px 55px;
+    position: relative;
+    z-index: 5;
 }
 
+/* Archival thick border */
 .poster-border {
     position: absolute;
     top: 15px;
     left: 15px;
     right: 15px;
     bottom: 15px;
-    border: 2px solid rgba(201, 169, 97, 0.4);
+    border: 3px solid rgba(201, 169, 97, 0.55);
     border-radius: 36px;
     pointer-events: none;
     z-index: 10;
 }
 
+/* Corner ornaments */
 .corner-tl, .corner-tr, .corner-bl, .corner-br {
     position: absolute;
-    width: 80px;
-    height: 80px;
+    width: 120px;
+    height: 120px;
     border-color: rgba(201, 169, 97, 0.5);
     border-style: solid;
     z-index: 11;
     pointer-events: none;
 }
-.corner-tl { top: 35px; left: 35px; border-width: 2px 0 0 2px; }
-.corner-tr { top: 35px; right: 35px; border-width: 2px 2px 0 0; }
-.corner-bl { bottom: 35px; left: 35px; border-width: 0 0 2px 2px; }
-.corner-br { bottom: 35px; right: 35px; border-width: 0 2px 2px 0; }
+.corner-tl { top: 35px; left: 35px; border-width: 3px 0 0 3px; }
+.corner-tr { top: 35px; right: 35px; border-width: 3px 3px 0 0; }
+.corner-bl { bottom: 35px; left: 35px; border-width: 0 0 3px 3px; }
+.corner-br { bottom: 35px; right: 35px; border-width: 0 3px 3px 0; }
 
-.poster-inner {
-    padding: 50px 45px 40px;
+/* Theme backgrounds */
+.theme-black, .theme-maroon, .theme-blue, .theme-green, .theme-purple {
+    transition: background 0.3s ease;
     position: relative;
-    z-index: 5;
+}
+.theme-black {
+    background: radial-gradient(circle at 30% 10%, rgba(201, 169, 97, 0.12) 0%, transparent 40%),
+                radial-gradient(circle at 70% 90%, rgba(201, 169, 97, 0.08) 0%, transparent 35%),
+                linear-gradient(180deg, #0A0E14 0%, #12171F 30%, #1A212C 70%, #0D1117 100%);
+}
+.theme-maroon {
+    background: radial-gradient(circle at 30% 10%, rgba(229, 62, 62, 0.12) 0%, transparent 40%),
+                radial-gradient(circle at 70% 90%, rgba(139, 0, 0, 0.08) 0%, transparent 35%),
+                linear-gradient(180deg, #1A0A0A 0%, #2D1B1B 30%, #3D2828 70%, #1A0A0A 100%);
+}
+.theme-blue {
+    background: radial-gradient(circle at 30% 10%, rgba(59, 130, 246, 0.12) 0%, transparent 40%),
+                radial-gradient(circle at 70% 90%, rgba(30, 58, 138, 0.08) 0%, transparent 35%),
+                linear-gradient(180deg, #0A1628 0%, #1E3A5F 30%, #2C4A6E 70%, #0A1628 100%);
+}
+.theme-green {
+    background: radial-gradient(circle at 30% 10%, rgba(34, 197, 94, 0.12) 0%, transparent 40%),
+                radial-gradient(circle at 70% 90%, rgba(6, 78, 59, 0.08) 0%, transparent 35%),
+                linear-gradient(180deg, #0A1F0A 0%, #14532D 30%, #1A4D2E 70%, #0A1F0A 100%);
+}
+.theme-purple {
+    background: radial-gradient(circle at 30% 10%, rgba(168, 85, 247, 0.12) 0%, transparent 40%),
+                radial-gradient(circle at 70% 90%, rgba(88, 28, 135, 0.08) 0%, transparent 35%),
+                linear-gradient(180deg, #1A0A2E 0%, #2D1B4E 30%, #3D2B5F 70%, #1A0A2E 100%);
 }
 
 /* ===================== */
-/* LOGO - ONE LINE */
+/* LOGO - ONE LINE (FIXED) */
 /* ===================== */
 .logo-row {
     text-align: center;
-    margin-bottom: 15px;
+    margin-bottom: 10px;
 }
 .logo-main {
     font-family: 'Cinzel', serif;
@@ -276,26 +300,29 @@ button, .btn-generate, .btn-ghazal, select, input {
     font-weight: 800;
     letter-spacing: 3px;
     display: inline-block;
+    white-space: nowrap;
 }
 .logo-main .ucpc {
-    color: var(--gold-primary);
+    color: #D4AF37;
 }
 .logo-main .archive {
     color: white;
 }
 
-/* Digital Preservation - White, Larger */
+/* ===================== */
+/* DIGITAL PRESERVATION - WHITE, LARGER (FIXED) */
+/* ===================== */
 .follow-line {
     text-align: center;
-    margin-top: 5px;
+    margin-top: 6px;
     color: #ffffff;
-    font-size: 16px;
-    letter-spacing: 2px;
+    font-size: 17px;
+    letter-spacing: 2.5px;
     font-weight: 400;
     text-transform: uppercase;
     opacity: 0.9;
     padding-bottom: 10px;
-    border-bottom: 1px solid rgba(201, 169, 97, 0.3);
+    border-bottom: 1px solid rgba(201, 169, 97, 0.25);
     display: inline-block;
     width: auto;
     margin-left: auto;
@@ -303,175 +330,85 @@ button, .btn-generate, .btn-ghazal, select, input {
 }
 
 /* Poet Name */
-.poet-line-wrap {
-    display: flex;
-    align-items: center;
-    gap: 20px;
+.poet-name-wrapper {
     margin-top: 25px;
-    justify-content: center;
-}
-.line {
-    flex: 1;
-    max-width: 150px;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, var(--gold-primary), transparent);
+    margin-bottom: 20px;
+    text-align: center;
 }
 .poet-name {
-    font-size: 42px;
+    font-size: 46px;
     font-family: 'Cinzel', serif;
     font-weight: 700;
-    white-space: nowrap;
+    letter-spacing: 2px;
+    color: var(--gold-light);
     text-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
-    letter-spacing: 1px;
 }
-.theme-black .poet-name { color: var(--gold-light); }
-.theme-maroon .poet-name { color: #FFB3B3; }
-.theme-blue .poet-name { color: #9BC7FF; }
-.theme-green .poet-name { color: #B8F2C2; }
-.theme-purple .poet-name { color: #D8B4FE; }
+.poet-name-urdu {
+    font-family: 'Noto Nastaliq Urdu', serif;
+    font-size: 24px;
+    color: #E5D4A1;
+    margin-top: 6px;
+    direction: rtl;
+    display: inline-block;
+}
 
 /* Ghazal title */
 .ghazal-title {
     text-align: center;
-    color: #E5D4A1;
-    font-size: 28px;
-    margin-top: 10px;
-    margin-bottom: 20px;
+    color: #D4C4A8;
+    font-size: 26px;
+    margin: 10px 0 25px;
     font-family: 'Jameel Noori Nastaleeq', 'Noto Nastaliq Urdu', serif;
     direction: rtl;
 }
 
-/* Verses Area - NO DUPLICATE */
+/* Verses */
 .verses-area {
-    margin-top: 35px;
-    margin-bottom: 25px;
-    text-align: center;
+    margin: 15px 0 20px;
 }
-
+.verse-block {
+    margin-bottom: 35px;
+}
 .misra {
     direction: rtl;
     font-family: 'Jameel Noori Nastaleeq', 'Noto Nastaliq Urdu', serif;
     font-size: 58px;
-    line-height: 1.7;
+    line-height: 1.3;
     text-align: center;
-    text-shadow: 0 3px 8px rgba(0, 0, 0, 0.5);
-    white-space: nowrap;
-    overflow-x: auto;
-    overflow-y: hidden;
-    max-width: 100%;
-    scrollbar-width: thin;
-    margin-bottom: 0.15em;
+    text-shadow: 0 2px 5px rgba(0, 0, 0, 0.4);
+    white-space: normal;
+    overflow: visible;
+    word-break: keep-all;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    margin: 0;
+    padding: 0;
 }
-
-.misra::-webkit-scrollbar {
-    height: 4px;
-}
-.misra::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 10px;
-}
-.misra::-webkit-scrollbar-thumb {
-    background: var(--gold-primary);
-    border-radius: 10px;
-}
-
-@media (max-width: 1080px) {
-    .misra {
-        font-size: clamp(32px, 5vw, 58px);
-        white-space: normal;
-        word-break: keep-all;
-        line-height: 1.6;
-    }
-}
-
 .white {
     color: #FFF8F0;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
 }
-
 .gold {
     color: #FFD966;
-    text-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
-    font-weight: 500;
 }
 
-.theme-maroon .gold { color: #FFC8A8; }
-.theme-blue .gold { color: #B8DFFF; }
-.theme-green .gold { color: #C8F0C8; }
-.theme-purple .gold { color: #E0C8FF; }
-
-/* Complete Ghazal CTA */
-.complete-ghazal-cta {
-    text-align: center;
-    margin: 30px 0 12px;
-    font-family: 'Cinzel', serif;
-    font-size: 22px;
-    letter-spacing: 1px;
-    color: var(--gold-primary);
-    border-top: 1px solid rgba(201, 169, 97, 0.3);
-    border-bottom: 1px solid rgba(201, 169, 97, 0.3);
-    padding: 10px 0;
-    display: inline-block;
-    width: 100%;
-}
-.complete-ghazal-cta span {
-    background: linear-gradient(135deg, var(--gold-primary), var(--gold-light));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-}
-
-/* UCPC Unique Features */
-.ucpc-features {
-    text-align: center;
-    margin: 20px 0;
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 12px;
-    font-size: 17px;
-    color: var(--text-secondary);
-    font-weight: 500;
-}
-.ucpc-features span {
-    background: rgba(255,255,255,0.05);
-    padding: 5px 14px;
-    border-radius: 40px;
-    backdrop-filter: blur(4px);
-}
-
-/* Value strip */
-.ucpc-value {
-    text-align: center;
-    font-size: 24px;
-    color: #FFD966;
-    margin: 15px 0;
-    font-weight: 700;
-    font-family: 'Cinzel', serif;
-    letter-spacing: 1px;
-}
-
-/* Dedication Box */
+/* Dedication */
 .dedication {
-    margin-top: 25px;
-    background: linear-gradient(135deg, rgba(201, 169, 97, 0.12), rgba(229, 212, 161, 0.08), rgba(201, 169, 97, 0.12));
-    backdrop-filter: blur(18px);
-    border: 1px solid rgba(201, 169, 97, 0.25);
-    border-radius: 24px;
-    padding: 20px 25px;
-    color: var(--text-primary);
-    font-size: 30px;
+    margin: 20px 0 15px;
     text-align: center;
     font-family: 'Cinzel', serif;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-    position: relative;
+    font-size: 28px;
+    color: #F6D878;
+    background: rgba(201, 169, 97, 0.05);
+    border-top: 1px solid rgba(201, 169, 97, 0.15);
+    border-bottom: 1px solid rgba(201, 169, 97, 0.15);
+    padding: 15px 20px;
 }
 .dedication.hidden {
     display: none;
 }
 .dedication-heart {
-    font-size: 40px;
-    margin: 8px 0;
+    font-size: 30px;
+    margin: 6px 0;
     animation: heartbeat 1.5s ease-in-out infinite;
 }
 @keyframes heartbeat {
@@ -479,49 +416,46 @@ button, .btn-generate, .btn-ghazal, select, input {
     50% { transform: scale(1.1); }
 }
 
-/* Footer - Reduced spacing */
+/* ===================== */
+/* FOOTER - WITH READ FULL GHAZAL LINK (FIXED) */
+/* ===================== */
 .footer-card {
-    margin-top: 20px;
+    margin-top: 10px;
     padding: 15px 20px;
-    background: rgba(0, 0, 0, 0.4);
-    backdrop-filter: blur(16px);
-    border-radius: 20px;
-    border: 1px solid rgba(201, 169, 97, 0.25);
+    background: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(12px);
+    border-radius: 24px;
+    border: 1px solid rgba(201, 169, 97, 0.2);
     text-align: center;
 }
-.footer-brand {
-    font-family: 'Cinzel', serif;
+.footer-read-more {
     font-size: 18px;
-    color: var(--gold-primary);
-    letter-spacing: 2px;
     font-weight: 700;
+    margin-bottom: 8px;
 }
-.footer-mission {
-    font-size: 11px;
-    color: var(--text-secondary);
-    margin: 5px 0;
-    text-transform: uppercase;
-    letter-spacing: 1px;
+.footer-read-more a {
+    color: #FFD966;
+    text-decoration: none;
+    letter-spacing: 0.5px;
+}
+.footer-read-more a:hover {
+    text-decoration: underline;
 }
 .footer-url {
     font-size: 14px;
-    color: var(--gold-light);
+    color: #C9A961;
     text-decoration: none;
     word-break: break-all;
     display: inline-block;
     margin-top: 5px;
-    font-weight: 500;
+    opacity: 0.8;
 }
 .footer-url:hover {
     text-decoration: underline;
-}
-.footer-read-more {
-    font-size: 14px;
-    font-weight: 700;
-    margin-bottom: 6px;
-    color: var(--gold-light);
+    opacity: 1;
 }
 
+/* Responsive */
 @media (max-width: 1100px) {
     #poster-container {
         transform: scale(0.45);
@@ -583,59 +517,46 @@ button, .btn-generate, .btn-ghazal, select, input {
                             <span class="archive"> Poetry Archive</span>
                         </div>
                     </div>
+                    
+                    <!-- DIGITAL PRESERVATION - WHITE, LARGER -->
                     <div class="follow-line">Digital Preservation of Urdu Literature</div>
 
                     <!-- Poet Name -->
-                    <div class="poet-line-wrap">
-                        <div class="line"></div>
+                    <div class="poet-name-wrapper">
                         <div class="poet-name">{{ ghazal.poet_name }}</div>
-                        <div class="line"></div>
+                        {% if ghazal.poet_name_urdu %}
+                        <div class="poet-name-urdu" dir="rtl">{{ ghazal.poet_name_urdu }}</div>
+                        {% endif %}
                     </div>
 
-                    <!-- Ghazal Title (if available) -->
+                    <!-- Ghazal Title -->
                     {% if ghazal.title_urdu %}
                     <div class="ghazal-title" dir="rtl">{{ ghazal.title_urdu }}</div>
                     {% endif %}
 
-                    <!-- VERSES - NO DUPLICATE, ONLY misra1 and misra2 -->
+                    <!-- Verses -->
                     <div class="verses-area">
                         {% for verse in poster_verses %}
-                        <div class="misra white">{{ verse.misra1_urdu|safe }}</div>
-                        <div class="misra gold">{{ verse.misra2_urdu|safe }}</div>
+                        <div class="verse-block">
+                            <div class="misra white">{{ verse.misra1_urdu|safe }}</div>
+                            <div class="misra gold">{{ verse.misra2_urdu|safe }}</div>
+                        </div>
                         {% endfor %}
-                    </div>
-
-                    <!-- Complete Ghazal CTA -->
-                    <div class="complete-ghazal-cta">
-                        <span>📖 Complete Ghazal Available at UCPC Poetry Archive</span>
-                    </div>
-
-                    <!-- UCPC Unique Features -->
-                    <div class="ucpc-features">
-                        <span>📖 Complete Ghazals</span>
-                        <span>🎨 Poster Generator</span>
-                        <span>❤️ Poetry Dedications</span>
-                        <span>✍️ Poetry Submission</span>
-                    </div>
-
-                    <!-- Value strip -->
-                    <div class="ucpc-value">
-                        📖 Complete Ghazal Available
                     </div>
 
                     <!-- Dedication -->
                     <div id="dedicationBox" class="dedication hidden">
                         ✨ A Gift of Poetry ✨
-                        <div style="margin-top: 12px;">From <span id="dedFrom">_____</span></div>
+                        <div style="margin-top: 8px;">From <span id="dedFrom">_____</span></div>
                         <div class="dedication-heart">❤️</div>
                         <div>To <span id="dedTo">_____</span></div>
                     </div>
 
-                    <!-- FOOTER - REDUCED SPACING -->
+                    <!-- FOOTER - WITH READ FULL GHAZAL LINK -->
                     <div class="footer-card">
-                        <div class="footer-read-more">📖 Read Complete Ghazal at UCPC Poetry Archive</div>
-                        <div class="footer-brand">✨ UCPC Poetry Archive ✨</div>
-                        <div class="footer-mission">Digital Preservation of Urdu Literature</div>
+                        <div class="footer-read-more">
+                            📖 <a href="{{ url_for('ghazals.ghazal_page', text_id=ghazal.id, _external=True) }}" target="_blank">Read Complete Ghazal</a>
+                        </div>
                         <a href="https://ucpc-poetry-archive.onrender.com" class="footer-url" target="_blank">ucpc-poetry-archive.onrender.com</a>
                     </div>
                 </div>
@@ -646,7 +567,6 @@ button, .btn-generate, .btn-ghazal, select, input {
 
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script>
-// DOM Elements
 const inputFrom = document.getElementById('inputFrom');
 const inputTo = document.getElementById('inputTo');
 const dedicationBox = document.getElementById('dedicationBox');
@@ -656,7 +576,6 @@ const posterContainer = document.getElementById('poster-container');
 const themeSelect = document.getElementById('themeSelect');
 const downloadBtn = document.getElementById('downloadBtn');
 
-// Update dedication text
 function updateDedication() {
     const from = inputFrom.value.trim();
     const to = inputTo.value.trim();
@@ -673,7 +592,6 @@ inputFrom.addEventListener('input', updateDedication);
 inputTo.addEventListener('input', updateDedication);
 updateDedication();
 
-// Change theme
 function changeTheme() {
     const selectedTheme = themeSelect.value;
     posterContainer.classList.remove('theme-black', 'theme-maroon', 'theme-blue', 'theme-green', 'theme-purple');
@@ -681,7 +599,6 @@ function changeTheme() {
 }
 themeSelect.addEventListener('change', changeTheme);
 
-// Download poster
 downloadBtn.addEventListener('click', async function() {
     const originalText = downloadBtn.innerHTML;
     downloadBtn.innerHTML = '⏳ Generating...';
@@ -695,12 +612,13 @@ downloadBtn.addEventListener('click', async function() {
     posterContainer.style.transformOrigin = 'top left';
     
     try {
-        await new Promise(resolve => setTimeout(resolve, 100));
+        await document.fonts.ready;
+        await new Promise(resolve => setTimeout(resolve, 300));
         
         const canvas = await html2canvas(posterContainer, { 
-            scale: 2,
-            useCORS: false,
-            backgroundColor: '#0D1117',
+            scale: 3,
+            useCORS: true,
+            backgroundColor: null,
             logging: false,
             allowTaint: true,
             windowWidth: 1080,
@@ -721,7 +639,6 @@ downloadBtn.addEventListener('click', async function() {
             downloadBtn.disabled = false;
             downloadBtn.style.opacity = '1';
         }, 2000);
-        
     } catch (err) {
         console.error('Poster capture error:', err);
         downloadBtn.innerHTML = '❌ Failed! Try Again';
