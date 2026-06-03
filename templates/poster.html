@@ -288,7 +288,7 @@ button, .btn-generate, .btn-ghazal, select, input {
 }
 
 /* ===================== */
-/* LOGO - ONE LINE (FIXED) */
+/* LOGO - UCPC BRAND */
 /* ===================== */
 .logo-row {
     text-align: center;
@@ -310,7 +310,7 @@ button, .btn-generate, .btn-ghazal, select, input {
 }
 
 /* ===================== */
-/* DIGITAL PRESERVATION - WHITE, LARGER (FIXED) */
+/* DIGITAL PRESERVATION - WHITE, LARGER */
 /* ===================== */
 .follow-line {
     text-align: center;
@@ -329,7 +329,7 @@ button, .btn-generate, .btn-ghazal, select, input {
     margin-right: auto;
 }
 
-/* Poet Name */
+/* Poet Name - Urdu removed */
 .poet-name-wrapper {
     margin-top: 25px;
     margin-bottom: 20px;
@@ -343,14 +343,6 @@ button, .btn-generate, .btn-ghazal, select, input {
     color: var(--gold-light);
     text-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
 }
-.poet-name-urdu {
-    font-family: 'Noto Nastaliq Urdu', serif;
-    font-size: 24px;
-    color: #E5D4A1;
-    margin-top: 6px;
-    direction: rtl;
-    display: inline-block;
-}
 
 /* Ghazal title */
 .ghazal-title {
@@ -362,12 +354,15 @@ button, .btn-generate, .btn-ghazal, select, input {
     direction: rtl;
 }
 
-/* Verses */
+/* Verses - Only 2 couplets */
 .verses-area {
     margin: 15px 0 20px;
 }
 .verse-block {
-    margin-bottom: 35px;
+    margin-bottom: 45px;
+}
+.verse-block:last-child {
+    margin-bottom: 0;
 }
 .misra {
     direction: rtl;
@@ -417,7 +412,7 @@ button, .btn-generate, .btn-ghazal, select, input {
 }
 
 /* ===================== */
-/* FOOTER - WITH READ FULL GHAZAL LINK (FIXED) */
+/* FOOTER - WITH READ FULL GHAZAL LINK */
 /* ===================== */
 .footer-card {
     margin-top: 10px;
@@ -453,6 +448,16 @@ button, .btn-generate, .btn-ghazal, select, input {
 .footer-url:hover {
     text-decoration: underline;
     opacity: 1;
+}
+
+/* UCPC Footer Brand */
+.ucpc-footer {
+    text-align: center;
+    margin-top: 15px;
+    font-size: 12px;
+    color: rgba(201, 169, 97, 0.6);
+    font-family: 'Cinzel', serif;
+    letter-spacing: 1px;
 }
 
 /* Responsive */
@@ -510,7 +515,7 @@ button, .btn-generate, .btn-ghazal, select, input {
                 <div class="corner-br"></div>
                 <div class="poster-border"></div>
                 <div class="poster-inner">
-                    <!-- LOGO - ONE LINE -->
+                    <!-- LOGO - UCPC Brand -->
                     <div class="logo-row">
                         <div class="logo-main">
                             <span class="ucpc">UCPC</span>
@@ -518,15 +523,12 @@ button, .btn-generate, .btn-ghazal, select, input {
                         </div>
                     </div>
                     
-                    <!-- DIGITAL PRESERVATION - WHITE, LARGER -->
+                    <!-- DIGITAL PRESERVATION -->
                     <div class="follow-line">Digital Preservation of Urdu Literature</div>
 
-                    <!-- Poet Name -->
+                    <!-- Poet Name - Urdu removed -->
                     <div class="poet-name-wrapper">
                         <div class="poet-name">{{ ghazal.poet_name }}</div>
-                        {% if ghazal.poet_name_urdu %}
-                        <div class="poet-name-urdu" dir="rtl">{{ ghazal.poet_name_urdu }}</div>
-                        {% endif %}
                     </div>
 
                     <!-- Ghazal Title -->
@@ -534,9 +536,9 @@ button, .btn-generate, .btn-ghazal, select, input {
                     <div class="ghazal-title" dir="rtl">{{ ghazal.title_urdu }}</div>
                     {% endif %}
 
-                    <!-- Verses -->
+                    <!-- Verses - Only 2 couplets (4 lines total) -->
                     <div class="verses-area">
-                        {% for verse in poster_verses %}
+                        {% for verse in poster_verses[:2] %}
                         <div class="verse-block">
                             <div class="misra white">{{ verse.misra1_urdu|safe }}</div>
                             <div class="misra gold">{{ verse.misra2_urdu|safe }}</div>
@@ -559,6 +561,9 @@ button, .btn-generate, .btn-ghazal, select, input {
                         </div>
                         <a href="https://ucpc-poetry-archive.onrender.com" class="footer-url" target="_blank">ucpc-poetry-archive.onrender.com</a>
                     </div>
+                    
+                    <!-- UCPC Footer Brand -->
+                    <div class="ucpc-footer">UCPC · Preserving Urdu Poetry</div>
                 </div>
             </div>
         </div>
