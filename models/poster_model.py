@@ -1,14 +1,11 @@
 from models.db import get_db
 
 class PosterModel:
-    """Database access for poster data"""
 
     @staticmethod
     def get_ghazal_data(text_id):
-        """Fetch ghazal metadata"""
         conn = get_db()
         cur = conn.cursor()
-
         cur.execute("""
             SELECT t.id, t.verse_count, t.views, t.poet_id, t.title_urdu,
                    p.name as poet_name, p.name_urdu as poet_name_urdu
@@ -23,14 +20,14 @@ class PosterModel:
 
     @staticmethod
     def get_verses(text_id, limit=4):
-        """Fetch UNIQUE verses for poster (first `limit` couplets)"""
+        """Fetch unique verses - no duplicates"""
         conn = get_db()
         cur = conn.cursor()
         cur.execute("""
             SELECT DISTINCT ON (couplet_index) 
                    misra1_urdu, misra2_urdu, couplet_index
             FROM verses
-            WHERE text_id = %s
+            WHERE text_id = %s AND misra1_urdu IS NOT NULL
             ORDER BY couplet_index ASC
             LIMIT %s
         """, (text_id, limit))
@@ -41,13 +38,12 @@ class PosterModel:
 
     @staticmethod
     def increment_views(text_id):
-        """Increase the view counter"""
         conn = get_db()
         cur = conn.cursor()
         try:
             cur.execute("UPDATE texts SET views = COALESCE(views, 0) + 1 WHERE id = %s", (text_id,))
             conn.commit()
-        except Exception:
+        except:
             conn.rollback()
         finally:
             cur.close()
