@@ -24,7 +24,7 @@
     --warm-white: #FFF8F0;
     --text-primary: #F5F0E1;
     --text-secondary: #D4C4A8;
-    --dedication-bg: linear-gradient(135deg, rgba(201, 169, 97, 0.15), rgba(229, 212, 161, 0.08));
+    --dedication-bg: linear-gradient(135deg, rgba(201, 169, 97, 0.2), rgba(229, 212, 161, 0.08));
     --dedication-border: linear-gradient(90deg, transparent, var(--gold-primary), transparent);
 }
 
@@ -292,7 +292,7 @@ button, .btn-generate, .btn-ghazal, select, input {
     color: white;
 }
 
-/* Preservation mission - ENLARGED FONT & NEW COLOR */
+/* Preservation mission */
 .preservation-line {
     text-align: center;
     font-size: 22px;
@@ -364,7 +364,9 @@ button, .btn-generate, .btn-ghazal, select, input {
     color: #FFD966;
 }
 
-/* Dedication - BEAUTIFUL STYLING WITH ENLARGED FONT */
+/* ===================== */
+/* IMPROVED DEDICATION SECTION - BETTER TEXT COLORS */
+/* ===================== */
 .dedication {
     margin: 35px 0 30px;
     text-align: center;
@@ -382,7 +384,7 @@ button, .btn-generate, .btn-ghazal, select, input {
 .dedication-title {
     font-size: 32px;
     font-weight: 700;
-    color: #FFD966;
+    color: #FFE4A3;  /* Brighter gold */
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
     letter-spacing: 2px;
     margin-bottom: 15px;
@@ -390,11 +392,11 @@ button, .btn-generate, .btn-ghazal, select, input {
 .dedication-from, .dedication-to {
     font-size: 28px;
     font-weight: 600;
-    color: #E8D5A3;
+    color: #FFD966;  /* Warm gold */
     margin: 10px 0;
 }
 .dedication-from span, .dedication-to span {
-    color: #FFD966;
+    color: #FFFFFF;  /* Pure white for names - maximum contrast */
     font-weight: 800;
     text-decoration: underline;
     text-decoration-thickness: 2px;
@@ -405,7 +407,8 @@ button, .btn-generate, .btn-ghazal, select, input {
     margin: 12px 0;
     display: inline-block;
     animation: heartbeat 1.5s ease-in-out infinite;
-    filter: drop-shadow(0 0 10px rgba(255, 217, 102, 0.5));
+    filter: drop-shadow(0 0 10px rgba(255, 107, 107, 0.5));
+    color: #FF6B6B;  /* Vibrant red heart */
 }
 @keyframes heartbeat {
     0%, 100% { transform: scale(1); }
@@ -525,7 +528,7 @@ button, .btn-generate, .btn-ghazal, select, input {
                         </div>
                     </div>
                     
-                    <!-- Preservation Mission - ENLARGED -->
+                    <!-- Preservation Mission -->
                     <div class="preservation-line">Digital Preservation of Urdu Literature</div>
 
                     <!-- Poet Name -->
@@ -548,7 +551,7 @@ button, .btn-generate, .btn-ghazal, select, input {
                         {% endfor %}
                     </div>
 
-                    <!-- Dedication - BEAUTIFUL & ENLARGED -->
+                    <!-- Dedication - IMPROVED COLORS -->
                     <div id="dedicationBox" class="dedication hidden">
                         <div class="dedication-title">✨ A Gift of Poetry ✨</div>
                         <div class="dedication-from">From <span id="dedFrom">_____</span></div>
