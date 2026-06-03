@@ -1,9 +1,11 @@
 from models.db import get_db
 
 class PosterModel:
+    """Database access for poster data"""
 
     @staticmethod
     def get_ghazal_data(text_id):
+        """Fetch ghazal metadata"""
         conn = get_db()
         cur = conn.cursor()
         cur.execute("""
@@ -20,14 +22,18 @@ class PosterModel:
 
     @staticmethod
     def get_verses(text_id, limit=4):
-        """Fetch unique verses - no duplicates"""
+        """Fetch UNIQUE verses for poster - NO DUPLICATES"""
         conn = get_db()
         cur = conn.cursor()
         cur.execute("""
             SELECT DISTINCT ON (couplet_index) 
                    misra1_urdu, misra2_urdu, couplet_index
             FROM verses
-            WHERE text_id = %s AND misra1_urdu IS NOT NULL
+            WHERE text_id = %s 
+              AND misra1_urdu IS NOT NULL 
+              AND misra1_urdu != ''
+              AND misra2_urdu IS NOT NULL 
+              AND misra2_urdu != ''
             ORDER BY couplet_index ASC
             LIMIT %s
         """, (text_id, limit))
@@ -38,12 +44,13 @@ class PosterModel:
 
     @staticmethod
     def increment_views(text_id):
+        """Increase the view counter"""
         conn = get_db()
         cur = conn.cursor()
         try:
             cur.execute("UPDATE texts SET views = COALESCE(views, 0) + 1 WHERE id = %s", (text_id,))
             conn.commit()
-        except:
+        except Exception:
             conn.rollback()
         finally:
             cur.close()
