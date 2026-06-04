@@ -365,7 +365,7 @@ button, .btn-generate, .btn-ghazal, select, input {
 }
 
 /* ===================== */
-/* IMPROVED DEDICATION SECTION - BETTER TEXT COLORS */
+/* IMPROVED DEDICATION SECTION - ENLARGED "TO" NAME */
 /* ===================== */
 .dedication {
     margin: 35px 0 30px;
@@ -384,7 +384,7 @@ button, .btn-generate, .btn-ghazal, select, input {
 .dedication-title {
     font-size: 32px;
     font-weight: 700;
-    color: #FFE4A3;  /* Brighter gold */
+    color: #FFE4A3;
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
     letter-spacing: 2px;
     margin-bottom: 15px;
@@ -392,15 +392,29 @@ button, .btn-generate, .btn-ghazal, select, input {
 .dedication-from, .dedication-to {
     font-size: 28px;
     font-weight: 600;
-    color: #FFD966;  /* Warm gold */
+    color: #FFD966;
     margin: 10px 0;
 }
-.dedication-from span, .dedication-to span {
-    color: #FFFFFF;  /* Pure white for names - maximum contrast */
+/* "From" name is slightly smaller (36px) */
+.dedication-from span {
+    color: #FFFFFF;
     font-weight: 800;
     text-decoration: underline;
     text-decoration-thickness: 2px;
     text-underline-offset: 5px;
+    font-size: 42px;
+}
+/* "To" name matches UCPC brand size (52px) for prominence */
+.dedication-to span {
+    color: #FFFFFF;
+    font-weight: 800;
+    text-decoration: underline;
+    text-decoration-thickness: 3px;
+    text-underline-offset: 8px;
+    font-size: 52px;
+    display: inline-block;
+    margin-top: 5px;
+    letter-spacing: 1px;
 }
 .dedication-heart {
     font-size: 48px;
@@ -408,7 +422,7 @@ button, .btn-generate, .btn-ghazal, select, input {
     display: inline-block;
     animation: heartbeat 1.5s ease-in-out infinite;
     filter: drop-shadow(0 0 10px rgba(255, 107, 107, 0.5));
-    color: #FF6B6B;  /* Vibrant red heart */
+    color: #FF6B6B;
 }
 @keyframes heartbeat {
     0%, 100% { transform: scale(1); }
@@ -541,17 +555,24 @@ button, .btn-generate, .btn-ghazal, select, input {
                     <div class="ghazal-title" dir="rtl">{{ ghazal.title_urdu }}</div>
                     {% endif %}
 
-                    <!-- Verses - First 2 couplets only -->
+                    <!-- Verses - First 2 couplets only, with fallback -->
                     <div class="verses-area">
-                        {% for verse in poster_verses[:2] %}
-                        <div class="verse-block">
-                            <div class="misra white">{{ verse.misra1_urdu|safe }}</div>
-                            <div class="misra gold">{{ verse.misra2_urdu|safe }}</div>
-                        </div>
-                        {% endfor %}
+                        {% if poster_verses and poster_verses|length > 0 %}
+                            {% for verse in poster_verses[:2] %}
+                            <div class="verse-block">
+                                <div class="misra white">{{ verse.misra1_urdu|safe }}</div>
+                                <div class="misra gold">{{ verse.misra2_urdu|safe }}</div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="verse-block">
+                                <div class="misra white">شعر دستیاب نہیں</div>
+                                <div class="misra gold">Verse not available</div>
+                            </div>
+                        {% endif %}
                     </div>
 
-                    <!-- Dedication - IMPROVED COLORS -->
+                    <!-- Dedication - ENLARGED "TO" NAME -->
                     <div id="dedicationBox" class="dedication hidden">
                         <div class="dedication-title">✨ A Gift of Poetry ✨</div>
                         <div class="dedication-from">From <span id="dedFrom">_____</span></div>
