@@ -656,4 +656,43 @@ async function capturePoster(mode) {
             backgroundColor: null,
             logging: false,
             allowTaint: true,
-            windowWidth: parse
+            windowWidth: parseInt(posterContainer.style.width),
+            windowHeight: parseInt(posterContainer.style.height)
+        });
+        
+        const imageData = canvas.toDataURL('image/png');
+        const link = document.createElement('a');
+        const poetName = "{{ ghazal.poet_name|replace(' ', '_') }}";
+        const timestamp = Date.now();
+        link.download = `UCPC_${poetName}_${mode === 'reel' ? 'Reel' : 'Feed'}_${timestamp}.png`;
+        link.href = imageData;
+        link.click();
+        
+        button.innerHTML = '✅ Downloaded!';
+        setTimeout(() => {
+            button.innerHTML = originalText;
+            button.disabled = false;
+            button.style.opacity = '1';
+        }, 2000);
+    } catch (err) {
+        console.error('Poster capture error:', err);
+        button.innerHTML = '❌ Failed! Try Again';
+        setTimeout(() => {
+            button.innerHTML = originalText;
+            button.disabled = false;
+            button.style.opacity = '1';
+        }, 2000);
+    } finally {
+        // Restore original styles
+        posterContainer.style.width = originalWidth;
+        posterContainer.style.height = originalHeight;
+        posterInner.style.padding = originalPadding;
+        posterContainer.style.transform = originalTransform;
+        posterContainer.style.transformOrigin = originalTransformOrigin;
+    }
+}
+
+document.getElementById('downloadReelBtn').addEventListener('click', () => capturePoster('reel'));
+document.getElementById('downloadFeedBtn').addEventListener('click', () => capturePoster('feed'));
+</script>
+{% endblock %}
